@@ -74,7 +74,7 @@
     .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
     .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
     .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 600; gap: 4px; width: 25%; transition: var(--transition); cursor: pointer; }
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
     .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; position: relative; -webkit-overflow-scrolling: touch; }
@@ -104,7 +104,6 @@
     .stat-val.gold { color: var(--accent-gold); }
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
-    .section-link { font-size: 12px; color: var(--accent-cyan); text-decoration: none; font-weight: 600; }
     .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
@@ -131,25 +130,12 @@
     .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
     .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
     .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
-    .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .tx-info h4 { font-size: 14px; font-weight: 600; }
     .tx-info span { font-size: 11px; color: var(--text-dim); }
     .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; }
     .tx-positive { color: var(--success); }
     .tx-negative { color: var(--danger); }
-    .uploader-card { border: 2px dashed var(--border-color); border-radius: var(--radius-sm); padding: 20px; text-align: center; background: var(--bg-card); position: relative; cursor: pointer; }
-    .uploader-card input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .uploader-preview { position: relative; width: 100%; max-height: 220px; overflow: hidden; border-radius: var(--radius-sm); display: flex; justify-content: center; align-items: center; background: #000; }
-    .uploader-preview img { max-width: 100%; max-height: 220px; object-fit: contain; }
-    .modal-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .modal-box { background: var(--bg-surface); border-radius: var(--radius); width: 100%; max-width: 360px; padding: 20px; border: 1px solid var(--border-color); }
-    .neon-border { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .modal-header h3 { font-family: var(--font-gaming); font-size: 20px; }
-    .modal-x { background: transparent; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; }
-    .modal-body { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
-    .modal-actions { display: flex; gap: 10px; }
     .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
     .toast-msg.toast-success { border-color: var(--success); }
@@ -160,7 +146,6 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
     .hidden { display: none !important; }
-    .relative { position: relative; }
     .text-accent { color: var(--accent-cyan) !important; }
     .text-gold { color: var(--accent-gold) !important; }
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
@@ -214,51 +199,34 @@
       </div>
 
       <nav class="drawer-nav">
-        <a href="#/home" class="drawer-link"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="#/tournaments" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</a>
-        <a href="#/matches" class="drawer-link"><i class="fa-solid fa-crosshairs"></i> My Matches</a>
-        <a href="#/wallet" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</a>
-        <a href="#/deposit" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</a>
-        <a href="#/withdraw" class="drawer-link"><i class="fa-solid fa-circle-arrow-up"></i> Withdraw</a>
-        <a href="#/winners" class="drawer-link"><i class="fa-solid fa-medal"></i> Hall of Winners</a>
-        <a href="#/leaderboard" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</a>
-        <a href="#/notifications" class="drawer-link"><i class="fa-solid fa-bell"></i> Notifications</a>
-        <a href="#/support" class="drawer-link"><i class="fa-solid fa-headset"></i> Live Support</a>
-        <a href="#/profile" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</a>
-        <a href="#/settings" class="drawer-link"><i class="fa-solid fa-gear"></i> Settings</a>
-        <a href="#/rules" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</a>
-        <a href="#/about" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</a>
+        <button onclick="Router.navigate('#/home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
+        <button onclick="Router.navigate('#/tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
+        <button onclick="Router.navigate('#/matches')" class="drawer-link"><i class="fa-solid fa-crosshairs"></i> My Matches</button>
+        <button onclick="Router.navigate('#/wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</button>
+        <button onclick="Router.navigate('#/deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('#/winners')" class="drawer-link"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
+        <button onclick="Router.navigate('#/leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
+        <button onclick="Router.navigate('#/notifications')" class="drawer-link"><i class="fa-solid fa-bell"></i> Notifications</button>
+        <button onclick="Router.navigate('#/support')" class="drawer-link"><i class="fa-solid fa-headset"></i> Live Support</button>
+        <button onclick="Router.navigate('#/profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
+        <button onclick="Router.navigate('#/rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</button>
+        <button onclick="Router.navigate('#/about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
         <div class="drawer-divider"></div>
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
       <div class="drawer-footer">
-        <p>MULTANI FF v2.4.0 • 100% PRODUCTION</p>
+        <p>MULTANI FF • PRODUCTION READY</p>
       </div>
     </aside>
 
     <main id="app-view" class="main-content"></main>
 
     <nav id="bottom-nav" class="bottom-nav">
-      <a href="#/home" class="nav-item" data-route="#/home"><i class="fa-solid fa-house"></i><span>Home</span></a>
-      <a href="#/tournaments" class="nav-item" data-route="#/tournaments"><i class="fa-solid fa-trophy"></i><span>Tournaments</span></a>
-      <a href="#/matches" class="nav-item" data-route="#/matches"><i class="fa-solid fa-crosshairs"></i><span>My Matches</span></a>
-      <a href="#/wallet" class="nav-item" data-route="#/wallet"><i class="fa-solid fa-wallet"></i><span>Wallet</span></a>
-      <a href="#/profile" class="nav-item" data-route="#/profile"><i class="fa-solid fa-user-ninja"></i><span>Profile</span></a>
+      <div class="nav-item" data-route="#/home" onclick="Router.navigate('#/home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+      <div class="nav-item" data-route="#/tournaments" onclick="Router.navigate('#/tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
+      <div class="nav-item" data-route="#/matches" onclick="Router.navigate('#/matches')"><i class="fa-solid fa-crosshairs"></i><span>My Slots</span></div>
+      <div class="nav-item" data-route="#/wallet" onclick="Router.navigate('#/wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
-  </div>
-
-  <div id="modal-container" class="modal-overlay hidden">
-    <div class="modal-box neon-border">
-      <div class="modal-header">
-        <h3 id="modal-title">Confirm</h3>
-        <button id="modal-close" class="modal-x"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div id="modal-body" class="modal-body"></div>
-      <div class="modal-actions">
-        <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
-        <button id="modal-confirm-btn" class="btn btn-primary">Confirm</button>
-      </div>
-    </div>
   </div>
 
   <div id="toast-container" class="toast-container"></div>
@@ -269,7 +237,7 @@
 
   <script>
     // ==========================================
-    // 1. SUPABASE CLIENT
+    // 1. SUPABASE CLIENT & STATE
     // ==========================================
     const SUPABASE_URL = "https://egjvdypwmybxlkouhrvs.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_i7FK-6GcgF4nbr72LodCcg_JSwcrNm1";
@@ -288,6 +256,7 @@
     const Toast = {
       show(message, type = 'info') {
         const container = document.getElementById('toast-container');
+        if (!container) return;
         const toast = document.createElement('div');
         toast.className = `toast-msg toast-${type}`;
         let icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
@@ -301,100 +270,77 @@
       }
     };
 
-    const Modal = {
-      show({ title, body, confirmText = "Confirm", onConfirm }) {
-        const modalEl = document.getElementById('modal-container');
-        document.getElementById('modal-title').innerText = title;
-        document.getElementById('modal-body').innerHTML = body;
-        const confirmBtn = document.getElementById('modal-confirm-btn');
-        confirmBtn.innerText = confirmText;
-        modalEl.classList.remove('hidden');
-
-        const cleanup = () => {
-          confirmBtn.removeEventListener('click', handleConfirm);
-          document.getElementById('modal-cancel-btn').removeEventListener('click', handleCancel);
-          document.getElementById('modal-close').removeEventListener('click', handleCancel);
-        };
-        const handleConfirm = () => { if (onConfirm) onConfirm(); Modal.close(); cleanup(); };
-        const handleCancel = () => { Modal.close(); cleanup(); };
-
-        confirmBtn.addEventListener('click', handleConfirm);
-        document.getElementById('modal-cancel-btn').addEventListener('click', handleCancel);
-        document.getElementById('modal-close').addEventListener('click', handleCancel);
-      },
-      close() { document.getElementById('modal-container').classList.add('hidden'); }
-    };
-
     const Loader = {
       show(text = "Please wait...") {
-        document.getElementById('global-loader-text').innerText = text;
-        document.getElementById('global-loader').classList.remove('hidden');
+        const el = document.getElementById('global-loader');
+        const txt = document.getElementById('global-loader-text');
+        if (txt) txt.innerText = text;
+        if (el) el.classList.remove('hidden');
       },
-      hide() { document.getElementById('global-loader').classList.add('hidden'); }
+      hide() { 
+        const el = document.getElementById('global-loader');
+        if (el) el.classList.add('hidden'); 
+      }
     };
 
     // ==========================================
-    // 2. DATA FUNCTIONS
+    // 2. DATA FUNCTIONS & PROFILE
     // ==========================================
     async function loadSettings() {
-      const { data } = await sbClient.from('site_settings').select('*');
-      if (data) {
-        data.forEach(item => { AppState.siteSettings[item.setting_key] = item.setting_value; });
-      }
+      try {
+        const { data } = await sbClient.from('site_settings').select('*');
+        if (data) {
+          data.forEach(item => { AppState.siteSettings[item.setting_key] = item.setting_value; });
+        }
+      } catch (e) { console.error(e); }
     }
 
     async function loadProfile() {
-      const { data: { user } } = await sbClient.auth.getUser();
-      if (!user) {
-        AppState.user = null;
-        AppState.profile = null;
+      try {
+        const { data: { user } } = await sbClient.auth.getUser();
+        if (!user) {
+          AppState.user = null;
+          AppState.profile = null;
+          updateHeaderAndDrawerProfile();
+          return null;
+        }
+        AppState.user = user;
+        const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+        if (data) {
+          AppState.profile = data;
+          updateHeaderAndDrawerProfile();
+        }
+        return AppState.profile;
+      } catch (e) {
+        console.error(e);
         return null;
       }
-      AppState.user = user;
-      const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-      if (data) {
-        AppState.profile = data;
-        updateHeaderAndDrawerProfile();
-      }
-      return AppState.profile;
     }
 
     function updateHeaderAndDrawerProfile() {
-      if (!AppState.profile) return;
-      const avatar = AppState.profile.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-      document.getElementById('header-avatar-img').src = avatar;
-      document.getElementById('drawer-avatar').src = avatar;
-      document.getElementById('drawer-name').innerText = AppState.profile.free_fire_name || AppState.profile.username || 'Gamer';
-      document.getElementById('drawer-uid').innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${AppState.profile.free_fire_uid || '--'}`;
+      const avatar = AppState.profile?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+      const name = AppState.profile?.free_fire_name || AppState.profile?.username || (AppState.user ? 'Soldier' : 'Guest Gamer');
+      const uid = AppState.profile?.free_fire_uid || '--';
+
+      const hAvatar = document.getElementById('header-avatar-img');
+      const dAvatar = document.getElementById('drawer-avatar');
+      const dName = document.getElementById('drawer-name');
+      const dUid = document.getElementById('drawer-uid');
+
+      if (hAvatar) hAvatar.src = avatar;
+      if (dAvatar) dAvatar.src = avatar;
+      if (dName) dName.innerText = name;
+      if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${uid}`;
     }
 
     async function loadTournaments() {
-      const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
-      if (data) AppState.tournaments = data;
-      return AppState.tournaments;
-    }
-
-    async function loadMyMatches() {
-      if (!AppState.user) return [];
-      const { data } = await sbClient.from('tournament_entries').select('*, tournaments(*)').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
-      if (data) AppState.myMatches = data;
-      return AppState.myMatches;
-    }
-
-    async function loadWallet() {
-      if (!AppState.user) return;
-      await loadProfile();
-      const { data } = await sbClient.from('wallet_transactions').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
-      if (data) AppState.transactions = data;
-    }
-
-    async function loadNotifications() {
-      if (!AppState.user) return;
-      const { data } = await sbClient.from('notifications').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
-      if (data) {
-        AppState.notifications = data;
-        document.getElementById('notif-badge').classList.toggle('hidden', !data.some(n => !n.is_read));
+      try {
+        const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+        AppState.tournaments = data || [];
+      } catch (e) {
+        AppState.tournaments = [];
       }
+      return AppState.tournaments;
     }
 
     function checkAuthOrRedirect() {
@@ -404,30 +350,42 @@
         return false;
       }
       if (AppState.profile?.is_banned) {
-        Toast.show("Your account is banned. Action restricted.", "error");
+        Toast.show("Account is restricted/banned.", "error");
         return false;
       }
       return true;
     }
 
     // ==========================================
-    // 3. ROUTER & VIEWS
+    // 3. ROUTER & VIEWS CONTROLLER
     // ==========================================
     const Router = {
       routes: {},
       init() {
         window.addEventListener('hashchange', () => this.handleRoute());
-        this.handleRoute();
+        if (!window.location.hash || window.location.hash === '#') {
+          window.location.hash = '#/home';
+        } else {
+          this.handleRoute();
+        }
       },
-      navigate(hash) { window.location.hash = hash; },
-      back() { if (window.history.length > 1) window.history.back(); else this.navigate('#/home'); },
+      navigate(hash) { 
+        window.location.hash = hash; 
+      },
+      back() { 
+        if (window.history.length > 1) window.history.back(); 
+        else this.navigate('#/home'); 
+      },
       register(path, handler, title, isSecondary = false) {
         this.routes[path] = { handler, title, isSecondary };
       },
       async handleRoute() {
         const raw = window.location.hash || '#/home';
-        const [path, id] = raw.split('/');
-        const key = id ? `${path}/:id` : path;
+        const parts = raw.split('/');
+        const basePath = parts[0] + '/' + (parts[1] || '');
+        const id = parts[2];
+        const key = id ? `${basePath}/:id` : basePath;
+        
         const route = this.routes[key] || this.routes['#/home'];
 
         const masterHeader = document.getElementById('master-header-bar');
@@ -435,30 +393,32 @@
         const subTitle = document.getElementById('sub-header-title');
 
         if (route.isSecondary) {
-          masterHeader.classList.add('hidden');
-          subHeader.classList.remove('hidden');
-          subTitle.innerText = route.title;
+          if (masterHeader) masterHeader.classList.add('hidden');
+          if (subHeader) subHeader.classList.remove('hidden');
+          if (subTitle) subTitle.innerText = route.title;
         } else {
-          masterHeader.classList.remove('hidden');
-          subHeader.classList.add('hidden');
+          if (masterHeader) masterHeader.classList.remove('hidden');
+          if (subHeader) subHeader.classList.add('hidden');
         }
 
         document.querySelectorAll('.nav-item').forEach(el => {
-          el.classList.toggle('active', el.getAttribute('data-route') === path);
+          el.classList.toggle('active', el.getAttribute('data-route') === basePath);
         });
 
         Drawer.close();
         const view = document.getElementById('app-view');
-        view.scrollTop = 0;
-        view.innerHTML = '';
+        if (view) {
+          view.scrollTop = 0;
+          view.innerHTML = '';
+        }
         await route.handler(id);
       }
     };
 
     // VIEW: HOME
     async function renderHome() {
-      Loader.show("Loading Home...");
-      await Promise.all([loadSettings(), loadTournaments()]);
+      Loader.show("Loading arena...");
+      await Promise.all([loadSettings(), loadTournaments(), loadProfile()]);
       Loader.hide();
 
       const view = document.getElementById('app-view');
@@ -472,12 +432,19 @@
         </div>
       ` : '';
 
-      const p = AppState.profile || { free_fire_name: "Guest Player", free_fire_uid: "Not Logged In", wallet_balance: 0, total_won: 0, total_matches: 0, avatar_url: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" };
+      const p = AppState.profile || { 
+        free_fire_name: AppState.user ? "Soldier" : "Guest Gamer", 
+        free_fire_uid: AppState.user ? "Not Set" : "Please Login", 
+        wallet_balance: 0, 
+        total_won: 0, 
+        total_matches: 0, 
+        avatar_url: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" 
+      };
 
       const tournamentsHtml = AppState.tournaments.length ? AppState.tournaments.map(t => {
         const pct = Math.min(100, Math.round(((t.joined_players || 0) / t.max_players) * 100));
         return `
-          <div class="tournament-card" onclick="Router.navigate('#/tournament/${t.id}')">
+          <div class="tournament-card" onclick="Router.navigate('#/tournament/${t.id}')" style="cursor:pointer;">
             <div class="t-banner-wrapper">
               <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" alt="${t.title}" />
               <span class="t-badge badge-${t.status}">${t.status}</span>
@@ -503,7 +470,7 @@
                   <div class="t-fee">Entry: <span class="${t.entry_fee == 0 ? 'text-accent' : 'text-gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
                   <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
                 </div>
-                <button class="btn btn-primary btn-sm">JOIN MATCH</button>
+                <button class="btn btn-primary btn-sm">VIEW DETAILS</button>
               </div>
             </div>
           </div>
@@ -517,7 +484,7 @@
             <div class="hero-profile-row">
               <img src="${p.avatar_url}" class="hero-avatar" alt="Avatar" />
               <div class="hero-details">
-                <h2>${p.free_fire_name || p.username || 'Multani Soldier'}</h2>
+                <h2>${p.free_fire_name || 'Player'}</h2>
                 <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${p.free_fire_uid || '--'}</span>
               </div>
             </div>
@@ -538,26 +505,25 @@
           </div>
 
           <div class="quick-actions-grid">
-            <a href="#/tournaments" class="action-card"><i class="fa-solid fa-trophy"></i><span>Join Match</span></a>
-            <a href="#/deposit" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></a>
-            <a href="#/matches" class="action-card"><i class="fa-solid fa-crosshairs"></i><span>My Slots</span></a>
-            <a href="#/wallet" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--accent-gold)"></i><span>Wallet</span></a>
-            <a href="#/winners" class="action-card"><i class="fa-solid fa-medal"></i><span>Winners</span></a>
-            <a href="#/support" class="action-card"><i class="fa-solid fa-headset"></i><span>Support</span></a>
+            <div onclick="Router.navigate('#/tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Tournaments</span></div>
+            <div onclick="Router.navigate('#/deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
+            <div onclick="Router.navigate('#/matches')" class="action-card"><i class="fa-solid fa-crosshairs"></i><span>My Slots</span></div>
+            <div onclick="Router.navigate('#/wallet')" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--accent-gold)"></i><span>Wallet</span></div>
+            <div onclick="Router.navigate('#/winners')" class="action-card"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
+            <div onclick="Router.navigate('#/support')" class="action-card"><i class="fa-solid fa-headset"></i><span>Support</span></div>
           </div>
 
           <div class="section-title">
-            <span>Available Tournaments</span>
-            <a href="#/tournaments" class="section-link">View All <i class="fa-solid fa-chevron-right"></i></a>
+            <span>Available Matches</span>
           </div>
           <div>${tournamentsHtml}</div>
         </div>
       `;
     }
 
-    // VIEW: MATCH DETAILS (CALLS YOUR EXISTING join_tournament RPC)
+    // VIEW: TOURNAMENT DETAILS
     async function renderTournamentDetails(id) {
-      Loader.show("Fetching match...");
+      Loader.show("Fetching match details...");
       const { data: t, error } = await sbClient.from('tournaments').select('*').eq('id', id).single();
       Loader.hide();
 
@@ -626,32 +592,22 @@
       `;
 
       if (!isJoined) {
-        document.getElementById('btn-join-match').addEventListener('click', () => {
+        document.getElementById('btn-join-match').addEventListener('click', async () => {
           if (!checkAuthOrRedirect()) return;
 
-          Modal.show({
-            title: "Book Permanent Slot",
-            body: `
-              <p>Entry Fee: <strong>PKR ${t.entry_fee}</strong> will be deducted atomically from your wallet.</p>
-              <div style="margin-top:10px; font-size:12px; color:var(--text-muted); border-left: 2px solid var(--danger); padding-left: 8px;">
-                Once joined, this booking is <strong>PERMANENT</strong>. No refunds or cancellations.
-              </div>
-            `,
-            confirmText: "Confirm & Deduct",
-            onConfirm: async () => {
-              Loader.show("Securing Permanent Slot...");
-              const { data, error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
-              Loader.hide();
+          if (!confirm(`Deduct PKR ${t.entry_fee} from wallet and reserve slot?`)) return;
 
-              if (error) {
-                Toast.show(error.message, "error");
-              } else {
-                Toast.show("Joined successfully!", "success");
-                await loadProfile();
-                renderTournamentDetails(t.id);
-              }
-            }
-          });
+          Loader.show("Securing Slot...");
+          const { data, error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
+          Loader.hide();
+
+          if (error) {
+            Toast.show(error.message, "error");
+          } else {
+            Toast.show("Joined successfully!", "success");
+            await loadProfile();
+            renderTournamentDetails(t.id);
+          }
         });
       }
     }
@@ -660,22 +616,22 @@
     async function renderMyMatches() {
       if (!checkAuthOrRedirect()) return;
       Loader.show("Loading Joined Matches...");
-      await loadMyMatches();
+      const { data: entries } = await sbClient.from('tournament_entries').select('*, tournaments(*)').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
       Loader.hide();
 
       const view = document.getElementById('app-view');
-      if (!AppState.myMatches.length) {
+      if (!entries || !entries.length) {
         view.innerHTML = `
           <div class="view-container empty-state">
             <i class="fa-solid fa-crosshairs"></i>
             <h3>No Registered Matches</h3>
-            <p>Join a tournament to view your reserved slots.</p>
+            <p>Join an upcoming match to view your assigned slot and room details.</p>
           </div>
         `;
         return;
       }
 
-      const matchesHtml = AppState.myMatches.map(m => {
+      const matchesHtml = entries.map(m => {
         const t = m.tournaments || {};
         const showRoom = t.room_id ? true : false;
         return `
@@ -688,7 +644,7 @@
               <div><i class="fa-solid fa-calendar-day"></i> Match: ${new Date(t.match_date).toLocaleString()}</div>
               <div><i class="fa-solid fa-coins"></i> Entry: ${t.entry_fee} PKR | Prize: ${t.prize_pool} PKR</div>
             </div>
-            <div style="background:rgba(0,0,0,0.4); border:1px dashed var(--border-color); border-radius: var(--radius-sm); padding:10px; margin-bottom:10px;">
+            <div style="background:rgba(0,0,0,0.5); border:1px dashed var(--border-color); border-radius: var(--radius-sm); padding:10px; margin-bottom:10px;">
               <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">
                 <i class="fa-solid fa-lock"></i> Custom Room Credentials
               </div>
@@ -697,7 +653,6 @@
                 <div>Password: <span style="color:var(--accent-cyan); font-weight:bold;">${showRoom ? t.room_password : '••••••••'}</span></div>
               </div>
             </div>
-            <div style="font-size:11px; color:var(--text-dim); text-align:right;">Slot is permanent & verified</div>
           </div>
         `;
       }).join('');
@@ -709,11 +664,12 @@
     async function renderWallet() {
       if (!checkAuthOrRedirect()) return;
       Loader.show("Fetching Wallet...");
-      await loadWallet();
+      await loadProfile();
+      const { data: txs } = await sbClient.from('wallet_transactions').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
       Loader.hide();
 
       const view = document.getElementById('app-view');
-      const transactionsHtml = AppState.transactions.length ? AppState.transactions.map(tx => `
+      const transactionsHtml = (txs && txs.length) ? txs.map(tx => `
         <div class="tx-item">
           <div class="tx-info">
             <h4>${tx.description || tx.transaction_type}</h4>
@@ -730,9 +686,8 @@
           <div class="wallet-hero">
             <span class="wallet-balance-title">Available Cash Balance</span>
             <div class="wallet-amount">PKR ${AppState.profile?.wallet_balance || 0}</div>
-            <div class="wallet-actions">
-              <button class="btn btn-primary" onclick="Router.navigate('#/deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Deposit</button>
-              <button class="btn btn-secondary" onclick="Router.navigate('#/withdraw')"><i class="fa-solid fa-circle-arrow-up"></i> Withdraw</button>
+            <div class="wallet-actions" style="display:grid; grid-template-columns: 1fr;">
+              <button class="btn btn-primary" onclick="Router.navigate('#/deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
             </div>
           </div>
           <div class="section-title"><span>Transaction History</span></div>
@@ -752,14 +707,14 @@
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom:14px;">
             <h4 style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Accounts</h4>
-            <div style="font-size:13px;">JazzCash / Easypaisa: <strong>${depositNumber}</strong></div>
-            <div style="font-size:12px; color:var(--text-muted);">Title: ${depositTitle}</div>
+            <div style="font-size:15px; font-weight:bold; color:#00f0ff;">JazzCash / Easypaisa: ${depositNumber}</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>${depositTitle}</strong></div>
           </div>
 
           <form id="deposit-form">
             <div class="form-group">
               <label class="form-label">Deposit Amount (PKR)</label>
-              <input type="number" id="dep-amount" class="form-input" placeholder="Min 30" required min="30" />
+              <input type="number" id="dep-amount" class="form-input" placeholder="Min 10" required min="10" />
             </div>
             <div class="form-group">
               <label class="form-label">Payment Method</label>
@@ -771,7 +726,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Sender Account Name</label>
-              <input type="text" id="dep-sender" class="form-input" placeholder="Your account name" required />
+              <input type="text" id="dep-sender" class="form-input" placeholder="Your sender name" required />
             </div>
             <div class="form-group">
               <label class="form-label">Transaction ID (TID)</label>
@@ -779,149 +734,51 @@
             </div>
             <div class="form-group">
               <label class="form-label">Payment Screenshot Proof</label>
-              <div id="uploader-dropzone" class="uploader-card">
-                <input type="file" id="dep-file" accept="image/*" required />
-                <div id="uploader-prompt">
-                  <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px; color:var(--accent-cyan);"></i>
-                  <div style="font-size:13px; font-weight:600; margin-top:4px;">Select Screenshot Image</div>
-                </div>
-                <div id="uploader-preview-box" class="uploader-preview hidden">
-                  <img id="uploader-img-preview" src="" alt="Proof" />
-                </div>
-              </div>
+              <input type="file" id="dep-file" class="form-input" accept="image/*" required />
             </div>
             <button type="submit" class="btn btn-primary" style="margin-top:8px;">SUBMIT DEPOSIT SLIP</button>
           </form>
         </div>
       `;
 
-      let selectedFile = null;
-      const fileInput = document.getElementById('dep-file');
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          if (file.size > 5 * 1024 * 1024) {
-            Toast.show("Screenshot must be under 5MB", "error");
-            fileInput.value = "";
-            return;
-          }
-          selectedFile = file;
-          const reader = new FileReader();
-          reader.onload = (re) => {
-            document.getElementById('uploader-img-preview').src = re.target.result;
-            document.getElementById('uploader-prompt').classList.add('hidden');
-            document.getElementById('uploader-preview-box').classList.remove('hidden');
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-
       document.getElementById('deposit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!selectedFile) {
-          Toast.show("Please upload transaction screenshot", "error");
+        const fileInput = document.getElementById('dep-file');
+        const file = fileInput.files[0];
+        if (!file) {
+          Toast.show("Please select screenshot proof", "error");
           return;
         }
 
         Loader.show("Uploading Receipt...");
-        const fileExt = selectedFile.name.split('.').pop();
-        const filePath = `${AppState.user.id}/${Date.now()}.${fileExt}`;
+        try {
+          const fileExt = file.name.split('.').pop();
+          const filePath = `${AppState.user.id}/${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, selectedFile);
-        if (uploadError) {
+          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file);
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
+
+          const { error: dbError } = await sbClient.from('deposit_requests').insert([{
+            user_id: AppState.user.id,
+            amount: parseFloat(document.getElementById('dep-amount').value),
+            payment_method: document.getElementById('dep-method').value,
+            sender_name: document.getElementById('dep-sender').value,
+            transaction_id: document.getElementById('dep-tid').value,
+            screenshot_url: publicUrl,
+            status: 'pending'
+          }]);
+
+          if (dbError) throw dbError;
+
           Loader.hide();
-          Toast.show(`Storage: ${uploadError.message}`, "error");
-          return;
-        }
-
-        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
-
-        const { error: dbError } = await sbClient.from('deposit_requests').insert([{
-          user_id: AppState.user.id,
-          amount: parseFloat(document.getElementById('dep-amount').value),
-          payment_method: document.getElementById('dep-method').value,
-          sender_name: document.getElementById('dep-sender').value,
-          transaction_id: document.getElementById('dep-tid').value,
-          screenshot_url: publicUrl,
-          status: 'pending'
-        }]);
-
-        Loader.hide();
-        if (dbError) Toast.show(dbError.message, "error");
-        else {
           Toast.show("Deposit slip submitted successfully!", "success");
           Router.navigate('#/wallet');
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message, "error");
         }
-      });
-    }
-
-    // VIEW: WITHDRAW
-    function renderWithdraw() {
-      if (!checkAuthOrRedirect()) return;
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
-        <div class="view-container">
-          <div class="wallet-hero" style="padding:14px; margin-bottom:14px;">
-            <span class="wallet-balance-title">Withdrawable Balance</span>
-            <div class="wallet-amount" style="font-size:28px; margin:4px 0;">PKR ${AppState.profile.wallet_balance || 0}</div>
-          </div>
-          <form id="withdraw-form">
-            <div class="form-group">
-              <label class="form-label">Withdraw Amount (PKR)</label>
-              <input type="number" id="wd-amount" class="form-input" min="150" max="${AppState.profile.wallet_balance || 0}" placeholder="Min 150" required />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Payout Method</label>
-              <select id="wd-method" class="form-input">
-                <option value="JazzCash">JazzCash</option>
-                <option value="Easypaisa">Easypaisa</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Account Number</label>
-              <input type="text" id="wd-acc-num" class="form-input" placeholder="03XXXXXXXXX" required />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Account Title Name</label>
-              <input type="text" id="wd-acc-name" class="form-input" placeholder="Recipient Name" required />
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:10px;">SUBMIT CASHOUT REQUEST</button>
-          </form>
-        </div>
-      `;
-
-      document.getElementById('withdraw-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const amount = parseFloat(document.getElementById('wd-amount').value);
-        if (amount > (AppState.profile.wallet_balance || 0)) {
-          Toast.show("Insufficient wallet balance", "error");
-          return;
-        }
-
-        Modal.show({
-          title: "Confirm Withdrawal",
-          body: `Request cashout of <strong>PKR ${amount}</strong>? Amount will be held until approved.`,
-          confirmText: "Submit Request",
-          onConfirm: async () => {
-            Loader.show("Processing Cashout...");
-            const { data, error } = await sbClient.rpc('request_withdrawal', {
-              p_amount: amount,
-              p_method: document.getElementById('wd-method').value,
-              p_acc_num: document.getElementById('wd-acc-num').value,
-              p_acc_name: document.getElementById('wd-acc-name').value
-            });
-            Loader.hide();
-
-            if (error) Toast.show(error.message, "error");
-            else if (data && data.success) {
-              Toast.show(data.message, "success");
-              await loadProfile();
-              Router.navigate('#/wallet');
-            } else {
-              Toast.show(data?.message || "Failed.", "error");
-            }
-          }
-        });
       });
     }
 
@@ -987,18 +844,18 @@
     async function renderNotifications() {
       if (!checkAuthOrRedirect()) return;
       Loader.show("Loading Notifications...");
-      await loadNotifications();
+      const { data } = await sbClient.from('notifications').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
       Loader.hide();
 
       const view = document.getElementById('app-view');
-      if (!AppState.notifications.length) {
+      if (!data || !data.length) {
         view.innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
         return;
       }
 
       view.innerHTML = `
         <div class="view-container">
-          ${AppState.notifications.map(n => `
+          ${data.map(n => `
             <div class="tx-item" style="border-left: 3px solid ${n.is_read ? 'var(--border-color)' : 'var(--primary)'}">
               <div class="tx-info">
                 <h4>${n.title}</h4>
@@ -1044,7 +901,7 @@
       `;
 
       const chatBox = document.getElementById('chat-box');
-      chatBox.scrollTop = chatBox.scrollHeight;
+      if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 
       document.getElementById('chat-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1154,6 +1011,7 @@
         else {
           Toast.show("Authenticated successfully!", "success");
           await loadProfile();
+          setupRealtimeListeners();
           Router.navigate('#/home');
         }
       };
@@ -1190,6 +1048,7 @@
           Loader.hide();
           Toast.show("Account created successfully!", "success");
           await loadProfile();
+          setupRealtimeListeners();
           Router.navigate('#/home');
         }
       };
@@ -1203,19 +1062,17 @@
       view.innerHTML = `
         <div class="view-container">
           <div class="player-hero-card" style="text-align:center;">
-            <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" alt="Avatar" />
-            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p.free_fire_name || 'Player'}</h2>
-            <span class="uid-tag">UID: ${p.free_fire_uid}</span>
+            <img src="${p?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" alt="Avatar" />
+            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p?.free_fire_name || 'Player'}</h2>
+            <span class="uid-tag">UID: ${p?.free_fire_uid || '--'}</span>
           </div>
           <div class="player-hero-card">
             <div style="font-size:13px; line-height:2;">
-              <div>Full Name: <strong>${p.full_name || '--'}</strong></div>
-              <div>Email: <strong>${p.email}</strong></div>
-              <div>Phone: <strong>${p.phone || '--'}</strong></div>
-              <div>Referral Code: <strong>${p.referral_code || 'None'}</strong></div>
+              <div>Full Name: <strong>${p?.full_name || '--'}</strong></div>
+              <div>Email: <strong>${p?.email || '--'}</strong></div>
+              <div>Phone: <strong>${p?.phone || '--'}</strong></div>
             </div>
           </div>
-          <button class="btn btn-secondary" onclick="Router.navigate('#/settings')"><i class="fa-solid fa-gear"></i> Account Settings</button>
         </div>
       `;
     }
@@ -1239,64 +1096,90 @@
       document.getElementById('app-view').innerHTML = `
         <div class="view-container" style="text-align:center;">
           <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and instant cashouts.</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments and instant winner announcements.</p>
         </div>
       `;
     }
 
-    function renderSettings() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card">
-            <h4 style="margin-bottom:10px;">Account Security</h4>
-            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="sendPasswordReset()">Send Password Reset Email</button>
-          </div>
-        </div>
-      `;
+    // ==========================================
+    // 4. REALTIME LISTENERS
+    // ==========================================
+    function setupRealtimeListeners() {
+      // Tournaments sync
+      sbClient.channel('realtime:tournaments')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, async () => {
+          await loadTournaments();
+          if (window.location.hash.startsWith('#/home') || window.location.hash === '#/tournaments') {
+            renderHome();
+          }
+        })
+        .subscribe();
+
+      // Profile balance & ban status
+      if (AppState.user) {
+        sbClient.channel(`realtime:profile-${AppState.user.id}`)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${AppState.user.id}` }, async (payload) => {
+            AppState.profile = payload.new;
+            updateHeaderAndDrawerProfile();
+            if (payload.new.is_banned) {
+              alert("Your account has been suspended/banned.");
+              await sbClient.auth.signOut();
+              window.location.reload();
+            }
+          })
+          .subscribe();
+
+        // Instant In-App Notifications
+        sbClient.channel(`realtime:notifications-${AppState.user.id}`)
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${AppState.user.id}` }, (payload) => {
+            Toast.show(`🔔 ${payload.new.title}: ${payload.new.message}`, "info");
+            document.getElementById('notif-badge').classList.remove('hidden');
+          })
+          .subscribe();
+      }
     }
 
-    async function sendPasswordReset() {
-      if (!AppState.user) return;
-      Loader.show("Sending reset link...");
-      const { error } = await sbClient.auth.resetPasswordForEmail(AppState.user.email);
-      Loader.hide();
-      if (error) Toast.show(error.message, "error");
-      else Toast.show("Password reset email sent!", "success");
-    }
-
+    // DRAWER INITIALIZATION
     const Drawer = {
       init() {
-        document.getElementById('btn-hamburger').onclick = () => this.open();
-        document.getElementById('btn-close-drawer').onclick = () => this.close();
-        document.getElementById('drawer-overlay').onclick = () => this.close();
-        document.getElementById('btn-back').onclick = () => Router.back();
+        const btnHam = document.getElementById('btn-hamburger');
+        const btnClose = document.getElementById('btn-close-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        const btnBack = document.getElementById('btn-back');
+        const btnLogout = document.getElementById('btn-drawer-logout');
 
-        document.getElementById('btn-drawer-logout').onclick = () => {
-          this.close();
-          Modal.show({
-            title: "End Session",
-            body: "Are you sure you want to log out?",
-            confirmText: "Logout",
-            onConfirm: async () => {
-              await sbClient.auth.signOut();
-              AppState.user = null;
-              AppState.profile = null;
-              Toast.show("Logged out successfully", "info");
-              Router.navigate('#/login');
-            }
-          });
-        };
+        if (btnHam) btnHam.onclick = () => this.open();
+        if (btnClose) btnClose.onclick = () => this.close();
+        if (overlay) overlay.onclick = () => this.close();
+        if (btnBack) btnBack.onclick = () => Router.back();
+
+        if (btnLogout) {
+          btnLogout.onclick = async () => {
+            this.close();
+            await sbClient.auth.signOut();
+            AppState.user = null;
+            AppState.profile = null;
+            Toast.show("Logged out successfully", "info");
+            updateHeaderAndDrawerProfile();
+            Router.navigate('#/login');
+          };
+        }
       },
       open() {
-        document.getElementById('side-drawer').classList.add('open');
-        document.getElementById('drawer-overlay').classList.remove('hidden');
+        const d = document.getElementById('side-drawer');
+        const o = document.getElementById('drawer-overlay');
+        if (d) d.classList.add('open');
+        if (o) o.classList.remove('hidden');
       },
       close() {
-        document.getElementById('side-drawer').classList.remove('open');
-        document.getElementById('drawer-overlay').classList.add('hidden');
+        const d = document.getElementById('side-drawer');
+        const o = document.getElementById('drawer-overlay');
+        if (d) d.classList.remove('open');
+        if (o) o.classList.add('hidden');
       }
     };
 
+    // BOOTSTRAP APP
     window.addEventListener('DOMContentLoaded', async () => {
       Router.register('#/home', renderHome, "MULTANI FF", false);
       Router.register('#/tournaments', renderHome, "Tournaments", true);
@@ -1304,13 +1187,11 @@
       Router.register('#/matches', renderMyMatches, "My Matches", true);
       Router.register('#/wallet', renderWallet, "Gaming Wallet", true);
       Router.register('#/deposit', renderDeposit, "Deposit Cash", true);
-      Router.register('#/withdraw', renderWithdraw, "Cashout", true);
       Router.register('#/winners', renderWinners, "Hall of Winners", true);
       Router.register('#/leaderboard', renderLeaderboard, "Leaderboard", true);
       Router.register('#/notifications', renderNotifications, "Notifications", true);
       Router.register('#/support', renderSupport, "Live Support", true);
       Router.register('#/profile', renderProfile, "Profile", true);
-      Router.register('#/settings', renderSettings, "Settings", true);
       Router.register('#/rules', renderRules, "Rules", true);
       Router.register('#/about', renderAbout, "About Us", true);
       Router.register('#/login', renderAuth, "Login / Register", true);
@@ -1324,10 +1205,12 @@
         } else {
           AppState.user = null;
           AppState.profile = null;
+          updateHeaderAndDrawerProfile();
         }
       });
 
       await loadProfile();
+      setupRealtimeListeners();
       Router.init();
     });
   </script>
