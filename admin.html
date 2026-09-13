@@ -2,915 +2,519 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>MULTANI FF - Official Admin Dashboard</title>
-  <meta name="theme-color" content="#06070a" />
-
-  <!-- Fonts & Icons -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MULTANI FF - Super Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Supabase CDN Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg-base: #06070a;
-      --bg-surface: #0e1118;
-      --bg-card: #151922;
-      --border-color: #262f40;
-
-      --primary: #ff4624;
-      --primary-glow: rgba(255, 70, 36, 0.45);
-      --accent-cyan: #00f0ff;
-      --accent-gold: #ffbe00;
-      --accent-gold-glow: rgba(255, 190, 0, 0.4);
-
-      --success: #00e676;
-      --danger: #ff1744;
-      --text-main: #f3f4f6;
-      --text-muted: #8e9bb0;
-      --text-dim: #5c687a;
-
-      --header-height: 60px;
-      --max-app-width: 480px;
-      --font-gaming: 'Rajdhani', sans-serif;
-      --font-ui: 'Inter', sans-serif;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      background-color: #020203;
-      color: var(--text-main);
-      font-family: var(--font-ui);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-    }
-
-    #admin-container {
-      width: 100%;
-      max-width: var(--max-app-width);
-      height: 100vh;
-      min-height: 100dvh;
-      background-color: var(--bg-base);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 2px rgba(255, 190, 0, 0.3);
-    }
-
-    @media (min-width: 481px) {
-      #admin-container {
-        height: 94vh;
-        border-radius: 28px;
-        border: 1px solid #2a3449;
-      }
-    }
-
-    /* HEADER */
-    .admin-header {
-      height: var(--header-height);
-      background: rgba(14, 17, 24, 0.98);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .admin-brand {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .admin-brand-sub {
-      font-family: var(--font-gaming);
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--accent-gold);
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .admin-brand-main {
-      font-family: var(--font-gaming);
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      background: linear-gradient(90deg, #ffbe00, #ff5722);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-main);
-      font-size: 18px;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .icon-btn:active { background: rgba(255, 255, 255, 0.08); }
-
-    /* CONTENT SCROLLER */
-    .admin-main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      position: relative;
-    }
-
-    /* TAB STRIP */
-    .admin-tabs {
-      display: flex;
-      overflow-x: auto;
-      gap: 8px;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border-color);
-      scrollbar-width: none;
-    }
-    .admin-tabs::-webkit-scrollbar { display: none; }
-
-    .tab-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-gaming);
-      font-size: 14px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--accent-gold);
-      color: #000;
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 12px var(--accent-gold-glow);
-    }
-
-    /* CARD COMPONENTS */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .pill {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-      text-transform: uppercase;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-    }
-    .pill-gold { background: var(--accent-gold); color: #000; font-weight: 800; border: none; }
-
-    /* FORMS & BUTTONS */
-    .form-group { margin-bottom: 12px; }
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 11px 13px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      color: #fff;
-      font-family: var(--font-ui);
-      font-size: 14px;
-      outline: none;
-    }
-    .form-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold-glow); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-gaming);
-      font-size: 15px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border: none;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-    .btn:active { transform: scale(0.98); }
-
-    .btn-gold { background: linear-gradient(135deg, #ffc400, #ff9100); color: #000; font-weight: 800; }
-    .btn-cyan { background: linear-gradient(135deg, #00f0ff, #0099cc); color: #000; font-weight: 800; }
-    .btn-success { background: var(--success); color: #000; font-weight: 800; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-    .btn-sm { padding: 7px 12px; font-size: 13px; width: auto; }
-
-    /* IMAGE PREVIEWS */
-    .slip-preview-container {
-      width: 100%;
-      max-height: 180px;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      margin: 10px 0;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .slip-preview-container img { max-width: 100%; max-height: 180px; object-fit: contain; }
-
-    /* TOAST & LOADER */
-    .toast-box {
-      position: absolute;
-      bottom: 20px;
-      left: 16px;
-      right: 16px;
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    .toast {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 13px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.7);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: slideToast 0.25s ease;
-      pointer-events: auto;
-    }
-    .toast-success { border-color: var(--success); }
-    .toast-error { border-color: var(--danger); }
-    .toast-info { border-color: var(--accent-gold); }
-    @keyframes slideToast { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .global-loader {
-      position: absolute;
-      inset: 0;
-      background: rgba(6, 7, 10, 0.9);
-      backdrop-filter: blur(5px);
-      z-index: 600;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-    }
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 3px solid transparent;
-      border-top-color: var(--accent-gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
-    .empty-state i { font-size: 38px; margin-bottom: 12px; }
-    .hidden { display: none !important; }
+    body { font-family: 'Inter', sans-serif; }
+    .font-gaming { font-family: 'Rajdhani', sans-serif; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; border-radius: 4px; }
   </style>
 </head>
-<body>
+<body class="bg-[#06070a] text-gray-100 flex h-screen overflow-hidden">
 
-  <div id="admin-container">
-    <!-- HEADER -->
-    <header class="admin-header">
-      <div class="admin-brand">
-        <span class="admin-brand-sub">CONTROL PANEL</span>
-        <span class="admin-brand-main">MULTANI FF ADMIN</span>
+  <!-- SIDEBAR (Added More Navigation Buttons) -->
+  <aside class="w-64 bg-[#0e1118] border-r border-[#262f40] flex flex-col justify-between shrink-0">
+    <div class="flex flex-col h-full">
+      <div class="p-5 border-b border-[#262f40] flex items-center gap-3">
+        <i class="fa-solid fa-shield-halved text-[#ff4624] text-2xl"></i>
+        <div>
+          <h2 class="font-gaming text-xl font-bold tracking-wider text-white">MULTANI FF</h2>
+          <span class="text-[10px] text-gray-400 uppercase tracking-widest block font-bold">Admin Console</span>
+        </div>
       </div>
-      <div style="display:flex; gap:6px;">
-        <button id="btn-refresh" class="icon-btn" title="Refresh Live Data"><i class="fa-solid fa-rotate-right"></i></button>
-        <button id="btn-admin-logout" class="icon-btn" title="Exit Admin" style="color:var(--danger);"><i class="fa-solid fa-power-off"></i></button>
+
+      <!-- Navigation Buttons List -->
+      <nav class="p-3 space-y-1 overflow-y-auto sidebar-scroll flex-1">
+        <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#ff4624] text-white">
+          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        </button>
+        <button onclick="switchTab('tournaments')" id="nav-tournaments" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-trophy w-5"></i> Tournaments & Rooms
+        </button>
+        <button onclick="switchTab('winners')" id="nav-winners" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-medal w-5 text-yellow-400"></i> Declare Winners
+        </button>
+        <button onclick="switchTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
+          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-xs px-2 py-0.5 rounded-full">1</span>
+        </button>
+        <button onclick="switchTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-circle-arrow-up w-5"></i> Withdrawals
+        </button>
+        <button onclick="switchTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-users w-5"></i> Gamers & Balance
+        </button>
+        <button onclick="switchTab('notifications')" id="nav-notifications" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-bullhorn w-5 text-cyan-400"></i> Push Notification
+        </button>
+        <button onclick="switchTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
+        </button>
+        <button onclick="switchTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition">
+          <i class="fa-solid fa-gear w-5"></i> App Settings
+        </button>
+      </nav>
+      
+      <div class="p-4 border-t border-[#262f40] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs">MLT</div>
+          <div class="text-xs">
+            <p class="font-bold text-white">Admin Master</p>
+            <p class="text-gray-500">Multani FF</p>
+          </div>
+        </div>
+        <button onclick="alert('Session ended')" class="text-gray-400 hover:text-red-500 transition" title="Logout"><i class="fa-solid fa-power-off"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Bar with Action Buttons -->
+    <header class="h-16 bg-[#0e1118] border-b border-[#262f40] px-8 flex items-center justify-between shrink-0">
+      <h1 id="panel-title" class="font-gaming text-2xl font-bold uppercase tracking-wide text-white">Dashboard Overview</h1>
+      <div class="flex items-center gap-3">
+        <!-- Quick Action Buttons on Top Bar -->
+        <button onclick="openModal('modal-add-tournament')" class="bg-[#ff4624] hover:bg-[#e03a19] text-white px-3 py-1.5 rounded-lg text-xs font-gaming font-bold tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> NEW MATCH
+        </button>
+        <button onclick="openModal('modal-broadcast')" class="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg text-xs font-gaming font-bold flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> SEND ALERT
+        </button>
+        <button onclick="location.reload()" class="bg-[#151922] hover:bg-[#262f40] text-gray-300 p-2 rounded-lg border border-[#262f40]" title="Refresh Data">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
       </div>
     </header>
 
-    <!-- TAB NAVIGATION -->
-    <div style="padding: 14px 16px 0 16px;">
-      <nav class="admin-tabs">
-        <button class="tab-btn active" data-tab="deposits"><i class="fa-solid fa-circle-arrow-down"></i> Deposits <span id="badge-dep-count" class="pill pill-gold">0</span></button>
-        <button class="tab-btn" data-tab="rooms"><i class="fa-solid fa-satellite-dish"></i> Room Credentials</button>
-        <button class="tab-btn" data-tab="create-tournament"><i class="fa-solid fa-plus"></i> New Match</button>
-        <button class="tab-btn" data-tab="withdrawals"><i class="fa-solid fa-money-bill-transfer"></i> Cashouts <span id="badge-wd-count" class="pill pill-gold">0</span></button>
-        <button class="tab-btn" data-tab="announcement"><i class="fa-solid fa-bullhorn"></i> Banner Notice</button>
-      </nav>
+    <div class="flex-1 overflow-y-auto p-8 space-y-6">
+
+      <!-- ================= SECTION: OVERVIEW ================= -->
+      <section id="section-overview" class="space-y-6">
+        <!-- Dashboard Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
+            <span class="text-xs font-semibold text-gray-400 uppercase">Total Deposit Pool</span>
+            <h3 class="text-2xl font-bold font-gaming text-[#ffbe00] mt-1">PKR 142,500</h3>
+            <span class="text-[11px] text-emerald-400"><i class="fa-solid fa-arrow-trend-up"></i> +14% this month</span>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
+            <span class="text-xs font-semibold text-gray-400 uppercase">Pending Deposits</span>
+            <h3 class="text-2xl font-bold font-gaming text-[#ff4624] mt-1">1 Slip</h3>
+            <span class="text-[11px] text-red-400">Needs Approval</span>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
+            <span class="text-xs font-semibold text-gray-400 uppercase">Pending Cashouts</span>
+            <h3 class="text-2xl font-bold font-gaming text-cyan-400 mt-1">PKR 1,400</h3>
+            <span class="text-[11px] text-gray-400">1 Request pending</span>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
+            <span class="text-xs font-semibold text-gray-400 uppercase">Total Users</span>
+            <h3 class="text-2xl font-bold font-gaming text-white mt-1">428</h3>
+            <span class="text-[11px] text-emerald-400">Active Gamers</span>
+          </div>
+        </div>
+
+        <!-- Extra Quick Action Grid Buttons -->
+        <div class="bg-[#151922] border border-[#262f40] p-5 rounded-xl">
+          <h3 class="font-gaming text-base font-bold text-gray-300 uppercase mb-3">Quick Control Buttons</h3>
+          <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <button onclick="switchTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-lg text-center transition group">
+              <i class="fa-solid fa-trophy text-[#ff4624] text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Add Match</p>
+            </button>
+            <button onclick="switchTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-emerald-500 rounded-lg text-center transition group">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Approve Slips</p>
+            </button>
+            <button onclick="switchTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-yellow-400 rounded-lg text-center transition group">
+              <i class="fa-solid fa-medal text-yellow-400 text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Pay Winners</p>
+            </button>
+            <button onclick="switchTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-cyan-400 rounded-lg text-center transition group">
+              <i class="fa-solid fa-wallet text-cyan-400 text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Add Balances</p>
+            </button>
+            <button onclick="switchTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-purple-400 rounded-lg text-center transition group">
+              <i class="fa-solid fa-comments text-purple-400 text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Live Chat</p>
+            </button>
+            <button onclick="switchTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-red-500 rounded-lg text-center transition group">
+              <i class="fa-solid fa-bullhorn text-red-400 text-xl group-hover:scale-110 transition"></i>
+              <p class="text-xs font-bold mt-2">Set Ticker</p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: TOURNAMENTS ================= -->
+      <section id="section-tournaments" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="font-gaming text-xl font-bold">Tournament Rooms</h2>
+            <p class="text-xs text-gray-400">Match ke shuru hone se pehle Room ID aur Password players ko bhejein</p>
+          </div>
+          <button onclick="openModal('modal-add-tournament')" class="bg-[#ff4624] hover:bg-[#e03a19] text-white px-4 py-2 rounded-lg text-xs font-gaming font-bold tracking-wide">
+            + CREATE TOURNAMENT
+          </button>
+        </div>
+
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#0e1118] text-gray-400 text-xs font-mono uppercase">
+              <tr>
+                <th class="p-4">Match Title</th>
+                <th class="p-4">Fee / Prize</th>
+                <th class="p-4">Slots</th>
+                <th class="p-4">Room ID</th>
+                <th class="p-4">Password</th>
+                <th class="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tournaments-tbody" class="divide-y divide-[#262f40]">
+              <tr>
+                <td class="p-4 font-bold text-white">CLASH SQUAD #402</td>
+                <td class="p-4 text-gray-300">50 PKR / 2400 PKR</td>
+                <td class="p-4 font-mono text-cyan-400">44 / 48</td>
+                <td class="p-4"><input type="text" id="rid-402" value="982341" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-xs text-cyan-400 w-24"></td>
+                <td class="p-4"><input type="text" id="rpass-402" value="7788" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-xs text-cyan-400 w-20"></td>
+                <td class="p-4 flex items-center gap-2">
+                  <button onclick="alert('Room ID/Pass broadcasted to players!')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/30 px-3 py-1 rounded text-xs font-bold font-gaming">
+                    BROADCAST
+                  </button>
+                  <button onclick="alert('Tournament deleted')" class="bg-red-500/20 text-red-400 hover:bg-red-500/30 px-2 py-1 rounded text-xs">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: DECLARE WINNERS ================= -->
+      <section id="section-winners" class="space-y-6 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-6 rounded-xl max-w-2xl">
+          <h2 class="font-gaming text-xl font-bold text-yellow-400 mb-1">Declare Match Winner & Distribute Prize</h2>
+          <p class="text-xs text-gray-400 mb-4">Player ka Free Fire UID select karein aur automatic prize wallet me credit karein</p>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
+              <select class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white">
+                <option>CLASH SQUAD #402 (Prize: 2400 PKR)</option>
+                <option>SOLO SURVIVORS #108 (Prize: 1200 PKR)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Winner Free Fire UID</label>
+                <input type="text" placeholder="e.g. 2984189312" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Winning Amount (PKR)</label>
+                <input type="number" placeholder="1400" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Rank Position</label>
+              <select class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white">
+                <option>1st Place Champion</option>
+                <option>2nd Place Runner Up</option>
+                <option>3rd Place</option>
+                <option>Most Kills MVP</option>
+              </select>
+            </div>
+            <button onclick="alert('Prize has been sent to player wallet and added to Hall of Winners!')" class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider text-sm">
+              Reward Player & Distribute Cash
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: DEPOSITS ================= -->
+      <section id="section-deposits" class="space-y-6 hidden">
+        <h2 class="font-gaming text-xl font-bold">Deposit Slip Approvals</h2>
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#0e1118] text-gray-400 text-xs font-mono uppercase">
+              <tr>
+                <th class="p-4">Player</th>
+                <th class="p-4">TID & Method</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Action Buttons</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#262f40]">
+              <tr id="dep-row-1">
+                <td class="p-4">
+                  <div class="font-bold text-white">Hamza Multani</div>
+                  <div class="text-xs text-cyan-400 font-mono">UID: 2984189312</div>
+                </td>
+                <td class="p-4 font-mono text-xs">
+                  <div>Easypaisa</div>
+                  <div class="text-gray-400">TID: 9841893121</div>
+                </td>
+                <td class="p-4 font-gaming text-lg font-bold text-yellow-400">PKR 500</td>
+                <td class="p-4 space-x-2">
+                  <button onclick="approveDeposit('dep-row-1', 500)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs font-bold font-gaming uppercase">
+                    Approve
+                  </button>
+                  <button onclick="rejectDeposit('dep-row-1')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-xs font-bold font-gaming uppercase">
+                    Reject
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: WITHDRAWALS ================= -->
+      <section id="section-withdrawals" class="space-y-6 hidden">
+        <h2 class="font-gaming text-xl font-bold">Withdraw Requests</h2>
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#0e1118] text-gray-400 text-xs font-mono uppercase">
+              <tr>
+                <th class="p-4">Player</th>
+                <th class="p-4">Account Number</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#262f40]">
+              <tr id="with-1">
+                <td class="p-4 font-bold text-white">MLT・SHADOW</td>
+                <td class="p-4 font-mono text-cyan-400">0301-9988776 (Easypaisa)</td>
+                <td class="p-4 font-gaming text-lg font-bold text-emerald-400">PKR 1,400</td>
+                <td class="p-4 space-x-2">
+                  <button onclick="alert('Payout completed!'); document.getElementById('with-1').remove();" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold font-gaming">
+                    MARK PAID
+                  </button>
+                  <button onclick="alert('Cancelled & Refunded'); document.getElementById('with-1').remove();" class="bg-red-600 text-white px-3 py-1.5 rounded text-xs font-bold font-gaming">
+                    REJECT
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: USERS ================= -->
+      <section id="section-users" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <h2 class="font-gaming text-xl font-bold">Gamers Wallet Management</h2>
+          <input type="text" placeholder="Search UID or Name..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white" />
+        </div>
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#0e1118] text-gray-400 text-xs font-mono uppercase">
+              <tr>
+                <th class="p-4">Player Name</th>
+                <th class="p-4">UID</th>
+                <th class="p-4">Wallet Balance</th>
+                <th class="p-4">Add/Cut Balance</th>
+                <th class="p-4">Moderation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#262f40]">
+              <tr>
+                <td class="p-4 font-bold text-white">MLT・HAMZA★</td>
+                <td class="p-4 font-mono text-cyan-400">2984189312</td>
+                <td class="p-4 font-gaming text-lg font-bold text-yellow-400">PKR <span id="ubal-1">450</span></td>
+                <td class="p-4 space-x-1">
+                  <button onclick="editBal('ubal-1', 100)" class="bg-[#262f40] hover:bg-[#ff4624] text-white px-2 py-1 rounded text-xs font-bold">+100</button>
+                  <button onclick="editBal('ubal-1', 500)" class="bg-[#262f40] hover:bg-[#ff4624] text-white px-2 py-1 rounded text-xs font-bold">+500</button>
+                  <button onclick="editBal('ubal-1', -100)" class="bg-[#262f40] hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">-100</button>
+                </td>
+                <td class="p-4">
+                  <button onclick="alert('Player UID 2984189312 has been BANNED!')" class="bg-red-500/20 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1 rounded text-xs font-bold">
+                    BAN USER
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: NOTIFICATIONS ================= -->
+      <section id="section-notifications" class="space-y-6 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-6 rounded-xl max-w-xl">
+          <h2 class="font-gaming text-xl font-bold text-cyan-400 mb-2">Send Push Notification / App Alert</h2>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Notification Title</label>
+              <input type="text" placeholder="e.g. Free Entry Tournament Alert!" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Notification Message</label>
+              <textarea rows="3" placeholder="Match starts in 30 minutes. Be ready..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white"></textarea>
+            </div>
+            <button onclick="alert('Notification dispatched to all gamers!')" class="bg-cyan-500 hover:bg-cyan-400 text-black px-5 py-2.5 rounded-lg font-gaming font-bold uppercase text-sm">
+              Send Broadcast Alert
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: LIVE SUPPORT ================= -->
+      <section id="section-support" class="space-y-6 hidden">
+        <h2 class="font-gaming text-xl font-bold">Live Support Chat Queue</h2>
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 flex flex-col h-96">
+          <div class="flex-1 space-y-3 overflow-y-auto pr-2">
+            <div class="bg-[#0e1118] p-3 rounded-lg max-w-md border border-[#262f40]">
+              <span class="text-[10px] text-cyan-400 font-bold block">User: Hamza (UID: 2984189312)</span>
+              <p class="text-xs text-gray-200 mt-1">Bhai mera deposit approve kardo jaldi match start hone wala hai!</p>
+            </div>
+          </div>
+          <div class="flex gap-2 pt-3 border-t border-[#262f40]">
+            <input type="text" placeholder="Reply to player..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-lg px-3 text-xs text-white" />
+            <button onclick="alert('Reply sent')" class="bg-[#ff4624] text-white px-4 py-2 rounded-lg font-gaming font-bold text-xs">REPLY</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: BANNED PLAYERS ================= -->
+      <section id="section-banned" class="space-y-6 hidden">
+        <h2 class="font-gaming text-xl font-bold text-red-500">Banned Hackers & Suspended Accounts</h2>
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#0e1118] text-gray-400 text-xs font-mono uppercase">
+              <tr>
+                <th class="p-4">Free Fire UID</th>
+                <th class="p-4">Reason</th>
+                <th class="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#262f40]">
+              <tr>
+                <td class="p-4 font-mono text-red-400">1098273612</td>
+                <td class="p-4 text-xs text-gray-400">Emulator / Auto Headshot Hack reported in Match #401</td>
+                <td class="p-4">
+                  <button onclick="alert('Account Unbanned'); this.closest('tr').remove();" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded text-xs font-bold">
+                    UNBAN PLAYER
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: APP SETTINGS ================= -->
+      <section id="section-settings" class="space-y-6 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-6 rounded-xl max-w-xl space-y-4">
+          <h2 class="font-gaming text-xl font-bold text-white">App Announcement Ticker Setting</h2>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
+            <input type="text" id="ticker-input" value="🔥 Grand Duo Championship this Sunday! Prize Pool: 15,000 PKR. Slots filling up fast!" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="ticker-active" checked class="w-4 h-4 accent-[#ff4624]" />
+            <label for="ticker-active" class="text-xs text-gray-300">Show ticker on user homepage</label>
+          </div>
+          <button onclick="alert('Announcement Ticker updated on user app!')" class="bg-[#ff4624] hover:bg-[#e03a19] text-white px-5 py-2.5 rounded-lg font-gaming font-bold uppercase text-sm">
+            Save App Settings
+          </button>
+        </div>
+      </section>
+
     </div>
+  </main>
 
-    <!-- TAB CONTENT ROOT -->
-    <main id="admin-main-view" class="admin-main"></main>
-
-    <!-- TOASTS -->
-    <div id="toast-container" class="toast-box"></div>
-
-    <!-- LOADER -->
-    <div id="admin-loader" class="global-loader hidden">
-      <div class="spinner"></div>
-      <span id="loader-msg" style="font-family:var(--font-gaming); font-size:15px; color:var(--accent-gold);">Authorizing...</span>
+  <!-- MODAL: ADD TOURNAMENT -->
+  <div id="modal-add-tournament" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0e1118] border border-[#262f40] w-full max-w-md rounded-xl p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-[#262f40] pb-3">
+        <h3 class="font-gaming text-xl font-bold">New Tournament Match</h3>
+        <button onclick="closeModal('modal-add-tournament')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3">
+        <input type="text" id="t-name" placeholder="Tournament Name" class="w-full bg-[#151922] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" id="t-fee" placeholder="Entry Fee (PKR)" class="w-full bg-[#151922] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+          <input type="number" id="t-prize" placeholder="Prize (PKR)" class="w-full bg-[#151922] border border-[#262f40] rounded-lg p-2.5 text-sm text-white" />
+        </div>
+        <button onclick="addTournamentRow()" class="w-full bg-[#ff4624] text-white py-3 rounded-lg font-gaming font-bold uppercase text-sm">Publish Tournament</button>
+      </div>
     </div>
   </div>
 
   <script>
-    /* ==========================================================================
-       1. SUPABASE CONFIGURATION
-       Same URL & Anon Key used in user frontend. (Admin verification happens via profiles.is_admin)
-       ========================================================================== */
-    const SUPABASE_CONFIG = {
-      SUPABASE_URL: "https://your-supabase-project.supabase.co",
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    };
+    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'withdrawals', 'users', 'notifications', 'support', 'banned', 'settings'];
 
-    let sb = null;
-    try {
-      if (window.supabase && SUPABASE_CONFIG.SUPABASE_URL.startsWith("https://") && !SUPABASE_CONFIG.SUPABASE_URL.includes("your-supabase-project")) {
-        sb = window.supabase.createClient(SUPABASE_CONFIG.SUPABASE_URL, SUPABASE_CONFIG.SUPABASE_ANON_KEY);
-      }
-    } catch(e) {
-      console.warn("Supabase init error:", e);
+    function switchTab(selected) {
+      tabs.forEach(t => {
+        document.getElementById(`section-${t}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${t}`);
+        if(navBtn) navBtn.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 hover:text-white hover:bg-[#151922] transition";
+      });
+
+      document.getElementById(`section-${selected}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${selected}`);
+      if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#ff4624] text-white";
+
+      document.getElementById('panel-title').innerText = selected.toUpperCase() + " MANAGEMENT";
     }
 
-    /* ==========================================================================
-       2. ADMIN STATE STORE
-       ========================================================================== */
-    const AdminState = {
-      user: null,
-      isAdminAuthorized: true, // Set to true for instant preview; verified with backend on login
-      currentTab: 'deposits',
-      deposits: [
-        {
-          id: "dep-001",
-          user_id: "usr-010",
-          user_name: "Hamza Multani (MLT・HAMZA★)",
-          amount: 500,
-          payment_method: "JazzCash",
-          sender_name: "Hamza Ali",
-          transaction_id: "9823145671",
-          screenshot_url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80",
-          created_at: "Just now"
-        }
-      ],
-      tournaments: [
-        {
-          id: "t-101",
-          title: "BATTLE ROYALE CLASH SQUAD #402",
-          mode: "Squad (4v4)",
-          map: "Bermuda Remastered",
-          joined_players: 44,
-          max_players: 48,
-          room_id: "",
-          room_pass: ""
-        },
-        {
-          id: "t-102",
-          title: "SOLO SURVIVORS SHOWDOWN #108",
-          mode: "Solo",
-          map: "Purgatory",
-          joined_players: 48,
-          max_players: 48,
-          room_id: "8899120",
-          room_pass: "777"
-        }
-      ],
-      withdrawals: [
-        {
-          id: "wd-001",
-          user_name: "Ali Raza (OP_ALII)",
-          amount: 600,
-          method: "Easypaisa",
-          account_number: "03451234567",
-          account_title: "Muhammad Ali Raza",
-          created_at: "15 mins ago"
-        }
-      ],
-      announcement: {
-        status: true,
-        text: "🔥 Grand Duo Championship this Sunday! Prize Pool: 15,000 PKR. Slots filling up fast!"
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function approveDeposit(rowId, amt) {
+      if (confirm(`Approve deposit of PKR ${amt}?`)) {
+        document.getElementById(rowId).remove();
+        document.getElementById('badge-deposits').innerText = "0";
+        alert("Deposit Approved!");
       }
-    };
-
-    /* ==========================================================================
-       3. UTILITIES & TOASTS
-       ========================================================================== */
-    const Toast = {
-      show(msg, type = 'info') {
-        const box = document.getElementById('toast-container');
-        const el = document.createElement('div');
-        el.className = `toast toast-${type}`;
-        let icon = 'fa-circle-info';
-        if (type === 'success') icon = 'fa-circle-check';
-        if (type === 'error') icon = 'fa-triangle-exclamation';
-
-        el.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
-        box.appendChild(el);
-        setTimeout(() => {
-          el.style.opacity = '0';
-          el.style.transition = '0.3s ease';
-          setTimeout(() => el.remove(), 300);
-        }, 3200);
-      }
-    };
-
-    const Loader = {
-      show(msg = "Processing...") {
-        document.getElementById('loader-msg').innerText = msg;
-        document.getElementById('admin-loader').classList.remove('hidden');
-      },
-      hide() {
-        document.getElementById('admin-loader').classList.add('hidden');
-      }
-    };
-
-    /* ==========================================================================
-       4. AUTHENTICATION & SECURITY GUARD
-       ========================================================================== */
-    async function checkAdminAuth() {
-      if (!sb) {
-        renderCurrentTab();
-        return;
-      }
-
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) {
-        renderLoginForm();
-        return;
-      }
-
-      // Check profiles table for admin role
-      const { data: profile, error } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).single();
-      if (error || !profile || !profile.is_admin) {
-        document.getElementById('admin-main-view').innerHTML = `
-          <div class="empty-state">
-            <i class="fa-solid fa-shield-xmark" style="color:var(--danger);"></i>
-            <h3>Unauthorized Access</h3>
-            <p style="font-size:13px; margin-top:6px;">This email does not have verified administrative clearance.</p>
-            <button class="btn btn-secondary" style="margin-top:14px;" onclick="location.href='index.html'">Go to Player App</button>
-          </div>
-        `;
-        return;
-      }
-
-      AdminState.user = session.user;
-      AdminState.isAdminAuthorized = true;
-      fetchLiveData();
     }
 
-    function renderLoginForm() {
-      document.getElementById('admin-main-view').innerHTML = `
-        <div class="card" style="margin-top:20px;">
-          <h3 style="font-family:var(--font-gaming); font-size:22px; color:var(--accent-gold); margin-bottom:8px;">ADMIN LOGIN</h3>
-          <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Sign in with your verified MULTANI FF Admin credentials.</p>
-          <form id="admin-login-form">
-            <div class="form-group">
-              <label class="form-label">Admin Email</label>
-              <input type="email" id="adm-email" class="form-input" placeholder="admin@multaniff.com" required />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Password</label>
-              <input type="password" id="adm-pass" class="form-input" placeholder="••••••••" required />
-            </div>
-            <button type="submit" class="btn btn-gold" style="margin-top:10px;">ENTER SECURE CONSOLE</button>
-          </form>
-        </div>
+    function rejectDeposit(rowId) {
+      if (confirm("Reject slip?")) {
+        document.getElementById(rowId).remove();
+        document.getElementById('badge-deposits').innerText = "0";
+      }
+    }
+
+    function editBal(id, amount) {
+      const current = parseInt(document.getElementById(id).innerText);
+      const res = current + amount;
+      if(res < 0) return alert("Balance negative nahi ho sakta!");
+      document.getElementById(id).innerText = res;
+    }
+
+    function addTournamentRow() {
+      const name = document.getElementById('t-name').value || "CUSTOM CLASH SQUAD";
+      const fee = document.getElementById('t-fee').value || "50";
+      const prize = document.getElementById('t-prize').value || "2000";
+
+      const tr = `
+        <tr>
+          <td class="p-4 font-bold text-white">${name}</td>
+          <td class="p-4 text-gray-300">${fee} PKR / ${prize} PKR</td>
+          <td class="p-4 font-mono text-cyan-400">0 / 48</td>
+          <td class="p-4"><input type="text" placeholder="Room ID" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-xs text-cyan-400 w-24"></td>
+          <td class="p-4"><input type="text" placeholder="Pass" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-xs text-cyan-400 w-20"></td>
+          <td class="p-4 flex items-center gap-2">
+            <button onclick="alert('Room Broadcasted!')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-3 py-1 rounded text-xs font-bold font-gaming">BROADCAST</button>
+          </td>
+        </tr>
       `;
-
-      document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const em = document.getElementById('adm-email').value;
-        const ps = document.getElementById('adm-pass').value;
-        Loader.show("Verifying Admin Credentials...");
-
-        if (sb) {
-          const { error } = await sb.auth.signInWithPassword({ email: em, password: ps });
-          Loader.hide();
-          if (error) {
-            Toast.show(error.message, "error");
-          } else {
-            Toast.show("Authenticated successfully", "success");
-            checkAdminAuth();
-          }
-        } else {
-          Loader.hide();
-          Toast.show("Local Admin Session active", "info");
-          renderCurrentTab();
-        }
-      });
+      document.getElementById('tournaments-tbody').insertAdjacentHTML('afterbegin', tr);
+      closeModal('modal-add-tournament');
+      alert("New Tournament Added!");
     }
-
-    /* ==========================================================================
-       5. DATA SYNC (SUPABASE LIVE QUERIES)
-       ========================================================================== */
-    async function fetchLiveData() {
-      if (!sb) {
-        updateBadges();
-        renderCurrentTab();
-        return;
-      }
-
-      Loader.show("Fetching Live Platform Data...");
-
-      // 1. Pending Deposits
-      const { data: depData } = await sb.from('deposit_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false });
-      if (depData) AdminState.deposits = depData;
-
-      // 2. Tournaments
-      const { data: tourData } = await sb.from('tournaments').select('*').order('created_at', { ascending: false });
-      if (tourData) AdminState.tournaments = tourData;
-
-      // 3. Pending Withdrawals
-      const { data: wdData } = await sb.from('withdrawal_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false });
-      if (wdData) AdminState.withdrawals = wdData;
-
-      Loader.hide();
-      updateBadges();
-      renderCurrentTab();
-    }
-
-    function updateBadges() {
-      document.getElementById('badge-dep-count').innerText = AdminState.deposits.length;
-      document.getElementById('badge-wd-count').innerText = AdminState.withdrawals.length;
-    }
-
-    /* ==========================================================================
-       6. TAB RENDERERS
-       ========================================================================== */
-    function renderCurrentTab() {
-      const container = document.getElementById('admin-main-view');
-      container.scrollTop = 0;
-
-      // TAB 1: DEPOSITS APPROVAL
-      if (AdminState.currentTab === 'deposits') {
-        if (!AdminState.deposits.length) {
-          container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="color:var(--success);"></i><h3>No Pending Deposits</h3><p>All deposit slips verified.</p></div>`;
-          return;
-        }
-
-        container.innerHTML = AdminState.deposits.map(d => `
-          <div class="card">
-            <div class="card-header">
-              <strong style="color:var(--accent-gold); font-size:18px; font-family:var(--font-gaming);">PKR ${d.amount}</strong>
-              <span class="pill pill-gold">${d.payment_method}</span>
-            </div>
-            <div style="font-size:13px; line-height:1.7; color:var(--text-muted); margin-bottom:10px;">
-              <div>Sender: <strong style="color:#fff;">${d.sender_name || 'N/A'}</strong></div>
-              <div>Transaction ID (TID): <strong style="color:var(--accent-cyan); font-family:monospace;">${d.transaction_id}</strong></div>
-              <div>Requested: ${d.created_at || 'Recently'}</div>
-            </div>
-
-            <div class="slip-preview-container">
-              <a href="${d.screenshot_url}" target="_blank" title="Tap to expand proof">
-                <img src="${d.screenshot_url}" alt="Deposit Slip Proof" />
-              </a>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:12px;">
-              <button class="btn btn-success btn-sm" style="flex:1;" onclick="approveDeposit('${d.id}')">
-                <i class="fa-solid fa-check"></i> APPROVE & CREDIT
-              </button>
-              <button class="btn btn-danger btn-sm" style="flex:1;" onclick="rejectDeposit('${d.id}')">
-                <i class="fa-solid fa-xmark"></i> REJECT
-              </button>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      // TAB 2: ROOM CREDENTIALS LIVE RELEASE
-      else if (AdminState.currentTab === 'rooms') {
-        container.innerHTML = AdminState.tournaments.map(t => `
-          <div class="card">
-            <h4 style="font-family:var(--font-gaming); font-size:19px; margin-bottom:6px;">${t.title}</h4>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-              Mode: ${t.mode} • Map: ${t.map} • Joined: ${t.joined_players}/${t.max_players}
-            </div>
-
-            <form onsubmit="publishRoomCredentials(event, '${t.id}')">
-              <div class="form-group">
-                <label class="form-label">Custom Room ID</label>
-                <input type="text" id="room-id-${t.id}" class="form-input" value="${t.room_id || ''}" placeholder="e.g. 5599812" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Room Password</label>
-                <input type="text" id="room-pass-${t.id}" class="form-input" value="${t.room_pass || ''}" placeholder="e.g. 1234" required />
-              </div>
-              <button type="submit" class="btn btn-cyan btn-sm" style="width:100%;">
-                <i class="fa-solid fa-satellite-dish"></i> BROADCAST TO PLAYERS
-              </button>
-            </form>
-          </div>
-        `).join('');
-      }
-
-      // TAB 3: CREATE TOURNAMENT
-      else if (AdminState.currentTab === 'create-tournament') {
-        container.innerHTML = `
-          <div class="card">
-            <h3 style="font-family:var(--font-gaming); font-size:20px; color:var(--accent-gold); margin-bottom:12px;">CREATE NEW TOURNAMENT</h3>
-            <form id="form-create-t">
-              <div class="form-group">
-                <label class="form-label">Tournament Title</label>
-                <input type="text" id="t-title" class="form-input" placeholder="e.g. BATTLE ROYALE SOLO CLASH #55" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Game Mode</label>
-                <select id="t-mode" class="form-input">
-                  <option value="Squad (4v4)">Squad (4v4)</option>
-                  <option value="Solo">Solo</option>
-                  <option value="Duo">Duo</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Map</label>
-                <input type="text" id="t-map" class="form-input" placeholder="Bermuda Remastered / Purgatory" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Entry Fee (PKR)</label>
-                <input type="number" id="t-fee" class="form-input" placeholder="50" min="0" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Prize Pool (PKR)</label>
-                <input type="number" id="t-prize" class="form-input" placeholder="2400" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Total Slots</label>
-                <input type="number" id="t-max" class="form-input" value="48" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Match Date & Time</label>
-                <input type="text" id="t-schedule" class="form-input" placeholder="Tonight, 09:30 PM PKT" required />
-              </div>
-              <button type="submit" class="btn btn-gold" style="margin-top:8px;">PUBLISH TO APP</button>
-            </form>
-          </div>
-        `;
-
-        document.getElementById('form-create-t').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          Loader.show("Publishing Tournament...");
-          const payload = {
-            title: document.getElementById('t-title').value,
-            game: "Free Fire Max",
-            mode: document.getElementById('t-mode').value,
-            map: document.getElementById('t-map').value,
-            entry_fee: parseFloat(document.getElementById('t-fee').value),
-            prize_pool: parseFloat(document.getElementById('t-prize').value),
-            max_players: parseInt(document.getElementById('t-max').value),
-            joined_players: 0,
-            match_date: document.getElementById('t-schedule').value,
-            reg_deadline: "15 mins before match",
-            status: "upcoming",
-            banner_url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-            rules: "Strict mobile only. Emulators prohibited.",
-            winning_rules: "Winner takes official pool reward."
-          };
-
-          if (sb) {
-            const { error } = await sb.from('tournaments').insert([payload]);
-            Loader.hide();
-            if (error) {
-              Toast.show(error.message, "error");
-              return;
-            }
-          } else {
-            AdminState.tournaments.unshift({ id: "t-" + Date.now(), ...payload });
-            Loader.hide();
-          }
-
-          Toast.show("Tournament published live!", "success");
-          switchTab('rooms');
-        });
-      }
-
-      // TAB 4: CASHOUTS / WITHDRAWALS
-      else if (AdminState.currentTab === 'withdrawals') {
-        if (!AdminState.withdrawals.length) {
-          container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="color:var(--success);"></i><h3>No Pending Cashouts</h3><p>All player withdrawals cleared.</p></div>`;
-          return;
-        }
-
-        container.innerHTML = AdminState.withdrawals.map(w => `
-          <div class="card">
-            <div class="card-header">
-              <strong style="color:var(--success); font-size:18px; font-family:var(--font-gaming);">PKR ${w.amount}</strong>
-              <span class="pill pill-gold">${w.method}</span>
-            </div>
-            <div style="font-size:13px; line-height:1.8; color:var(--text-muted); margin-bottom:12px;">
-              <div>Player: <strong style="color:#fff;">${w.user_name || 'Player'}</strong></div>
-              <div>Account Title: <strong style="color:#fff;">${w.account_title}</strong></div>
-              <div>Account Number: <strong style="color:var(--accent-cyan); font-family:monospace; font-size:15px;">${w.account_number}</strong></div>
-              <div>Requested: ${w.created_at || 'Recently'}</div>
-            </div>
-            <button class="btn btn-success btn-sm" style="width:100%;" onclick="completeWithdrawal('${w.id}')">
-              <i class="fa-solid fa-paper-plane"></i> MARK AS SENT (PAID)
-            </button>
-          </div>
-        `).join('');
-      }
-
-      // TAB 5: ANNOUNCEMENT BANNER
-      else if (AdminState.currentTab === 'announcement') {
-        container.innerHTML = `
-          <div class="card">
-            <h3 style="font-family:var(--font-gaming); font-size:19px; color:var(--accent-gold); margin-bottom:12px;">HOMEPAGE TICKER NOTICE</h3>
-            <form onsubmit="saveNotice(event)">
-              <div class="form-group">
-                <label class="form-label">Banner Message</label>
-                <textarea id="notice-text" class="form-input" rows="3" required>${AdminState.announcement.text}</textarea>
-              </div>
-              <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
-                <label class="form-label" style="margin:0;">Active Status</label>
-                <input type="checkbox" id="notice-toggle" ${AdminState.announcement.status ? 'checked' : ''} />
-              </div>
-              <button type="submit" class="btn btn-gold btn-sm" style="width:100%; margin-top:8px;">UPDATE APP BANNER</button>
-            </form>
-          </div>
-        `;
-      }
-    }
-
-    /* ==========================================================================
-       7. TAB SWITCHER & ACTION HANDLERS
-       ========================================================================= */
-    function switchTab(tabId) {
-      AdminState.currentTab = tabId;
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-      });
-      renderCurrentTab();
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
-    });
-
-    document.getElementById('btn-refresh').addEventListener('click', () => {
-      Toast.show("Refreshing data...", "info");
-      fetchLiveData();
-    });
-
-    document.getElementById('btn-admin-logout').addEventListener('click', async () => {
-      if (sb) await sb.auth.signOut();
-      Toast.show("Admin session closed", "info");
-      location.href = "index.html";
-    });
-
-    // Action: Approve Deposit via RPC
-    window.approveDeposit = async function(id) {
-      Loader.show("Crediting Player Wallet...");
-      if (sb) {
-        const { error } = await sb.rpc('approve_deposit_request', { p_request_id: id });
-        Loader.hide();
-        if (error) {
-          Toast.show(error.message, "error");
-          return;
-        }
-      } else {
-        AdminState.deposits = AdminState.deposits.filter(d => d.id !== id);
-        Loader.hide();
-      }
-
-      Toast.show("Deposit approved! Funds automatically added.", "success");
-      updateBadges();
-      renderCurrentTab();
-    };
-
-    // Action: Reject Deposit
-    window.rejectDeposit = async function(id) {
-      Loader.show("Rejecting Request...");
-      if (sb) {
-        const { error } = await sb.from('deposit_requests').update({ status: 'rejected' }).eq('id', id);
-        Loader.hide();
-        if (error) {
-          Toast.show(error.message, "error");
-          return;
-        }
-      } else {
-        AdminState.deposits = AdminState.deposits.filter(d => d.id !== id);
-        Loader.hide();
-      }
-
-      Toast.show("Deposit slip marked as rejected", "info");
-      updateBadges();
-      renderCurrentTab();
-    };
-
-    // Action: Broadcast Room Credentials
-    window.publishRoomCredentials = async function(e, tournamentId) {
-      e.preventDefault();
-      const rId = document.getElementById(`room-id-${tournamentId}`).value;
-      const rPass = document.getElementById(`room-pass-${tournamentId}`).value;
-
-      Loader.show("Broadcasting Room Info...");
-      if (sb) {
-        const { error } = await sb.from('tournaments').update({ room_id: rId, room_pass: rPass }).eq('id', tournamentId);
-        Loader.hide();
-        if (error) {
-          Toast.show(error.message, "error");
-          return;
-        }
-      } else {
-        const t = AdminState.tournaments.find(x => x.id === tournamentId);
-        if (t) { t.room_id = rId; t.room_pass = rPass; }
-        Loader.hide();
-      }
-
-      Toast.show("Room ID & Password live on player screens!", "success");
-    };
-
-    // Action: Complete Withdrawal
-    window.completeWithdrawal = async function(id) {
-      Loader.show("Processing Cashout...");
-      if (sb) {
-        const { error } = await sb.from('withdrawal_requests').update({ status: 'completed' }).eq('id', id);
-        Loader.hide();
-        if (error) {
-          Toast.show(error.message, "error");
-          return;
-        }
-      } else {
-        AdminState.withdrawals = AdminState.withdrawals.filter(w => w.id !== id);
-        Loader.hide();
-      }
-
-      Toast.show("Withdrawal marked as successfully sent", "success");
-      updateBadges();
-      renderCurrentTab();
-    };
-
-    // Action: Update Site Notice
-    window.saveNotice = async function(e) {
-      e.preventDefault();
-      const txt = document.getElementById('notice-text').value;
-      const status = document.getElementById('notice-toggle').checked;
-
-      AdminState.announcement = { status, text: txt };
-      if (sb) {
-        await sb.from('site_settings').upsert({ id: 'main', announcement_text: txt, announcement_status: status });
-      }
-
-      Toast.show("Homepage announcement updated!", "success");
-    };
-
-    /* ==========================================================================
-       8. INITIALIZATION
-       ========================================================================== */
-    window.addEventListener('DOMContentLoaded', () => {
-      checkAdminAuth();
-    });
   </script>
 </body>
 </html>
