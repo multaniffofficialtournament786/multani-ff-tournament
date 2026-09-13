@@ -7,819 +7,162 @@
   <meta name="description" content="Pakistan's Ultimate Free Fire Tournament Platform" />
   <meta name="theme-color" content="#0a0a0f" />
   
-  <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Supabase CDN Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
-    /* ==========================================================================
-       CORE STYLES - DARK FUTURISTIC GAMING THEME (MOBILE FIRST)
-       ========================================================================== */
     :root {
       --bg-base: #06070a;
       --bg-surface: #0e1118;
       --bg-card: #151922;
       --border-color: #262f40;
-      
       --primary: #ff4624;
       --primary-glow: rgba(255, 70, 36, 0.45);
       --accent-cyan: #00f0ff;
       --accent-cyan-glow: rgba(0, 240, 255, 0.4);
       --accent-gold: #ffbe00;
       --accent-gold-glow: rgba(255, 190, 0, 0.4);
-
       --success: #00e676;
       --danger: #ff1744;
       --text-main: #f3f4f6;
       --text-muted: #8e9bb0;
       --text-dim: #5c687a;
-      
       --header-height: 60px;
       --bottom-nav-height: 68px;
       --max-app-width: 430px;
-      
       --font-gaming: 'Rajdhani', sans-serif;
       --font-ui: 'Inter', sans-serif;
       --radius: 12px;
       --radius-sm: 8px;
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: #020203;
-      color: var(--text-main);
-      font-family: var(--font-ui);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
-      user-select: none;
-    }
-
-    /* Mobile App Frame */
-    #app-container {
-      width: 100%;
-      max-width: var(--max-app-width);
-      height: 100vh;
-      min-height: 100dvh;
-      background-color: var(--bg-base);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3);
-    }
-
-    @media (min-width: 431px) {
-      #app-container {
-        height: 94vh;
-        border-radius: 28px;
-        border: 1px solid #1f2636;
-      }
-    }
-
-    /* HEADER */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      height: var(--header-height);
-      background: rgba(14, 17, 24, 0.96);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .header-bar {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-    }
-
-    .brand-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .brand-sub {
-      font-family: var(--font-gaming);
-      font-size: 10px;
-      letter-spacing: 3px;
-      color: var(--primary);
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .brand-main {
-      font-family: var(--font-gaming);
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      background: linear-gradient(90deg, #ffffff, #ffb39e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-main);
-      font-size: 18px;
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .icon-btn:active {
-      transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .avatar-btn {
-      padding: 0;
-      overflow: hidden;
-      border: 1.5px solid var(--primary);
-    }
-
-    .avatar-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .badge-dot {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      width: 8px;
-      height: 8px;
-      background-color: var(--primary);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--primary);
-    }
-
-    .back-btn {
-      width: auto;
-      gap: 6px;
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-    .back-btn:hover, .back-btn:active { color: var(--primary); }
-
-    .sub-header-title {
-      font-family: var(--font-gaming);
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; user-select: none; }
+    #app-container { width: 100%; max-width: var(--max-app-width); height: 100vh; min-height: 100dvh; background-color: var(--bg-base); display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); }
+    @media (min-width: 431px) { #app-container { height: 94vh; border-radius: 28px; border: 1px solid #1f2636; } }
+    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
+    .header-bar { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
+    .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+    .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .badge-dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); }
+    .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
+    .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .sub-header-spacer { width: 38px; }
-
-    /* HAMBURGER SIDE DRAWER */
-    .drawer-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 150;
-      transition: opacity 0.3s ease;
-    }
-
-    .side-drawer {
-      position: absolute;
-      top: 0;
-      left: -320px;
-      width: 290px;
-      height: 100%;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border-color);
-      z-index: 200;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      padding: 20px 16px;
-      box-shadow: 10px 0 30px rgba(0,0,0,0.8);
-    }
-
+    .drawer-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 150; }
+    .side-drawer { position: absolute; top: 0; left: -320px; width: 290px; height: 100%; background: var(--bg-surface); border-right: 1px solid var(--border-color); z-index: 200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
     .side-drawer.open { transform: translateX(320px); }
-
-    .drawer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .drawer-user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .avatar-round {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 2px solid var(--primary);
-      object-fit: cover;
-    }
-
-    .user-meta h3 {
-      font-family: var(--font-gaming);
-      font-size: 18px;
-      color: var(--text-main);
-      line-height: 1.1;
-    }
-
-    .uid-tag {
-      font-size: 11px;
-      color: var(--accent-cyan);
-      font-weight: 500;
-    }
-
-    .drawer-nav {
-      flex: 1;
-      overflow-y: auto;
-      margin-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .drawer-link {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 14px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: var(--radius-sm);
-      transition: var(--transition);
-      background: transparent;
-      border: none;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .drawer-link i {
-      width: 18px;
-      font-size: 16px;
-      color: var(--text-dim);
-    }
-
-    .drawer-link:hover, .drawer-link:active {
-      background: var(--bg-card);
-      color: #fff;
-    }
-    .drawer-link:hover i { color: var(--primary); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .drawer-user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar-round { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .user-meta h3 { font-family: var(--font-gaming); font-size: 18px; color: var(--text-main); line-height: 1.1; }
+    .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
+    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
+    .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
+    .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
     .drawer-link.logout-link { color: var(--danger); }
-    .drawer-link.logout-link i { color: var(--danger); }
-
-    .drawer-divider {
-      height: 1px;
-      background: var(--border-color);
-      margin: 8px 0;
-    }
-
-    .drawer-footer {
-      padding-top: 12px;
-      text-align: center;
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
-
-    /* BOTTOM NAV */
-    .bottom-nav {
-      height: var(--bottom-nav-height);
-      background: rgba(14, 17, 24, 0.98);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 8px;
-      z-index: 100;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 10px;
-      font-weight: 600;
-      gap: 4px;
-      width: 20%;
-      transition: var(--transition);
-    }
-
+    .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
+    .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+    .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); }
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
-    .nav-item.active i {
-      transform: translateY(-2px);
-      filter: drop-shadow(0 0 6px var(--primary-glow));
-    }
-
-    /* MAIN VIEW CONTAINER */
-    .main-content {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding-bottom: 24px;
-      position: relative;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .view-container {
-      padding: 16px;
-      animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* BUTTONS & FORMS */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 13px 18px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #ff5733, #e62200);
-      color: #fff;
-      box-shadow: 0 4px 18px var(--primary-glow);
-    }
-
-    .btn-primary:active {
-      transform: scale(0.98);
-      filter: brightness(0.9);
-    }
-
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-cyan {
-      background: linear-gradient(135deg, #00f0ff, #0099cc);
-      color: #06070a;
-      font-weight: 800;
-      box-shadow: 0 4px 18px var(--accent-cyan-glow);
-    }
-
-    .btn-sm {
-      padding: 8px 12px;
-      font-size: 13px;
-      width: auto;
-    }
-
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; position: relative; -webkit-overflow-scrolling: touch; }
+    .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; }
     .form-group { margin-bottom: 14px; }
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      color: #fff;
-      font-family: var(--font-ui);
-      font-size: 14px;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .form-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 10px var(--primary-glow);
-    }
-
-    /* CARDS & PANELS */
-    .announcement-banner {
-      background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15));
-      border: 1px solid rgba(255, 70, 36, 0.3);
-      padding: 9px 12px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      font-size: 12px;
-      overflow: hidden;
-    }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .announcement-banner { background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15)); border: 1px solid rgba(255, 70, 36, 0.3); padding: 9px 12px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 12px; overflow: hidden; }
     .announcement-banner i { color: var(--accent-gold); }
-
-    .ticker-wrap { overflow: hidden; white-space: nowrap; }
-    .ticker-move {
-      display: inline-block;
-      animation: ticker 20s linear infinite;
-    }
-    @keyframes ticker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    .player-hero-card {
-      background: linear-gradient(145deg, #181d29, #0f131a);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 18px;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 16px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-    }
-
-    .hero-profile-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .hero-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      object-fit: cover;
-    }
-
-    .hero-details h2 {
-      font-family: var(--font-gaming);
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .hero-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .stat-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+    .ticker-wrap { overflow: hidden; white-space: nowrap; width: 100%; }
+    .ticker-move { display: inline-block; animation: ticker 25s linear infinite; }
+    @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
+    .hero-profile-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
+    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
+    .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
     .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
     .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
     .stat-val.gold { color: var(--accent-gold); }
     .stat-val.green { color: var(--success); }
-
-    .section-title {
-      font-family: var(--font-gaming);
-      font-size: 17px;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin: 18px 0 10px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .section-link {
-      font-size: 12px;
-      color: var(--accent-cyan);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .quick-actions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .action-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 12px 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      color: var(--text-main);
-      text-decoration: none;
-      cursor: pointer;
-      transition: var(--transition);
-    }
+    .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    .section-link { font-size: 12px; color: var(--accent-cyan); text-decoration: none; font-weight: 600; }
+    .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+    .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
     .action-card span { font-size: 11px; font-weight: 600; }
-    .action-card:active { transform: translateY(-2px); border-color: var(--primary); }
-
-    /* TOURNAMENT CARD */
-    .tournament-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 14px;
-      position: relative;
-      transition: var(--transition);
-    }
-    .tournament-card:hover { border-color: rgba(255, 70, 36, 0.4); }
-
-    .t-banner-wrapper {
-      position: relative;
-      width: 100%;
-      height: 120px;
-      background-color: #1a1e28;
-    }
+    .tournament-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; position: relative; }
+    .t-banner-wrapper { position: relative; width: 100%; height: 120px; background-color: #1a1e28; }
     .t-banner-img { width: 100%; height: 100%; object-fit: cover; }
-
-    .t-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: var(--font-gaming);
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
+    .t-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 4px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; text-transform: uppercase; }
     .badge-live { background: var(--danger); color: #fff; }
     .badge-upcoming { background: var(--accent-cyan); color: #000; }
     .badge-filling { background: var(--accent-gold); color: #000; }
     .badge-full { background: #555; color: #fff; }
-
     .t-details { padding: 14px; }
     .t-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
     .t-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .spec-pill {
-      font-size: 11px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      padding: 3px 7px;
-      border-radius: 4px;
-      color: var(--text-muted);
-    }
+    .spec-pill { font-size: 11px; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 3px 7px; border-radius: 4px; color: var(--text-muted); }
     .spec-pill strong { color: #fff; }
-
     .t-slot-progress-wrap { margin-bottom: 12px; }
-    .t-slot-bar {
-      width: 100%;
-      height: 6px;
-      background: var(--bg-surface);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-    .t-slot-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-cyan), var(--primary));
-      transition: width 0.4s ease;
-    }
-
-    .t-footer-grid {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border-color);
-      padding-top: 10px;
-    }
+    .t-slot-bar { width: 100%; height: 6px; background: var(--bg-surface); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .t-slot-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--primary)); }
+    .t-footer-grid { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; }
     .t-prize { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--accent-gold); }
     .t-fee { font-size: 12px; color: var(--text-muted); }
-
-    /* WALLET & TRANSACTIONS */
-    .wallet-hero {
-      background: linear-gradient(135deg, #1d1b28, #10121a);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
+    .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
     .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
-    .wallet-amount {
-      font-family: var(--font-gaming);
-      font-size: 38px;
-      font-weight: 800;
-      color: var(--accent-gold);
-      margin: 6px 0 14px 0;
-      text-shadow: 0 0 15px var(--accent-gold-glow);
-    }
+    .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
     .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .tx-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .tx-info h4 { font-size: 14px; font-weight: 600; }
     .tx-info span { font-size: 11px; color: var(--text-dim); }
     .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; }
     .tx-positive { color: var(--success); }
     .tx-negative { color: var(--danger); }
-
-    /* IMAGE UPLOADER */
-    .uploader-card {
-      border: 2px dashed var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 20px;
-      text-align: center;
-      background: var(--bg-card);
-      position: relative;
-      cursor: pointer;
-    }
-    .uploader-card input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    .uploader-preview {
-      position: relative;
-      width: 100%;
-      max-height: 220px;
-      overflow: hidden;
-      border-radius: var(--radius-sm);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-    }
+    .uploader-card { border: 2px dashed var(--border-color); border-radius: var(--radius-sm); padding: 20px; text-align: center; background: var(--bg-card); position: relative; cursor: pointer; }
+    .uploader-card input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .uploader-preview { position: relative; width: 100%; max-height: 220px; overflow: hidden; border-radius: var(--radius-sm); display: flex; justify-content: center; align-items: center; background: #000; }
     .uploader-preview img { max-width: 100%; max-height: 220px; object-fit: contain; }
-    .btn-remove-preview {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 23, 68, 0.85);
-      color: #fff;
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    /* MODAL & TOAST */
-    .modal-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(5px);
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-box {
-      background: var(--bg-surface);
-      border-radius: var(--radius);
-      width: 100%;
-      max-width: 360px;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-    }
-    .neon-border {
-      border-color: var(--primary);
-      box-shadow: 0 0 20px var(--primary-glow);
-    }
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal-box { background: var(--bg-surface); border-radius: var(--radius); width: 100%; max-width: 360px; padding: 20px; border: 1px solid var(--border-color); }
+    .neon-border { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .modal-header h3 { font-family: var(--font-gaming); font-size: 20px; }
     .modal-x { background: transparent; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; }
     .modal-body { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
     .modal-actions { display: flex; gap: 10px; }
-
-    .toast-container {
-      position: absolute;
-      bottom: 80px;
-      left: 16px;
-      right: 16px;
-      z-index: 600;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast-msg {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 13px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: slideToast 0.3s ease;
-      pointer-events: auto;
-    }
+    .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
     .toast-msg.toast-success { border-color: var(--success); }
     .toast-msg.toast-error { border-color: var(--danger); }
     .toast-msg.toast-info { border-color: var(--accent-cyan); }
-    @keyframes slideToast {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .global-loader {
-      position: absolute;
-      inset: 0;
-      background: rgba(6, 7, 10, 0.88);
-      backdrop-filter: blur(6px);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-    }
-    .spinner-flame {
-      width: 50px;
-      height: 50px;
-      border: 3px solid transparent;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
-
     .hidden { display: none !important; }
     .relative { position: relative; }
     .text-accent { color: var(--accent-cyan) !important; }
     .text-gold { color: var(--accent-gold) !important; }
-    .text-danger { color: var(--danger) !important; }
-    .glow-text { text-shadow: 0 0 10px var(--primary-glow); }
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; }
   </style>
@@ -827,10 +170,7 @@
 <body>
 
   <div id="app-container">
-    
-    <!-- TOP HEADER -->
     <header id="main-header" class="app-header">
-      <!-- Master Header -->
       <div id="master-header-bar" class="header-bar">
         <button id="btn-hamburger" class="icon-btn" aria-label="Open Menu">
           <i class="fa-solid fa-bars-staggered"></i>
@@ -850,7 +190,6 @@
         </div>
       </div>
 
-      <!-- Secondary Back Header -->
       <div id="sub-header-bar" class="header-bar hidden">
         <button id="btn-back" class="icon-btn back-btn">
           <i class="fa-solid fa-arrow-left"></i>
@@ -861,14 +200,13 @@
       </div>
     </header>
 
-    <!-- HAMBURGER SIDE DRAWER -->
     <div id="drawer-overlay" class="drawer-overlay hidden"></div>
     <aside id="side-drawer" class="side-drawer">
       <div class="drawer-header">
         <div class="drawer-user-info">
           <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-round" />
           <div class="user-meta">
-            <h3 id="drawer-name" class="glow-text">Player</h3>
+            <h3 id="drawer-name">Guest Gamer</h3>
             <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: --</span>
           </div>
         </div>
@@ -894,39 +232,21 @@
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
       <div class="drawer-footer">
-        <p>MULTANI FF v2.4.0 • 100% SECURE</p>
+        <p>MULTANI FF v2.4.0 • 100% PRODUCTION</p>
       </div>
     </aside>
 
-    <!-- MAIN VIEW CONTAINER -->
     <main id="app-view" class="main-content"></main>
 
-    <!-- BOTTOM NAVIGATION -->
     <nav id="bottom-nav" class="bottom-nav">
-      <a href="#/home" class="nav-item" data-route="#/home">
-        <i class="fa-solid fa-house"></i>
-        <span>Home</span>
-      </a>
-      <a href="#/tournaments" class="nav-item" data-route="#/tournaments">
-        <i class="fa-solid fa-trophy"></i>
-        <span>Tournaments</span>
-      </a>
-      <a href="#/matches" class="nav-item" data-route="#/matches">
-        <i class="fa-solid fa-crosshairs"></i>
-        <span>My Matches</span>
-      </a>
-      <a href="#/wallet" class="nav-item" data-route="#/wallet">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Wallet</span>
-      </a>
-      <a href="#/profile" class="nav-item" data-route="#/profile">
-        <i class="fa-solid fa-user-ninja"></i>
-        <span>Profile</span>
-      </a>
+      <a href="#/home" class="nav-item" data-route="#/home"><i class="fa-solid fa-house"></i><span>Home</span></a>
+      <a href="#/tournaments" class="nav-item" data-route="#/tournaments"><i class="fa-solid fa-trophy"></i><span>Tournaments</span></a>
+      <a href="#/matches" class="nav-item" data-route="#/matches"><i class="fa-solid fa-crosshairs"></i><span>My Matches</span></a>
+      <a href="#/wallet" class="nav-item" data-route="#/wallet"><i class="fa-solid fa-wallet"></i><span>Wallet</span></a>
+      <a href="#/profile" class="nav-item" data-route="#/profile"><i class="fa-solid fa-user-ninja"></i><span>Profile</span></a>
     </nav>
   </div>
 
-  <!-- MODAL -->
   <div id="modal-container" class="modal-overlay hidden">
     <div class="modal-box neon-border">
       <div class="modal-header">
@@ -941,261 +261,43 @@
     </div>
   </div>
 
-  <!-- TOAST CONTAINER -->
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- GLOBAL LOADER -->
   <div id="global-loader" class="global-loader hidden">
     <div class="spinner-flame"></div>
     <span id="global-loader-text" class="loader-text">Loading...</span>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
-    /* ==========================================================================
-       1. SUPABASE CREDENTIALS PLACEHOLDER
-       Replace with your Supabase URL & Anon Public Key. (NEVER put service-role key here)
-       ========================================================================== */
-    const SUPABASE_CONFIG = {
-      SUPABASE_URL: "https://your-supabase-project.supabase.co",
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    };
+    // ==========================================
+    // 1. SUPABASE CLIENT
+    // ==========================================
+    const SUPABASE_URL = "https://egjvdypwmybxlkouhrvs.supabase.co";
+    const SUPABASE_ANON_KEY = "Sb_publishable_i7FK-6GcgF4nbr72LodCcg_JSwcrNm1";
+    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let sbClient = null;
-    try {
-      if (window.supabase && SUPABASE_CONFIG.SUPABASE_URL.startsWith("https://") && !SUPABASE_CONFIG.SUPABASE_URL.includes("your-supabase-project")) {
-        sbClient = window.supabase.createClient(SUPABASE_CONFIG.SUPABASE_URL, SUPABASE_CONFIG.SUPABASE_ANON_KEY);
-      }
-    } catch (err) {
-      console.warn("Supabase init error:", err);
-    }
-
-    /* ==========================================================================
-       2. STATE STORE & MOCK DATA
-       ========================================================================== */
     const AppState = {
       user: null,
-      profile: {
-        username: "MultaniWarrior",
-        full_name: "Hamza Multani",
-        ff_uid: "2984189312",
-        ff_name: "MLT・HAMZA★",
-        email: "player@multaniff.com",
-        phone: "+92 300 1234567",
-        referral_code: "MLT777",
-        balance: 450,
-        total_winnings: 1850,
-        matches_played: 14,
-        matches_won: 6,
-        avatar_url: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200&auto=format&fit=crop&q=80"
-      },
-      siteSettings: {
-        website_title: "MULTANI FF OFFICIAL TOURNAMENT",
-        main_heading: "PAKISTAN'S ULTIMATE FREE FIRE BATTLEGROUND",
-        announcement_status: true,
-        announcement_text: "🔥 Grand Duo Championship this Sunday! Prize Pool: 15,000 PKR. Slots filling up fast!"
-      },
-      mockTournaments: [
-        {
-          id: "t-101",
-          title: "BATTLE ROYALE CLASH SQUAD #402",
-          game: "Free Fire Max",
-          mode: "Squad (4v4)",
-          map: "Bermuda Remastered",
-          entry_fee: 50,
-          prize_pool: 2400,
-          joined_players: 44,
-          max_players: 48,
-          match_date: "Today, 09:00 PM PKT",
-          reg_deadline: "Today, 08:30 PM PKT",
-          status: "filling",
-          banner_url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-          rules: "Strict mobile only. Teaming equals permanent suspension.",
-          winning_rules: "1st: 1400 PKR | 2nd: 600 PKR | 3rd: 400 PKR | Per Kill: 10 PKR"
-        },
-        {
-          id: "t-102",
-          title: "SOLO SURVIVORS SHOWDOWN #108",
-          game: "Free Fire Max",
-          mode: "Solo",
-          map: "Purgatory",
-          entry_fee: 30,
-          prize_pool: 1200,
-          joined_players: 48,
-          max_players: 48,
-          match_date: "Today, 10:30 PM PKT",
-          reg_deadline: "Today, 10:00 PM PKT",
-          status: "full",
-          banner_url: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
-          rules: "No emulator allowed. Gun skins off. Character skill: YES.",
-          winning_rules: "1st: 700 PKR | 2nd: 300 PKR | 3rd: 200 PKR"
-        },
-        {
-          id: "t-103",
-          title: "DUO ELITE CUP #22",
-          game: "Free Fire Max",
-          mode: "Duo",
-          map: "Kalahari",
-          entry_fee: 0,
-          prize_pool: 500,
-          joined_players: 18,
-          max_players: 50,
-          match_date: "Tomorrow, 07:00 PM PKT",
-          reg_deadline: "Tomorrow, 06:00 PM PKT",
-          status: "upcoming",
-          banner_url: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80",
-          rules: "Free entry tournament sponsored by MULTANI FF Clan.",
-          winning_rules: "1st Place: 500 PKR + Elite Pass Voucher"
-        }
-      ],
-      myJoinedMatches: [
-        {
-          tournament_id: "t-101",
-          tournament_title: "BATTLE ROYALE CLASH SQUAD #402",
-          slot_number: 14,
-          match_date: "Today, 09:00 PM PKT",
-          entry_fee: 50,
-          prize_pool: 2400,
-          room_id: "Hidden until 15m prior",
-          room_pass: "Hidden until 15m prior",
-          status: "upcoming"
-        }
-      ],
-      transactions: [
-        { id: "tx-1", type: "deposit", amount: 500, date: "2026-09-12 14:20", desc: "Easypaisa Deposit Approved", status: "approved", balance_after: 500 },
-        { id: "tx-2", type: "entry_fee", amount: -50, date: "2026-09-13 11:15", desc: "Joined Tournament #402", status: "completed", balance_after: 450 }
-      ],
-      notifications: [
-        { id: "notif-1", title: "Deposit Approved", message: "Your deposit of 500 PKR via JazzCash has been approved.", time: "2 hours ago", read: false },
-        { id: "notif-2", title: "Tournament Reminder", message: "Clash Squad #402 starts at 09:00 PM PKT. Be on time.", time: "5 hours ago", read: true }
-      ],
-      supportMessages: [
-        { id: 1, sender: "admin", text: "Welcome to MULTANI FF Support! How can we assist your squad today?", time: "10:00 AM" }
-      ]
+      profile: null,
+      siteSettings: {},
+      tournaments: [],
+      myMatches: [],
+      transactions: [],
+      notifications: []
     };
 
-    /* ==========================================================================
-       3. SUPABASE SERVICE LAYER
-       ========================================================================== */
-    const SupabaseService = {
-      async registerUser(formData) {
-        if (!sbClient) return { error: null, user: AppState.profile };
-        return await sbClient.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              full_name: formData.fullName,
-              username: formData.username,
-              ff_uid: formData.ffUid,
-              ff_name: formData.ffName,
-              phone: formData.phone
-            }
-          }
-        });
-      },
-
-      async login(email, password) {
-        if (!sbClient) return { data: { user: AppState.profile }, error: null };
-        return await sbClient.auth.signInWithPassword({ email, password });
-      },
-
-      async logout() {
-        if (sbClient) await sbClient.auth.signOut();
-        AppState.user = null;
-      },
-
-      async joinTournamentRPC(tournamentId) {
-        if (!sbClient) {
-          const t = AppState.mockTournaments.find(x => x.id === tournamentId);
-          if (!t) return { success: false, message: "Tournament not found." };
-          if (AppState.profile.balance < t.entry_fee) {
-            return { success: false, message: "Insufficient wallet balance." };
-          }
-          AppState.profile.balance -= t.entry_fee;
-          t.joined_players += 1;
-          const bookedSlot = t.joined_players;
-          AppState.myJoinedMatches.unshift({
-            tournament_id: t.id,
-            tournament_title: t.title,
-            slot_number: bookedSlot,
-            match_date: t.match_date,
-            entry_fee: t.entry_fee,
-            prize_pool: t.prize_pool,
-            room_id: "Released 15m before match",
-            room_pass: "Released 15m before match",
-            status: "upcoming"
-          });
-          AppState.transactions.unshift({
-            id: "tx-" + Date.now(),
-            type: "entry_fee",
-            amount: -t.entry_fee,
-            date: "Just now",
-            desc: `Entry Fee: ${t.title}`,
-            status: "completed",
-            balance_after: AppState.profile.balance
-          });
-          return { success: true, slotNumber: bookedSlot };
-        }
-
-        const { data, error } = await sbClient.rpc('join_tournament_permanently', { p_tournament_id: tournamentId });
-        if (error) return { success: false, message: error.message };
-        return data;
-      },
-
-      async submitDeposit(file, amount, method, txnId, senderName) {
-        if (sbClient) {
-          const fileExt = file.name.split('.').pop();
-          const filePath = `receipts/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-          
-          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file);
-          if (uploadError) return { success: false, message: uploadError.message };
-
-          const { error } = await sbClient.from('deposit_requests').insert([{
-            amount: parseFloat(amount),
-            payment_method: method,
-            transaction_id: txnId,
-            sender_name: senderName,
-            screenshot_url: filePath,
-            status: 'pending'
-          }]);
-          if (error) return { success: false, message: error.message };
-        } else {
-          AppState.transactions.unshift({
-            id: "dep-" + Date.now(),
-            type: "deposit",
-            amount: parseFloat(amount),
-            date: "Just now",
-            desc: `Deposit via ${method} (Pending)`,
-            status: "pending",
-            balance_after: AppState.profile.balance
-          });
-        }
-        return { success: true, message: "Deposit slip submitted successfully. Verification pending." };
-      }
-    };
-
-    /* ==========================================================================
-       4. TOAST, MODAL & LOADER HELPERS
-       ========================================================================== */
     const Toast = {
       show(message, type = 'info') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast-msg toast-${type}`;
-        
-        let icon = 'fa-circle-info';
-        if (type === 'success') icon = 'fa-circle-check';
-        if (type === 'error') icon = 'fa-triangle-exclamation';
-
+        let icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
         toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
         container.appendChild(toast);
-
         setTimeout(() => {
           toast.style.opacity = '0';
           toast.style.transition = '0.3s ease';
           setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        }, 3200);
       }
     };
 
@@ -1204,35 +306,23 @@
         const modalEl = document.getElementById('modal-container');
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-body').innerHTML = body;
-        
         const confirmBtn = document.getElementById('modal-confirm-btn');
         confirmBtn.innerText = confirmText;
         modalEl.classList.remove('hidden');
-
-        const handleConfirm = () => {
-          if (onConfirm) onConfirm();
-          Modal.close();
-          cleanup();
-        };
-
-        const handleCancel = () => {
-          Modal.close();
-          cleanup();
-        };
 
         const cleanup = () => {
           confirmBtn.removeEventListener('click', handleConfirm);
           document.getElementById('modal-cancel-btn').removeEventListener('click', handleCancel);
           document.getElementById('modal-close').removeEventListener('click', handleCancel);
         };
+        const handleConfirm = () => { if (onConfirm) onConfirm(); Modal.close(); cleanup(); };
+        const handleCancel = () => { Modal.close(); cleanup(); };
 
         confirmBtn.addEventListener('click', handleConfirm);
         document.getElementById('modal-cancel-btn').addEventListener('click', handleCancel);
         document.getElementById('modal-close').addEventListener('click', handleCancel);
       },
-      close() {
-        document.getElementById('modal-container').classList.add('hidden');
-      }
+      close() { document.getElementById('modal-container').classList.add('hidden'); }
     };
 
     const Loader = {
@@ -1240,76 +330,105 @@
         document.getElementById('global-loader-text').innerText = text;
         document.getElementById('global-loader').classList.remove('hidden');
       },
-      hide() {
-        document.getElementById('global-loader').classList.add('hidden');
-      }
+      hide() { document.getElementById('global-loader').classList.add('hidden'); }
     };
 
-    /* ==========================================================================
-       5. ROUTER & DRAWER ENGINE
-       ========================================================================== */
-    const Drawer = {
-      init() {
-        document.getElementById('btn-hamburger').addEventListener('click', () => this.open());
-        document.getElementById('btn-close-drawer').addEventListener('click', () => this.close());
-        document.getElementById('drawer-overlay').addEventListener('click', () => this.close());
-        document.getElementById('btn-back').addEventListener('click', () => Router.back());
-
-        document.getElementById('btn-drawer-logout').addEventListener('click', () => {
-          this.close();
-          Modal.show({
-            title: "Log Out",
-            body: "Are you sure you want to end your gaming session?",
-            confirmText: "Logout",
-            onConfirm: async () => {
-              await SupabaseService.logout();
-              Toast.show("Logged out successfully", "info");
-              Router.navigate('#/login');
-            }
-          });
-        });
-      },
-      open() {
-        document.getElementById('side-drawer').classList.add('open');
-        document.getElementById('drawer-overlay').classList.remove('hidden');
-        document.getElementById('drawer-name').innerText = AppState.profile.ff_name || AppState.profile.username;
-        document.getElementById('drawer-uid').innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${AppState.profile.ff_uid}`;
-      },
-      close() {
-        document.getElementById('side-drawer').classList.remove('open');
-        document.getElementById('drawer-overlay').classList.add('hidden');
+    // ==========================================
+    // 2. DATA FUNCTIONS
+    // ==========================================
+    async function loadSettings() {
+      const { data } = await sbClient.from('site_settings').select('*');
+      if (data) {
+        data.forEach(item => { AppState.siteSettings[item.setting_key] = item.setting_value; });
       }
-    };
+    }
 
+    async function loadProfile() {
+      const { data: { user } } = await sbClient.auth.getUser();
+      if (!user) {
+        AppState.user = null;
+        AppState.profile = null;
+        return null;
+      }
+      AppState.user = user;
+      const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
+      if (data) {
+        AppState.profile = data;
+        updateHeaderAndDrawerProfile();
+      }
+      return AppState.profile;
+    }
+
+    function updateHeaderAndDrawerProfile() {
+      if (!AppState.profile) return;
+      const avatar = AppState.profile.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+      document.getElementById('header-avatar-img').src = avatar;
+      document.getElementById('drawer-avatar').src = avatar;
+      document.getElementById('drawer-name').innerText = AppState.profile.free_fire_name || AppState.profile.username || 'Gamer';
+      document.getElementById('drawer-uid').innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${AppState.profile.free_fire_uid || '--'}`;
+    }
+
+    async function loadTournaments() {
+      const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+      if (data) AppState.tournaments = data;
+      return AppState.tournaments;
+    }
+
+    async function loadMyMatches() {
+      if (!AppState.user) return [];
+      const { data } = await sbClient.from('tournament_entries').select('*, tournaments(*)').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
+      if (data) AppState.myMatches = data;
+      return AppState.myMatches;
+    }
+
+    async function loadWallet() {
+      if (!AppState.user) return;
+      await loadProfile();
+      const { data } = await sbClient.from('wallet_transactions').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
+      if (data) AppState.transactions = data;
+    }
+
+    async function loadNotifications() {
+      if (!AppState.user) return;
+      const { data } = await sbClient.from('notifications').select('*').eq('user_id', AppState.user.id).order('created_at', { ascending: false });
+      if (data) {
+        AppState.notifications = data;
+        document.getElementById('notif-badge').classList.toggle('hidden', !data.some(n => !n.is_read));
+      }
+    }
+
+    function checkAuthOrRedirect() {
+      if (!AppState.user) {
+        Toast.show("Please login to proceed", "info");
+        Router.navigate('#/login');
+        return false;
+      }
+      if (AppState.profile?.is_banned) {
+        Toast.show("Your account is banned. Action restricted.", "error");
+        return false;
+      }
+      return true;
+    }
+
+    // ==========================================
+    // 3. ROUTER & VIEWS
+    // ==========================================
     const Router = {
       routes: {},
       init() {
         window.addEventListener('hashchange', () => this.handleRoute());
-        if (!window.location.hash) {
-          window.location.hash = '#/home';
-        } else {
-          this.handleRoute();
-        }
+        this.handleRoute();
       },
-      navigate(hash) {
-        window.location.hash = hash;
+      navigate(hash) { window.location.hash = hash; },
+      back() { if (window.history.length > 1) window.history.back(); else this.navigate('#/home'); },
+      register(path, handler, title, isSecondary = false) {
+        this.routes[path] = { handler, title, isSecondary };
       },
-      back() {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          this.navigate('#/home');
-        }
-      },
-      register(path, viewHandler, title = "MULTANI FF", isSecondary = false) {
-        this.routes[path] = { viewHandler, title, isSecondary };
-      },
-      handleRoute() {
-        const rawHash = window.location.hash || '#/home';
-        const [path, param] = rawHash.split('/');
-        const fullRouteKey = param ? `${path}/:id` : path;
-
-        const route = this.routes[fullRouteKey] || this.routes['#/home'];
+      async handleRoute() {
+        const raw = window.location.hash || '#/home';
+        const [path, id] = raw.split('/');
+        const key = id ? `${path}/:id` : path;
+        const route = this.routes[key] || this.routes['#/home'];
 
         const masterHeader = document.getElementById('master-header-bar');
         const subHeader = document.getElementById('sub-header-bar');
@@ -1318,93 +437,102 @@
         if (route.isSecondary) {
           masterHeader.classList.add('hidden');
           subHeader.classList.remove('hidden');
-          subTitle.textContent = route.title;
+          subTitle.innerText = route.title;
         } else {
           masterHeader.classList.remove('hidden');
           subHeader.classList.add('hidden');
         }
 
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.toggle('active', item.getAttribute('data-route') === path);
+        document.querySelectorAll('.nav-item').forEach(el => {
+          el.classList.toggle('active', el.getAttribute('data-route') === path);
         });
 
         Drawer.close();
-
-        const viewContainer = document.getElementById('app-view');
-        viewContainer.scrollTop = 0;
-        viewContainer.innerHTML = '';
-        route.viewHandler(param);
+        const view = document.getElementById('app-view');
+        view.scrollTop = 0;
+        view.innerHTML = '';
+        await route.handler(id);
       }
     };
 
-    /* ==========================================================================
-       6. VIEW RENDERERS
-       ========================================================================== */
-    function renderHome() {
-      const container = document.getElementById('app-view');
-      const announcementHtml = AppState.siteSettings.announcement_status ? `
+    // VIEW: HOME
+    async function renderHome() {
+      Loader.show("Loading Home...");
+      await Promise.all([loadSettings(), loadTournaments()]);
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      const tickerText = AppState.siteSettings.announcement_ticker || "🔥 Welcome to MULTANI FF Official Tournament platform!";
+      const tickerActive = AppState.siteSettings.announcement_enabled !== 'false';
+
+      const announcementHtml = tickerActive ? `
         <div class="announcement-banner">
           <i class="fa-solid fa-bullhorn"></i>
-          <div class="ticker-wrap"><div class="ticker-move">${AppState.siteSettings.announcement_text}</div></div>
+          <div class="ticker-wrap"><div class="ticker-move">${tickerText}</div></div>
         </div>
       ` : '';
 
-      const tournamentsHtml = AppState.mockTournaments.map(t => `
-        <div class="tournament-card" onclick="Router.navigate('#/tournament/${t.id}')">
-          <div class="t-banner-wrapper">
-            <img src="${t.banner_url}" class="t-banner-img" alt="${t.title}" />
-            <span class="t-badge badge-${t.status}">${t.status}</span>
-          </div>
-          <div class="t-details">
-            <h3 class="t-title">${t.title}</h3>
-            <div class="t-specs">
-              <span class="spec-pill">Mode: <strong>${t.mode}</strong></span>
-              <span class="spec-pill">Map: <strong>${t.map}</strong></span>
-              <span class="spec-pill"><i class="fa-solid fa-clock"></i> ${t.match_date}</span>
-            </div>
-            <div class="t-slot-progress-wrap">
-              <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
-                <span>Slots: ${t.joined_players}/${t.max_players}</span>
-                <span>${Math.round((t.joined_players / t.max_players) * 100)}%</span>
-              </div>
-              <div class="t-slot-bar">
-                <div class="t-slot-fill" style="width: ${(t.joined_players / t.max_players) * 100}%"></div>
-              </div>
-            </div>
-            <div class="t-footer-grid">
-              <div>
-                <div class="t-fee">Entry: <span class="${t.entry_fee === 0 ? 'text-accent' : 'text-gold'}">${t.entry_fee === 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-                <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
-              </div>
-              <button class="btn btn-primary btn-sm">DETAILS</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
+      const p = AppState.profile || { free_fire_name: "Guest Player", free_fire_uid: "Not Logged In", wallet_balance: 0, total_won: 0, total_matches: 0, avatar_url: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" };
 
-      container.innerHTML = `
+      const tournamentsHtml = AppState.tournaments.length ? AppState.tournaments.map(t => {
+        const pct = Math.min(100, Math.round(((t.joined_players || 0) / t.max_players) * 100));
+        return `
+          <div class="tournament-card" onclick="Router.navigate('#/tournament/${t.id}')">
+            <div class="t-banner-wrapper">
+              <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" alt="${t.title}" />
+              <span class="t-badge badge-${t.status}">${t.status}</span>
+            </div>
+            <div class="t-details">
+              <h3 class="t-title">${t.title}</h3>
+              <div class="t-specs">
+                <span class="spec-pill">Mode: <strong>${t.mode}</strong></span>
+                <span class="spec-pill">Map: <strong>${t.map}</strong></span>
+                <span class="spec-pill"><i class="fa-solid fa-clock"></i> ${new Date(t.match_date).toLocaleString()}</span>
+              </div>
+              <div class="t-slot-progress-wrap">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                  <span>Slots: ${t.joined_players || 0}/${t.max_players}</span>
+                  <span>${pct}%</span>
+                </div>
+                <div class="t-slot-bar">
+                  <div class="t-slot-fill" style="width: ${pct}%"></div>
+                </div>
+              </div>
+              <div class="t-footer-grid">
+                <div>
+                  <div class="t-fee">Entry: <span class="${t.entry_fee == 0 ? 'text-accent' : 'text-gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+                  <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
+                </div>
+                <button class="btn btn-primary btn-sm">JOIN MATCH</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') : `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No active tournaments found.</p></div>`;
+
+      view.innerHTML = `
         <div class="view-container">
           ${announcementHtml}
           <div class="player-hero-card">
             <div class="hero-profile-row">
-              <img src="${AppState.profile.avatar_url}" class="hero-avatar" alt="Avatar" />
+              <img src="${p.avatar_url}" class="hero-avatar" alt="Avatar" />
               <div class="hero-details">
-                <h2>${AppState.profile.ff_name}</h2>
-                <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${AppState.profile.ff_uid}</span>
+                <h2>${p.free_fire_name || p.username || 'Multani Soldier'}</h2>
+                <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${p.free_fire_uid || '--'}</span>
               </div>
             </div>
             <div class="hero-stats-grid">
               <div class="stat-box">
                 <span class="stat-label">Balance</span>
-                <span class="stat-val gold">PKR ${AppState.profile.balance}</span>
+                <span class="stat-val gold">PKR ${p.wallet_balance || 0}</span>
               </div>
               <div class="stat-box">
                 <span class="stat-label">Won</span>
-                <span class="stat-val green">PKR ${AppState.profile.total_winnings}</span>
+                <span class="stat-val green">PKR ${p.total_won || 0}</span>
               </div>
               <div class="stat-box">
                 <span class="stat-label">Matches</span>
-                <span class="stat-val">${AppState.profile.matches_played}</span>
+                <span class="stat-val">${p.total_matches || 0}</span>
               </div>
             </div>
           </div>
@@ -1419,7 +547,7 @@
           </div>
 
           <div class="section-title">
-            <span>Live Tournaments</span>
+            <span>Available Tournaments</span>
             <a href="#/tournaments" class="section-link">View All <i class="fa-solid fa-chevron-right"></i></a>
           </div>
           <div>${tournamentsHtml}</div>
@@ -1427,44 +555,32 @@
       `;
     }
 
-    function renderTournaments() {
-      const container = document.getElementById('app-view');
-      const cardsHtml = AppState.mockTournaments.map(t => `
-        <div class="tournament-card" onclick="Router.navigate('#/tournament/${t.id}')">
-          <div class="t-banner-wrapper">
-            <img src="${t.banner_url}" class="t-banner-img" alt="${t.title}" />
-            <span class="t-badge badge-${t.status}">${t.status}</span>
-          </div>
-          <div class="t-details">
-            <h3 class="t-title">${t.title}</h3>
-            <div class="t-specs">
-              <span class="spec-pill">${t.mode}</span>
-              <span class="spec-pill">${t.map}</span>
-              <span class="spec-pill">${t.match_date}</span>
-            </div>
-            <div class="t-footer-grid">
-              <div>
-                <div class="t-fee">Entry: <strong>${t.entry_fee === 0 ? 'FREE' : t.entry_fee + ' PKR'}</strong></div>
-                <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
-              </div>
-              <button class="btn btn-primary btn-sm">VIEW DETAILS</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
+    // VIEW: MATCH DETAILS (CALLS YOUR EXISTING join_tournament RPC)
+    async function renderTournamentDetails(id) {
+      Loader.show("Fetching match...");
+      const { data: t, error } = await sbClient.from('tournaments').select('*').eq('id', id).single();
+      Loader.hide();
 
-      container.innerHTML = `<div class="view-container"><div>${cardsHtml}</div></div>`;
-    }
+      if (error || !t) {
+        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><p>Tournament not found.</p></div>`;
+        return;
+      }
 
-    function renderTournamentDetails(tournamentId) {
-      const t = AppState.mockTournaments.find(x => x.id === tournamentId) || AppState.mockTournaments[0];
-      const container = document.getElementById('app-view');
-      const isAlreadyJoined = AppState.myJoinedMatches.some(m => m.tournament_id === t.id);
+      let isJoined = false;
+      let userSlot = null;
+      if (AppState.user) {
+        const { data: entry } = await sbClient.from('tournament_entries').select('slot_number').eq('tournament_id', t.id).eq('user_id', AppState.user.id).maybeSingle();
+        if (entry) {
+          isJoined = true;
+          userSlot = entry.slot_number;
+        }
+      }
 
-      container.innerHTML = `
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
         <div class="view-container">
           <div class="t-banner-wrapper" style="height: 180px; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;">
-            <img src="${t.banner_url}" class="t-banner-img" alt="${t.title}" />
+            <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" alt="${t.title}" />
             <span class="t-badge badge-${t.status}">${t.status}</span>
           </div>
 
@@ -1473,7 +589,7 @@
           <div class="hero-stats-grid" style="margin-bottom: 16px;">
             <div class="stat-box">
               <span class="stat-label">Entry Fee</span>
-              <span class="stat-val ${t.entry_fee === 0 ? 'green' : 'gold'}">${t.entry_fee === 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
+              <span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
             </div>
             <div class="stat-box">
               <span class="stat-label">Prize Pool</span>
@@ -1481,55 +597,58 @@
             </div>
             <div class="stat-box">
               <span class="stat-label">Slots</span>
-              <span class="stat-val">${t.joined_players}/${t.max_players}</span>
+              <span class="stat-val">${t.joined_players || 0}/${t.max_players}</span>
             </div>
           </div>
 
           <div class="player-hero-card" style="margin-bottom: 14px;">
             <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 8px;">Prize Distribution</h4>
-            <p style="font-size: 13px;">${t.winning_rules}</p>
+            <p style="font-size: 13px;">${t.winning_rules || 'Standard rules apply.'}</p>
           </div>
 
           <div class="player-hero-card" style="margin-bottom: 20px;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--danger); margin-bottom: 8px;">Rules & Fair Play</h4>
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules}</p>
+            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--danger); margin-bottom: 8px;">Rules & Guidelines</h4>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Strict mobile only. Emulators/hacks strictly prohibited.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
-            ${
-              isAlreadyJoined
-              ? `<button class="btn btn-secondary" style="cursor: not-allowed;" disabled>
-                  <i class="fa-solid fa-check-double"></i> YOU HAVE BOOKED A PERMANENT SLOT
-                 </button>`
-              : `<button id="btn-join-match" class="btn btn-primary">
-                  <i class="fa-solid fa-shield-virus"></i> JOIN TOURNAMENT (${t.entry_fee} PKR)
-                 </button>`
-            }
+            ${isJoined ? `
+              <button class="btn btn-secondary" style="cursor: not-allowed;" disabled>
+                <i class="fa-solid fa-check-double"></i> PERMANENT SLOT ASSIGNED: #${userSlot || 'Joined'}
+              </button>
+            ` : `
+              <button id="btn-join-match" class="btn btn-primary">
+                <i class="fa-solid fa-shield-virus"></i> JOIN TOURNAMENT (${t.entry_fee} PKR)
+              </button>
+            `}
           </div>
         </div>
       `;
 
-      if (!isAlreadyJoined) {
+      if (!isJoined) {
         document.getElementById('btn-join-match').addEventListener('click', () => {
+          if (!checkAuthOrRedirect()) return;
+
           Modal.show({
-            title: "Confirm Permanent Slot Booking",
+            title: "Book Permanent Slot",
             body: `
-              <p>Entry fee of <strong>PKR ${t.entry_fee}</strong> will be deducted instantly from your Multani FF Wallet.</p>
+              <p>Entry Fee: <strong>PKR ${t.entry_fee}</strong> will be deducted atomically from your wallet.</p>
               <div style="margin-top:10px; font-size:12px; color:var(--text-muted); border-left: 2px solid var(--danger); padding-left: 8px;">
-                Once joined, this booking is <strong>PERMANENT</strong>. You cannot leave, cancel, or refund your slot.
+                Once joined, this booking is <strong>PERMANENT</strong>. No refunds or cancellations.
               </div>
             `,
-            confirmText: "Deduct & Book Slot",
+            confirmText: "Confirm & Deduct",
             onConfirm: async () => {
-              Loader.show("Securing Slot...");
-              const res = await SupabaseService.joinTournamentRPC(t.id);
+              Loader.show("Securing Permanent Slot...");
+              const { data, error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
               Loader.hide();
 
-              if (res.success) {
-                Toast.show(`Slot #${res.slotNumber} booked permanently!`, "success");
-                renderTournamentDetails(t.id);
+              if (error) {
+                Toast.show(error.message, "error");
               } else {
-                Toast.show(res.message || "Failed to join tournament", "error");
+                Toast.show("Joined successfully!", "success");
+                await loadProfile();
+                renderTournamentDetails(t.id);
               }
             }
           });
@@ -1537,66 +656,80 @@
       }
     }
 
-    function renderMyMatches() {
-      const container = document.getElementById('app-view');
-      if (!AppState.myJoinedMatches.length) {
-        container.innerHTML = `
+    // VIEW: MY MATCHES
+    async function renderMyMatches() {
+      if (!checkAuthOrRedirect()) return;
+      Loader.show("Loading Joined Matches...");
+      await loadMyMatches();
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (!AppState.myMatches.length) {
+        view.innerHTML = `
           <div class="view-container empty-state">
             <i class="fa-solid fa-crosshairs"></i>
             <h3>No Registered Matches</h3>
-            <p>Join a tournament to view booked slots.</p>
+            <p>Join a tournament to view your reserved slots.</p>
           </div>
         `;
         return;
       }
 
-      const matchesHtml = AppState.myJoinedMatches.map(m => `
-        <div class="tournament-card" style="padding: 14px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-            <h3 class="t-title" style="margin:0;">${m.tournament_title}</h3>
-            <span class="spec-pill" style="background:var(--primary); color:#fff; font-weight:700;">SLOT #${m.slot_number}</span>
-          </div>
-          
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">
-            <div><i class="fa-solid fa-calendar-day"></i> Schedule: ${m.match_date}</div>
-            <div><i class="fa-solid fa-coins"></i> Entry: ${m.entry_fee} PKR | Prize: ${m.prize_pool} PKR</div>
-          </div>
-
-          <div style="background:rgba(0,0,0,0.4); border:1px dashed var(--border-color); border-radius: var(--radius-sm); padding:10px; margin-bottom:10px;">
-            <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">
-              <i class="fa-solid fa-lock"></i> Custom Room Credentials
+      const matchesHtml = AppState.myMatches.map(m => {
+        const t = m.tournaments || {};
+        const showRoom = t.room_id ? true : false;
+        return `
+          <div class="tournament-card" style="padding: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
+              <h3 class="t-title" style="margin:0;">${t.title}</h3>
+              <span class="spec-pill" style="background:var(--primary); color:#fff; font-weight:700;">SLOT #${m.slot_number || '--'}</span>
             </div>
-            <div style="font-size:13px; font-family:monospace; margin-top:4px;">
-              <div>Room ID: <span style="color:var(--accent-cyan);">${m.room_id}</span></div>
-              <div>Password: <span style="color:var(--accent-cyan);">${m.room_pass}</span></div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">
+              <div><i class="fa-solid fa-calendar-day"></i> Match: ${new Date(t.match_date).toLocaleString()}</div>
+              <div><i class="fa-solid fa-coins"></i> Entry: ${t.entry_fee} PKR | Prize: ${t.prize_pool} PKR</div>
             </div>
+            <div style="background:rgba(0,0,0,0.4); border:1px dashed var(--border-color); border-radius: var(--radius-sm); padding:10px; margin-bottom:10px;">
+              <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">
+                <i class="fa-solid fa-lock"></i> Custom Room Credentials
+              </div>
+              <div style="font-size:13px; font-family:monospace; margin-top:4px;">
+                <div>Room ID: <span style="color:var(--accent-cyan); font-weight:bold;">${showRoom ? t.room_id : 'Pending Release (Wait for Admin)'}</span></div>
+                <div>Password: <span style="color:var(--accent-cyan); font-weight:bold;">${showRoom ? t.room_password : '••••••••'}</span></div>
+              </div>
+            </div>
+            <div style="font-size:11px; color:var(--text-dim); text-align:right;">Slot is permanent & verified</div>
           </div>
-          <div style="font-size:11px; color:var(--text-dim); text-align:right;">Slot is permanent & non-refundable</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
-      container.innerHTML = `<div class="view-container">${matchesHtml}</div>`;
+      view.innerHTML = `<div class="view-container">${matchesHtml}</div>`;
     }
 
-    function renderWallet() {
-      const container = document.getElementById('app-view');
-      const transactionsHtml = AppState.transactions.map(tx => `
+    // VIEW: WALLET
+    async function renderWallet() {
+      if (!checkAuthOrRedirect()) return;
+      Loader.show("Fetching Wallet...");
+      await loadWallet();
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      const transactionsHtml = AppState.transactions.length ? AppState.transactions.map(tx => `
         <div class="tx-item">
           <div class="tx-info">
-            <h4>${tx.desc}</h4>
-            <span>${tx.date} • <strong style="text-transform:capitalize;">${tx.status}</strong></span>
+            <h4>${tx.description || tx.transaction_type}</h4>
+            <span>${new Date(tx.created_at).toLocaleString()} • <strong style="text-transform:capitalize;">${tx.status}</strong></span>
           </div>
           <div class="tx-amount ${tx.amount > 0 ? 'tx-positive' : 'tx-negative'}">
             ${tx.amount > 0 ? '+' : ''}${tx.amount} PKR
           </div>
         </div>
-      `).join('');
+      `).join('') : `<div class="empty-state"><p>No transactions recorded yet.</p></div>`;
 
-      container.innerHTML = `
+      view.innerHTML = `
         <div class="view-container">
           <div class="wallet-hero">
             <span class="wallet-balance-title">Available Cash Balance</span>
-            <div class="wallet-amount">PKR ${AppState.profile.balance}</div>
+            <div class="wallet-amount">PKR ${AppState.profile?.wallet_balance || 0}</div>
             <div class="wallet-actions">
               <button class="btn btn-primary" onclick="Router.navigate('#/deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Deposit</button>
               <button class="btn btn-secondary" onclick="Router.navigate('#/withdraw')"><i class="fa-solid fa-circle-arrow-up"></i> Withdraw</button>
@@ -1608,20 +741,25 @@
       `;
     }
 
+    // VIEW: DEPOSIT
     function renderDeposit() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+      if (!checkAuthOrRedirect()) return;
+      const view = document.getElementById('app-view');
+      const depositNumber = AppState.siteSettings.payment_account_number || "0300-1234567";
+      const depositTitle = AppState.siteSettings.payment_account_title || "MULTANI FF OFFICIAL";
+
+      view.innerHTML = `
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom:14px;">
-            <h4 style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Accounts</h4>
-            <div style="font-size:13px;">JazzCash / Easypaisa: <strong>0300-1234567</strong></div>
-            <div style="font-size:12px; color:var(--text-muted);">Title: MULTANI FF OFFICIAL</div>
+            <h4 style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Accounts</h4>
+            <div style="font-size:13px;">JazzCash / Easypaisa: <strong>${depositNumber}</strong></div>
+            <div style="font-size:12px; color:var(--text-muted);">Title: ${depositTitle}</div>
           </div>
 
           <form id="deposit-form">
             <div class="form-group">
               <label class="form-label">Deposit Amount (PKR)</label>
-              <input type="number" id="dep-amount" class="form-input" placeholder="e.g. 500" required min="30" />
+              <input type="number" id="dep-amount" class="form-input" placeholder="Min 30" required min="30" />
             </div>
             <div class="form-group">
               <label class="form-label">Payment Method</label>
@@ -1633,23 +771,22 @@
             </div>
             <div class="form-group">
               <label class="form-label">Sender Account Name</label>
-              <input type="text" id="dep-sender" class="form-input" placeholder="Sender Name" required />
+              <input type="text" id="dep-sender" class="form-input" placeholder="Your account name" required />
             </div>
             <div class="form-group">
               <label class="form-label">Transaction ID (TID)</label>
               <input type="text" id="dep-tid" class="form-input" placeholder="e.g. 9841893121" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Payment Screenshot</label>
+              <label class="form-label">Payment Screenshot Proof</label>
               <div id="uploader-dropzone" class="uploader-card">
-                <input type="file" id="dep-file" accept="image/png, image/jpeg, image/webp" capture="environment" required />
+                <input type="file" id="dep-file" accept="image/*" required />
                 <div id="uploader-prompt">
                   <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px; color:var(--accent-cyan);"></i>
-                  <div style="font-size:13px; font-weight:600; margin-top:4px;">Upload Receipt Image</div>
+                  <div style="font-size:13px; font-weight:600; margin-top:4px;">Select Screenshot Image</div>
                 </div>
                 <div id="uploader-preview-box" class="uploader-preview hidden">
-                  <img id="uploader-img-preview" src="" alt="Proof Preview" />
-                  <button type="button" id="btn-clear-preview" class="btn-remove-preview"><i class="fa-solid fa-xmark"></i></button>
+                  <img id="uploader-img-preview" src="" alt="Proof" />
                 </div>
               </div>
             </div>
@@ -1658,78 +795,80 @@
         </div>
       `;
 
-      const fileInput = document.getElementById('dep-file');
-      const promptBox = document.getElementById('uploader-prompt');
-      const previewBox = document.getElementById('uploader-preview-box');
-      const previewImg = document.getElementById('uploader-img-preview');
-      const clearBtn = document.getElementById('btn-clear-preview');
       let selectedFile = null;
-
+      const fileInput = document.getElementById('dep-file');
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
           if (file.size > 5 * 1024 * 1024) {
-            Toast.show("File size exceeds 5MB limit", "error");
+            Toast.show("Screenshot must be under 5MB", "error");
             fileInput.value = "";
             return;
           }
           selectedFile = file;
           const reader = new FileReader();
           reader.onload = (re) => {
-            previewImg.src = re.target.result;
-            promptBox.classList.add('hidden');
-            previewBox.classList.remove('hidden');
+            document.getElementById('uploader-img-preview').src = re.target.result;
+            document.getElementById('uploader-prompt').classList.add('hidden');
+            document.getElementById('uploader-preview-box').classList.remove('hidden');
           };
           reader.readAsDataURL(file);
         }
       });
 
-      clearBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectedFile = null;
-        fileInput.value = "";
-        previewImg.src = "";
-        previewBox.classList.add('hidden');
-        promptBox.classList.remove('hidden');
-      });
-
       document.getElementById('deposit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!selectedFile) {
-          Toast.show("Please select screenshot proof", "error");
+          Toast.show("Please upload transaction screenshot", "error");
           return;
         }
-        Loader.show("Uploading Receipt...");
-        const res = await SupabaseService.submitDeposit(
-          selectedFile,
-          document.getElementById('dep-amount').value,
-          document.getElementById('dep-method').value,
-          document.getElementById('dep-tid').value,
-          document.getElementById('dep-sender').value
-        );
-        Loader.hide();
 
-        if (res.success) {
-          Toast.show(res.message, "success");
+        Loader.show("Uploading Receipt...");
+        const fileExt = selectedFile.name.split('.').pop();
+        const filePath = `${AppState.user.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, selectedFile);
+        if (uploadError) {
+          Loader.hide();
+          Toast.show(`Storage: ${uploadError.message}`, "error");
+          return;
+        }
+
+        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
+
+        const { error: dbError } = await sbClient.from('deposit_requests').insert([{
+          user_id: AppState.user.id,
+          amount: parseFloat(document.getElementById('dep-amount').value),
+          payment_method: document.getElementById('dep-method').value,
+          sender_name: document.getElementById('dep-sender').value,
+          transaction_id: document.getElementById('dep-tid').value,
+          screenshot_url: publicUrl,
+          status: 'pending'
+        }]);
+
+        Loader.hide();
+        if (dbError) Toast.show(dbError.message, "error");
+        else {
+          Toast.show("Deposit slip submitted successfully!", "success");
           Router.navigate('#/wallet');
-        } else {
-          Toast.show(res.message || "Failed to submit", "error");
         }
       });
     }
 
+    // VIEW: WITHDRAW
     function renderWithdraw() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+      if (!checkAuthOrRedirect()) return;
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
         <div class="view-container">
           <div class="wallet-hero" style="padding:14px; margin-bottom:14px;">
             <span class="wallet-balance-title">Withdrawable Balance</span>
-            <div class="wallet-amount" style="font-size:28px; margin:4px 0;">PKR ${AppState.profile.balance}</div>
+            <div class="wallet-amount" style="font-size:28px; margin:4px 0;">PKR ${AppState.profile.wallet_balance || 0}</div>
           </div>
           <form id="withdraw-form">
             <div class="form-group">
               <label class="form-label">Withdraw Amount (PKR)</label>
-              <input type="number" id="wd-amount" class="form-input" min="150" max="${AppState.profile.balance}" placeholder="Min 150" required />
+              <input type="number" id="wd-amount" class="form-input" min="150" max="${AppState.profile.wallet_balance || 0}" placeholder="Min 150" required />
             </div>
             <div class="form-group">
               <label class="form-label">Payout Method</label>
@@ -1742,7 +881,11 @@
               <label class="form-label">Account Number</label>
               <input type="text" id="wd-acc-num" class="form-input" placeholder="03XXXXXXXXX" required />
             </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:10px;">REQUEST CASHOUT</button>
+            <div class="form-group">
+              <label class="form-label">Account Title Name</label>
+              <input type="text" id="wd-acc-name" class="form-input" placeholder="Recipient Name" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:10px;">SUBMIT CASHOUT REQUEST</button>
           </form>
         </div>
       `;
@@ -1750,106 +893,148 @@
       document.getElementById('withdraw-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('wd-amount').value);
-        if (amount > AppState.profile.balance) {
-          Toast.show("Insufficient balance", "error");
+        if (amount > (AppState.profile.wallet_balance || 0)) {
+          Toast.show("Insufficient wallet balance", "error");
           return;
         }
+
         Modal.show({
-          title: "Confirm Cashout",
-          body: `Request cashout of PKR ${amount}?`,
-          confirmText: "Confirm",
-          onConfirm: () => {
-            AppState.profile.balance -= amount;
-            AppState.transactions.unshift({
-              id: "wd-" + Date.now(),
-              type: "withdrawal",
-              amount: -amount,
-              date: "Just now",
-              desc: `Withdrawal to ${document.getElementById('wd-acc-num').value}`,
-              status: "pending",
-              balance_after: AppState.profile.balance
+          title: "Confirm Withdrawal",
+          body: `Request cashout of <strong>PKR ${amount}</strong>? Amount will be held until approved.`,
+          confirmText: "Submit Request",
+          onConfirm: async () => {
+            Loader.show("Processing Cashout...");
+            const { data, error } = await sbClient.rpc('request_withdrawal', {
+              p_amount: amount,
+              p_method: document.getElementById('wd-method').value,
+              p_acc_num: document.getElementById('wd-acc-num').value,
+              p_acc_name: document.getElementById('wd-acc-name').value
             });
-            Toast.show("Withdrawal placed successfully", "success");
-            Router.navigate('#/wallet');
+            Loader.hide();
+
+            if (error) Toast.show(error.message, "error");
+            else if (data && data.success) {
+              Toast.show(data.message, "success");
+              await loadProfile();
+              Router.navigate('#/wallet');
+            } else {
+              Toast.show(data?.message || "Failed.", "error");
+            }
           }
         });
       });
     }
 
-    function renderWinners() {
-      const container = document.getElementById('app-view');
-      const list = [
-        { name: "MLT・SHADOW", prize: 1400, tournament: "Clash Squad #401", pos: "1st" },
-        { name: "RAISTAR・PK", prize: 600, tournament: "Clash Squad #401", pos: "2nd" }
-      ];
-      container.innerHTML = `
+    // VIEW: WINNERS
+    async function renderWinners() {
+      Loader.show("Fetching Winners...");
+      const { data, error } = await sbClient.from('winners').select('*, profiles(free_fire_name, username), tournaments(title)').order('created_at', { ascending: false });
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (error || !data || !data.length) {
+        view.innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-medal"></i><p>No winners declared yet.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
         <div class="view-container">
-          ${list.map(w => `
+          ${data.map(w => `
             <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
               <div>
-                <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800;">${w.pos} PLACE</span>
-                <h3 style="margin-top:4px;">${w.name}</h3>
-                <div style="font-size:11px; color:var(--text-dim);">${w.tournament}</div>
+                <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800;">${w.position || 'WINNER'}</span>
+                <h3 style="margin-top:4px;">${w.profiles?.free_fire_name || w.profiles?.username || 'Player'}</h3>
+                <div style="font-size:11px; color:var(--text-dim);">${w.tournaments?.title || 'Tournament'}</div>
               </div>
-              <div style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:var(--accent-gold);">+PKR ${w.prize}</div>
+              <div style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:var(--accent-gold);">+PKR ${w.prize_amount}</div>
             </div>
           `).join('')}
         </div>
       `;
     }
 
-    function renderLeaderboard() {
-      const container = document.getElementById('app-view');
-      const leaders = [
-        { rank: 1, name: "MLT・HAMZA★", wins: 28, winnings: 14500 },
-        { rank: 2, name: "OP_VIRUS_FF", wins: 21, winnings: 9800 }
-      ];
-      container.innerHTML = `
+    // VIEW: LEADERBOARD
+    async function renderLeaderboard() {
+      Loader.show("Loading Leaderboard...");
+      const { data } = await sbClient.from('profiles').select('username, free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (!data || !data.length) {
+        view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
         <div class="view-container">
-          ${leaders.map(l => `
+          ${data.map((l, index) => `
             <div class="tx-item">
               <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:var(--accent-gold);">#${l.rank}</span>
+                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${index === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${index + 1}</span>
                 <div>
-                  <h4>${l.name}</h4>
-                  <span style="font-size:11px; color:var(--text-dim);">${l.wins} Tournament Wins</span>
+                  <h4>${l.free_fire_name || l.username}</h4>
+                  <span style="font-size:11px; color:var(--text-dim);">${l.total_wins || 0} Tournament Wins</span>
                 </div>
               </div>
-              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.winnings}</div>
+              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
             </div>
           `).join('')}
         </div>
       `;
     }
 
-    function renderNotifications() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+    // VIEW: NOTIFICATIONS
+    async function renderNotifications() {
+      if (!checkAuthOrRedirect()) return;
+      Loader.show("Loading Notifications...");
+      await loadNotifications();
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (!AppState.notifications.length) {
+        view.innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
         <div class="view-container">
           ${AppState.notifications.map(n => `
-            <div class="tx-item" style="border-left: 3px solid ${n.read ? 'var(--border-color)' : 'var(--primary)'}">
+            <div class="tx-item" style="border-left: 3px solid ${n.is_read ? 'var(--border-color)' : 'var(--primary)'}">
               <div class="tx-info">
                 <h4>${n.title}</h4>
                 <p style="font-size:12px; color:var(--text-muted);">${n.message}</p>
-                <span>${n.time}</span>
+                <span>${new Date(n.created_at).toLocaleString()}</span>
               </div>
             </div>
           `).join('')}
         </div>
       `;
+
+      await sbClient.from('notifications').update({ is_read: true }).eq('user_id', AppState.user.id);
+      document.getElementById('notif-badge').classList.add('hidden');
     }
 
-    function renderSupport() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+    // VIEW: SUPPORT CHAT
+    async function renderSupport() {
+      if (!checkAuthOrRedirect()) return;
+      Loader.show("Loading Support...");
+      const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${AppState.user.id},user_id.eq.${AppState.user.id}`).order('created_at', { ascending: true });
+      Loader.hide();
+
+      const messages = data || [];
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
         <div class="view-container" style="display:flex; flex-direction:column; height:calc(100vh - var(--header-height) - 40px);">
           <div id="chat-box" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-bottom:12px;">
-            ${AppState.supportMessages.map(m => `
-              <div style="max-width:80%; padding:10px 14px; border-radius:12px; font-size:13px; align-self:${m.sender === 'user' ? 'flex-end' : 'flex-start'}; background:${m.sender === 'user' ? 'var(--primary)' : 'var(--bg-card)'};">
-                <div>${m.text}</div>
-                <div style="font-size:10px; opacity:0.7; text-align:right;">${m.time}</div>
-              </div>
-            `).join('')}
+            ${messages.map(m => {
+              const isMine = m.sender_id === AppState.user.id;
+              return `
+                <div style="max-width:80%; padding:10px 14px; border-radius:12px; font-size:13px; align-self:${isMine ? 'flex-end' : 'flex-start'}; background:${isMine ? 'var(--primary)' : 'var(--bg-card)'};">
+                  <div>${m.message}</div>
+                  <div style="font-size:10px; opacity:0.7; text-align:right;">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+              `;
+            }).join('')}
           </div>
           <form id="chat-form" style="display:flex; gap:8px;">
             <input type="text" id="chat-input" class="form-input" placeholder="Type message..." required />
@@ -1858,117 +1043,269 @@
         </div>
       `;
 
-      document.getElementById('chat-form').addEventListener('submit', (e) => {
+      const chatBox = document.getElementById('chat-box');
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      document.getElementById('chat-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const input = document.getElementById('chat-input');
-        AppState.supportMessages.push({ id: Date.now(), sender: 'user', text: input.value, time: "Just now" });
+        const text = input.value.trim();
+        if (!text) return;
         input.value = "";
-        renderSupport();
+
+        const { error } = await sbClient.from('support_messages').insert([{
+          user_id: AppState.user.id,
+          sender_id: AppState.user.id,
+          sender_role: 'player',
+          message: text
+        }]);
+
+        if (error) Toast.show(error.message, "error");
+        else renderSupport();
       });
     }
 
+    // VIEW: AUTH
+    function renderAuth() {
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
+        <div class="view-container">
+          <div style="text-align:center; margin: 20px 0;">
+            <h2 style="font-family:var(--font-gaming); font-size:24px;">MULTANI FF PORTAL</h2>
+            <p style="font-size:12px; color:var(--text-muted);">Sign in or create your Free Fire tournament account</p>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:16px;">
+            <button id="tab-login" class="btn btn-primary btn-sm" style="flex:1;">LOGIN</button>
+            <button id="tab-signup" class="btn btn-secondary btn-sm" style="flex:1;">SIGN UP</button>
+          </div>
+
+          <form id="form-login">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="login-email" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="login-pass" class="form-input" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:10px;">SIGN IN</button>
+          </form>
+
+          <form id="form-signup" class="hidden">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="reg-name" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Free Fire In-Game Name</label>
+              <input type="text" id="reg-ff-name" class="form-input" placeholder="e.g. MLT・HAMZA★" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Free Fire UID</label>
+              <input type="text" id="reg-ff-uid" class="form-input" placeholder="e.g. 2984189312" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Mobile #</label>
+              <input type="text" id="reg-phone" class="form-input" placeholder="03001234567" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="reg-email" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="reg-pass" class="form-input" minlength="6" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:10px;">REGISTER ACCOUNT</button>
+          </form>
+        </div>
+      `;
+
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
+      const formLogin = document.getElementById('form-login');
+      const formSignup = document.getElementById('form-signup');
+
+      tabLogin.onclick = () => {
+        tabLogin.className = "btn btn-primary btn-sm";
+        tabSignup.className = "btn btn-secondary btn-sm";
+        formLogin.classList.remove('hidden');
+        formSignup.classList.add('hidden');
+      };
+
+      tabSignup.onclick = () => {
+        tabSignup.className = "btn btn-primary btn-sm";
+        tabLogin.className = "btn btn-secondary btn-sm";
+        formSignup.classList.remove('hidden');
+        formLogin.classList.add('hidden');
+      };
+
+      formLogin.onsubmit = async (e) => {
+        e.preventDefault();
+        Loader.show("Signing in...");
+        const { error } = await sbClient.auth.signInWithPassword({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-pass').value
+        });
+        Loader.hide();
+
+        if (error) Toast.show(error.message, "error");
+        else {
+          Toast.show("Authenticated successfully!", "success");
+          await loadProfile();
+          Router.navigate('#/home');
+        }
+      };
+
+      formSignup.onsubmit = async (e) => {
+        e.preventDefault();
+        Loader.show("Registering account...");
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-pass').value;
+        const fullName = document.getElementById('reg-name').value;
+        const ffName = document.getElementById('reg-ff-name').value;
+        const ffUid = document.getElementById('reg-ff-uid').value;
+        const phone = document.getElementById('reg-phone').value;
+
+        const { data, error } = await sbClient.auth.signUp({ email, password });
+        if (error) {
+          Loader.hide();
+          Toast.show(error.message, "error");
+          return;
+        }
+
+        if (data.user) {
+          await sbClient.from('profiles').upsert([{
+            id: data.user.id,
+            email,
+            full_name: fullName,
+            free_fire_name: ffName,
+            free_fire_uid: ffUid,
+            phone: phone,
+            wallet_balance: 0,
+            is_banned: false,
+            is_admin: false
+          }]);
+          Loader.hide();
+          Toast.show("Account created successfully!", "success");
+          await loadProfile();
+          Router.navigate('#/home');
+        }
+      };
+    }
+
+    // VIEW: PROFILE
     function renderProfile() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+      if (!checkAuthOrRedirect()) return;
+      const p = AppState.profile;
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
         <div class="view-container">
           <div class="player-hero-card" style="text-align:center;">
-            <img src="${AppState.profile.avatar_url}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" alt="Avatar" />
-            <h2 style="font-family:var(--font-gaming); font-size:22px;">${AppState.profile.ff_name}</h2>
-            <span class="uid-tag">UID: ${AppState.profile.ff_uid}</span>
+            <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" alt="Avatar" />
+            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p.free_fire_name || 'Player'}</h2>
+            <span class="uid-tag">UID: ${p.free_fire_uid}</span>
           </div>
           <div class="player-hero-card">
             <div style="font-size:13px; line-height:2;">
-              <div>Email: <strong>${AppState.profile.email}</strong></div>
-              <div>Phone: <strong>${AppState.profile.phone}</strong></div>
-              <div>Referral: <strong>${AppState.profile.referral_code}</strong></div>
+              <div>Full Name: <strong>${p.full_name || '--'}</strong></div>
+              <div>Email: <strong>${p.email}</strong></div>
+              <div>Phone: <strong>${p.phone || '--'}</strong></div>
+              <div>Referral Code: <strong>${p.referral_code || 'None'}</strong></div>
             </div>
           </div>
-          <button class="btn btn-secondary" style="margin-top:10px;" onclick="Router.navigate('#/settings')"><i class="fa-solid fa-gear"></i> Settings</button>
-        </div>
-      `;
-    }
-
-    function renderSettings() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card">
-            <h4 style="margin-bottom:10px;">Security & Preferences</h4>
-            <button class="btn btn-secondary btn-sm" style="width:100%; margin-bottom:8px;" onclick="Toast.show('Password link sent', 'info')">Change Password</button>
-          </div>
+          <button class="btn btn-secondary" onclick="Router.navigate('#/settings')"><i class="fa-solid fa-gear"></i> Account Settings</button>
         </div>
       `;
     }
 
     function renderRules() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="player-hero-card">
             <h3 style="color:var(--primary); font-family:var(--font-gaming); margin-bottom:6px;">Fair Play Mandatory</h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">No hacks, emulators, or teaming allowed. Violators receive an instant ban and lose all wallet funds.</p>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">No hacks, emulators, or teaming allowed. Violators will be banned permanently with forfeiture of wallet balance.</p>
           </div>
           <div class="player-hero-card" style="margin-top:10px;">
-            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:6px;">Slot Booking Policy</h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">Slots are permanent once booked. No player refund or leave match is permitted.</p>
+            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:6px;">Permanent Slot Policy</h3>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">Once a slot is reserved, funds are locked and slot registration is non-refundable.</p>
           </div>
         </div>
       `;
     }
 
     function renderAbout() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container" style="text-align:center;">
           <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and verified cashouts.</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and instant cashouts.</p>
         </div>
       `;
     }
 
-    function renderAuth() {
-      const container = document.getElementById('app-view');
-      container.innerHTML = `
+    function renderSettings() {
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <div style="text-align:center; margin: 20px 0;">
-            <h2 style="font-family:var(--font-gaming); font-size:24px;">MULTANI FF LOGIN</h2>
+          <div class="player-hero-card">
+            <h4 style="margin-bottom:10px;">Account Security</h4>
+            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="sendPasswordReset()">Send Password Reset Email</button>
           </div>
-          <form id="form-login">
-            <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input type="email" id="login-email" class="form-input" placeholder="player@multaniff.com" required />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Password</label>
-              <input type="password" id="login-pass" class="form-input" placeholder="••••••••" required />
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:10px;">SIGN IN</button>
-          </form>
         </div>
       `;
-
-      document.getElementById('form-login').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        Loader.show("Authenticating...");
-        await SupabaseService.login(document.getElementById('login-email').value, document.getElementById('login-pass').value);
-        Loader.hide();
-        Toast.show("Welcome back!", "success");
-        Router.navigate('#/home');
-      });
     }
 
-    /* ==========================================================================
-       7. BOOTSTRAP INITIALIZER
-       ========================================================================== */
-    window.addEventListener('DOMContentLoaded', () => {
+    async function sendPasswordReset() {
+      if (!AppState.user) return;
+      Loader.show("Sending reset link...");
+      const { error } = await sbClient.auth.resetPasswordForEmail(AppState.user.email);
+      Loader.hide();
+      if (error) Toast.show(error.message, "error");
+      else Toast.show("Password reset email sent!", "success");
+    }
+
+    const Drawer = {
+      init() {
+        document.getElementById('btn-hamburger').onclick = () => this.open();
+        document.getElementById('btn-close-drawer').onclick = () => this.close();
+        document.getElementById('drawer-overlay').onclick = () => this.close();
+        document.getElementById('btn-back').onclick = () => Router.back();
+
+        document.getElementById('btn-drawer-logout').onclick = () => {
+          this.close();
+          Modal.show({
+            title: "End Session",
+            body: "Are you sure you want to log out?",
+            confirmText: "Logout",
+            onConfirm: async () => {
+              await sbClient.auth.signOut();
+              AppState.user = null;
+              AppState.profile = null;
+              Toast.show("Logged out successfully", "info");
+              Router.navigate('#/login');
+            }
+          });
+        };
+      },
+      open() {
+        document.getElementById('side-drawer').classList.add('open');
+        document.getElementById('drawer-overlay').classList.remove('hidden');
+      },
+      close() {
+        document.getElementById('side-drawer').classList.remove('open');
+        document.getElementById('drawer-overlay').classList.add('hidden');
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
       Router.register('#/home', renderHome, "MULTANI FF", false);
-      Router.register('#/tournaments', renderTournaments, "Tournaments", true);
+      Router.register('#/tournaments', renderHome, "Tournaments", true);
       Router.register('#/tournament/:id', renderTournamentDetails, "Match Details", true);
       Router.register('#/matches', renderMyMatches, "My Matches", true);
       Router.register('#/wallet', renderWallet, "Gaming Wallet", true);
-      Router.register('#/deposit', renderDeposit, "Deposit Money", true);
-      Router.register('#/withdraw', renderWithdraw, "Withdraw Cash", true);
-      Router.register('#/winners', renderWinners, "Winners", true);
+      Router.register('#/deposit', renderDeposit, "Deposit Cash", true);
+      Router.register('#/withdraw', renderWithdraw, "Cashout", true);
+      Router.register('#/winners', renderWinners, "Hall of Winners", true);
       Router.register('#/leaderboard', renderLeaderboard, "Leaderboard", true);
       Router.register('#/notifications', renderNotifications, "Notifications", true);
       Router.register('#/support', renderSupport, "Live Support", true);
@@ -1976,9 +1313,21 @@
       Router.register('#/settings', renderSettings, "Settings", true);
       Router.register('#/rules', renderRules, "Rules", true);
       Router.register('#/about', renderAbout, "About Us", true);
-      Router.register('#/login', renderAuth, "Login", true);
+      Router.register('#/login', renderAuth, "Login / Register", true);
 
       Drawer.init();
+
+      sbClient.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+          AppState.user = session.user;
+          await loadProfile();
+        } else {
+          AppState.user = null;
+          AppState.profile = null;
+        }
+      });
+
+      await loadProfile();
       Router.init();
     });
   </script>
