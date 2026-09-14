@@ -689,7 +689,6 @@
       `;
     }
 
-    // MATCHES PAGE: SIRF MATCHES LIST SHOW HOGI
     async function renderTournaments() {
       Loader.show("Loading arena matches...");
       try {
@@ -755,7 +754,6 @@
             </div>
           ` : ''}
 
-          <!-- PRIZE RULES: ONLY BOOYAH PRIZE, KILL PRIZE COMING SOON -->
           <div class="player-hero-card" style="margin-bottom: 12px;">
             <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px;">Prize Distribution Policy</h4>
             <p style="font-size: 13px; font-weight: 600; color: #fff;">🏆 Only Booyah: Full Winner Prize Awarded on Booyah!</p>
@@ -806,17 +804,20 @@
       }
     }
 
+    // ==========================================
+    // WINNERS RENDERER (BULLETPROOF FIX)
+    // ==========================================
     async function renderWinners() {
       Loader.show("Loading winners...");
-      const { data, error } = await sbClient
+      
+      const { data: winnersData, error } = await sbClient
         .from('winners')
-        .select('*, profiles(free_fire_name, free_fire_uid), tournaments(title)')
+        .select('*')
         .order('created_at', { ascending: false });
-      Loader.hide();
 
-      const view = document.getElementById('app-view');
-      if (error || !data || !data.length) {
-        view.innerHTML = `
+      if (error || !winnersData || !winnersData.length) {
+        Loader.hide();
+        document.getElementById('app-view').innerHTML = `
           <div class="view-container empty-state">
             <i class="fa-solid fa-medal text-gold"></i>
             <h3>No Winners Declared Yet</h3>
@@ -826,34 +827,55 @@
         return;
       }
 
+      const userIds = winnersData.map(w => w.user_id || w.player_id).filter(Boolean);
+      const tourneyIds = winnersData.map(w => w.tournament_id).filter(Boolean);
+
+      const [profRes, tourRes] = await Promise.all([
+        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').in('id', userIds),
+        sbClient.from('tournaments').select('id, title').in('id', tourneyIds)
+      ]);
+
+      const profMap = {};
+      (profRes.data || []).forEach(p => { profMap[p.id] = p; });
+
+      const tourMap = {};
+      (tourRes.data || []).forEach(t => { tourMap[t.id] = t; });
+
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
           <div class="section-title">
             <span><i class="fa-solid fa-trophy text-gold"></i> Hall of Champions</span>
           </div>
-          ${data.map(w => `
-            <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <div>
-                <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;">
-                  <i class="fa-solid fa-crown"></i> ${w.position}
-                </span>
-                <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${w.profiles?.free_fire_name || 'Champion'}</h3>
-                <div style="font-size:11px; color:var(--text-dim);">UID: ${w.profiles?.free_fire_uid || '--'}</div>
-                <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${w.tournaments?.title || 'Tournament'}</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
-                <div style="font-family:var(--font-gaming); font-size:22px; font-weight:800; color:var(--accent-gold);">
-                  PKR ${w.prize_amount}
+          ${winnersData.map(w => {
+            const uId = w.user_id || w.player_id;
+            const p = profMap[uId] || {};
+            const t = tourMap[w.tournament_id] || {};
+            return `
+              <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div>
+                  <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;">
+                    <i class="fa-solid fa-crown"></i> ${w.position || '1st Place (Booyah)'}
+                  </span>
+                  <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${p.free_fire_name || 'Champion'}</h3>
+                  <div style="font-size:11px; color:var(--text-dim);">UID: ${p.free_fire_uid || '--'}</div>
+                  <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${t.title || 'Tournament'}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
+                  <div style="font-family:var(--font-gaming); font-size:22px; font-weight:800; color:var(--accent-gold);">
+                    PKR ${w.prize_amount}
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       `;
     }
 
-    // PAYMENT HISTORY & STATUS (PENDING / APPROVED / REJECTED)
     async function renderWallet() {
       if (!currentUser) { Router.navigate('login'); return; }
       Loader.show("Loading payment records...");
@@ -871,7 +893,7 @@
       const view = document.getElementById('app-view');
 
       const depositSlipsHtml = deposits.length ? deposits.map(d => {
-        let badgeColor = 'background:#ff9800; color:#000;'; // Pending
+        let badgeColor = 'background:#ff9800; color:#000;';
         if (d.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
         if (d.status === 'rejected') badgeColor = 'background:#ff1744; color:#fff;';
 
@@ -918,14 +940,12 @@
       `;
     }
 
-    // DEPOSIT FORM WITH EASYPAISA & SADAPAY ONLY + GMAIL INPUT
     function renderDeposit() {
       if (!currentUser) { Router.navigate('login'); return; }
 
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
-          <!-- ACCOUNT DETAILS BOX -->
           <div class="player-hero-card" style="margin-bottom:14px;">
             <h4 id="dep-box-header" style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Details</h4>
             <div id="dep-box-number" style="font-size:18px; font-weight:bold; color:var(--accent-cyan);">03186815926</div>
@@ -951,7 +971,6 @@
               <input type="text" id="dp-sender" class="form-input" placeholder="Your account title name" required />
             </div>
 
-            <!-- TRANSACTION ID REPLACED BY GMAIL -->
             <div class="form-group">
               <label class="form-label">Your Gmail Address</label>
               <input type="email" id="dp-gmail" class="form-input" value="${currentUser.email || ''}" placeholder="e.g. yourname@gmail.com" required />
@@ -980,7 +999,6 @@
 
           const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
 
-          // SENDER EMAIL SAVED IN TRANSACTION_ID COLUMN
           const { error: dbError } = await sbClient.from('deposit_requests').insert([{
             user_id: currentUser.id,
             amount: parseFloat(document.getElementById('dp-amount').value),
