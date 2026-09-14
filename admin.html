@@ -811,14 +811,16 @@
 
     async function kickPlayerFromMatch(entryId, tId) {
       if (!confirm("Kick this player from match? Slot will be released.")) return;
+      
       const { error } = await sbClient.from('tournament_entries').delete().eq('id', entryId);
-      if (error) alert("Kick failed: " + error.message);
-      else {
+      if (error) {
+        alert("Kick failed: " + error.message);
+      } else {
         const { data: t } = await sbClient.from('tournaments').select('joined_players').eq('id', tId).single();
         if (t && t.joined_players > 0) {
           await sbClient.from('tournaments').update({ joined_players: t.joined_players - 1 }).eq('id', tId);
         }
-        alert("Player kicked.");
+        alert("Player kicked and slot released successfully.");
         closePlayersModal();
         loadTournaments();
       }
