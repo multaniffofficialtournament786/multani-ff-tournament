@@ -18,6 +18,32 @@
 </head>
 <body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative">
 
+  <!-- AUTH GUARD OVERLAY / LOGIN FORM -->
+  <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <i class="fa-solid fa-shield-halved text-[#ff4624] text-4xl mb-2"></i>
+        <h2 class="font-gaming text-2xl font-bold tracking-wider text-white">MULTANI FF ADMIN</h2>
+        <p class="text-xs text-gray-400">Master Control Console</p>
+      </div>
+
+      <form id="admin-login-form" class="space-y-3 pt-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Admin Email</label>
+          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
+          <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+        </div>
+        <button type="submit" id="btn-adm-login" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          AUTHENTICATE CONSOLE
+        </button>
+      </form>
+      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden"></div>
+    </div>
+  </div>
+
   <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
 
   <!-- SIDEBAR -->
@@ -72,8 +98,8 @@
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs">MLT</div>
           <div class="text-xs">
-            <p id="admin-user-name" class="font-bold text-white">Admin Master</p>
-            <p class="text-gray-500 text-[10px]">Verified Admin</p>
+            <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
+            <p class="text-emerald-400 text-[10px]">Active Session</p>
           </div>
         </div>
         <button onclick="adminSignOut()" title="Logout" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-power-off"></i></button>
@@ -120,14 +146,14 @@
         </div>
 
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Shortcuts</h3>
+          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
             <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
             <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p></button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
             <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-comments text-purple-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p></button>
-            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Ticker</p></button>
+            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Settings</p></button>
           </div>
         </div>
       </section>
@@ -154,7 +180,7 @@
         </div>
       </section>
 
-      <!-- DEPOSITS (USES YOUR admin_review_deposit) -->
+      <!-- DEPOSITS -->
       <section id="section-deposits" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4">
           <table class="w-full text-left text-xs whitespace-nowrap">
@@ -347,37 +373,101 @@
 
   <script>
     // ==========================================
-    // 1. SUPABASE CLIENT & AUTH GUARD
+    // 1. SUPABASE CLIENT WITH REAL PUBLISHABLE KEY
     // ==========================================
     const SUPABASE_URL = "https://egjvdypwmybxlkouhrvs.supabase.co";
-    const SUPABASE_ANON_KEY = "Sb_publishable_i7FK-6GcgF4nbr72LodCcg_JSwcrNm1";
+    const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentAdmin = null;
 
-    async function checkAdminAuth() {
-      const { data: { user } } = await sbClient.auth.getUser();
-      if (!user) {
-        window.location.href = 'index.html#/login';
-        return;
-      }
-      const { data: profile, error } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-
-      if (error || !profile || !profile.is_admin) {
-        alert("Unauthorized. Admin access required.");
-        await sbClient.auth.signOut();
-        window.location.href = 'index.html#/login';
-        return;
-      }
-
-      currentAdmin = profile;
-      document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Admin Master';
-      loadDashboardStats();
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
     }
+
+    async function checkAdminAuth() {
+      const authScreen = document.getElementById('admin-auth-screen');
+      const authMsg = document.getElementById('admin-auth-msg');
+
+      try {
+        const { data: { session }, error: sessionError } = await sbClient.auth.getSession();
+        if (sessionError || !session) {
+          authScreen.classList.remove('hidden');
+          return;
+        }
+
+        const { data: profile, error } = await sbClient
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error || !profile || !profile.is_admin) {
+          authScreen.classList.remove('hidden');
+          authMsg.innerText = "Access denied: Account is not authorized as an Administrator.";
+          authMsg.classList.remove('hidden');
+          await sbClient.auth.signOut();
+          return;
+        }
+
+        // Verified Admin
+        currentAdmin = profile;
+        authScreen.classList.add('hidden');
+        document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
+        loadDashboardStats();
+      } catch (err) {
+        console.error("Admin check failed:", err);
+        authScreen.classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('admin-login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('adm-email').value.trim();
+      const password = document.getElementById('adm-pass').value;
+      const btn = document.getElementById('btn-adm-login');
+      const msg = document.getElementById('admin-auth-msg');
+
+      btn.disabled = true;
+      msg.classList.add('hidden');
+
+      try {
+        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Check is_admin column in profiles
+        const { data: prof, error: pErr } = await sbClient
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (pErr || !prof || !prof.is_admin) {
+          await sbClient.auth.signOut();
+          throw new Error("Unauthorized: This account lacks master admin privileges.");
+        }
+
+        currentAdmin = prof;
+        document.getElementById('admin-auth-screen').classList.add('hidden');
+        document.getElementById('admin-user-name').innerText = prof.free_fire_name || prof.full_name || 'Master Admin';
+        loadDashboardStats();
+      } catch (err) {
+        msg.innerText = err.message || "Failed to authenticate.";
+        msg.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+      }
+    };
 
     async function adminSignOut() {
       await sbClient.auth.signOut();
-      window.location.href = 'index.html#/login';
+      currentAdmin = null;
+      document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
 
     function toggleSidebar() {
@@ -414,19 +504,19 @@
     }
 
     // ==========================================
-    // 2. DASHBOARD OVERVIEW
+    // 2. DASHBOARD DATA
     // ==========================================
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
-      const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount), 0);
+      const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
       document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
 
       const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      document.getElementById('stat-pending-deposits').innerText = `${pendingDepCount || 0} Request${pendingDepCount === 1 ? '' : 's'}`;
+      document.getElementById('stat-pending-deposits').innerText = `${pendingDepCount || 0}`;
       document.getElementById('badge-deposits').innerText = pendingDepCount || 0;
 
       const { data: wdData } = await sbClient.from('withdrawals').select('amount').eq('status', 'pending');
-      const pendingWdTotal = (wdData || []).reduce((sum, w) => sum + parseFloat(w.amount), 0);
+      const pendingWdTotal = (wdData || []).reduce((sum, w) => sum + parseFloat(w.amount || 0), 0);
       document.getElementById('stat-pending-cashouts').innerText = `PKR ${pendingWdTotal}`;
       document.getElementById('badge-withdrawals').innerText = (wdData || []).length;
 
@@ -441,17 +531,17 @@
       const { data, error } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('tournaments-table-body');
       if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No tournaments created yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No tournaments registered.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(t => `
         <tr>
-          <td class="p-3 font-bold text-white">${t.title}</td>
+          <td class="p-3 font-bold text-white">${escapeHTML(t.title)}</td>
           <td class="p-3 font-mono">${t.joined_players || 0}/${t.max_players}</td>
           <td class="p-3">${t.entry_fee} / ${t.prize_pool} PKR</td>
-          <td class="p-3"><input type="text" id="rid-${t.id}" value="${t.room_id || ''}" placeholder="Room ID" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 w-24"></td>
-          <td class="p-3"><input type="text" id="rpass-${t.id}" value="${t.room_password || ''}" placeholder="Pass" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 w-20"></td>
+          <td class="p-3"><input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Room ID" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 w-24"></td>
+          <td class="p-3"><input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Pass" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 w-20"></td>
           <td class="p-3">
             <select id="stat-${t.id}" class="bg-[#06070a] border border-[#262f40] rounded px-1.5 py-1 text-xs">
               <option value="upcoming" ${t.status === 'upcoming' ? 'selected' : ''}>upcoming</option>
@@ -468,8 +558,8 @@
     }
 
     async function updateTournamentCredentials(id) {
-      const room_id = document.getElementById(`rid-${id}`).value;
-      const room_password = document.getElementById(`rpass-${id}`).value;
+      const room_id = document.getElementById(`rid-${id}`).value.trim();
+      const room_password = document.getElementById(`rpass-${id}`).value.trim();
       const status = document.getElementById(`stat-${id}`).value;
 
       const { error } = await sbClient.from('tournaments').update({
@@ -480,24 +570,24 @@
       }).eq('id', id);
 
       if (error) alert("Update failed: " + error.message);
-      else alert("Credentials & status saved!");
+      else alert("Credentials & status saved successfully!");
     }
 
     function openCreateTournamentModal() { document.getElementById('modal-match').classList.remove('hidden'); }
     function closeCreateTournamentModal() { document.getElementById('modal-match').classList.add('hidden'); }
 
     async function saveNewTournament() {
-      const title = document.getElementById('m-title').value;
-      const mode = document.getElementById('m-mode').value;
-      const map = document.getElementById('m-map').value;
+      const title = document.getElementById('m-title').value.trim();
+      const mode = document.getElementById('m-mode').value.trim();
+      const map = document.getElementById('m-map').value.trim();
       const entry_fee = parseFloat(document.getElementById('m-fee').value);
       const prize_pool = parseFloat(document.getElementById('m-prize').value);
       const max_players = parseInt(document.getElementById('m-max').value);
       const match_date = document.getElementById('m-date').value;
-      const thumbnail_url = document.getElementById('m-banner').value;
+      const thumbnail_url = document.getElementById('m-banner').value.trim();
 
       if (!title || !match_date) {
-        alert("Title and match date are required");
+        alert("Title and match date are mandatory.");
         return;
       }
 
@@ -523,12 +613,12 @@
     }
 
     // ==========================================
-    // 4. DEPOSIT REVIEW (CALLS YOUR admin_review_deposit)
+    // 4. DEPOSIT REVIEW
     // ==========================================
     async function loadDeposits() {
       const { data, error } = await sbClient
         .from('deposit_requests')
-        .select('*, profiles(free_fire_name, free_fire_uid, username)')
+        .select('*, profiles(free_fire_name, free_fire_uid, full_name)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -541,16 +631,16 @@
       tbody.innerHTML = data.map(d => `
         <tr id="dep-${d.id}">
           <td class="p-3">
-            <span class="font-bold text-white">${d.profiles?.free_fire_name || d.profiles?.username}</span><br>
-            <span class="text-gray-500 font-mono">UID: ${d.profiles?.free_fire_uid || '--'}</span>
+            <span class="font-bold text-white">${escapeHTML(d.profiles?.free_fire_name || d.profiles?.full_name)}</span><br>
+            <span class="text-gray-500 font-mono">UID: ${escapeHTML(d.profiles?.free_fire_uid || '--')}</span>
           </td>
           <td class="p-3 font-bold text-yellow-400">PKR ${d.amount}</td>
           <td class="p-3 font-mono text-cyan-400">
-            ${d.transaction_id}<br>
-            <span class="text-gray-500">${d.payment_method} (${d.sender_name})</span>
+            ${escapeHTML(d.transaction_id)}<br>
+            <span class="text-gray-500">${escapeHTML(d.payment_method)} (${escapeHTML(d.sender_name)})</span>
           </td>
           <td class="p-3">
-            <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold"><i class="fa-solid fa-image"></i> View Receipt</a>
+            <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold"><i class="fa-solid fa-image"></i> View Slip</a>
           </td>
           <td class="p-3 space-x-1">
             <button onclick="reviewDeposit('${d.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded font-bold">APPROVE</button>
@@ -572,7 +662,7 @@
 
       if (error) alert(error.message);
       else {
-        alert("Processed successfully!");
+        alert("Deposit processed!");
         loadDeposits();
         loadDashboardStats();
       }
@@ -584,26 +674,26 @@
     async function loadWithdrawals() {
       const { data, error } = await sbClient
         .from('withdrawals')
-        .select('*, profiles(free_fire_name, phone, username)')
+        .select('*, profiles(free_fire_name, phone, full_name)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
       const tbody = document.getElementById('withdrawals-table-body');
       if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No pending withdrawals.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No pending cashouts.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(w => `
         <tr id="wd-${w.id}">
           <td class="p-3">
-            <span class="font-bold text-white">${w.profiles?.free_fire_name || w.profiles?.username}</span><br>
-            <span class="text-gray-500">${w.profiles?.phone || '--'}</span>
+            <span class="font-bold text-white">${escapeHTML(w.profiles?.free_fire_name || w.profiles?.full_name)}</span><br>
+            <span class="text-gray-500">${escapeHTML(w.profiles?.phone || '--')}</span>
           </td>
           <td class="p-3 font-bold text-cyan-400">PKR ${w.amount}</td>
           <td class="p-3 font-mono">
-            ${w.account_number} (${w.method})<br>
-            <span class="text-gray-500">Title: ${w.account_name || '--'}</span>
+            ${escapeHTML(w.account_number)} (${escapeHTML(w.method)})<br>
+            <span class="text-gray-500">Title: ${escapeHTML(w.account_name || '--')}</span>
           </td>
           <td class="p-3 space-x-1">
             <button onclick="reviewWithdrawal('${w.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded font-bold">PAY / OK</button>
@@ -629,7 +719,7 @@
         loadWithdrawals();
         loadDashboardStats();
       } else {
-        alert(data?.message || "Failed.");
+        alert(data?.message || "Operation failed.");
       }
     }
 
@@ -639,7 +729,7 @@
     async function loadWinnerSelectOptions() {
       const { data: tourneys } = await sbClient.from('tournaments').select('id, title').order('created_at', { ascending: false });
       const selectT = document.getElementById('win-tournament');
-      selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+      selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${escapeHTML(t.title)}</option>`).join('');
 
       selectT.onchange = () => loadTournamentJoinedPlayers(selectT.value);
       if (tourneys && tourneys.length) loadTournamentJoinedPlayers(tourneys[0].id);
@@ -657,7 +747,7 @@
         return;
       }
       selectP.innerHTML = data.map(e => `
-        <option value="${e.user_id}">${e.profiles?.free_fire_name} (UID: ${e.profiles?.free_fire_uid})</option>
+        <option value="${e.user_id}">${escapeHTML(e.profiles?.free_fire_name)} (UID: ${escapeHTML(e.profiles?.free_fire_uid)})</option>
       `).join('');
     }
 
@@ -665,10 +755,10 @@
       const tournament_id = document.getElementById('win-tournament').value;
       const user_id = document.getElementById('win-player').value;
       const prize_amount = parseFloat(document.getElementById('win-amount').value);
-      const position = document.getElementById('win-pos').value;
+      const position = document.getElementById('win-pos').value.trim();
 
-      if (!tournament_id || !user_id || !prize_amount || !position) {
-        alert("All fields are required.");
+      if (!tournament_id || !user_id || isNaN(prize_amount) || !position) {
+        alert("All fields are mandatory.");
         return;
       }
 
@@ -685,7 +775,7 @@
         document.getElementById('win-amount').value = '';
         document.getElementById('win-pos').value = '';
       } else {
-        alert(data?.message || "Failed.");
+        alert(data?.message || "Declaration failed.");
       }
     }
 
@@ -696,17 +786,17 @@
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('users-table-body');
       if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No gamers found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No players registered.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(u => `
         <tr>
           <td class="p-3">
-            <span class="font-bold text-white">${u.free_fire_name || u.username}</span><br>
-            <span class="text-gray-500">${u.email}</span>
+            <span class="font-bold text-white">${escapeHTML(u.free_fire_name || u.full_name)}</span><br>
+            <span class="text-gray-500">${escapeHTML(u.email)}</span>
           </td>
-          <td class="p-3 font-mono text-cyan-400">${u.free_fire_uid || '--'}</td>
+          <td class="p-3 font-mono text-cyan-400">${escapeHTML(u.free_fire_uid || '--')}</td>
           <td class="p-3 font-bold text-yellow-400">PKR ${u.wallet_balance || 0}</td>
           <td class="p-3 text-emerald-400">PKR ${u.total_won || 0}</td>
           <td class="p-3">${u.total_matches || 0}</td>
@@ -729,7 +819,7 @@
       const { error } = await sbClient.from('profiles').update({ is_banned: newStatus }).eq('id', userId);
       if (error) alert(error.message);
       else {
-        alert("Player status updated.");
+        alert("Player ban status updated.");
         loadUsers();
         loadBannedUsers();
       }
@@ -744,9 +834,9 @@
       }
       tbody.innerHTML = data.map(b => `
         <tr>
-          <td class="p-3 font-bold text-white">${b.free_fire_name || b.username}</td>
-          <td class="p-3 font-mono text-red-400">${b.free_fire_uid || '--'}</td>
-          <td class="p-3">${b.email}</td>
+          <td class="p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
+          <td class="p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
+          <td class="p-3">${escapeHTML(b.email)}</td>
           <td class="p-3">
             <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold">UNBAN</button>
           </td>
@@ -770,10 +860,10 @@
     }
 
     async function saveSiteSettings() {
-      const tickerText = document.getElementById('set-ticker-text').value;
+      const tickerText = document.getElementById('set-ticker-text').value.trim();
       const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
-      const payNumber = document.getElementById('set-pay-number').value;
-      const payTitle = document.getElementById('set-pay-title').value;
+      const payNumber = document.getElementById('set-pay-number').value.trim();
+      const payTitle = document.getElementById('set-pay-title').value.trim();
 
       const updates = [
         { setting_key: 'announcement_ticker', setting_value: tickerText },
@@ -794,9 +884,9 @@
     async function loadSupportChats() {
       const { data } = await sbClient
         .from('support_messages')
-        .select('*, profiles(free_fire_name, username)')
+        .select('*, profiles(free_fire_name, full_name)')
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(25);
 
       const box = document.getElementById('admin-chat-list');
       if (!data || !data.length) {
@@ -807,10 +897,10 @@
       box.innerHTML = data.map(m => `
         <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg text-xs space-y-1">
           <div class="flex justify-between items-center text-gray-400">
-            <span class="font-bold text-white">${m.profiles?.free_fire_name || m.profiles?.username || 'Player'} (${m.sender_role})</span>
+            <span class="font-bold text-white">${escapeHTML(m.profiles?.free_fire_name || m.profiles?.full_name || 'Gamer')} (${escapeHTML(m.sender_role)})</span>
             <span>${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
-          <p class="text-gray-200">${m.message}</p>
+          <p class="text-gray-200">${escapeHTML(m.message)}</p>
           <div class="pt-1 flex gap-2">
             <input type="text" id="rep-${m.id}" placeholder="Reply to player..." class="flex-1 bg-[#151922] border border-[#262f40] rounded px-2 py-1 text-white text-xs">
             <button onclick="sendSupportReply('${m.user_id}', '${m.id}')" class="bg-[#ff4624] text-white px-2 py-1 rounded font-bold">REPLY</button>
