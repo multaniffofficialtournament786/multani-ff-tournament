@@ -121,7 +121,7 @@
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 38s linear infinite; }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 20s linear infinite; }
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
     .bottom-nav { 
@@ -841,6 +841,7 @@
             </div>
           `}
 
+          <!-- DOWNLOAD OFFICIAL APP BUTTON -->
           <div style="margin-bottom: 16px;">
             <a href="https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
@@ -859,6 +860,7 @@
           <div class="section-title"><span>Available Tournaments</span></div>
           <div>${buildTournamentCardsHTML(activeTournaments)}</div>
 
+          <!-- SOCIAL MEDIA FOOTER LINKS -->
           <div class="social-footer">
             <p>Connect With Us</p>
             <div class="social-icons-row">
@@ -983,10 +985,9 @@
             <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
           </div>
 
-          <!-- UPDATED MATCH RULES -->
           <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Custom Room ID & Password match start hone se 5 minute pehle app mein show ho jaye ga. Mobile only, no emulators, no hacks, aur teaming bilkul mana hai. Violation par instant ban aur account balance zero kar diya jaye ga!'}</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -1251,18 +1252,23 @@
             <button id="tab-signup-btn" class="btn btn-secondary btn-sm" style="flex:1;" onclick="toggleAuth(false)">REGISTER</button>
           </div>
 
+          <!-- LOGIN FORM -->
           <form id="login-form">
             <div class="form-group">
               <label class="form-label">Email</label>
               <input type="email" id="log-email" class="form-input" required />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:4px;">
               <label class="form-label">Password</label>
               <input type="password" id="log-pass" class="form-input" required />
+            </div>
+            <div style="text-align:right; margin-bottom:14px;">
+              <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--accent-cyan); cursor:pointer; font-weight:600;">Forgot Password?</span>
             </div>
             <button type="submit" class="btn btn-primary">SIGN IN</button>
           </form>
 
+          <!-- REGISTER FORM -->
           <form id="signup-form" class="hidden">
             <div class="form-group">
               <label class="form-label">Full Name</label>
@@ -1343,6 +1349,106 @@
           Toast.show("Account registered successfully!", "success");
           await syncAuthAndProfile();
           Router.navigate('home');
+        }
+      };
+    }
+
+    // FORGOT PASSWORD FLOW RENDERER
+    function renderForgotPassword() {
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
+        <div class="view-container">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+            <button class="icon-btn" onclick="Router.navigate('login')" style="width:34px; height:34px;"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">RESET PASSWORD</h3>
+          </div>
+
+          <!-- STEP 1: SEND OTP / EMAIL -->
+          <form id="forgot-email-form">
+            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Enter your registered Gmail address to receive the password reset OTP code.</p>
+              <div class="form-group">
+                <label class="form-label">Gmail Address</label>
+                <input type="email" id="fg-email" class="form-input" placeholder="e.g. yourname@gmail.com" required />
+              </div>
+              <button type="submit" class="btn btn-primary">SEND OTP TO GMAIL</button>
+            </div>
+          </form>
+
+          <!-- STEP 2: VERIFY OTP & NEW PASSWORD -->
+          <form id="forgot-verify-form" class="hidden">
+            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
+              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
+              
+              <div class="form-group">
+                <label class="form-label">Enter OTP Code</label>
+                <input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP code" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 6 characters" minlength="6" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="6" required />
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      document.getElementById('forgot-email-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('fg-email').value.trim();
+        Loader.show("Sending OTP to Gmail...");
+        
+        const { error } = await sbClient.auth.resetPasswordForEmail(email);
+        Loader.hide();
+
+        if (error) {
+          Toast.show(error.message, "error");
+        } else {
+          Toast.show("OTP sent to your Gmail inbox!", "success");
+          window.resetEmailTarget = email;
+          document.getElementById('forgot-email-form').classList.add('hidden');
+          document.getElementById('forgot-verify-form').classList.remove('hidden');
+        }
+      };
+
+      document.getElementById('forgot-verify-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const token = document.getElementById('fg-otp').value.trim();
+        const newPassword = document.getElementById('fg-newpass').value;
+        const confPassword = document.getElementById('fg-confpass').value;
+
+        if (newPassword !== confPassword) {
+          Toast.show("New password and confirm password do not match!", "error");
+          return;
+        }
+
+        Loader.show("Verifying & Updating password...");
+        try {
+          const { error: verifyErr } = await sbClient.auth.verifyOtp({
+            email: window.resetEmailTarget,
+            token: token,
+            type: 'recovery'
+          });
+
+          if (verifyErr) throw verifyErr;
+
+          const { error: updateErr } = await sbClient.auth.updateUser({ password: newPassword });
+          if (updateErr) throw updateErr;
+
+          Loader.hide();
+          Toast.show("Password changed successfully! Please login.", "success");
+          Router.navigate('login');
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message || "Invalid OTP or failed to update.", "error");
         }
       };
     }
@@ -1475,10 +1581,9 @@
       }
     }
 
-    /* UPDATED LEADERBOARD FUNCTION TO SHOW UID INSTEAD OF 0 WINS */
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
-      const { data } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, total_won').order('total_won', { ascending: false }).limit(20);
+      const { data } = await sbClient.from('profiles').select('free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
       Loader.hide();
 
       const view = document.getElementById('app-view');
@@ -1495,7 +1600,7 @@
                 <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
                 <div>
                   <h4>${l.free_fire_name || 'Player'}</h4>
-                  <span style="font-size:11px; color:var(--accent-cyan); font-family:monospace;"><i class="fa-solid fa-gamepad"></i> UID: ${l.free_fire_uid || '--'}</span>
+                  <span style="font-size:11px; color:var(--text-dim);">${l.total_wins || 0} Wins</span>
                 </div>
               </div>
               <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
