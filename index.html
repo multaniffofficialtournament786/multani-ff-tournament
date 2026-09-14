@@ -209,7 +209,6 @@
     .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
     .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
     
-    /* PROPER CHAT STYLING */
     .chat-row { display: flex; flex-direction: column; width: 100%; }
     .chat-row.mine { align-items: flex-end; }
     .chat-row.theirs { align-items: flex-start; }
@@ -245,24 +244,72 @@
     .action-card i { font-size: 20px; color: var(--primary); }
     .action-card span { font-size: 11px; font-weight: 600; text-align: center; }
 
-    .tournament-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; position: relative; }
-    .t-banner-wrapper { position: relative; width: 100%; height: 120px; background-color: #1a1e28; }
-    .t-banner-img { width: 100%; height: 100%; object-fit: cover; }
-    .t-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 4px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    /* ====================================================
+       FULL BACKGROUND DP & TRANSPARENT GLASSMORPHISM CARDS
+       ==================================================== */
+    .tournament-card { 
+      border: 1px solid rgba(255, 255, 255, 0.12); 
+      border-radius: var(--radius); 
+      overflow: hidden; 
+      margin-bottom: 16px; 
+      position: relative; 
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      background-color: #0c0e14;
+    }
+    .t-full-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+    .t-overlay-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6, 7, 10, 0.25) 0%, rgba(6, 7, 10, 0.5) 40%, rgba(6, 7, 10, 0.94) 100%);
+      z-index: 2;
+    }
+    .t-badge { 
+      position: absolute; 
+      top: 12px; 
+      right: 12px; 
+      padding: 4px 10px; 
+      border-radius: 6px; 
+      font-family: var(--font-gaming); 
+      font-size: 11px; 
+      font-weight: 800; 
+      text-transform: uppercase; 
+      z-index: 4;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    }
     .badge-live { background: var(--danger); color: #fff; }
     .badge-upcoming { background: var(--accent-cyan); color: #000; }
-    .badge-joined { background: #00e676; color: #000; font-weight: 800; border: 1px solid #fff; }
-    .t-details { padding: 14px; }
-    .t-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .t-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .spec-pill { font-size: 11px; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 3px 7px; border-radius: 4px; color: var(--text-muted); }
+    .badge-joined { background: #00e676; color: #000; border: 1.5px solid #fff; }
+
+    .t-glass-details { 
+      position: relative;
+      z-index: 3;
+      padding: 14px 14px 12px 14px; 
+      background: rgba(14, 17, 24, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .t-title { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; margin-bottom: 6px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+    .t-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .spec-pill { font-size: 11px; background: rgba(0, 0, 0, 0.55); border: 1px solid rgba(255, 255, 255, 0.12); padding: 3px 8px; border-radius: 4px; color: var(--text-muted); }
     .spec-pill strong { color: #fff; }
-    .t-slot-progress-wrap { margin-bottom: 12px; }
-    .t-slot-bar { width: 100%; height: 6px; background: var(--bg-surface); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .t-slot-progress-wrap { margin-bottom: 8px; }
+    .t-slot-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; margin-top: 3px; }
     .t-slot-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--primary)); }
-    .t-footer-grid { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; }
-    .t-prize { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--accent-gold); }
-    .t-fee { font-size: 12px; color: var(--text-muted); }
+    .t-footer-grid { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 8px; }
+    .t-prize { font-family: var(--font-gaming); font-size: 17px; font-weight: 800; color: var(--accent-gold); text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+    .t-fee { font-size: 11px; color: var(--text-muted); }
     
     /* FREE FIRE ROOM SLOTS GRID */
     .room-slots-container {
@@ -308,7 +355,6 @@
       font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
-      truncate: true;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -620,7 +666,7 @@
     };
 
     // ==========================================
-    // 4. VIEW RENDERERS
+    // 4. VIEW RENDERERS (FULL DP + TRANSPARENT DETAILS)
     // ==========================================
     function buildTournamentCardsHTML(list) {
       if (!list || !list.length) {
@@ -632,11 +678,14 @@
 
         return `
           <div class="tournament-card" onclick="Router.navigate('tournament_detail', '${t.id}')" style="cursor:pointer;">
-            <div class="t-banner-wrapper">
-              <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" />
-              ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
-            </div>
-            <div class="t-details">
+            <!-- FULL CARD DP IMAGE -->
+            <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-full-bg-img" />
+            <div class="t-overlay-gradient"></div>
+            
+            ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
+
+            <!-- TRANSPARENT GLASSMORPHISM DETAILS OVERLAY -->
+            <div class="t-glass-details">
               <h3 class="t-title">${t.title}</h3>
               <div class="t-specs">
                 <span class="spec-pill">Mode: <strong>${t.mode}</strong></span>
@@ -805,7 +854,6 @@
 
       const isJoined = (mySlotNumber !== null);
 
-      // Render Free Fire Room Slots
       let slotsHTML = '';
       const totalSlots = t.max_players || 12;
       for (let i = 1; i <= totalSlots; i++) {
@@ -825,17 +873,19 @@
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
-          <div class="t-banner-wrapper" style="height: 140px; border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;">
-            <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" />
+          <div class="tournament-card" style="margin-bottom: 12px; min-height: 180px;">
+            <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-full-bg-img" />
+            <div class="t-overlay-gradient"></div>
             ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
-          </div>
-
-          <h2 style="font-family: var(--font-gaming); font-size: 20px; margin-bottom: 8px;">${t.title}</h2>
-          
-          <div class="hero-stats-grid" style="margin-bottom: 12px; padding:8px;">
-            <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:15px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-            <div class="stat-box"><span class="stat-label">Prize Pool</span><span class="stat-val green" style="font-size:15px;">PKR ${t.prize_pool}</span></div>
-            <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:15px;">${t.joined_players || 0}/${t.max_players}</span></div>
+            
+            <div class="t-glass-details">
+              <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px;">${t.title}</h2>
+              <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5);">
+                <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+                <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
+                <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
+              </div>
+            </div>
           </div>
 
           ${isJoined ? `
@@ -848,7 +898,7 @@
             </div>
           ` : ''}
 
-          <!-- FREE FIRE CUSTOM ROOM SLOTS GRID (SCREENSHOT 2 STYLE) -->
+          <!-- FREE FIRE CUSTOM ROOM SLOTS GRID -->
           <div class="room-slots-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #1f2636; padding-bottom:6px;">
               <span style="font-family:var(--font-gaming); font-size:12px; font-weight:bold; color:var(--accent-gold); text-transform:uppercase;">
@@ -1527,7 +1577,6 @@
         }
 
         container.innerHTML = data.map(m => {
-          // CHECK SENDER ROLE
           const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
           const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
