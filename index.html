@@ -54,7 +54,6 @@
     .header-actions { display: flex; align-items: center; gap: 8px; }
     .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
     .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
-    .badge-dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); }
     .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
     .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .sub-header-spacer { width: 38px; }
@@ -88,11 +87,6 @@
     .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
     .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
     .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .announcement-banner { background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15)); border: 1px solid rgba(255, 70, 36, 0.3); padding: 9px 12px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 12px; overflow: hidden; }
-    .announcement-banner i { color: var(--accent-gold); }
-    .ticker-wrap { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-move { display: inline-block; animation: ticker 25s linear infinite; }
-    @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
     .hero-profile-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
     .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
@@ -150,6 +144,32 @@
     .text-gold { color: var(--accent-gold) !important; }
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; }
+
+    /* FLOATING ADMIN CHAT BUTTON */
+    .floating-admin-btn {
+      position: absolute;
+      bottom: 80px;
+      right: 16px;
+      z-index: 120;
+      background: linear-gradient(135deg, #ff4624, #d32f2f);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-gaming);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 18px var(--primary-glow);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .floating-admin-btn:active {
+      transform: scale(0.94);
+    }
   </style>
 </head>
 <body>
@@ -200,10 +220,9 @@
       <nav class="drawer-nav">
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
-        <button onclick="Router.navigate('matches')" class="drawer-link"><i class="fa-solid fa-crosshairs"></i> My Matches</button>
+        <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
-        <button onclick="Router.navigate('winners')" class="drawer-link"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link"><i class="fa-solid fa-bell"></i> Notifications</button>
         <button onclick="Router.navigate('support')" class="drawer-link"><i class="fa-solid fa-headset"></i> Live Support</button>
@@ -214,16 +233,23 @@
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
       <div class="drawer-footer">
-        <p>MULTANI FF • PRODUCTION READY</p>
+        <p>MULTANI FF • OFFICIAL TOURNAMENT</p>
       </div>
     </aside>
 
     <main id="app-view" class="main-content"></main>
 
+    <!-- FLOATING ADMIN BUTTON -->
+    <div id="btn-floating-admin" class="floating-admin-btn" onclick="Router.navigate('support')">
+      <i class="fa-solid fa-comments"></i>
+      <span>ADMIN</span>
+    </div>
+
+    <!-- BOTTOM NAV: MY SLOTS KI JAGAH WINNERS -->
     <nav id="bottom-nav" class="bottom-nav">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-      <div class="nav-item" data-page="matches" onclick="Router.navigate('matches')"><i class="fa-solid fa-crosshairs"></i><span>My Slots</span></div>
+      <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
       <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
   </div>
@@ -306,12 +332,12 @@
         if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
       } else {
         if (dName) dName.innerText = 'Guest Gamer';
-        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> Click below to Login`;
+        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-user"></i> Login / Register`;
       }
     }
 
     // ==========================================
-    // 3. PAGE CONTROLLER (RELIABLE DIRECT ROUTING)
+    // 3. PAGE CONTROLLER
     // ==========================================
     const Router = {
       history: ['home'],
@@ -342,7 +368,6 @@
         if (page === 'home') renderHome();
         else if (page === 'tournaments') renderTournaments();
         else if (page === 'tournament_detail') renderTournamentDetail(id);
-        else if (page === 'matches') renderMatches();
         else if (page === 'wallet') renderWallet();
         else if (page === 'deposit') renderDeposit();
         else if (page === 'login') renderAuth();
@@ -366,7 +391,7 @@
     };
 
     // ==========================================
-    // 4. VIEW RENDERERS
+    // 4. VIEW RENDERERS (DIRECT OPENING LIKE FB)
     // ==========================================
     async function renderHome() {
       Loader.show("Loading arena...");
@@ -424,10 +449,12 @@
       view.innerHTML = `
         <div class="view-container">
           ${!currentUser ? `
-            <div class="player-hero-card" style="border: 1.5px solid var(--primary); text-align:center;">
-              <h3 style="color:var(--primary); font-family:var(--font-gaming); font-size:20px;">WELCOME TO MULTANI FF</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin: 6px 0 14px 0;">Sign in to register slots, track wallet, and join official tournaments</p>
-              <button class="btn btn-primary" onclick="Router.navigate('login')"><i class="fa-solid fa-right-to-bracket"></i> LOGIN / SIGN UP NOW</button>
+            <div class="player-hero-card" style="border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="color:var(--text-main); font-family:var(--font-gaming); font-size:18px;">JOIN THE BATTLE</h3>
+                <p style="font-size:11px; color:var(--text-muted);">Sign up to participate & win real cash prizes</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="Router.navigate('login')">LOGIN</button>
             </div>
           ` : `
             <div class="player-hero-card">
@@ -449,9 +476,9 @@
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
             <div onclick="Router.navigate('deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
-            <div onclick="Router.navigate('matches')" class="action-card"><i class="fa-solid fa-crosshairs"></i><span>My Slots</span></div>
-            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--accent-gold)"></i><span>Wallet</span></div>
-            <div onclick="Router.navigate('winners')" class="action-card"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
+            <div onclick="Router.navigate('winners')" class="action-card"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i><span>Winners</span></div>
+            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+            <div onclick="Router.navigate('leaderboard')" class="action-card"><i class="fa-solid fa-ranking-star"></i><span>Top List</span></div>
             <div onclick="Router.navigate('support')" class="action-card"><i class="fa-solid fa-headset"></i><span>Support</span></div>
           </div>
 
@@ -500,6 +527,16 @@
             <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val">${t.joined_players || 0}/${t.max_players}</span></div>
           </div>
 
+          ${isJoined ? `
+            <div style="background:rgba(0,0,0,0.5); border:1px dashed var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom: 14px;">
+              <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room ID & Password (SLOT #${slotNum})</div>
+              <div style="font-size:13px; font-family:monospace; margin-top:4px;">
+                <div>Room ID: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_id || 'Pending (Wait for match)'}</span></div>
+                <div>Password: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_password || '••••••••'}</span></div>
+              </div>
+            </div>
+          ` : ''}
+
           <div class="player-hero-card" style="margin-bottom: 12px;">
             <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px;">Prize Distribution</h4>
             <p style="font-size: 13px;">${t.winning_rules || '1st, 2nd & Kill based prizes apply.'}</p>
@@ -507,7 +544,7 @@
 
           <div class="player-hero-card" style="margin-bottom: 20px;">
             <h4 style="font-size: 13px; text-transform: uppercase; color: var(--danger); margin-bottom: 6px;">Match Rules</h4>
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Mobile only. No hacks, scripts, or teaming.'}</p>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Mobile only. No hacks, emulators or teaming.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -549,19 +586,24 @@
       }
     }
 
-    async function renderMatches() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Fetching my slots...");
-      const { data: entries } = await sbClient.from('tournament_entries').select('*, tournaments(*)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    // ==========================================
+    // 5. WINNERS VIEW (ADMIN ANNOUNCEMENTS)
+    // ==========================================
+    async function renderWinners() {
+      Loader.show("Loading winners...");
+      const { data, error } = await sbClient
+        .from('winners')
+        .select('*, profiles(free_fire_name, free_fire_uid), tournaments(title)')
+        .order('created_at', { ascending: false });
       Loader.hide();
 
       const view = document.getElementById('app-view');
-      if (!entries || !entries.length) {
+      if (error || !data || !data.length) {
         view.innerHTML = `
           <div class="view-container empty-state">
-            <i class="fa-solid fa-crosshairs"></i>
-            <h3>No Matches Registered</h3>
-            <p>Go to the home page and grab your tournament slot!</p>
+            <i class="fa-solid fa-medal text-gold"></i>
+            <h3>No Winners Declared Yet</h3>
+            <p>Admin will announce tournament winners right here!</p>
           </div>
         `;
         return;
@@ -569,24 +611,27 @@
 
       view.innerHTML = `
         <div class="view-container">
-          ${entries.map(m => {
-            const t = m.tournaments || {};
-            return `
-              <div class="tournament-card" style="padding: 14px;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-                  <h3 class="t-title" style="margin:0;">${t.title}</h3>
-                  <span class="spec-pill" style="background:var(--primary); color:#fff; font-weight:700;">SLOT #${m.slot_number}</span>
-                </div>
-                <div style="background:rgba(0,0,0,0.5); border:1px dashed var(--border-color); border-radius: var(--radius-sm); padding:10px; margin: 10px 0;">
-                  <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room ID & Password</div>
-                  <div style="font-size:13px; font-family:monospace; margin-top:4px;">
-                    <div>Room ID: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_id || 'Pending (Wait for match start)'}</span></div>
-                    <div>Password: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_password || '••••••••'}</span></div>
-                  </div>
+          <div class="section-title">
+            <span><i class="fa-solid fa-trophy text-gold"></i> Hall of Champions</span>
+          </div>
+          ${data.map(w => `
+            <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <div>
+                <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;">
+                  <i class="fa-solid fa-crown"></i> ${w.position}
+                </span>
+                <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${w.profiles?.free_fire_name || 'Champion'}</h3>
+                <div style="font-size:11px; color:var(--text-dim);">UID: ${w.profiles?.free_fire_uid || '--'}</div>
+                <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${w.tournaments?.title || 'Tournament'}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
+                <div style="font-family:var(--font-gaming); font-size:22px; font-weight:800; color:var(--accent-gold);">
+                  PKR ${w.prize_amount}
                 </div>
               </div>
-            `;
-          }).join('')}
+            </div>
+          `).join('')}
         </div>
       `;
     }
@@ -836,33 +881,6 @@
       `;
     }
 
-    async function renderWinners() {
-      Loader.show("Fetching winners...");
-      const { data } = await sbClient.from('winners').select('*, profiles(free_fire_name), tournaments(title)').order('created_at', { ascending: false });
-      Loader.hide();
-
-      const view = document.getElementById('app-view');
-      if (!data || !data.length) {
-        view.innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-medal"></i><p>No winners declared yet.</p></div>`;
-        return;
-      }
-
-      view.innerHTML = `
-        <div class="view-container">
-          ${data.map(w => `
-            <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <div>
-                <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800;">${w.position}</span>
-                <h3 style="margin-top:4px;">${w.profiles?.free_fire_name || 'Player'}</h3>
-                <div style="font-size:11px; color:var(--text-dim);">${w.tournaments?.title || 'Match'}</div>
-              </div>
-              <div style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:var(--accent-gold);">+PKR ${w.prize_amount}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
       const { data } = await sbClient.from('profiles').select('free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
@@ -920,8 +938,12 @@
     }
 
     async function renderSupport() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading support...");
+      if (!currentUser) { 
+        Toast.show("Please sign in to chat with admin", "info");
+        Router.navigate('login'); 
+        return; 
+      }
+      Loader.show("Connecting to admin...");
       const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
       Loader.hide();
 
@@ -930,6 +952,7 @@
       view.innerHTML = `
         <div class="view-container" style="display:flex; flex-direction:column; height:calc(100vh - var(--header-height) - 40px);">
           <div id="chat-box" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-bottom:12px;">
+            ${messages.length === 0 ? `<p style="text-align:center; color:var(--text-dim); font-size:12px; margin-top:20px;">Send a message to Admin below.</p>` : ''}
             ${messages.map(m => {
               const isMine = m.sender_id === currentUser.id;
               return `
@@ -941,7 +964,7 @@
             }).join('')}
           </div>
           <form id="chat-form" style="display:flex; gap:8px;">
-            <input type="text" id="chat-input" class="form-input" placeholder="Type message..." required />
+            <input type="text" id="chat-input" class="form-input" placeholder="Message to Admin..." required />
             <button type="submit" class="btn btn-primary btn-sm" style="width:50px;"><i class="fa-solid fa-paper-plane"></i></button>
           </form>
         </div>
@@ -992,7 +1015,7 @@
     }
 
     // ==========================================
-    // 5. DRAWER LOGIC
+    // 6. DRAWER LOGIC
     // ==========================================
     const Drawer = {
       open() {
@@ -1006,7 +1029,7 @@
     };
 
     // ==========================================
-    // 6. INITIALIZATION
+    // 7. INITIALIZATION
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('btn-hamburger').onclick = () => Drawer.open();
