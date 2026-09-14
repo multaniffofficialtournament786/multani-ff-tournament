@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   
+  <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
+  <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
+
   <!-- ADVANCED SEO META TAGS -->
   <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
   <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
@@ -384,6 +387,47 @@
     .text-gold { color: var(--accent-gold) !important; }
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; }
+    
+    /* SOCIAL FOOTER STYLES */
+    .social-footer {
+      background: #090c12;
+      border-top: 1px solid var(--border-color);
+      padding: 14px 16px;
+      text-align: center;
+      margin-top: 20px;
+      border-radius: var(--radius-sm);
+    }
+    .social-footer p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-family: var(--font-gaming);
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .social-icons-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .social-icon-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+      color: #fff;
+    }
+    .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
+    .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
+    .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
+    .social-icon-btn:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
@@ -812,6 +856,22 @@
 
           <div class="section-title"><span>Available Tournaments</span></div>
           <div>${buildTournamentCardsHTML(activeTournaments)}</div>
+
+          <!-- SOCIAL MEDIA FOOTER LINKS -->
+          <div class="social-footer">
+            <p>Connect With Us</p>
+            <div class="social-icons-row">
+              <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
+                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+              </a>
+              <a href="https://www.tiktok.com/@multaniffgaming" target="_blank" class="social-icon-btn tiktok">
+                <i class="fa-brands fa-tiktok text-sm"></i> TikTok
+              </a>
+              <a href="https://www.youtube.com/@Multaniff-b2k" target="_blank" class="social-icon-btn youtube">
+                <i class="fa-brands fa-youtube text-sm"></i> YouTube
+              </a>
+            </div>
+          </div>
         </div>
       `;
     }
