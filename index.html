@@ -511,7 +511,7 @@
       <span class="bot-badge-tag">ADMIN</span>
     </div>
 
-    <!-- REAL CHAT MODAL WITH VOICE RECORDING -->
+    <!-- REAL CHAT MODAL (TEXT ONLY) -->
     <div id="chat-modal-overlay" class="hidden">
       <div class="chat-dialog">
         <div class="chat-dialog-header">
@@ -531,20 +531,14 @@
         <div id="chat-modal-messages" class="chat-dialog-body">
           <div class="chat-row theirs">
             <div class="chat-bubble theirs">
-              Assalam-o-Alaikum! Tap mic to start recording, speak your message, and tap mic again to send!
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
             </div>
             <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
           </div>
         </div>
 
         <form id="chat-modal-form" class="chat-input-bar">
-          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message or click mic..." style="margin-bottom:0;" autocomplete="off" />
-          
-          <!-- VOICE RECORDING BUTTON -->
-          <button type="button" id="btn-mic-record" onclick="toggleVoiceRecording()" class="icon-btn" style="background:#1f2636; color:#00f0ff; width:44px; height:44px; border-radius:8px; flex-shrink:0;" title="Click to Record / Stop Voice Note">
-            <i class="fa-solid fa-microphone" id="mic-icon"></i>
-          </button>
-
+          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
           <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -1562,88 +1556,6 @@
       `;
     }
 
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-
-    async function toggleVoiceRecording() {
-      const micBtn = document.getElementById('btn-mic-record');
-      const micIcon = document.getElementById('mic-icon');
-      const input = document.getElementById('chat-modal-input') || document.getElementById('admin-chat-input');
-
-      if (!isRecording) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-
-          mediaRecorder.ondataavailable = event => {
-            if (event.data.size > 0) {
-              audioChunks.push(event.data);
-            }
-          };
-
-          mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            stream.getTracks().forEach(track => track.stop());
-            await uploadAndSendVoiceNote(audioBlob);
-          };
-
-          mediaRecorder.start();
-          isRecording = true;
-          if (micBtn) micBtn.style.background = '#ff1744';
-          if (micIcon) micIcon.className = "fa-solid fa-stop";
-          if (input) input.placeholder = "🔴 Recording... Click mic again to stop & send.";
-          Toast.show("Recording started. Speak now!", "info");
-        } catch (err) {
-          Toast.show("Microphone access denied or not supported.", "error");
-        }
-      } else {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-          mediaRecorder.stop();
-        }
-        isRecording = false;
-        if (micBtn) micBtn.style.background = '#1f2636';
-        if (micIcon) micIcon.className = "fa-solid fa-microphone";
-        if (input) input.placeholder = "Type message or click mic...";
-      }
-    }
-
-    async function uploadAndSendVoiceNote(blob) {
-      if (!currentUser) return;
-      Loader.show("Sending voice note...");
-      try {
-        const fileName = `voice_${currentUser.id}_${Date.now()}.webm`;
-        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(fileName, blob);
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(fileName);
-
-        const isAdmin = currentProfile?.is_admin || false;
-        const targetUserId = (isAdmin && window.activeAdminChatUserId) ? window.activeAdminChatUserId : currentUser.id;
-
-        const { error: dbError } = await sbClient.from('support_messages').insert([{
-          user_id: targetUserId,
-          sender_id: currentUser.id,
-          sender_role: isAdmin ? 'admin' : 'player',
-          message: `<audio controls src="${publicUrl}" style="max-width:200px; height:35px;"></audio>`,
-          is_read: false
-        }]);
-
-        if (dbError) throw dbError;
-        Loader.hide();
-        Toast.show("Voice note sent successfully!", "success");
-        if (isAdmin && window.activeAdminChatUserId) {
-          loadAdminChatMessages(window.activeAdminChatUserId);
-        } else {
-          ChatModal.loadMessages();
-        }
-      } catch (err) {
-        Loader.hide();
-        Toast.show("Failed to send voice note.", "error");
-      }
-    }
-
     const ChatModal = {
       isOpen: false,
       interval: null,
@@ -1667,10 +1579,6 @@
         document.getElementById('chat-modal-overlay').classList.add('hidden');
         this.isOpen = false;
         if (this.interval) clearInterval(this.interval);
-        if (isRecording && mediaRecorder) {
-          mediaRecorder.stop();
-          isRecording = false;
-        }
         syncAuthAndProfile();
       },
       async loadMessages() {
@@ -1682,7 +1590,7 @@
           container.innerHTML = `
             <div class="chat-row theirs">
               <div class="chat-bubble theirs">
-                Assalam-o-Alaikum! Tap mic to start recording, speak your message, and tap mic again to send!
+                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
               </div>
               <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
             </div>
@@ -1716,11 +1624,10 @@
       if (!text || !currentUser) return;
       input.value = "";
 
-      const isAdmin = currentProfile?.is_admin || false;
       const { error } = await sbClient.from('support_messages').insert([{
         user_id: currentUser.id,
         sender_id: currentUser.id,
-        sender_role: isAdmin ? 'admin' : 'player',
+        sender_role: 'player',
         message: text,
         is_read: false
       }]);
@@ -1851,10 +1758,7 @@
           </div>
 
           <form id="admin-chat-form" style="display:flex; gap:8px; margin-top:8px;">
-            <input type="text" id="admin-chat-input" class="form-input" placeholder="Type message to player..." style="margin-bottom:0;" autocomplete="off" />
-            <button type="button" id="btn-mic-record" onclick="toggleVoiceRecording()" class="icon-btn" style="background:#1f2636; color:#00f0ff; width:44px; height:44px; border-radius:8px; flex-shrink:0;" title="Record Voice Note">
-              <i class="fa-solid fa-microphone" id="mic-icon"></i>
-            </button>
+            <input type="text" id="admin-chat-input" class="form-input" placeholder="Type message to player..." style="margin-bottom:0;" autocomplete="off" required />
             <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
