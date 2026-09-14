@@ -582,7 +582,7 @@
             sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
             sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
             sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin')
+            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin').eq('is_read', false)
           ]);
           currentProfile = profRes.data;
           userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
@@ -1455,7 +1455,6 @@
       `;
     }
 
-    // NOTIFICATIONS VIEW (MARKS ALL AS READ UPON OPENING)
     async function renderNotifications() {
       if (!currentUser) { Router.navigate('login'); return; }
       Loader.show("Loading notifications...");
@@ -1537,13 +1536,24 @@
         }
         document.getElementById('chat-modal-overlay').classList.remove('hidden');
         this.isOpen = true;
+        
+        // Mark admin messages as read when player opens chat
+        await sbClient.from('support_messages')
+          .update({ is_read: true })
+          .eq('user_id', currentUser.id)
+          .eq('sender_role', 'admin')
+          .eq('is_read', false);
+
         await this.loadMessages();
+        await syncAuthAndProfile();
+
         this.interval = setInterval(() => this.loadMessages(), 3500);
       },
       close() {
         document.getElementById('chat-modal-overlay').classList.add('hidden');
         this.isOpen = false;
         if (this.interval) clearInterval(this.interval);
+        syncAuthAndProfile();
       },
       async loadMessages() {
         if (!currentUser) return;
@@ -1596,7 +1606,8 @@
         user_id: currentUser.id,
         sender_id: currentUser.id,
         sender_role: 'player',
-        message: text
+        message: text,
+        is_read: false
       }]);
 
       if (error) {
