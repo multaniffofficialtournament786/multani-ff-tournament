@@ -252,9 +252,7 @@
     .action-card i { font-size: 20px; color: var(--primary); }
     .action-card span { font-size: 11px; font-weight: 600; text-align: center; }
 
-    /* ====================================================
-       FULL BACKGROUND DP & CLEAR GLASSMORPHISM CARDS
-       ==================================================== */
+    /* TOURNAMENT CARD STYLES */
     .tournament-card { 
       border: 1px solid rgba(255, 255, 255, 0.18) !important; 
       border-radius: 16px !important; 
@@ -444,7 +442,7 @@
         </div>
         <div class="header-actions">
           <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share Website">
-            <i class="fa-solid fa-share-nodes text-cyan-400" style="color:var(--accent-cyan);"></i>
+            <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
           </button>
           <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
             <i class="fa-solid fa-bell"></i>
@@ -504,7 +502,7 @@
 
     <main id="app-view" class="main-content"></main>
 
-    <!-- DRAGGABLE BOT WIDGET WITH UNREAD CHAT COUNT BADGE -->
+    <!-- DRAGGABLE BOT WIDGET -->
     <div id="admin-float-widget">
       <div class="bot-bubble">
         <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
@@ -513,7 +511,7 @@
       <span class="bot-badge-tag">ADMIN</span>
     </div>
 
-    <!-- REAL CHAT MODAL (WHATSAPP STYLE) -->
+    <!-- REAL CHAT MODAL -->
     <div id="chat-modal-overlay" class="hidden">
       <div class="chat-dialog">
         <div class="chat-dialog-header">
@@ -564,9 +562,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. SUPABASE CLIENT & STATE
-    // ==========================================
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -619,9 +614,6 @@
       }
     }
 
-    // ==========================================
-    // 2. DATA SYNCHRONIZATION & NOTIFICATION BADGES
-    // ==========================================
     async function syncAuthAndProfile() {
       try {
         const { data: { user } } = await sbClient.auth.getUser();
@@ -655,9 +647,7 @@
       const drawerBadge = document.getElementById('drawer-notif-badge');
       const floatChatBadge = document.getElementById('float-chat-badge');
 
-      if (bellBadge) {
-        bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
-      }
+      if (bellBadge) bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
       if (drawerBadge) {
         drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
         drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
@@ -687,9 +677,6 @@
       }
     }
 
-    // ==========================================
-    // 3. PAGE CONTROLLER
-    // ==========================================
     const Router = {
       history: ['home'],
       async navigate(page, id = null) {
@@ -730,6 +717,7 @@
         else if (page === 'notifications') renderNotifications();
         else if (page === 'rules') renderRules();
         else if (page === 'about') renderAbout();
+        else if (page === 'admin') renderAdminPanel();
       },
       async back() {
         if (this.history.length > 1) {
@@ -742,9 +730,6 @@
       }
     };
 
-    // ==========================================
-    // 4. VIEW RENDERERS
-    // ==========================================
     function buildTournamentCardsHTML(list) {
       if (!list || !list.length) {
         return `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No active matches found.</p></div>`;
@@ -757,7 +742,6 @@
         return `
           <div class="tournament-card" onclick="Router.navigate('tournament_detail', '${t.id}')" style="background-image: url('${imgUrl}'); cursor:pointer;">
             <div class="t-card-overlay"></div>
-            
             ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
 
             <div class="t-glass-details">
@@ -803,9 +787,10 @@
       }
       Loader.hide();
 
-      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
+      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "" };
       const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
       const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
+      const displayPhone = p.phone || 'No WhatsApp added';
 
       const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
 
@@ -830,11 +815,14 @@
             </div>
           ` : `
             <div class="player-hero-card">
-              <div class="hero-profile-row">
+              <div class="hero-profile-row" style="margin-bottom:10px;">
                 <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
                 <div class="hero-details">
                   <h2>${displayName}</h2>
                   <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${displayUid}</span>
+                  <div style="font-size: 12px; color: var(--success); margin-top: 3px; font-weight: 600;">
+                    <i class="fa-brands fa-whatsapp"></i> ${displayPhone}
+                  </div>
                 </div>
               </div>
               <div class="hero-stats-grid">
@@ -844,6 +832,14 @@
               </div>
             </div>
           `}
+
+          ${currentProfile?.is_admin ? `
+            <div style="margin-bottom: 14px;">
+              <button class="btn btn-primary" onclick="Router.navigate('admin')" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color:#000; font-weight:800;">
+                <i class="fa-solid fa-user-shield"></i> OPEN ADMIN PANEL
+              </button>
+            </div>
+          ` : ''}
 
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
@@ -1028,11 +1024,7 @@
 
     async function renderWinners() {
       Loader.show("Loading winners...");
-      
-      const { data: winnersData, error } = await sbClient
-        .from('winners')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: winnersData, error } = await sbClient.from('winners').select('*').order('created_at', { ascending: false });
 
       if (error || !winnersData || !winnersData.length) {
         Loader.hide();
@@ -1062,8 +1054,7 @@
 
       Loader.hide();
 
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="section-title"><span><i class="fa-solid fa-trophy text-gold"></i> Hall of Champions</span></div>
           ${winnersData.map(w => {
@@ -1103,8 +1094,6 @@
       const deposits = depRes.data || [];
       const txs = txRes.data || [];
 
-      const view = document.getElementById('app-view');
-
       const depositSlipsHtml = deposits.length ? deposits.map(d => {
         let badgeColor = 'background:#ff9800; color:#000;';
         if (d.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
@@ -1139,7 +1128,7 @@
         `;
       }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
 
-      view.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="wallet-hero">
             <span class="wallet-balance-title">Current Balance</span>
@@ -1159,8 +1148,7 @@
     function renderDeposit() {
       if (!currentUser) { Router.navigate('login'); return; }
 
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom:14px;">
             <h4 id="dep-box-header" style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Details</h4>
@@ -1250,8 +1238,7 @@
     }
 
     function renderAuth() {
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div style="display:flex; gap:10px; margin-bottom:16px;">
             <button id="tab-login-btn" class="btn btn-primary btn-sm" style="flex:1;" onclick="toggleAuth(true)">LOGIN</button>
@@ -1429,21 +1416,12 @@
         const fileExt = file.name.split('.').pop();
         const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await sbClient.storage
-          .from('deposit-screenshots')
-          .upload(filePath, file, { upsert: true });
-
+        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file, { upsert: true });
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = sbClient.storage
-          .from('deposit-screenshots')
-          .getPublicUrl(filePath);
+        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
 
-        const { error: updateError } = await sbClient
-          .from('profiles')
-          .update({ avatar_url: publicUrl })
-          .eq('id', currentUser.id);
-
+        const { error: updateError } = await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
         if (updateError) throw updateError;
 
         document.getElementById('profile-display-avatar').src = publicUrl;
@@ -1491,6 +1469,104 @@
       }
     }
 
+    // ==========================================
+    // ADMIN PANEL WITH WHATSAPP CHAT BUTTON
+    // ==========================================
+    async function renderAdminPanel() {
+      if (!currentProfile?.is_admin) {
+        Toast.show("Access denied: Admins only", "error");
+        Router.navigate('home');
+        return;
+      }
+
+      Loader.show("Loading Admin Dashboard...");
+      const { data: users, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (error || !users) {
+        view.innerHTML = `<div class="view-container empty-state"><p>Error loading users.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
+        <div class="view-container">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h2 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">ADMIN • USERS & WALLET</h2>
+            <button class="btn btn-secondary btn-sm" onclick="Router.navigate('home')"><i class="fa-solid fa-arrow-left"></i> Home</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            ${users.map(u => {
+              const waNumber = u.phone || 'No phone';
+              let waLink = '#';
+              if (u.phone) {
+                let cleanNum = u.phone.replace(/[^0-9]/g, '');
+                if (cleanNum.startsWith('0')) {
+                  cleanNum = '92' + cleanNum.substring(1);
+                }
+                waLink = `https://wa.me/${cleanNum}?text=Hello%20${encodeURIComponent(u.free_fire_name || 'Gamer')},%20regarding%20Multani%20FF%20Tournament...`;
+              }
+
+              return `
+                <div class="player-hero-card" style="margin-bottom:0; padding:14px;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                    <div>
+                      <h3 style="font-family:var(--font-gaming); font-size:17px; color:#fff;">${u.free_fire_name || u.full_name || 'User'}</h3>
+                      <span class="uid-tag">UID: ${u.free_fire_uid || '--'}</span>
+                    </div>
+                    <span style="font-size:10px; font-weight:bold; padding:2px 8px; border-radius:6px; background:${u.is_banned ? 'var(--danger)' : 'var(--success)'}; color:#000;">
+                      ${u.is_banned ? 'BANNED' : 'ACTIVE'}
+                    </span>
+                  </div>
+
+                  <!-- WHATSAPP NUMBER & BUTTON ROW -->
+                  <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(0,230,118,0.08); border:1px solid rgba(0,230,118,0.3); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:10px;">
+                    <div style="font-size:13px; color:#00e676; font-family:monospace; font-weight:bold;">
+                      <i class="fa-brands fa-whatsapp"></i> ${waNumber}
+                    </div>
+                    ${u.phone ? `
+                      <a href="${waLink}" target="_blank" class="icon-btn" style="background:#25D366; color:#fff; width:34px; height:34px; border-radius:8px; text-decoration:none;" title="Chat on WhatsApp">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                      </a>
+                    ` : '<span style="font-size:10px; color:var(--text-dim);">No WhatsApp</span>'}
+                  </div>
+
+                  <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:var(--radius-sm); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:12px; color:var(--accent-gold); font-weight:bold;">PKR ${u.wallet_balance || 0}</span>
+                    <div style="display:flex; gap:6px;">
+                      <input type="number" id="bal-input-${u.id}" class="form-input" value="${u.wallet_balance || 0}" style="width:80px; padding:6px; font-size:12px; margin-bottom:0;" />
+                      <button class="btn btn-primary btn-sm" onclick="adminUpdateWallet('${u.id}')">UPDATE</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function adminUpdateWallet(userId) {
+      const inputVal = document.getElementById(`bal-input-${userId}`).value;
+      const newBal = parseFloat(inputVal);
+      if (isNaN(newBal)) {
+        Toast.show("Invalid balance amount", "error");
+        return;
+      }
+
+      Loader.show("Updating balance...");
+      const { error } = await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', userId);
+      Loader.hide();
+
+      if (error) {
+        Toast.show(error.message, "error");
+      } else {
+        Toast.show("User balance updated successfully!", "success");
+        renderAdminPanel();
+      }
+    }
+
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
       const { data } = await sbClient.from('profiles').select('free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
@@ -1534,13 +1610,12 @@
       Loader.hide();
 
       const data = notifRes.data;
-      const view = document.getElementById('app-view');
       if (!data || !data.length) {
-        view.innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
+        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
         return;
       }
 
-      view.innerHTML = `
+      document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           ${data.map(n => `
             <div class="tx-item" style="border-left: 3px solid var(--primary);">
@@ -1602,12 +1677,7 @@
         document.getElementById('chat-modal-overlay').classList.remove('hidden');
         this.isOpen = true;
         
-        // Mark admin messages as read when player opens chat
-        await sbClient.from('support_messages')
-          .update({ is_read: true })
-          .eq('user_id', currentUser.id)
-          .eq('sender_role', 'admin')
-          .eq('is_read', false);
+        await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', currentUser.id).eq('sender_role', 'admin').eq('is_read', false);
 
         await this.loadMessages();
         await syncAuthAndProfile();
@@ -1622,11 +1692,7 @@
       },
       async loadMessages() {
         if (!currentUser) return;
-        const { data } = await sbClient
-          .from('support_messages')
-          .select('*')
-          .or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`)
-          .order('created_at', { ascending: true });
+        const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
 
         const container = document.getElementById('chat-modal-messages');
         if (!data || data.length === 0) {
@@ -1675,11 +1741,8 @@
         is_read: false
       }]);
 
-      if (error) {
-        Toast.show(error.message, "error");
-      } else {
-        ChatModal.loadMessages();
-      }
+      if (error) Toast.show(error.message, "error");
+      else ChatModal.loadMessages();
     };
 
     function setupDraggableBot() {
@@ -1706,9 +1769,7 @@
         const dx = touch.clientX - startX;
         const dy = touch.clientY - startY;
 
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-          hasMoved = true;
-        }
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
 
         let newX = origX + dx;
         let newY = origY + dy;
@@ -1725,22 +1786,17 @@
         widget.style.bottom = 'auto';
       }
 
-      function onEnd() {
-        isDragging = false;
-      }
+      function onEnd() { isDragging = false; }
 
       widget.addEventListener('touchstart', onStart, { passive: true });
       window.addEventListener('touchmove', onMove, { passive: true });
       window.addEventListener('touchend', onEnd);
-
       widget.addEventListener('mousedown', onStart);
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
       widget.addEventListener('click', () => {
-        if (!hasMoved) {
-          ChatModal.open();
-        }
+        if (!hasMoved) ChatModal.open();
       });
     }
 
