@@ -594,7 +594,6 @@
       if (tabId === 'support') loadSupportInbox();
     }
 
-    // DASHBOARD & SIDEBAR LIVE BADGES SYNC
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
       const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
@@ -603,17 +602,14 @@
       const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
       const pendingCount = pendingDepCount || 0;
       
-      // Dashboard Pending Card count
       document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
       
-      // Sidebar Deposit Badge
       const badgeDep = document.getElementById('badge-deposits');
       if (badgeDep) {
         badgeDep.innerText = pendingCount;
         badgeDep.classList.toggle('hidden', pendingCount === 0);
       }
 
-      // Quick Action Deposit Tile Badge
       const quickDep = document.getElementById('quick-badge-deposits');
       if (quickDep) {
         quickDep.innerText = pendingCount;
@@ -623,18 +619,16 @@
       const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
       document.getElementById('stat-total-players').innerText = userCount || 0;
 
-      // Unread support messages count
-      const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true });
+      // Unread support messages count (where sender is player and is_read is false)
+      const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false);
       const supCount = supportCount || 0;
 
-      // Sidebar Support Badge
       const badgeSup = document.getElementById('badge-support');
       if (badgeSup) {
         badgeSup.innerText = supCount;
         badgeSup.classList.toggle('hidden', supCount === 0);
       }
 
-      // Quick Action Chat Tile Badge
       const quickSup = document.getElementById('quick-badge-support');
       if (quickSup) {
         quickSup.innerText = supCount;
@@ -1211,10 +1205,12 @@
             userId: uId,
             lastMsg: m.message,
             lastTime: m.created_at,
-            count: 0
+            unreadCount: 0
           };
         }
-        threadMap[uId].count++;
+        if (m.sender_role === 'player' && !m.is_read) {
+          threadMap[uId].unreadCount++;
+        }
       });
 
       const userIds = Object.keys(threadMap);
@@ -1249,7 +1245,7 @@
             <div class="text-right">
               <span class="text-[9px] text-gray-500">${time}</span>
               <div class="mt-1">
-                <span class="bg-[#ff4624] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${item.count}</span>
+                ${item.unreadCount > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${item.unreadCount}</span>` : ''}
               </div>
             </div>
           </div>
@@ -1264,6 +1260,15 @@
       document.getElementById('support-inbox-view').classList.add('hidden');
       document.getElementById('support-chat-view').classList.remove('hidden');
 
+      // Mark messages from this player as read
+      await sbClient.from('support_messages')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('sender_role', 'player')
+        .eq('is_read', false);
+
+      loadDashboardStats();
+
       await renderActiveChatMessages();
       if (chatInterval) clearInterval(chatInterval);
       chatInterval = setInterval(renderActiveChatMessages, 3500);
@@ -1275,6 +1280,7 @@
       document.getElementById('support-chat-view').classList.add('hidden');
       document.getElementById('support-inbox-view').classList.remove('hidden');
       loadSupportInbox();
+      loadDashboardStats();
     }
 
     async function renderActiveChatMessages() {
@@ -1316,7 +1322,8 @@
         user_id: activeChatPlayerId,
         sender_id: currentAdmin.id,
         sender_role: 'admin',
-        message: text
+        message: text,
+        is_read: true
       }]);
 
       if (error) alert("Send error: " + error.message);
