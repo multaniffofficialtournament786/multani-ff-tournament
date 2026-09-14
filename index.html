@@ -1569,7 +1569,7 @@
     async function toggleVoiceRecording() {
       const micBtn = document.getElementById('btn-mic-record');
       const micIcon = document.getElementById('mic-icon');
-      const input = document.getElementById('chat-modal-input');
+      const input = document.getElementById('chat-modal-input') || document.getElementById('admin-chat-input');
 
       if (!isRecording) {
         try {
@@ -1591,9 +1591,9 @@
 
           mediaRecorder.start();
           isRecording = true;
-          micBtn.style.background = '#ff1744';
-          micIcon.className = "fa-solid fa-stop";
-          if(input) input.placeholder = "🔴 Recording... Click mic again to stop & send.";
+          if (micBtn) micBtn.style.background = '#ff1744';
+          if (micIcon) micIcon.className = "fa-solid fa-stop";
+          if (input) input.placeholder = "🔴 Recording... Click mic again to stop & send.";
           Toast.show("Recording started. Speak now!", "info");
         } catch (err) {
           Toast.show("Microphone access denied or not supported.", "error");
@@ -1603,9 +1603,9 @@
           mediaRecorder.stop();
         }
         isRecording = false;
-        micBtn.style.background = '#1f2636';
-        micIcon.className = "fa-solid fa-microphone";
-        if(input) input.placeholder = "Type message or click mic...";
+        if (micBtn) micBtn.style.background = '#1f2636';
+        if (micIcon) micIcon.className = "fa-solid fa-microphone";
+        if (input) input.placeholder = "Type message or click mic...";
       }
     }
 
@@ -1620,7 +1620,7 @@
         const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(fileName);
 
         const isAdmin = currentProfile?.is_admin || false;
-        const targetUserId = window.activeAdminChatUserId || currentUser.id;
+        const targetUserId = (isAdmin && window.activeAdminChatUserId) ? window.activeAdminChatUserId : currentUser.id;
 
         const { error: dbError } = await sbClient.from('support_messages').insert([{
           user_id: targetUserId,
