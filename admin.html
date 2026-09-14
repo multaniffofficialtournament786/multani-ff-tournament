@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MULTANI FF - Admin Console</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .font-gaming { font-family: 'Rajdhani', sans-serif; }
     .sidebar-scroll::-webkit-scrollbar { width: 3px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
@@ -176,14 +176,14 @@
           <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
         </div>
 
-        <div id="tournaments-cards-container" class="space-y-3">
+        <div id="tournaments-cards-container" class="space-y-3 max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
       </section>
 
       <!-- DEPOSITS -->
       <section id="section-deposits" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4">
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4 max-w-3xl">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
               <tr>
@@ -232,7 +232,7 @@
       <!-- USERS & WALLET EDIT -->
       <section id="section-users" class="space-y-3 hidden">
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
-        <div id="users-cards-container" class="space-y-3">
+        <div id="users-cards-container" class="space-y-3 max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
         </div>
       </section>
@@ -272,7 +272,7 @@
 
       <!-- BANNED -->
       <section id="section-banned" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4">
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-3xl overflow-x-auto">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
               <tr>
@@ -619,7 +619,6 @@
       const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
       document.getElementById('stat-total-players').innerText = userCount || 0;
 
-      // Unread support messages count (where sender is player and is_read is false)
       const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false);
       const supCount = supportCount || 0;
 
@@ -679,18 +678,18 @@
       container.innerHTML = filtered.map(t => {
         const currentStatus = t.status || 'upcoming';
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3 relative overflow-hidden">
             <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-gaming text-lg font-bold text-white">${escapeHTML(t.title)}</h3>
-                <div class="flex gap-2 text-[11px] text-gray-400 mt-0.5">
+              <div class="pr-24">
+                <h3 class="font-gaming text-base md:text-lg font-bold text-white leading-tight">${escapeHTML(t.title)}</h3>
+                <div class="flex flex-wrap gap-2 text-[11px] text-gray-400 mt-1">
                   <span class="text-cyan-400 font-bold">${escapeHTML(t.mode)}</span> • 
                   <span>${escapeHTML(t.map)}</span> • 
                   <span class="text-yellow-400 font-bold">PKR ${t.prize_pool}</span>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <select onchange="updateTournamentStatus('${t.id}', this.value)" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-[11px] font-bold uppercase text-white outline-none">
+              <div class="absolute top-4 right-4">
+                <select onchange="updateTournamentStatus('${t.id}', this.value)" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-[10px] font-bold uppercase text-white outline-none">
                   <option value="upcoming" ${currentStatus === 'upcoming' ? 'selected' : ''}>Upcoming</option>
                   <option value="live" ${currentStatus === 'live' ? 'selected' : ''}>Live</option>
                   <option value="completed" ${currentStatus === 'completed' ? 'selected' : ''}>Completed</option>
@@ -701,11 +700,11 @@
             <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
               <div>
                 <span class="text-gray-500 text-[10px] uppercase font-bold block">Room ID</span>
-                <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Set Room ID" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
+                <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Set Room ID" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs outline-none">
               </div>
               <div>
                 <span class="text-gray-500 text-[10px] uppercase font-bold block">Password</span>
-                <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Set Pass" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
+                <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Set Pass" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs outline-none">
               </div>
             </div>
 
@@ -1079,38 +1078,61 @@
         return;
       }
 
-      container.innerHTML = data.map(u => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <div>
-              <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-              <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-              ${u.is_banned ? 'BANNED' : 'ACTIVE'}
-            </span>
-          </div>
+      container.innerHTML = data.map(u => {
+        const waNumber = u.phone || '';
+        let waLink = '#';
+        if (waNumber) {
+          let cleanNum = waNumber.replace(/[^0-9]/g, '');
+          if (cleanNum.startsWith('0')) {
+            cleanNum = '92' + cleanNum.substring(1);
+          }
+          const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin regarding your tournament or wallet details.");
+          waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
+        }
 
-          <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
-            <div>
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Current Balance</span>
-              <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${u.wallet_balance || 0}</span>
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+                ${u.is_banned ? 'BANNED' : 'ACTIVE'}
+              </span>
             </div>
-            <div class="flex items-center gap-1.5">
-              <input type="number" id="bal-${u.id}" value="${u.wallet_balance || 0}" class="w-24 bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-white font-mono text-xs outline-none focus:border-[#ff4624]" />
-              <button onclick="updatePlayerBalance('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold font-gaming">UPDATE</button>
-            </div>
-          </div>
 
-          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
-            <span>Won: <strong class="text-emerald-400">PKR ${u.total_won || 0}</strong></span>
-            <span>Matches: <strong>${u.total_matches || 0}</strong></span>
-            <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" class="${u.is_banned ? 'bg-emerald-600' : 'bg-red-600'} text-white px-2.5 py-0.5 rounded font-bold text-[10px]">
-              ${u.is_banned ? 'UNBAN' : 'BAN'}
-            </button>
+            <!-- WHATSAPP CONTACT ROW -->
+            <div class="flex items-center justify-between bg-[rgba(0,230,118,0.08)] border border-[rgba(0,230,118,0.3)] rounded-lg px-3 py-2">
+              <span class="text-xs text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No phone added')}</span>
+              ${waNumber ? `
+                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 shadow">
+                  <i class="fa-brands fa-whatsapp text-sm"></i> Chat
+                </a>
+              ` : '<span class="text-[10px] text-gray-500">No WhatsApp</span>'}
+            </div>
+
+            <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
+              <div>
+                <span class="text-[10px] text-gray-400 uppercase font-bold block">Current Balance</span>
+                <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${u.wallet_balance || 0}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <input type="number" id="bal-${u.id}" value="${u.wallet_balance || 0}" class="w-24 bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-white font-mono text-xs outline-none focus:border-[#ff4624]" />
+                <button onclick="updatePlayerBalance('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold font-gaming">UPDATE</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
+              <span>Won: <strong class="text-emerald-400">PKR ${u.total_won || 0}</strong></span>
+              <span>Matches: <strong>${u.total_matches || 0}</strong></span>
+              <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" class="${u.is_banned ? 'bg-emerald-600' : 'bg-red-600'} text-white px-2.5 py-0.5 rounded font-bold text-[10px]">
+                ${u.is_banned ? 'UNBAN' : 'BAN'}
+              </button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function updatePlayerBalance(userId) {
@@ -1260,7 +1282,6 @@
       document.getElementById('support-inbox-view').classList.add('hidden');
       document.getElementById('support-chat-view').classList.remove('hidden');
 
-      // Mark messages from this player as read
       await sbClient.from('support_messages')
         .update({ is_read: true })
         .eq('user_id', userId)
