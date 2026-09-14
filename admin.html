@@ -35,9 +35,9 @@
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
           <div class="relative">
-            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-9 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
-            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs">
-              <i id="eye-icon" class="fa-solid fa-eye"></i>
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+              <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
             </button>
           </div>
         </div>
@@ -501,7 +501,7 @@
       }
     }
 
-    document.getElementById('admin-login-form').onsubmit = async (e) => {
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('adm-email').value.trim();
       const password = document.getElementById('adm-pass').value;
@@ -536,7 +536,7 @@
       } finally {
         btn.disabled = false;
       }
-    };
+    });
 
     async function adminSignOut() {
       await sbClient.auth.signOut();
@@ -1156,7 +1156,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    document.getElementById('admin-reply-form').onsubmit = async (e) => {
+    document.getElementById('admin-reply-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const input = document.getElementById('admin-reply-input');
       const text = input.value.trim();
@@ -1172,7 +1172,7 @@
 
       if (error) alert("Send error: " + error.message);
       else renderActiveChatMessages();
-    };
+    });
 
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
