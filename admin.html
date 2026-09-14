@@ -158,7 +158,7 @@
         </div>
       </section>
 
-      <!-- TOURNAMENTS WITH STATUS FILTER BUTTONS -->
+      <!-- TOURNAMENTS -->
       <section id="section-tournaments" class="space-y-4 hidden">
         <div class="flex items-center gap-2 overflow-x-auto pb-1">
           <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
@@ -220,25 +220,11 @@
         </div>
       </section>
 
-      <!-- USERS -->
-      <section id="section-users" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-              <tr>
-                <th class="p-3">Player</th>
-                <th class="p-3">Free Fire UID</th>
-                <th class="p-3">Balance</th>
-                <th class="p-3">Won</th>
-                <th class="p-3">Matches</th>
-                <th class="p-3">Status</th>
-                <th class="p-3">Action</th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body" class="divide-y divide-[#262f40]">
-              <tr><td colspan="7" class="p-4 text-center text-gray-500">Loading gamers...</td></tr>
-            </tbody>
-          </table>
+      <!-- USERS & WALLET EDIT (MOBILE RESPONSIVE CARDS) -->
+      <section id="section-users" class="space-y-3 hidden">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
+        <div id="users-cards-container" class="space-y-3">
+          <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
         </div>
       </section>
 
@@ -811,7 +797,6 @@
 
     async function kickPlayerFromMatch(entryId, tId) {
       if (!confirm("Kick this player from match? Slot will be released.")) return;
-      
       const { error } = await sbClient.from('tournament_entries').delete().eq('id', entryId);
       if (error) {
         alert("Kick failed: " + error.message);
@@ -1041,6 +1026,124 @@
       document.getElementById('win-amount').value = '';
     }
 
+    // ==========================================
+    // GAMERS & BALANCE EDIT WITH NOTIFICATION
+    // ==========================================
+    async function loadUsers() {
+      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+      const container = document.getElementById('users-cards-container');
+      
+      if (error || !data || !data.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players registered.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(u => `
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+              <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+              ${u.is_banned ? 'BANNED' : 'ACTIVE'}
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
+            <div>
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">Current Balance</span>
+              <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${u.wallet_balance || 0}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="bal-${u.id}" value="${u.wallet_balance || 0}" class="w-24 bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-white font-mono text-xs outline-none focus:border-[#ff4624]" />
+              <button onclick="updatePlayerBalance('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold font-gaming">UPDATE</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
+            <span>Won: <strong class="text-emerald-400">PKR ${u.total_won || 0}</strong></span>
+            <span>Matches: <strong>${u.total_matches || 0}</strong></span>
+            <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" class="${u.is_banned ? 'bg-emerald-600' : 'bg-red-600'} text-white px-2.5 py-0.5 rounded font-bold text-[10px]">
+              ${u.is_banned ? 'UNBAN' : 'BAN'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function updatePlayerBalance(userId) {
+      const newBalInput = document.getElementById(`bal-${userId}`);
+      const newBalance = parseFloat(newBalInput.value);
+
+      if (isNaN(newBalance)) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+
+      if (!confirm(`Update player balance to PKR ${newBalance}?`)) return;
+
+      // 1. Update profile wallet balance
+      const { error } = await sbClient.from('profiles').update({
+        wallet_balance: newBalance,
+        updated_at: new Date().toISOString()
+      }).eq('id', userId);
+
+      if (error) {
+        alert("Failed to update balance: " + error.message);
+        return;
+      }
+
+      // 2. Send notification to player's notification bell
+      await sbClient.from('notifications').insert([{
+        user_id: userId,
+        title: "Wallet Balance Updated",
+        message: `Admin has updated your wallet balance. Your current balance is now PKR ${newBalance}.`
+      }]);
+
+      // 3. Log transaction
+      await sbClient.from('wallet_transactions').insert([{
+        user_id: userId,
+        amount: newBalance,
+        transaction_type: 'admin_adjustment',
+        status: 'approved',
+        description: 'Admin balance adjustment'
+      }]);
+
+      alert("Balance updated successfully & notification sent to player!");
+      loadUsers();
+    }
+
+    async function toggleBanUser(userId, newStatus) {
+      if (!confirm(`Are you sure you want to ${newStatus ? 'BAN' : 'UNBAN'} this player?`)) return;
+      const { error } = await sbClient.from('profiles').update({ is_banned: newStatus }).eq('id', userId);
+      if (error) alert(error.message);
+      else {
+        alert("Player ban status updated.");
+        loadUsers();
+        loadBannedUsers();
+      }
+    }
+
+    async function loadBannedUsers() {
+      const { data } = await sbClient.from('profiles').select('*').eq('is_banned', true);
+      const tbody = document.getElementById('banned-table-body');
+      if (!data || !data.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No players currently banned.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(b => `
+        <tr>
+          <td class="p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
+          <td class="p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
+          <td class="p-3">${escapeHTML(b.email)}</td>
+          <td class="p-3">
+            <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold text-xs">UNBAN</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
     async function loadSupportInbox() {
       const inboxList = document.getElementById('support-inbox-list');
       inboxList.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
@@ -1175,68 +1278,6 @@
       if (error) alert("Send error: " + error.message);
       else renderActiveChatMessages();
     });
-
-    async function loadUsers() {
-      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
-      const tbody = document.getElementById('users-table-body');
-      if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No players registered.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = data.map(u => `
-        <tr>
-          <td class="p-3">
-            <span class="font-bold text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</span><br>
-            <span class="text-gray-500">${escapeHTML(u.email || '--')}</span>
-          </td>
-          <td class="p-3 font-mono text-cyan-400">${escapeHTML(u.free_fire_uid || '--')}</td>
-          <td class="p-3 font-bold text-yellow-400">PKR ${u.wallet_balance || 0}</td>
-          <td class="p-3 text-emerald-400">PKR ${u.total_won || 0}</td>
-          <td class="p-3">${u.total_matches || 0}</td>
-          <td class="p-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-              ${u.is_banned ? 'BANNED' : 'ACTIVE'}
-            </span>
-          </td>
-          <td class="p-3 space-x-1">
-            <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" class="${u.is_banned ? 'bg-emerald-600' : 'bg-red-600'} text-white px-2 py-1 rounded font-bold text-xs">
-              ${u.is_banned ? 'UNBAN' : 'BAN'}
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    async function toggleBanUser(userId, newStatus) {
-      if (!confirm(`Are you sure you want to ${newStatus ? 'BAN' : 'UNBAN'} this player?`)) return;
-      const { error } = await sbClient.from('profiles').update({ is_banned: newStatus }).eq('id', userId);
-      if (error) alert(error.message);
-      else {
-        alert("Player ban status updated.");
-        loadUsers();
-        loadBannedUsers();
-      }
-    }
-
-    async function loadBannedUsers() {
-      const { data } = await sbClient.from('profiles').select('*').eq('is_banned', true);
-      const tbody = document.getElementById('banned-table-body');
-      if (!data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No players currently banned.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = data.map(b => `
-        <tr>
-          <td class="p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
-          <td class="p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
-          <td class="p-3">${escapeHTML(b.email)}</td>
-          <td class="p-3">
-            <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold text-xs">UNBAN</button>
-          </td>
-        </tr>
-      `).join('');
-    }
 
     async function loadSettings() {
       const { data } = await sbClient.from('site_settings').select('*');
