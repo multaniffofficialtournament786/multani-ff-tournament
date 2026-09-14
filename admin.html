@@ -34,13 +34,18 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
-          <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+          <div class="relative">
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-9 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs">
+              <i id="eye-icon" class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" id="btn-adm-login" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
           AUTHENTICATE CONSOLE
         </button>
       </form>
-      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden"></div>
+      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
     </div>
   </div>
 
@@ -155,7 +160,6 @@
 
       <!-- TOURNAMENTS WITH STATUS FILTER BUTTONS -->
       <section id="section-tournaments" class="space-y-4 hidden">
-        <!-- FILTER BAR -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1">
           <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
           <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
@@ -238,7 +242,7 @@
         </div>
       </section>
 
-      <!-- SUPPORT (WHATSAPP STYLE INBOX) -->
+      <!-- SUPPORT -->
       <section id="section-support" class="space-y-4 hidden">
         <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
@@ -432,9 +436,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. SUPABASE CLIENT
-    // ==========================================
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -452,6 +453,18 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById('adm-pass');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        passInput.type = 'password';
+        eyeIcon.className = 'fa-solid fa-eye';
+      }
     }
 
     async function checkAdminAuth() {
@@ -599,16 +612,13 @@
       document.getElementById('stat-total-players').innerText = userCount || 0;
     }
 
-    // ==========================================
-    // TOURNAMENTS WITH STATUS FILTER & SWITCHER
-    // ==========================================
     async function loadTournaments() {
       const container = document.getElementById('tournaments-cards-container');
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading tournaments...</p>`;
 
       const { data, error } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
       if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tournaments found.</p>';
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tournaments found.</p>`;
         return;
       }
       loadedTournamentsList = data;
