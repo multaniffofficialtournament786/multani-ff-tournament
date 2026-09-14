@@ -98,7 +98,6 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* SCROLLING ANNOUNCEMENT TICKER */
     .announcement-box {
       background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15));
       border: 1px solid rgba(255, 70, 36, 0.35);
@@ -111,26 +110,10 @@
       overflow: hidden;
       box-shadow: 0 0 12px rgba(255, 70, 36, 0.2);
     }
-    .announcement-box i {
-      color: var(--accent-gold);
-      font-size: 14px;
-      animation: pulse 1.5s infinite;
-    }
+    .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .ticker-viewport {
-      overflow: hidden;
-      white-space: nowrap;
-      width: 100%;
-    }
-    .ticker-content {
-      display: inline-block;
-      font-family: var(--font-gaming);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #fff;
-      animation: marquee 20s linear infinite;
-    }
+    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 20s linear infinite; }
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
     .bottom-nav { 
@@ -151,7 +134,6 @@
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
-    /* DRAGGABLE BOT WIDGET */
     #admin-float-widget {
       position: absolute;
       bottom: 120px;
@@ -177,11 +159,7 @@
       justify-content: center;
       position: relative;
     }
-    .bot-bubble img {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-    }
+    .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
     .bot-badge-tag {
       margin-top: -6px;
       background: #ff4624;
@@ -197,7 +175,6 @@
       border: 1px solid rgba(255,255,255,0.3);
     }
 
-    /* REAL CHAT MODAL */
     #chat-modal-overlay {
       position: absolute;
       inset: 0;
@@ -228,70 +205,14 @@
       align-items: center;
       justify-content: space-between;
     }
-    .chat-user-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .chat-avatar-status {
-      position: relative;
-    }
-    .chat-online-dot {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 10px;
-      height: 10px;
-      background: #00e676;
-      border-radius: 50%;
-      border: 2px solid #151922;
-    }
-    .chat-dialog-body {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .chat-bubble {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.4;
-      position: relative;
-      word-break: break-word;
-    }
-    .chat-bubble.mine {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #ff4624, #e03212);
-      color: #fff;
-      border-bottom-right-radius: 2px;
-    }
-    .chat-bubble.theirs {
-      align-self: flex-start;
-      background: #1c2230;
-      color: #eee;
-      border-bottom-left-radius: 2px;
-      border: 1px solid var(--border-color);
-    }
-    .chat-time-tag {
-      font-size: 9px;
-      opacity: 0.7;
-      text-align: right;
-      margin-top: 4px;
-      font-family: monospace;
-    }
-    .chat-input-bar {
-      padding: 10px 14px;
-      background: #151922;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .chat-user-header { display: flex; align-items: center; gap: 10px; }
+    .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
+    .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; position: relative; word-break: break-word; }
+    .chat-bubble.mine { align-self: flex-end; background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.theirs { align-self: flex-start; background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .chat-time-tag { font-size: 9px; opacity: 0.7; text-align: right; margin-top: 4px; font-family: monospace; }
+    .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
@@ -313,7 +234,6 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    /* 6 QUICK ACTION TILES INCLUDING PAYMENT RECORD */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
@@ -376,7 +296,6 @@
           <span class="brand-main">OFFICIAL</span>
         </div>
         <div class="header-actions">
-          <!-- SHARE BUTTON -->
           <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share Website">
             <i class="fa-solid fa-share-nodes text-cyan-400" style="color:var(--accent-cyan);"></i>
           </button>
@@ -635,33 +554,13 @@
     };
 
     // ==========================================
-    // 4. VIEW RENDERERS (WITH SCROLLING TICKER & 6 ACTIONS)
+    // 4. VIEW RENDERERS
     // ==========================================
-    async function renderHome() {
-      Loader.show("Loading arena...");
-      try {
-        const [settingsRes, tourRes] = await Promise.all([
-          sbClient.from('site_settings').select('*'),
-          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
-        ]);
-        if (settingsRes.data) {
-          settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
-        }
-        activeTournaments = tourRes.data || [];
-      } catch (e) {
-        console.error(e);
+    function buildTournamentCardsHTML(list) {
+      if (!list || !list.length) {
+        return `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No active matches found.</p></div>`;
       }
-      Loader.hide();
-
-      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
-      const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
-      const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
-
-      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • FAIR PLAY MANDATORY • NO HACKS ALLOWED • DAILY MATCHES & INSTANT CASHOUTS!";
-
-      const view = document.getElementById('app-view');
-
-      const matchesHtml = activeTournaments.length ? activeTournaments.map(t => {
+      return list.map(t => {
         const pct = Math.min(100, Math.round(((t.joined_players || 0) / t.max_players) * 100));
         return `
           <div class="tournament-card" onclick="Router.navigate('tournament_detail', '${t.id}')" style="cursor:pointer;">
@@ -693,13 +592,37 @@
             </div>
           </div>
         `;
-      }).join('') : `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No active matches found.</p></div>`;
+      }).join('');
+    }
+
+    async function renderHome() {
+      Loader.show("Loading arena...");
+      try {
+        const [settingsRes, tourRes] = await Promise.all([
+          sbClient.from('site_settings').select('*'),
+          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
+        ]);
+        if (settingsRes.data) {
+          settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
+        }
+        activeTournaments = tourRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
+      Loader.hide();
+
+      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
+      const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
+      const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
+
+      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
+
+      const view = document.getElementById('app-view');
 
       view.innerHTML = `
         <div class="view-container">
-          
-          <!-- 1. SCROLLING ANNOUNCEMENT BUTTON/BOX (ABOVE PROFILE) -->
-          <div class="announcement-box" onclick="Toast.show('Official Multani FF Announcement', 'info')">
+          <!-- 1. SCROLLING ANNOUNCEMENT TICKER -->
+          <div class="announcement-box">
             <i class="fa-solid fa-bullhorn"></i>
             <div class="ticker-viewport">
               <div class="ticker-content">${tickerText}</div>
@@ -732,7 +655,7 @@
             </div>
           `}
 
-          <!-- 3. QUICK ACTIONS GRID (6 TILES INCL PAYMENT HISTORY) -->
+          <!-- 3. QUICK ACTIONS GRID (6 TILES) -->
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card">
               <i class="fa-solid fa-trophy"></i>
@@ -761,13 +684,30 @@
           </div>
 
           <div class="section-title"><span>Available Tournaments</span></div>
-          <div>${matchesHtml}</div>
+          <div>${buildTournamentCardsHTML(activeTournaments)}</div>
         </div>
       `;
     }
 
-    function renderTournaments() {
-      renderHome();
+    // MATCHES PAGE: SIRF MATCHES LIST SHOW HOGI
+    async function renderTournaments() {
+      Loader.show("Loading arena matches...");
+      try {
+        const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+        activeTournaments = data || [];
+      } catch (e) {
+        console.error(e);
+      }
+      Loader.hide();
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title">
+            <span><i class="fa-solid fa-trophy text-gold"></i> Active Tournaments & Rooms</span>
+          </div>
+          <div>${buildTournamentCardsHTML(activeTournaments)}</div>
+        </div>
+      `;
     }
 
     async function renderTournamentDetail(id) {
@@ -815,14 +755,16 @@
             </div>
           ` : ''}
 
+          <!-- PRIZE RULES: ONLY BOOYAH PRIZE, KILL PRIZE COMING SOON -->
           <div class="player-hero-card" style="margin-bottom: 12px;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px;">Prize Distribution</h4>
-            <p style="font-size: 13px;">${t.winning_rules || '1st, 2nd & Kill based prizes apply.'}</p>
+            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px;">Prize Distribution Policy</h4>
+            <p style="font-size: 13px; font-weight: 600; color: #fff;">🏆 Only Booyah: Full Winner Prize Awarded on Booyah!</p>
+            <p style="font-size: 12px; color: var(--accent-cyan); margin-top: 4px;">⚡ Per Kill Prize: <span style="background:#ff4624; color:#fff; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:bold;">COMING SOON</span></p>
           </div>
 
           <div class="player-hero-card" style="margin-bottom: 20px;">
             <h4 style="font-size: 13px; text-transform: uppercase; color: var(--danger); margin-bottom: 6px;">Match Rules</h4>
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Mobile only. No hacks, emulators or teaming.'}</p>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -911,25 +853,53 @@
       `;
     }
 
+    // PAYMENT HISTORY & STATUS (PENDING / APPROVED / REJECTED)
     async function renderWallet() {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading wallet...");
+      Loader.show("Loading payment records...");
       await syncAuthAndProfile();
-      const { data: txs } = await sbClient.from('wallet_transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      
+      const [txRes, depRes] = await Promise.all([
+        sbClient.from('wallet_transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sbClient.from('deposit_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+      ]);
       Loader.hide();
 
+      const deposits = depRes.data || [];
+      const txs = txRes.data || [];
+
       const view = document.getElementById('app-view');
-      const txHtml = (txs && txs.length) ? txs.map(tx => `
+
+      const depositSlipsHtml = deposits.length ? deposits.map(d => {
+        let badgeColor = 'background:#ff9800; color:#000;'; // Pending
+        if (d.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
+        if (d.status === 'rejected') badgeColor = 'background:#ff1744; color:#fff;';
+
+        return `
+          <div class="tx-item" style="border-left: 3px solid ${d.status === 'approved' ? '#00e676' : (d.status === 'rejected' ? '#ff1744' : '#ff9800')};">
+            <div class="tx-info">
+              <h4>Deposit (${d.payment_method})</h4>
+              <span>Email: <strong>${d.transaction_id}</strong> • ${new Date(d.created_at).toLocaleDateString()}</span>
+            </div>
+            <div style="text-align:right;">
+              <div class="tx-amount tx-positive">PKR ${d.amount}</div>
+              <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${d.status}</span>
+            </div>
+          </div>
+        `;
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No deposit requests submitted.</p>`;
+
+      const txHtml = txs.length ? txs.map(tx => `
         <div class="tx-item">
           <div class="tx-info">
             <h4>${tx.description || tx.transaction_type}</h4>
-            <span>${new Date(tx.created_at).toLocaleString()} • <strong style="text-transform:capitalize;">${tx.status}</strong></span>
+            <span>${new Date(tx.created_at).toLocaleString()}</span>
           </div>
           <div class="tx-amount ${tx.amount > 0 ? 'tx-positive' : 'tx-negative'}">
             ${tx.amount > 0 ? '+' : ''}${tx.amount} PKR
           </div>
         </div>
-      `).join('') : `<div class="empty-state"><p>No payment records found.</p></div>`;
+      `).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
 
       view.innerHTML = `
         <div class="view-container">
@@ -938,24 +908,28 @@
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
             <button class="btn btn-primary" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
           </div>
-          <div class="section-title"><span>Payment Record & History</span></div>
+
+          <div class="section-title"><span>Your Deposit Slips (Live Status)</span></div>
+          <div>${depositSlipsHtml}</div>
+
+          <div class="section-title" style="margin-top:20px;"><span>Wallet Activity</span></div>
           <div>${txHtml}</div>
         </div>
       `;
     }
 
+    // DEPOSIT FORM WITH EASYPAISA & SADAPAY ONLY + GMAIL INPUT
     function renderDeposit() {
       if (!currentUser) { Router.navigate('login'); return; }
-      const depNum = siteSettings.payment_account_number || "0300-1234567";
-      const depTitle = siteSettings.payment_account_title || "MULTANI FF OFFICIAL";
 
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
+          <!-- ACCOUNT DETAILS BOX -->
           <div class="player-hero-card" style="margin-bottom:14px;">
-            <h4 style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official JazzCash / Easypaisa</h4>
-            <div style="font-size:15px; font-weight:bold; color:#00f0ff;">Account: ${depNum}</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>${depTitle}</strong></div>
+            <h4 id="dep-box-header" style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Details</h4>
+            <div id="dep-box-number" style="font-size:18px; font-weight:bold; color:var(--accent-cyan);">03186815926</div>
+            <div id="dep-box-title" style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)</div>
           </div>
 
           <form id="dep-form">
@@ -963,26 +937,31 @@
               <label class="form-label">Deposit Amount (PKR)</label>
               <input type="number" id="dp-amount" class="form-input" placeholder="e.g. 100" required min="10" />
             </div>
+
             <div class="form-group">
-              <label class="form-label">Payment Method</label>
-              <select id="dp-method" class="form-input" required>
-                <option value="JazzCash">JazzCash</option>
+              <label class="form-label">Select Payment Method</label>
+              <select id="dp-method" class="form-input" onchange="updatePaymentDetailsDisplay(this.value)" required>
                 <option value="Easypaisa">Easypaisa</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="SadaPay">SadaPay</option>
               </select>
             </div>
+
             <div class="form-group">
               <label class="form-label">Sender Account Name</label>
-              <input type="text" id="dp-sender" class="form-input" placeholder="Your sender name" required />
+              <input type="text" id="dp-sender" class="form-input" placeholder="Your account title name" required />
             </div>
+
+            <!-- TRANSACTION ID REPLACED BY GMAIL -->
             <div class="form-group">
-              <label class="form-label">Transaction ID (TID)</label>
-              <input type="text" id="dp-tid" class="form-input" placeholder="e.g. 9841893121" required />
+              <label class="form-label">Your Gmail Address</label>
+              <input type="email" id="dp-gmail" class="form-input" value="${currentUser.email || ''}" placeholder="e.g. yourname@gmail.com" required />
             </div>
+
             <div class="form-group">
               <label class="form-label">Payment Screenshot</label>
               <input type="file" id="dp-file" class="form-input" accept="image/*" required />
             </div>
+
             <button type="submit" class="btn btn-primary" style="margin-top:8px;">SUBMIT DEPOSIT SLIP</button>
           </form>
         </div>
@@ -1001,12 +980,13 @@
 
           const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
 
+          // SENDER EMAIL SAVED IN TRANSACTION_ID COLUMN
           const { error: dbError } = await sbClient.from('deposit_requests').insert([{
             user_id: currentUser.id,
             amount: parseFloat(document.getElementById('dp-amount').value),
             payment_method: document.getElementById('dp-method').value,
             sender_name: document.getElementById('dp-sender').value,
-            transaction_id: document.getElementById('dp-tid').value,
+            transaction_id: document.getElementById('dp-gmail').value,
             screenshot_url: publicUrl,
             status: 'pending'
           }]);
@@ -1014,13 +994,25 @@
           if (dbError) throw dbError;
 
           Loader.hide();
-          Toast.show("Slip submitted! Please wait for admin approval.", "success");
+          Toast.show("Slip submitted! Check Payment Record for status.", "success");
           Router.navigate('wallet');
         } catch (err) {
           Loader.hide();
           Toast.show(err.message, "error");
         }
       };
+    }
+
+    function updatePaymentDetailsDisplay(method) {
+      const numEl = document.getElementById('dep-box-number');
+      const titleEl = document.getElementById('dep-box-title');
+      if (method === 'SadaPay') {
+        numEl.innerText = "03281926729";
+        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (SadaPay)";
+      } else {
+        numEl.innerText = "03186815926";
+        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)";
+      }
     }
 
     function renderAuth() {
