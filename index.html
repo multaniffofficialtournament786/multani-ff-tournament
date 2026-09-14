@@ -511,7 +511,7 @@
       <span class="bot-badge-tag">ADMIN</span>
     </div>
 
-    <!-- REAL CHAT MODAL -->
+    <!-- REAL CHAT MODAL WITH VOICE RECORDING FOR BOTH -->
     <div id="chat-modal-overlay" class="hidden">
       <div class="chat-dialog">
         <div class="chat-dialog-header">
@@ -531,14 +531,20 @@
         <div id="chat-modal-messages" class="chat-dialog-body">
           <div class="chat-row theirs">
             <div class="chat-bubble theirs">
-              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Type karein ya Mic button daba kar Voice Note bhejiye!
             </div>
             <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
           </div>
         </div>
 
         <form id="chat-modal-form" class="chat-input-bar">
-          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
+          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message or click mic..." style="margin-bottom:0;" autocomplete="off" />
+          
+          <!-- VOICE RECORDING BUTTON -->
+          <button type="button" id="btn-mic-record" onclick="toggleVoiceRecording()" class="icon-btn" style="background:#1f2636; color:#00f0ff; width:44px; height:44px; border-radius:8px; flex-shrink:0;" title="Hold or Click to Record Voice Note">
+            <i class="fa-solid fa-microphone" id="mic-icon"></i>
+          </button>
+
           <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -791,7 +797,7 @@
       const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
       const displayPhone = p.phone || 'No WhatsApp added';
 
-      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
+      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • 🏆 DAILY CUSTOM ROOMS (SOLO, DUO, SQUAD) • ⚡ INSTANT EASYPAISA & SADAPAY PRIZE WITHDRAWALS • 🚀 SHOW YOUR SKILLS & WIN REAL CASH PRIZES TODAY!";
 
       const view = document.getElementById('app-view');
 
@@ -1558,6 +1564,77 @@
       }
     };
 
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function toggleVoiceRecording() {
+      const micBtn = document.getElementById('btn-mic-record');
+      const micIcon = document.getElementById('mic-icon');
+      const input = document.getElementById('chat-modal-input');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            await uploadAndSendVoiceNote(audioBlob);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.style.background = '#ff1744';
+          micIcon.className = "fa-solid fa-stop";
+          input.placeholder = "Recording voice note... Click stop to send.";
+          Toast.show("Recording voice note...", "info");
+        } catch (err) {
+          Toast.show("Microphone access denied or not supported.", "error");
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        micBtn.style.background = '#1f2636';
+        micIcon.className = "fa-solid fa-microphone";
+        input.placeholder = "Type message or click mic...";
+      }
+    }
+
+    async function uploadAndSendVoiceNote(blob) {
+      if (!currentUser) return;
+      Loader.show("Sending voice note...");
+      try {
+        const fileName = `voice_${currentUser.id}_${Date.now()}.webm`;
+        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(fileName, blob);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(fileName);
+
+        const isAdmin = currentProfile?.is_admin || false;
+        const { error: dbError } = await sbClient.from('support_messages').insert([{
+          user_id: currentUser.id,
+          sender_id: currentUser.id,
+          sender_role: isAdmin ? 'admin' : 'player',
+          message: `<audio controls src="${publicUrl}" style="max-width:200px; height:35px;"></audio>`,
+          is_read: false
+        }]);
+
+        if (dbError) throw dbError;
+        Loader.hide();
+        Toast.show("Voice note sent!", "success");
+        ChatModal.loadMessages();
+      } catch (err) {
+        Loader.hide();
+        Toast.show("Failed to send voice note.", "error");
+      }
+    }
+
     const ChatModal = {
       isOpen: false,
       interval: null,
@@ -1592,7 +1669,7 @@
           container.innerHTML = `
             <div class="chat-row theirs">
               <div class="chat-bubble theirs">
-                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+                Assalam-o-Alaikum! Welcome to Multani FF Official. Type karein ya Mic button daba kar Voice Note bhejiye!
               </div>
               <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
             </div>
@@ -1626,10 +1703,11 @@
       if (!text || !currentUser) return;
       input.value = "";
 
+      const isAdmin = currentProfile?.is_admin || false;
       const { error } = await sbClient.from('support_messages').insert([{
         user_id: currentUser.id,
         sender_id: currentUser.id,
-        sender_role: 'player',
+        sender_role: isAdmin ? 'admin' : 'player',
         message: text,
         is_read: false
       }]);
