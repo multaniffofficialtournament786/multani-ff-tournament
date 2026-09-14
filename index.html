@@ -62,9 +62,9 @@
     .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
     .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
     .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
-    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
     .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
     .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
     .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
@@ -97,6 +97,41 @@
     }
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* SCROLLING ANNOUNCEMENT TICKER */
+    .announcement-box {
+      background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15));
+      border: 1px solid rgba(255, 70, 36, 0.35);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(255, 70, 36, 0.2);
+    }
+    .announcement-box i {
+      color: var(--accent-gold);
+      font-size: 14px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .ticker-viewport {
+      overflow: hidden;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .ticker-content {
+      display: inline-block;
+      font-family: var(--font-gaming);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+      animation: marquee 20s linear infinite;
+    }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
     .bottom-nav { 
       height: var(--bottom-nav-height); 
@@ -278,10 +313,11 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
+    /* 6 QUICK ACTION TILES INCLUDING PAYMENT RECORD */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
-    .action-card span { font-size: 11px; font-weight: 600; }
+    .action-card span { font-size: 11px; font-weight: 600; text-align: center; }
 
     .tournament-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; position: relative; }
     .t-banner-wrapper { position: relative; width: 100%; height: 120px; background-color: #1a1e28; }
@@ -340,6 +376,10 @@
           <span class="brand-main">OFFICIAL</span>
         </div>
         <div class="header-actions">
+          <!-- SHARE BUTTON -->
+          <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share Website">
+            <i class="fa-solid fa-share-nodes text-cyan-400" style="color:var(--accent-cyan);"></i>
+          </button>
           <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')">
             <i class="fa-solid fa-bell"></i>
           </button>
@@ -376,10 +416,11 @@
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
-        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</button>
+        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link"><i class="fa-solid fa-bell"></i> Notifications</button>
+        <button onclick="shareWebsite()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
         <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
         <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</button>
         <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
@@ -487,6 +528,21 @@
       }
     };
 
+    function shareWebsite() {
+      const shareData = {
+        title: 'MULTANI FF OFFICIAL TOURNAMENT',
+        text: 'Join Pakistan\'s Ultimate Free Fire Tournaments and Win Cash Prizes Daily!',
+        url: window.location.origin + window.location.pathname
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(err => console.log('Share canceled'));
+      } else {
+        navigator.clipboard.writeText(shareData.url);
+        Toast.show("Website link copied to clipboard!", "success");
+      }
+    }
+
     // ==========================================
     // 2. DATA SYNCHRONIZATION
     // ==========================================
@@ -579,7 +635,7 @@
     };
 
     // ==========================================
-    // 4. VIEW RENDERERS
+    // 4. VIEW RENDERERS (WITH SCROLLING TICKER & 6 ACTIONS)
     // ==========================================
     async function renderHome() {
       Loader.show("Loading arena...");
@@ -600,6 +656,8 @@
       const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
       const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
       const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
+
+      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • FAIR PLAY MANDATORY • NO HACKS ALLOWED • DAILY MATCHES & INSTANT CASHOUTS!";
 
       const view = document.getElementById('app-view');
 
@@ -639,6 +697,16 @@
 
       view.innerHTML = `
         <div class="view-container">
+          
+          <!-- 1. SCROLLING ANNOUNCEMENT BUTTON/BOX (ABOVE PROFILE) -->
+          <div class="announcement-box" onclick="Toast.show('Official Multani FF Announcement', 'info')">
+            <i class="fa-solid fa-bullhorn"></i>
+            <div class="ticker-viewport">
+              <div class="ticker-content">${tickerText}</div>
+            </div>
+          </div>
+
+          <!-- 2. USER PROFILE HERO CARD -->
           ${!currentUser ? `
             <div class="player-hero-card" style="border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
               <div>
@@ -664,12 +732,32 @@
             </div>
           `}
 
+          <!-- 3. QUICK ACTIONS GRID (6 TILES INCL PAYMENT HISTORY) -->
           <div class="quick-actions-grid">
-            <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-            <div onclick="Router.navigate('deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
-            <div onclick="Router.navigate('winners')" class="action-card"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i><span>Winners</span></div>
-            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i><span>Wallet</span></div>
-            <div onclick="Router.navigate('leaderboard')" class="action-card"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i><span>Top List</span></div>
+            <div onclick="Router.navigate('tournaments')" class="action-card">
+              <i class="fa-solid fa-trophy"></i>
+              <span>Matches</span>
+            </div>
+            <div onclick="Router.navigate('deposit')" class="action-card">
+              <i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i>
+              <span>Add Cash</span>
+            </div>
+            <div onclick="Router.navigate('winners')" class="action-card">
+              <i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i>
+              <span>Winners</span>
+            </div>
+            <div onclick="Router.navigate('wallet')" class="action-card">
+              <i class="fa-solid fa-wallet" style="color:var(--primary)"></i>
+              <span>Wallet</span>
+            </div>
+            <div onclick="Router.navigate('wallet')" class="action-card">
+              <i class="fa-solid fa-receipt" style="color:#00e676;"></i>
+              <span>Payment Record</span>
+            </div>
+            <div onclick="Router.navigate('leaderboard')" class="action-card">
+              <i class="fa-solid fa-ranking-star" style="color:#ff0055"></i>
+              <span>Top List</span>
+            </div>
           </div>
 
           <div class="section-title"><span>Available Tournaments</span></div>
@@ -841,7 +929,7 @@
             ${tx.amount > 0 ? '+' : ''}${tx.amount} PKR
           </div>
         </div>
-      `).join('') : `<div class="empty-state"><p>No transactions yet.</p></div>`;
+      `).join('') : `<div class="empty-state"><p>No payment records found.</p></div>`;
 
       view.innerHTML = `
         <div class="view-container">
@@ -850,7 +938,7 @@
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
             <button class="btn btn-primary" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
           </div>
-          <div class="section-title"><span>Transaction History</span></div>
+          <div class="section-title"><span>Payment Record & History</span></div>
           <div>${txHtml}</div>
         </div>
       `;
@@ -1048,7 +1136,7 @@
     }
 
     // ==========================================
-    // 5. PROFILE VIEW (FULL EDIT & PHOTO UPLOAD)
+    // 5. PROFILE VIEW
     // ==========================================
     function renderProfile() {
       if (!currentUser) { Router.navigate('login'); return; }
@@ -1057,7 +1145,6 @@
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <!-- AVATAR UPLOAD SECTION -->
           <div class="player-hero-card" style="text-align:center; position:relative;">
             <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
               <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
@@ -1070,7 +1157,6 @@
             <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${p.free_fire_uid || '--'}</span>
           </div>
 
-          <!-- EDIT PROFILE FORM -->
           <div class="player-hero-card">
             <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
               <i class="fa-solid fa-user-pen"></i> Edit Profile Details
