@@ -717,7 +717,6 @@
         else if (page === 'notifications') renderNotifications();
         else if (page === 'rules') renderRules();
         else if (page === 'about') renderAbout();
-        else if (page === 'admin') renderAdminPanel();
       },
       async back() {
         if (this.history.length > 1) {
@@ -832,14 +831,6 @@
               </div>
             </div>
           `}
-
-          ${currentProfile?.is_admin ? `
-            <div style="margin-bottom: 14px;">
-              <button class="btn btn-primary" onclick="Router.navigate('admin')" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color:#000; font-weight:800;">
-                <i class="fa-solid fa-user-shield"></i> OPEN ADMIN PANEL
-              </button>
-            </div>
-          ` : ''}
 
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
@@ -1466,104 +1457,6 @@
       } finally {
         btn.disabled = false;
         Loader.hide();
-      }
-    }
-
-    // ==========================================
-    // ADMIN PANEL WITH WHATSAPP CHAT BUTTON
-    // ==========================================
-    async function renderAdminPanel() {
-      if (!currentProfile?.is_admin) {
-        Toast.show("Access denied: Admins only", "error");
-        Router.navigate('home');
-        return;
-      }
-
-      Loader.show("Loading Admin Dashboard...");
-      const { data: users, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
-      Loader.hide();
-
-      const view = document.getElementById('app-view');
-      if (error || !users) {
-        view.innerHTML = `<div class="view-container empty-state"><p>Error loading users.</p></div>`;
-        return;
-      }
-
-      view.innerHTML = `
-        <div class="view-container">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <h2 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">ADMIN • USERS & WALLET</h2>
-            <button class="btn btn-secondary btn-sm" onclick="Router.navigate('home')"><i class="fa-solid fa-arrow-left"></i> Home</button>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            ${users.map(u => {
-              const waNumber = u.phone || 'No phone';
-              let waLink = '#';
-              if (u.phone) {
-                let cleanNum = u.phone.replace(/[^0-9]/g, '');
-                if (cleanNum.startsWith('0')) {
-                  cleanNum = '92' + cleanNum.substring(1);
-                }
-                waLink = `https://wa.me/${cleanNum}?text=Hello%20${encodeURIComponent(u.free_fire_name || 'Gamer')},%20regarding%20Multani%20FF%20Tournament...`;
-              }
-
-              return `
-                <div class="player-hero-card" style="margin-bottom:0; padding:14px;">
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                    <div>
-                      <h3 style="font-family:var(--font-gaming); font-size:17px; color:#fff;">${u.free_fire_name || u.full_name || 'User'}</h3>
-                      <span class="uid-tag">UID: ${u.free_fire_uid || '--'}</span>
-                    </div>
-                    <span style="font-size:10px; font-weight:bold; padding:2px 8px; border-radius:6px; background:${u.is_banned ? 'var(--danger)' : 'var(--success)'}; color:#000;">
-                      ${u.is_banned ? 'BANNED' : 'ACTIVE'}
-                    </span>
-                  </div>
-
-                  <!-- WHATSAPP NUMBER & BUTTON ROW -->
-                  <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(0,230,118,0.08); border:1px solid rgba(0,230,118,0.3); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:10px;">
-                    <div style="font-size:13px; color:#00e676; font-family:monospace; font-weight:bold;">
-                      <i class="fa-brands fa-whatsapp"></i> ${waNumber}
-                    </div>
-                    ${u.phone ? `
-                      <a href="${waLink}" target="_blank" class="icon-btn" style="background:#25D366; color:#fff; width:34px; height:34px; border-radius:8px; text-decoration:none;" title="Chat on WhatsApp">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                      </a>
-                    ` : '<span style="font-size:10px; color:var(--text-dim);">No WhatsApp</span>'}
-                  </div>
-
-                  <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:var(--radius-sm); display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:12px; color:var(--accent-gold); font-weight:bold;">PKR ${u.wallet_balance || 0}</span>
-                    <div style="display:flex; gap:6px;">
-                      <input type="number" id="bal-input-${u.id}" class="form-input" value="${u.wallet_balance || 0}" style="width:80px; padding:6px; font-size:12px; margin-bottom:0;" />
-                      <button class="btn btn-primary btn-sm" onclick="adminUpdateWallet('${u.id}')">UPDATE</button>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    async function adminUpdateWallet(userId) {
-      const inputVal = document.getElementById(`bal-input-${userId}`).value;
-      const newBal = parseFloat(inputVal);
-      if (isNaN(newBal)) {
-        Toast.show("Invalid balance amount", "error");
-        return;
-      }
-
-      Loader.show("Updating balance...");
-      const { error } = await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', userId);
-      Loader.hide();
-
-      if (error) {
-        Toast.show(error.message, "error");
-      } else {
-        Toast.show("User balance updated successfully!", "success");
-        renderAdminPanel();
       }
     }
 
