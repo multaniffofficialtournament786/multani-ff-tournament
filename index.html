@@ -208,10 +208,16 @@
     .chat-user-header { display: flex; align-items: center; gap: 10px; }
     .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
     .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; position: relative; word-break: break-word; }
-    .chat-bubble.mine { align-self: flex-end; background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
-    .chat-bubble.theirs { align-self: flex-start; background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
-    .chat-time-tag { font-size: 9px; opacity: 0.7; text-align: right; margin-top: 4px; font-family: monospace; }
+    
+    /* PROPER CHAT STYLING */
+    .chat-row { display: flex; flex-direction: column; width: 100%; }
+    .chat-row.mine { align-items: flex-end; }
+    .chat-row.theirs { align-items: flex-start; }
+    
+    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+    .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.theirs { background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
     .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
@@ -245,8 +251,7 @@
     .t-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 4px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; text-transform: uppercase; }
     .badge-live { background: var(--danger); color: #fff; }
     .badge-upcoming { background: var(--accent-cyan); color: #000; }
-    .badge-filling { background: var(--accent-gold); color: #000; }
-    .badge-full { background: #555; color: #fff; }
+    .badge-joined { background: #00e676; color: #000; font-weight: 800; border: 1px solid #fff; }
     .t-details { padding: 14px; }
     .t-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
     .t-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
@@ -258,6 +263,59 @@
     .t-footer-grid { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; }
     .t-prize { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--accent-gold); }
     .t-fee { font-size: 12px; color: var(--text-muted); }
+    
+    /* FREE FIRE ROOM SLOTS GRID */
+    .room-slots-container {
+      background: #090c12;
+      border: 1.5px solid #262f40;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+    .room-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .slot-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      background: #131722;
+      border: 1px solid #1f2636;
+      border-radius: 6px;
+    }
+    .slot-card.occupied {
+      background: #1c2233;
+      border-color: var(--accent-cyan);
+    }
+    .slot-card.my-slot {
+      background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233);
+      border-color: var(--primary);
+    }
+    .slot-num {
+      font-family: var(--font-gaming);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      width: 22px;
+    }
+    .slot-card.occupied .slot-num { color: var(--accent-gold); }
+    .slot-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      truncate: true;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .slot-card.occupied .slot-name { color: #fff; }
+    .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
+
     .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
     .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
     .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
@@ -361,12 +419,12 @@
       <span class="bot-badge-tag">ADMIN</span>
     </div>
 
-    <!-- REAL CHAT MODAL -->
+    <!-- REAL CHAT MODAL (WHATSAPP STYLE WITH SEPARATE SIDES) -->
     <div id="chat-modal-overlay" class="hidden">
       <div class="chat-dialog">
         <div class="chat-dialog-header">
           <div class="chat-user-header">
-            <div class="chat-avatar-status">
+            <div class="chat-avatar-status" style="position:relative;">
               <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">MLT</div>
               <span class="chat-online-dot"></span>
             </div>
@@ -379,9 +437,11 @@
         </div>
 
         <div id="chat-modal-messages" class="chat-dialog-body">
-          <div class="chat-bubble theirs">
-            Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-            <div class="chat-time-tag">Support Desk</div>
+          <div class="chat-row theirs">
+            <div class="chat-bubble theirs">
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+            </div>
+            <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
           </div>
         </div>
 
@@ -421,6 +481,7 @@
     let currentProfile = null;
     let siteSettings = {};
     let activeTournaments = [];
+    let userJoinedTournamentIds = new Set();
 
     const Toast = {
       show(msg, type = 'info') {
@@ -470,10 +531,15 @@
         const { data: { user } } = await sbClient.auth.getUser();
         currentUser = user;
         if (user) {
-          const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-          currentProfile = data;
+          const [profRes, entryRes] = await Promise.all([
+            sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+            sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id)
+          ]);
+          currentProfile = profRes.data;
+          userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
         } else {
           currentProfile = null;
+          userJoinedTournamentIds.clear();
         }
         updateDrawerUI();
       } catch (e) {
@@ -562,11 +628,13 @@
       }
       return list.map(t => {
         const pct = Math.min(100, Math.round(((t.joined_players || 0) / t.max_players) * 100));
+        const isJoined = userJoinedTournamentIds.has(t.id);
+
         return `
           <div class="tournament-card" onclick="Router.navigate('tournament_detail', '${t.id}')" style="cursor:pointer;">
             <div class="t-banner-wrapper">
               <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" />
-              <span class="t-badge badge-${t.status}">${t.status}</span>
+              ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
             </div>
             <div class="t-details">
               <h3 class="t-title">${t.title}</h3>
@@ -587,7 +655,7 @@
                   <div class="t-fee">Entry: <span class="${t.entry_fee == 0 ? 'text-accent' : 'text-gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
                   <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
                 </div>
-                <button class="btn btn-primary btn-sm">VIEW DETAILS</button>
+                <button class="btn btn-primary btn-sm">${isJoined ? 'VIEW ROOM' : 'VIEW DETAILS'}</button>
               </div>
             </div>
           </div>
@@ -709,66 +777,105 @@
       `;
     }
 
+    // TOURNAMENT DETAILS (WITH FREE FIRE CUSTOM ROOM SLOTS GRID & COMPACT CARDS)
     async function renderTournamentDetail(id) {
       Loader.show("Fetching tournament...");
-      const { data: t, error } = await sbClient.from('tournaments').select('*').eq('id', id).single();
+      const [tRes, entriesRes] = await Promise.all([
+        sbClient.from('tournaments').select('*').eq('id', id).single(),
+        sbClient.from('tournament_entries').select('slot_number, user_id, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id)
+      ]);
       Loader.hide();
 
-      if (error || !t) {
+      const t = tRes.data;
+      if (!t) {
         document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><p>Tournament not found.</p></div>`;
         return;
       }
 
-      let isJoined = false;
-      let slotNum = null;
-      if (currentUser) {
-        const { data: entry } = await sbClient.from('tournament_entries').select('slot_number').eq('tournament_id', t.id).eq('user_id', currentUser.id).maybeSingle();
-        if (entry) {
-          isJoined = true;
-          slotNum = entry.slot_number;
+      const entries = entriesRes.data || [];
+      const occupiedSlots = {};
+      let mySlotNumber = null;
+
+      entries.forEach(e => {
+        occupiedSlots[e.slot_number] = e.profiles?.free_fire_name || 'Gamer';
+        if (currentUser && e.user_id === currentUser.id) {
+          mySlotNumber = e.slot_number;
         }
+      });
+
+      const isJoined = (mySlotNumber !== null);
+
+      // Render Free Fire Room Slots
+      let slotsHTML = '';
+      const totalSlots = t.max_players || 12;
+      for (let i = 1; i <= totalSlots; i++) {
+        const isOccupied = !!occupiedSlots[i];
+        const isMine = (mySlotNumber === i);
+        const name = isMine ? (currentProfile?.free_fire_name || 'YOU') : (occupiedSlots[i] || 'Empty Slot');
+
+        slotsHTML += `
+          <div class="slot-card ${isOccupied ? 'occupied' : ''} ${isMine ? 'my-slot' : ''}">
+            <span class="slot-num">${i}</span>
+            <i class="fa-solid ${isOccupied ? 'fa-user' : 'fa-plus'} text-[10px]" style="color:${isMine ? 'var(--primary)' : (isOccupied ? 'var(--accent-cyan)' : 'var(--text-dim)')}"></i>
+            <span class="slot-name">${name}</span>
+          </div>
+        `;
       }
 
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
-          <div class="t-banner-wrapper" style="height: 170px; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;">
+          <div class="t-banner-wrapper" style="height: 140px; border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;">
             <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" class="t-banner-img" />
-            <span class="t-badge badge-${t.status}">${t.status}</span>
+            ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
           </div>
-          <h2 style="font-family: var(--font-gaming); font-size: 22px; margin-bottom: 10px;">${t.title}</h2>
+
+          <h2 style="font-family: var(--font-gaming); font-size: 20px; margin-bottom: 8px;">${t.title}</h2>
           
-          <div class="hero-stats-grid" style="margin-bottom: 16px;">
-            <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-            <div class="stat-box"><span class="stat-label">Prize Pool</span><span class="stat-val green">PKR ${t.prize_pool}</span></div>
-            <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val">${t.joined_players || 0}/${t.max_players}</span></div>
+          <div class="hero-stats-grid" style="margin-bottom: 12px; padding:8px;">
+            <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:15px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+            <div class="stat-box"><span class="stat-label">Prize Pool</span><span class="stat-val green" style="font-size:15px;">PKR ${t.prize_pool}</span></div>
+            <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:15px;">${t.joined_players || 0}/${t.max_players}</span></div>
           </div>
 
           ${isJoined ? `
-            <div style="background:rgba(0,0,0,0.5); border:1px dashed var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom: 14px;">
-              <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room ID & Password (SLOT #${slotNum})</div>
-              <div style="font-size:13px; font-family:monospace; margin-top:4px;">
-                <div>Room ID: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_id || 'Pending (Wait for match)'}</span></div>
-                <div>Password: <span style="color:var(--accent-cyan); font-weight:bold;">${t.room_password || '••••••••'}</span></div>
+            <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:10px 12px; margin-bottom: 12px;">
+              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room Credentials (SLOT #${mySlotNumber})</div>
+              <div style="font-size:12px; font-family:monospace; margin-top:4px; display:flex; justify-content:space-between;">
+                <div>Room ID: <strong style="color:var(--accent-cyan);">${t.room_id || 'Pending (Wait for match)'}</strong></div>
+                <div>Pass: <strong style="color:var(--accent-cyan);">${t.room_password || '••••••••'}</strong></div>
               </div>
             </div>
           ` : ''}
 
-          <div class="player-hero-card" style="margin-bottom: 12px;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px;">Prize Distribution Policy</h4>
-            <p style="font-size: 13px; font-weight: 600; color: #fff;">🏆 Only Booyah: Full Winner Prize Awarded on Booyah!</p>
-            <p style="font-size: 12px; color: var(--accent-cyan); margin-top: 4px;">⚡ Per Kill Prize: <span style="background:#ff4624; color:#fff; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:bold;">COMING SOON</span></p>
+          <!-- FREE FIRE CUSTOM ROOM SLOTS GRID (SCREENSHOT 2 STYLE) -->
+          <div class="room-slots-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #1f2636; padding-bottom:6px;">
+              <span style="font-family:var(--font-gaming); font-size:12px; font-weight:bold; color:var(--accent-gold); text-transform:uppercase;">
+                <i class="fa-solid fa-gamepad mr-1"></i> Room Slots (${t.joined_players || 0}/${t.max_players})
+              </span>
+              <span style="font-size:10px; color:var(--text-dim);">Map: ${t.map}</span>
+            </div>
+            <div class="room-slots-grid">${slotsHTML}</div>
           </div>
 
-          <div class="player-hero-card" style="margin-bottom: 20px;">
-            <h4 style="font-size: 13px; text-transform: uppercase; color: var(--danger); margin-bottom: 6px;">Match Rules</h4>
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
+          <!-- COMPACT PRIZE RULES SECTION -->
+          <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
+            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
+            <div style="font-size: 11px; color: var(--accent-cyan); margin-top: 2px;">⚡ Per Kill: <span style="background:#ff4624; color:#fff; padding:1px 5px; border-radius:4px; font-size:9px; font-weight:bold;">COMING SOON</span></div>
+          </div>
+
+          <!-- COMPACT MATCH RULES -->
+          <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
             ${isJoined ? `
-              <button class="btn btn-secondary" style="cursor: not-allowed;" disabled>
-                <i class="fa-solid fa-check-double"></i> YOU ARE IN! SLOT #${slotNum}
+              <button class="btn btn-secondary" style="cursor: default;" disabled>
+                <i class="fa-solid fa-check-double text-green-400"></i> YOU ARE IN! SLOT #${mySlotNumber}
               </button>
             ` : `
               <button id="btn-join-match" class="btn btn-primary">
@@ -804,9 +911,7 @@
       }
     }
 
-    // ==========================================
-    // WINNERS RENDERER (BULLETPROOF FIX)
-    // ==========================================
+    // WINNERS VIEW (CRASH-PROOF)
     async function renderWinners() {
       Loader.show("Loading winners...");
       
@@ -876,6 +981,7 @@
       `;
     }
 
+    // WALLET & ACTIVITY (WITH WINNER PRIZE RECORD DISPLAY)
     async function renderWallet() {
       if (!currentUser) { Router.navigate('login'); return; }
       Loader.show("Loading payment records...");
@@ -911,17 +1017,22 @@
         `;
       }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No deposit requests submitted.</p>`;
 
-      const txHtml = txs.length ? txs.map(tx => `
-        <div class="tx-item">
-          <div class="tx-info">
-            <h4>${tx.description || tx.transaction_type}</h4>
-            <span>${new Date(tx.created_at).toLocaleString()}</span>
+      const txHtml = txs.length ? txs.map(tx => {
+        const isPrize = tx.transaction_type === 'prize' || (tx.description && tx.description.toLowerCase().includes('prize'));
+        const isPositive = tx.amount > 0 || isPrize;
+
+        return `
+          <div class="tx-item" style="${isPrize ? 'border-left: 3px solid var(--accent-gold);' : ''}">
+            <div class="tx-info">
+              <h4>${isPrize ? '🏆 ' + (tx.description || 'Tournament Prize Won') : (tx.description || tx.transaction_type)}</h4>
+              <span>${new Date(tx.created_at).toLocaleString()}</span>
+            </div>
+            <div class="tx-amount ${isPositive ? 'tx-positive' : 'tx-negative'}">
+              ${isPositive ? '+' : ''}${tx.amount} PKR
+            </div>
           </div>
-          <div class="tx-amount ${tx.amount > 0 ? 'tx-positive' : 'tx-negative'}">
-            ${tx.amount > 0 ? '+' : ''}${tx.amount} PKR
-          </div>
-        </div>
-      `).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
+        `;
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
 
       view.innerHTML = `
         <div class="view-container">
@@ -1373,7 +1484,7 @@
     };
 
     // ==========================================
-    // 7. REAL CHAT MODAL LOGIC & POLLING
+    // 7. REAL CHAT MODAL LOGIC (SEPARATE SIDES & COLORS)
     // ==========================================
     const ChatModal = {
       isOpen: false,
@@ -1387,7 +1498,7 @@
         document.getElementById('chat-modal-overlay').classList.remove('hidden');
         this.isOpen = true;
         await this.loadMessages();
-        this.interval = setInterval(() => this.loadMessages(), 4000);
+        this.interval = setInterval(() => this.loadMessages(), 3500);
       },
       close() {
         document.getElementById('chat-modal-overlay').classList.add('hidden');
@@ -1405,21 +1516,29 @@
         const container = document.getElementById('chat-modal-messages');
         if (!data || data.length === 0) {
           container.innerHTML = `
-            <div class="chat-bubble theirs">
-              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-              <div class="chat-time-tag">Support Desk</div>
+            <div class="chat-row theirs">
+              <div class="chat-bubble theirs">
+                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+              </div>
+              <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
             </div>
           `;
           return;
         }
 
         container.innerHTML = data.map(m => {
-          const isMine = m.sender_id === currentUser.id;
+          // CHECK SENDER ROLE
+          const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
           const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
           return `
-            <div class="chat-bubble ${isMine ? 'mine' : 'theirs'}">
-              ${m.message}
-              <div class="chat-time-tag">${isMine ? 'You' : 'Admin'} • ${time}</div>
+            <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
+              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
+                ${m.message}
+              </div>
+              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
+                ${isMe ? 'You' : 'Admin Support'} • ${time}
+              </div>
             </div>
           `;
         }).join('');
@@ -1524,6 +1643,7 @@
         await sbClient.auth.signOut();
         currentUser = null;
         currentProfile = null;
+        userJoinedTournamentIds.clear();
         updateDrawerUI();
         Toast.show("Logged out successfully", "info");
         Router.navigate('home');
