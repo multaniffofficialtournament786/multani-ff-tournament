@@ -31,8 +31,8 @@
       --text-main: #f3f4f6;
       --text-muted: #8e9bb0;
       --text-dim: #5c687a;
-      --header-height: 60px;
-      --bottom-nav-height: 68px;
+      --header-height: 56px;
+      --bottom-nav-height: 64px;
       --max-app-width: 430px;
       --font-gaming: 'Rajdhani', sans-serif;
       --font-ui: 'Inter', sans-serif;
@@ -41,10 +41,23 @@
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; user-select: none; }
-    #app-container { width: 100%; max-width: var(--max-app-width); height: 100vh; min-height: 100dvh; background-color: var(--bg-base); display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
+    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100dvh; display: flex; justify-content: center; align-items: center; user-select: none; }
+    
+    #app-container { 
+      width: 100%; 
+      max-width: var(--max-app-width); 
+      height: 100dvh; 
+      background-color: var(--bg-base); 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); 
+    }
     @media (min-width: 431px) { #app-container { height: 94vh; border-radius: 28px; border: 1px solid #1f2636; } }
-    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
+
+    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
     .header-bar { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
     .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
@@ -57,6 +70,7 @@
     .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
     .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .sub-header-spacer { width: 38px; }
+
     .drawer-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 150; }
     .side-drawer { position: absolute; top: 0; left: -320px; width: 290px; height: 100%; background: var(--bg-surface); border-right: 1px solid var(--border-color); z-index: 200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
     .side-drawer.open { transform: translateX(320px); }
@@ -72,13 +86,62 @@
     .drawer-link.logout-link { color: var(--danger); }
     .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
     .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
-    .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 600; gap: 4px; width: 25%; transition: var(--transition); cursor: pointer; }
-    .nav-item i { font-size: 18px; }
-    .nav-item.active { color: var(--primary); }
-    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; position: relative; -webkit-overflow-scrolling: touch; }
+
+    /* MAIN CONTENT VIEWPORT FIXED SCROLL */
+    .main-content { 
+      flex: 1; 
+      overflow-y: auto; 
+      overflow-x: hidden; 
+      padding-bottom: 85px; 
+      position: relative; 
+      -webkit-overflow-scrolling: touch; 
+    }
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* FIXED BOTTOM NAVIGATION */
+    .bottom-nav { 
+      height: var(--bottom-nav-height); 
+      background: rgba(14, 17, 24, 0.98); 
+      border-top: 1px solid var(--border-color); 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-around; 
+      padding: 0 8px; 
+      z-index: 110; 
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 25%; transition: var(--transition); cursor: pointer; }
+    .nav-item i { font-size: 18px; }
+    .nav-item.active { color: var(--primary); }
+
+    /* FLOATING ADMIN BUTTON */
+    .floating-admin-btn {
+      position: absolute;
+      bottom: calc(var(--bottom-nav-height) + 14px);
+      right: 16px;
+      z-index: 120;
+      background: linear-gradient(135deg, #ff4624, #d32f2f);
+      color: #fff;
+      padding: 9px 15px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-gaming);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 18px var(--primary-glow);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .floating-admin-btn:active { transform: scale(0.94); }
+
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
     .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
@@ -98,10 +161,13 @@
     .stat-val.gold { color: var(--accent-gold); }
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* QUICK ACTIONS GRID (CLEAN 5 BUTTONS NO SUPPORT) */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
     .action-card span { font-size: 11px; font-weight: 600; }
+
     .tournament-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; position: relative; }
     .t-banner-wrapper { position: relative; width: 100%; height: 120px; background-color: #1a1e28; }
     .t-banner-img { width: 100%; height: 100%; object-fit: cover; }
@@ -144,32 +210,6 @@
     .text-gold { color: var(--accent-gold) !important; }
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; }
-
-    /* FLOATING ADMIN CHAT BUTTON */
-    .floating-admin-btn {
-      position: absolute;
-      bottom: 80px;
-      right: 16px;
-      z-index: 120;
-      background: linear-gradient(135deg, #ff4624, #d32f2f);
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-gaming);
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 18px var(--primary-glow);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .floating-admin-btn:active {
-      transform: scale(0.94);
-    }
   </style>
 </head>
 <body>
@@ -225,7 +265,6 @@
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link"><i class="fa-solid fa-bell"></i> Notifications</button>
-        <button onclick="Router.navigate('support')" class="drawer-link"><i class="fa-solid fa-headset"></i> Live Support</button>
         <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
         <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</button>
         <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
@@ -245,7 +284,7 @@
       <span>ADMIN</span>
     </div>
 
-    <!-- BOTTOM NAV: MY SLOTS KI JAGAH WINNERS -->
+    <!-- FIXED BOTTOM NAV (ALWAYS VISIBLE) -->
     <nav id="bottom-nav" class="bottom-nav">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
@@ -328,7 +367,7 @@
       if (dAvatar) dAvatar.src = avatarUrl;
 
       if (currentUser && currentProfile) {
-        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.username || 'Soldier';
+        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.full_name || 'Soldier';
         if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
       } else {
         if (dName) dName.innerText = 'Guest Gamer';
@@ -391,7 +430,7 @@
     };
 
     // ==========================================
-    // 4. VIEW RENDERERS (DIRECT OPENING LIKE FB)
+    // 4. VIEW RENDERERS
     // ==========================================
     async function renderHome() {
       Loader.show("Loading arena...");
@@ -410,6 +449,9 @@
       Loader.hide();
 
       const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
+      const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
+      const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
+
       const view = document.getElementById('app-view');
 
       const matchesHtml = activeTournaments.length ? activeTournaments.map(t => {
@@ -461,8 +503,8 @@
               <div class="hero-profile-row">
                 <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
                 <div class="hero-details">
-                  <h2>${p.free_fire_name}</h2>
-                  <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${p.free_fire_uid}</span>
+                  <h2>${displayName}</h2>
+                  <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${displayUid}</span>
                 </div>
               </div>
               <div class="hero-stats-grid">
@@ -473,13 +515,13 @@
             </div>
           `}
 
+          <!-- QUICK ACTIONS (NO SUPPORT BOX) -->
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
             <div onclick="Router.navigate('deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
             <div onclick="Router.navigate('winners')" class="action-card"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i><span>Winners</span></div>
-            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
-            <div onclick="Router.navigate('leaderboard')" class="action-card"><i class="fa-solid fa-ranking-star"></i><span>Top List</span></div>
-            <div onclick="Router.navigate('support')" class="action-card"><i class="fa-solid fa-headset"></i><span>Support</span></div>
+            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i><span>Wallet</span></div>
+            <div onclick="Router.navigate('leaderboard')" class="action-card"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i><span>Top List</span></div>
           </div>
 
           <div class="section-title"><span>Available Tournaments</span></div>
@@ -867,7 +909,7 @@
         <div class="view-container">
           <div class="player-hero-card" style="text-align:center;">
             <img src="${p?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" />
-            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p?.free_fire_name || 'Player'}</h2>
+            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p?.free_fire_name || p?.full_name || 'Player'}</h2>
             <span class="uid-tag">UID: ${p?.free_fire_uid || '--'}</span>
           </div>
           <div class="player-hero-card">
@@ -899,7 +941,7 @@
               <div style="display:flex; align-items:center; gap:12px;">
                 <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
                 <div>
-                  <h4>${l.free_fire_name}</h4>
+                  <h4>${l.free_fire_name || 'Player'}</h4>
                   <span style="font-size:11px; color:var(--text-dim);">${l.total_wins || 0} Wins</span>
                 </div>
               </div>
