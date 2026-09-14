@@ -86,6 +86,7 @@
         </button>
         <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
+          <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
@@ -135,7 +136,7 @@
             <span class="text-[10px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
             <h3 id="stat-total-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ffbe00] mt-0.5">PKR 0</h3>
           </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl cursor-pointer" onclick="selectTab('deposits')">
+          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl cursor-pointer relative" onclick="selectTab('deposits')">
             <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
             <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
           </div>
@@ -149,10 +150,16 @@
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
             <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
-            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition"><i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p></button>
+            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i>
+              <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
+            </button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-comments text-purple-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p></button>
+            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition relative">
+              <i class="fa-solid fa-comments text-purple-400 text-lg"></i>
+              <p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p>
+            </button>
             <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
           </div>
         </div>
@@ -220,7 +227,7 @@
         </div>
       </section>
 
-      <!-- USERS & WALLET EDIT (MOBILE RESPONSIVE CARDS) -->
+      <!-- USERS & WALLET EDIT -->
       <section id="section-users" class="space-y-3 hidden">
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
         <div id="users-cards-container" class="space-y-3">
@@ -585,17 +592,32 @@
       if (tabId === 'support') loadSupportInbox();
     }
 
+    // LIVE LIVE COUNTS (BADGES) FOR DEPOSITS & SUPPORT
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
       const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
       document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
 
       const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      document.getElementById('stat-pending-deposits').innerText = `${pendingDepCount || 0}`;
-      document.getElementById('badge-deposits').innerText = pendingDepCount || 0;
+      const pendingCount = pendingDepCount || 0;
+      document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
+      
+      const badgeDep = document.getElementById('badge-deposits');
+      if (badgeDep) {
+        badgeDep.innerText = pendingCount;
+        badgeDep.classList.toggle('hidden', pendingCount === 0);
+      }
 
       const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
       document.getElementById('stat-total-players').innerText = userCount || 0;
+
+      // Unread support messages count badge
+      const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true });
+      const badgeSup = document.getElementById('badge-support');
+      if (badgeSup) {
+        badgeSup.innerText = supportCount || 0;
+        badgeSup.classList.toggle('hidden', !supportCount || supportCount === 0);
+      }
     }
 
     async function loadTournaments() {
@@ -1020,15 +1042,19 @@
           status: 'approved',
           description: `Tournament Prize Won (${position})`
         }]);
+
+        await sbClient.from('notifications').insert([{
+          user_id: user_id,
+          title: "Tournament Won!",
+          message: `Congratulations! You won PKR ${prize_amount} (${position}). Prize credited to your wallet.`
+        }]);
       }
 
       alert("Winner announced and prize credited to player's wallet!");
       document.getElementById('win-amount').value = '';
     }
 
-    // ==========================================
-    // GAMERS & BALANCE EDIT WITH NOTIFICATION
-    // ==========================================
+    // GAMERS & WALLET EDIT (MOBILE RESPONSIVE CARDS)
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
       const container = document.getElementById('users-cards-container');
@@ -1083,7 +1109,6 @@
 
       if (!confirm(`Update player balance to PKR ${newBalance}?`)) return;
 
-      // 1. Update profile wallet balance
       const { error } = await sbClient.from('profiles').update({
         wallet_balance: newBalance,
         updated_at: new Date().toISOString()
@@ -1094,14 +1119,12 @@
         return;
       }
 
-      // 2. Send notification to player's notification bell
       await sbClient.from('notifications').insert([{
         user_id: userId,
         title: "Wallet Balance Updated",
         message: `Admin has updated your wallet balance. Your current balance is now PKR ${newBalance}.`
       }]);
 
-      // 3. Log transaction
       await sbClient.from('wallet_transactions').insert([{
         user_id: userId,
         amount: newBalance,
