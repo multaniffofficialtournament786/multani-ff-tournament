@@ -153,8 +153,16 @@
         </div>
       </section>
 
-      <!-- TOURNAMENTS (FULL SCREEN CARDS) -->
+      <!-- TOURNAMENTS WITH STATUS FILTER BUTTONS -->
       <section id="section-tournaments" class="space-y-4 hidden">
+        <!-- FILTER BAR -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1">
+          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
+          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
+          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
+          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
+        </div>
+
         <div id="tournaments-cards-container" class="space-y-3">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
@@ -232,7 +240,6 @@
 
       <!-- SUPPORT (WHATSAPP STYLE INBOX) -->
       <section id="section-support" class="space-y-4 hidden">
-        <!-- 1. INBOX THREAD LIST -->
         <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
             <span><i class="fa-solid fa-comments text-purple-400 mr-2"></i> Player Support Inboxes</span>
@@ -243,7 +250,6 @@
           </div>
         </div>
 
-        <!-- 2. DIRECT CHAT WINDOW -->
         <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-xl hidden flex flex-col h-[520px]">
           <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
             <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
@@ -302,7 +308,7 @@
     </div>
   </main>
 
-  <!-- MODAL: PLAYERS LIST IN A TOURNAMENT -->
+  <!-- MODAL: PLAYERS LIST -->
   <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
@@ -436,6 +442,8 @@
     let currentAdmin = null;
     let activeChatPlayerId = null;
     let chatInterval = null;
+    let loadedTournamentsList = [];
+    let currentTournamentFilter = 'all';
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -540,7 +548,6 @@
 
     const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'support', 'banned', 'settings'];
 
-    // DIRECT SCREEN NAVIGATION (NO 3-LINE MENU POPUP)
     function selectTab(tabId) {
       toggleSidebar(false);
 
@@ -579,9 +586,6 @@
       if (tabId === 'support') loadSupportInbox();
     }
 
-    // ==========================================
-    // 2. DASHBOARD DATA
-    // ==========================================
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
       const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
@@ -596,61 +600,109 @@
     }
 
     // ==========================================
-    // 3. TOURNAMENTS (CARD VIEW + EDIT/DELETE/PLAYERS)
+    // TOURNAMENTS WITH STATUS FILTER & SWITCHER
     // ==========================================
-    let loadedTournamentsList = [];
-
     async function loadTournaments() {
       const container = document.getElementById('tournaments-cards-container');
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading tournaments...</p>`;
 
       const { data, error } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
       if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tournaments found.</p>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tournaments found.</p>';
         return;
       }
       loadedTournamentsList = data;
+      renderTournamentsList();
+    }
 
-      container.innerHTML = data.map(t => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="font-gaming text-lg font-bold text-white">${escapeHTML(t.title)}</h3>
-              <div class="flex gap-2 text-[11px] text-gray-400 mt-0.5">
-                <span class="text-cyan-400 font-bold">${escapeHTML(t.mode)}</span> • 
-                <span>${escapeHTML(t.map)}</span> • 
-                <span class="text-yellow-400 font-bold">PKR ${t.prize_pool}</span>
+    function filterTournaments(status) {
+      currentTournamentFilter = status;
+      ['all', 'upcoming', 'live', 'completed'].forEach(s => {
+        const btn = document.getElementById(`filter-btn-${s}`);
+        if (btn) {
+          if (s === status) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
+          }
+        }
+      });
+      renderTournamentsList();
+    }
+
+    function renderTournamentsList() {
+      const container = document.getElementById('tournaments-cards-container');
+      const filtered = loadedTournamentsList.filter(t => {
+        if (currentTournamentFilter === 'all') return true;
+        return (t.status || 'upcoming').toLowerCase() === currentTournamentFilter;
+      });
+
+      if (!filtered.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No matches found for '${currentTournamentFilter}'.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => {
+        const currentStatus = t.status || 'upcoming';
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-gaming text-lg font-bold text-white">${escapeHTML(t.title)}</h3>
+                <div class="flex gap-2 text-[11px] text-gray-400 mt-0.5">
+                  <span class="text-cyan-400 font-bold">${escapeHTML(t.mode)}</span> • 
+                  <span>${escapeHTML(t.map)}</span> • 
+                  <span class="text-yellow-400 font-bold">PKR ${t.prize_pool}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <select onchange="updateTournamentStatus('${t.id}', this.value)" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-[11px] font-bold uppercase text-white outline-none">
+                  <option value="upcoming" ${currentStatus === 'upcoming' ? 'selected' : ''}>Upcoming</option>
+                  <option value="live" ${currentStatus === 'live' ? 'selected' : ''}>Live</option>
+                  <option value="completed" ${currentStatus === 'completed' ? 'selected' : ''}>Completed</option>
+                </select>
               </div>
             </div>
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${t.status === 'live' ? 'bg-red-500 text-white' : 'bg-[#262f40] text-gray-300'}">
-              ${t.status}
-            </span>
-          </div>
 
-          <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
-            <div>
-              <span class="text-gray-500 text-[10px] uppercase font-bold block">Room ID</span>
-              <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Set Room ID" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
+            <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block">Room ID</span>
+                <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Set Room ID" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
+              </div>
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block">Password</span>
+                <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Set Pass" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
+              </div>
             </div>
-            <div>
-              <span class="text-gray-500 text-[10px] uppercase font-bold block">Password</span>
-              <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Set Pass" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
-            </div>
-          </div>
 
-          <div class="flex items-center justify-between gap-1 pt-1 flex-wrap">
-            <div class="text-xs font-mono text-gray-400">
-              Slots: <span class="text-white font-bold">${t.joined_players || 0}/${t.max_players}</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="updateTournamentCredentials('${t.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-2.5 py-1 rounded text-xs font-bold font-gaming">SET ROOM</button>
-              <button onclick="viewTournamentPlayers('${t.id}', '${escapeHTML(t.title)}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded text-xs font-bold">PLAYERS</button>
-              <button onclick="openEditModal('${t.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-              <button onclick="deleteTournament('${t.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
+            <div class="flex items-center justify-between gap-1 pt-1 flex-wrap">
+              <div class="text-xs font-mono text-gray-400">
+                Slots: <span class="text-white font-bold">${t.joined_players || 0}/${t.max_players}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="updateTournamentCredentials('${t.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-2.5 py-1 rounded text-xs font-bold font-gaming">SET ROOM</button>
+                <button onclick="viewTournamentPlayers('${t.id}', '${escapeHTML(t.title)}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded text-xs font-bold">PLAYERS</button>
+                <button onclick="openEditModal('${t.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteTournament('${t.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
+              </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+    }
+
+    async function updateTournamentStatus(id, newStatus) {
+      const { error } = await sbClient.from('tournaments').update({
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      }).eq('id', id);
+
+      if (error) {
+        alert("Failed to update status: " + error.message);
+      } else {
+        const item = loadedTournamentsList.find(x => x.id === id);
+        if (item) item.status = newStatus;
+      }
     }
 
     async function updateTournamentCredentials(id) {
@@ -713,7 +765,6 @@
       }
     }
 
-    // PLAYERS LIST (KICK & BAN ACTIONS)
     async function viewTournamentPlayers(tId, tTitle) {
       document.getElementById('modal-players-title').innerText = `${tTitle} - Players`;
       const body = document.getElementById('modal-players-body');
@@ -753,7 +804,6 @@
       const { error } = await sbClient.from('tournament_entries').delete().eq('id', entryId);
       if (error) alert("Kick failed: " + error.message);
       else {
-        // Decrease joined count
         const { data: t } = await sbClient.from('tournaments').select('joined_players').eq('id', tId).single();
         if (t && t.joined_players > 0) {
           await sbClient.from('tournaments').update({ joined_players: t.joined_players - 1 }).eq('id', tId);
@@ -832,9 +882,6 @@
       }
     }
 
-    // ==========================================
-    // 4. DEPOSIT REVIEW
-    // ==========================================
     async function loadDeposits() {
       const tbody = document.getElementById('deposits-table-body');
       tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading pending deposit slips...</td></tr>`;
@@ -892,9 +939,6 @@
       }
     }
 
-    // ==========================================
-    // 5. DECLARE WINNERS
-    // ==========================================
     async function loadWinnerSelectOptions() {
       const { data: tourneys } = await sbClient.from('tournaments').select('id, title').order('created_at', { ascending: false });
       const selectT = document.getElementById('win-tournament');
@@ -985,9 +1029,6 @@
       document.getElementById('win-amount').value = '';
     }
 
-    // ==========================================
-    // 6. WHATSAPP-STYLE SUPPORT INBOX
-    // ==========================================
     async function loadSupportInbox() {
       const inboxList = document.getElementById('support-inbox-list');
       inboxList.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
@@ -1003,7 +1044,6 @@
         return;
       }
 
-      // Group messages by user_id
       const threadMap = {};
       msgs.forEach(m => {
         const uId = m.user_id || m.sender_id;
@@ -1124,9 +1164,6 @@
       else renderActiveChatMessages();
     };
 
-    // ==========================================
-    // 7. USERS & BANS
-    // ==========================================
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('users-table-body');
@@ -1189,9 +1226,6 @@
       `).join('');
     }
 
-    // ==========================================
-    // 8. ANNOUNCEMENT SETTINGS
-    // ==========================================
     async function loadSettings() {
       const { data } = await sbClient.from('site_settings').select('*');
       if (data) {
