@@ -121,7 +121,6 @@
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    /* SPEED SLOWED DOWN FROM 20s to 38s */
     .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 38s linear infinite; }
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
@@ -984,10 +983,10 @@
             <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
           </div>
 
-          <!-- UPDATED MATCH RULES AS REQUESTED -->
+          <!-- UPDATED MATCH RULES -->
           <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Apni profile mein apni real Free Fire ID aur active WhatsApp number lazmi add karein—Booyah karne par winner se prize ke liye sirf WhatsApp par hi rabta kiya jaye ga!'}</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Custom Room ID & Password match start hone se 5 minute pehle app mein show ho jaye ga. Mobile only, no emulators, no hacks, aur teaming bilkul mana hai. Violation par instant ban aur account balance zero kar diya jaye ga!'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -1476,9 +1475,10 @@
       }
     }
 
+    /* UPDATED LEADERBOARD FUNCTION TO SHOW UID INSTEAD OF 0 WINS */
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
-      const { data } = await sbClient.from('profiles').select('free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
+      const { data } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, total_won').order('total_won', { ascending: false }).limit(20);
       Loader.hide();
 
       const view = document.getElementById('app-view');
@@ -1495,7 +1495,7 @@
                 <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
                 <div>
                   <h4>${l.free_fire_name || 'Player'}</h4>
-                  <span style="font-size:11px; color:var(--text-dim);">${l.total_wins || 0} Wins</span>
+                  <span style="font-size:11px; color:var(--accent-cyan); font-family:monospace;"><i class="fa-solid fa-gamepad"></i> UID: ${l.free_fire_uid || '--'}</span>
                 </div>
               </div>
               <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
