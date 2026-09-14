@@ -79,7 +79,7 @@
         </button>
         <button onclick="selectTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
-          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-users w-5"></i> Gamers & Balance
@@ -153,12 +153,14 @@
             <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
               <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i>
               <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
+              <span id="quick-badge-deposits" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
             <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition relative">
               <i class="fa-solid fa-comments text-purple-400 text-lg"></i>
               <p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p>
+              <span id="quick-badge-support" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
             <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
           </div>
@@ -592,7 +594,7 @@
       if (tabId === 'support') loadSupportInbox();
     }
 
-    // LIVE LIVE COUNTS (BADGES) FOR DEPOSITS & SUPPORT
+    // DASHBOARD & SIDEBAR LIVE BADGES SYNC
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
       const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
@@ -600,23 +602,43 @@
 
       const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
       const pendingCount = pendingDepCount || 0;
+      
+      // Dashboard Pending Card count
       document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
       
+      // Sidebar Deposit Badge
       const badgeDep = document.getElementById('badge-deposits');
       if (badgeDep) {
         badgeDep.innerText = pendingCount;
         badgeDep.classList.toggle('hidden', pendingCount === 0);
       }
 
+      // Quick Action Deposit Tile Badge
+      const quickDep = document.getElementById('quick-badge-deposits');
+      if (quickDep) {
+        quickDep.innerText = pendingCount;
+        quickDep.classList.toggle('hidden', pendingCount === 0);
+      }
+
       const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
       document.getElementById('stat-total-players').innerText = userCount || 0;
 
-      // Unread support messages count badge
+      // Unread support messages count
       const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true });
+      const supCount = supportCount || 0;
+
+      // Sidebar Support Badge
       const badgeSup = document.getElementById('badge-support');
       if (badgeSup) {
-        badgeSup.innerText = supportCount || 0;
-        badgeSup.classList.toggle('hidden', !supportCount || supportCount === 0);
+        badgeSup.innerText = supCount;
+        badgeSup.classList.toggle('hidden', supCount === 0);
+      }
+
+      // Quick Action Chat Tile Badge
+      const quickSup = document.getElementById('quick-badge-support');
+      if (quickSup) {
+        quickSup.innerText = supCount;
+        quickSup.classList.toggle('hidden', supCount === 0);
       }
     }
 
@@ -1054,7 +1076,6 @@
       document.getElementById('win-amount').value = '';
     }
 
-    // GAMERS & WALLET EDIT (MOBILE RESPONSIVE CARDS)
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
       const container = document.getElementById('users-cards-container');
