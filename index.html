@@ -564,7 +564,7 @@
     }
 
     // ==========================================
-    // 2. DATA SYNCHRONIZATION
+    // 2. DATA SYNCHRONIZATION (AUTO-REFRESHED)
     // ==========================================
     async function syncAuthAndProfile() {
       try {
@@ -611,8 +611,10 @@
     // ==========================================
     const Router = {
       history: ['home'],
-      navigate(page, id = null) {
+      async navigate(page, id = null) {
         Drawer.close();
+        await syncAuthAndProfile(); // Live sync on every navigation
+        
         if (this.history[this.history.length - 1] !== page) {
           this.history.push(page);
         }
@@ -648,13 +650,13 @@
         else if (page === 'rules') renderRules();
         else if (page === 'about') renderAbout();
       },
-      back() {
+      async back() {
         if (this.history.length > 1) {
           this.history.pop();
           const prev = this.history[this.history.length - 1];
-          this.navigate(prev);
+          await this.navigate(prev);
         } else {
-          this.navigate('home');
+          await this.navigate('home');
         }
       }
     };
@@ -822,6 +824,8 @@
     // TOURNAMENT DETAILS (WITH FREE FIRE CUSTOM ROOM SLOTS GRID & COMPACT CARDS)
     async function renderTournamentDetail(id) {
       Loader.show("Fetching tournament...");
+      await syncAuthAndProfile(); // Ensure fresh join status
+
       const [tRes, entriesRes] = await Promise.all([
         sbClient.from('tournaments').select('*').eq('id', id).single(),
         sbClient.from('tournament_entries').select('slot_number, user_id, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id)
@@ -845,7 +849,8 @@
         }
       });
 
-      const isJoined = (mySlotNumber !== null);
+      // Double check from userJoinedTournamentIds set
+      const isJoined = mySlotNumber !== null || userJoinedTournamentIds.has(t.id);
       const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
 
       let slotsHTML = '';
@@ -883,7 +888,7 @@
 
           ${isJoined ? `
             <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:10px 12px; margin-bottom: 12px;">
-              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room Credentials (SLOT #${mySlotNumber})</div>
+              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}</div>
               <div style="font-size:12px; font-family:monospace; margin-top:4px; display:flex; justify-content:space-between;">
                 <div>Room ID: <strong style="color:var(--accent-cyan);">${t.room_id || 'Pending (Wait for match)'}</strong></div>
                 <div>Pass: <strong style="color:var(--accent-cyan);">${t.room_password || '••••••••'}</strong></div>
@@ -918,7 +923,7 @@
           <div style="position: sticky; bottom: 10px;">
             ${isJoined ? `
               <button class="btn btn-secondary" style="cursor: default;" disabled>
-                <i class="fa-solid fa-check-double text-green-400"></i> YOU ARE IN! SLOT #${mySlotNumber}
+                <i class="fa-solid fa-check-double text-green-400"></i> YOU ARE IN! ${mySlotNumber ? 'SLOT #' + mySlotNumber : ''}
               </button>
             ` : `
               <button id="btn-join-match" class="btn btn-primary">
