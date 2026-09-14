@@ -455,10 +455,11 @@
 
     <main id="app-view" class="main-content"></main>
 
-    <!-- DRAGGABLE BOT WIDGET -->
+    <!-- DRAGGABLE BOT WIDGET WITH UNREAD CHAT COUNT BADGE -->
     <div id="admin-float-widget">
       <div class="bot-bubble">
         <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
+        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
       </div>
       <span class="bot-badge-tag">ADMIN</span>
     </div>
@@ -527,6 +528,7 @@
     let activeTournaments = [];
     let userJoinedTournamentIds = new Set();
     let unreadNotifCount = 0;
+    let unreadChatCount = 0;
 
     const Toast = {
       show(msg, type = 'info') {
@@ -569,25 +571,28 @@
     }
 
     // ==========================================
-    // 2. DATA SYNCHRONIZATION & NOTIFICATION BADGE
+    // 2. DATA SYNCHRONIZATION & NOTIFICATION BADGES
     // ==========================================
     async function syncAuthAndProfile() {
       try {
         const { data: { user } } = await sbClient.auth.getUser();
         currentUser = user;
         if (user) {
-          const [profRes, entryRes, notifRes] = await Promise.all([
+          const [profRes, entryRes, notifRes, chatRes] = await Promise.all([
             sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
             sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
-            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false)
+            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin')
           ]);
           currentProfile = profRes.data;
           userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
           unreadNotifCount = notifRes.count || 0;
+          unreadChatCount = chatRes.count || 0;
         } else {
           currentProfile = null;
           userJoinedTournamentIds.clear();
           unreadNotifCount = 0;
+          unreadChatCount = 0;
         }
         updateDrawerUI();
         updateNotificationBadges();
@@ -599,6 +604,7 @@
     function updateNotificationBadges() {
       const bellBadge = document.getElementById('header-notif-badge');
       const drawerBadge = document.getElementById('drawer-notif-badge');
+      const floatChatBadge = document.getElementById('float-chat-badge');
 
       if (bellBadge) {
         bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
@@ -606,6 +612,10 @@
       if (drawerBadge) {
         drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
         drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
+      }
+      if (floatChatBadge) {
+        floatChatBadge.classList.toggle('hidden', unreadChatCount === 0);
+        floatChatBadge.innerText = unreadChatCount;
       }
     }
 
