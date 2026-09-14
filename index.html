@@ -87,7 +87,6 @@
     .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
     .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
 
-    /* MAIN CONTENT VIEWPORT FIXED SCROLL */
     .main-content { 
       flex: 1; 
       overflow-y: auto; 
@@ -99,7 +98,6 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* FIXED BOTTOM NAVIGATION */
     .bottom-nav { 
       height: var(--bottom-nav-height); 
       background: rgba(14, 17, 24, 0.98); 
@@ -118,29 +116,147 @@
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
-    /* FLOATING ADMIN BUTTON */
-    .floating-admin-btn {
+    /* DRAGGABLE FLOATING BOT WIDGET (ZONG BOT STYLE) */
+    #admin-float-widget {
       position: absolute;
-      bottom: calc(var(--bottom-nav-height) + 14px);
-      right: 16px;
-      z-index: 120;
-      background: linear-gradient(135deg, #ff4624, #d32f2f);
-      color: #fff;
-      padding: 9px 15px;
-      border-radius: 30px;
+      bottom: 120px;
+      right: 18px;
+      z-index: 300;
+      touch-action: none;
+      user-select: none;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #admin-float-widget:active { cursor: grabbing; }
+    .bot-bubble {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f293d, #0f131a);
+      border: 2px solid var(--primary);
+      box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3);
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-family: var(--font-gaming);
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 18px var(--primary-glow);
-      cursor: pointer;
-      transition: var(--transition);
+      justify-content: center;
+      position: relative;
     }
-    .floating-admin-btn:active { transform: scale(0.94); }
+    .bot-bubble img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+    .bot-badge-tag {
+      margin-top: -6px;
+      background: #ff4624;
+      color: #fff;
+      font-family: var(--font-gaming);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* REAL CHAT DIALOG MODAL */
+    #chat-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .chat-dialog {
+      height: 82%;
+      background: #0e1118;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-top: 1.5px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .chat-dialog-header {
+      padding: 14px 16px;
+      background: #151922;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-user-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-avatar-status {
+      position: relative;
+    }
+    .chat-online-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: #00e676;
+      border-radius: 50%;
+      border: 2px solid #151922;
+    }
+    .chat-dialog-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      position: relative;
+      word-break: break-word;
+    }
+    .chat-bubble.mine {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ff4624, #e03212);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-bubble.theirs {
+      align-self: flex-start;
+      background: #1c2230;
+      color: #eee;
+      border-bottom-left-radius: 2px;
+      border: 1px solid var(--border-color);
+    }
+    .chat-time-tag {
+      font-size: 9px;
+      opacity: 0.7;
+      text-align: right;
+      margin-top: 4px;
+      font-family: monospace;
+    }
+    .chat-input-bar {
+      padding: 10px 14px;
+      background: #151922;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
@@ -162,7 +278,6 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    /* QUICK ACTIONS GRID (CLEAN 5 BUTTONS NO SUPPORT) */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
     .action-card i { font-size: 20px; color: var(--primary); }
@@ -278,10 +393,45 @@
 
     <main id="app-view" class="main-content"></main>
 
-    <!-- FLOATING ADMIN BUTTON -->
-    <div id="btn-floating-admin" class="floating-admin-btn" onclick="Router.navigate('support')">
-      <i class="fa-solid fa-comments"></i>
-      <span>ADMIN</span>
+    <!-- DRAGGABLE FLOATING BOT WIDGET -->
+    <div id="admin-float-widget">
+      <div class="bot-bubble">
+        <img src="https://cdn-icons-png.flation.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
+      </div>
+      <span class="bot-badge-tag">ADMIN</span>
+    </div>
+
+    <!-- REAL CHAT MODAL -->
+    <div id="chat-modal-overlay" class="hidden">
+      <div class="chat-dialog">
+        <div class="chat-dialog-header">
+          <div class="chat-user-header">
+            <div class="chat-avatar-status">
+              <div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs text-white" style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">MLT</div>
+              <span class="chat-online-dot"></span>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:bold; color:#fff;">Multani FF Official Support</h4>
+              <p style="font-size:10px; color:#00e676;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> Online • Instant Help</p>
+            </div>
+          </div>
+          <button onclick="ChatModal.close()" class="icon-btn" style="color:#aaa;"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div id="chat-modal-messages" class="chat-dialog-body">
+          <div class="chat-bubble theirs">
+            Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+            <div class="chat-time-tag">Support Desk</div>
+          </div>
+        </div>
+
+        <form id="chat-modal-form" class="chat-input-bar">
+          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
+          <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- FIXED BOTTOM NAV (ALWAYS VISIBLE) -->
@@ -414,7 +564,6 @@
         else if (page === 'winners') renderWinners();
         else if (page === 'leaderboard') renderLeaderboard();
         else if (page === 'notifications') renderNotifications();
-        else if (page === 'support') renderSupport();
         else if (page === 'rules') renderRules();
         else if (page === 'about') renderAbout();
       },
@@ -515,7 +664,6 @@
             </div>
           `}
 
-          <!-- QUICK ACTIONS (NO SUPPORT BOX) -->
           <div class="quick-actions-grid">
             <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
             <div onclick="Router.navigate('deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
@@ -628,9 +776,6 @@
       }
     }
 
-    // ==========================================
-    // 5. WINNERS VIEW (ADMIN ANNOUNCEMENTS)
-    // ==========================================
     async function renderWinners() {
       Loader.show("Loading winners...");
       const { data, error } = await sbClient
@@ -979,59 +1124,6 @@
       `;
     }
 
-    async function renderSupport() {
-      if (!currentUser) { 
-        Toast.show("Please sign in to chat with admin", "info");
-        Router.navigate('login'); 
-        return; 
-      }
-      Loader.show("Connecting to admin...");
-      const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
-      Loader.hide();
-
-      const messages = data || [];
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
-        <div class="view-container" style="display:flex; flex-direction:column; height:calc(100vh - var(--header-height) - 40px);">
-          <div id="chat-box" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-bottom:12px;">
-            ${messages.length === 0 ? `<p style="text-align:center; color:var(--text-dim); font-size:12px; margin-top:20px;">Send a message to Admin below.</p>` : ''}
-            ${messages.map(m => {
-              const isMine = m.sender_id === currentUser.id;
-              return `
-                <div style="max-width:80%; padding:10px 14px; border-radius:12px; font-size:13px; align-self:${isMine ? 'flex-end' : 'flex-start'}; background:${isMine ? 'var(--primary)' : 'var(--bg-card)'};">
-                  <div>${m.message}</div>
-                  <div style="font-size:10px; opacity:0.7; text-align:right;">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          <form id="chat-form" style="display:flex; gap:8px;">
-            <input type="text" id="chat-input" class="form-input" placeholder="Message to Admin..." required />
-            <button type="submit" class="btn btn-primary btn-sm" style="width:50px;"><i class="fa-solid fa-paper-plane"></i></button>
-          </form>
-        </div>
-      `;
-
-      const box = document.getElementById('chat-box');
-      if (box) box.scrollTop = box.scrollHeight;
-
-      document.getElementById('chat-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if (!text) return;
-        input.value = "";
-
-        await sbClient.from('support_messages').insert([{
-          user_id: currentUser.id,
-          sender_id: currentUser.id,
-          sender_role: 'player',
-          message: text
-        }]);
-        renderSupport();
-      };
-    }
-
     function renderRules() {
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1057,7 +1149,7 @@
     }
 
     // ==========================================
-    // 6. DRAWER LOGIC
+    // 5. DRAWER LOGIC
     // ==========================================
     const Drawer = {
       open() {
@@ -1071,7 +1163,148 @@
     };
 
     // ==========================================
-    // 7. INITIALIZATION
+    // 6. REAL CHAT MODAL LOGIC & POLLING
+    // ==========================================
+    const ChatModal = {
+      isOpen: false,
+      interval: null,
+      async open() {
+        if (!currentUser) {
+          Toast.show("Please sign in to chat with admin", "info");
+          Router.navigate('login');
+          return;
+        }
+        document.getElementById('chat-modal-overlay').classList.remove('hidden');
+        this.isOpen = true;
+        await this.loadMessages();
+        this.interval = setInterval(() => this.loadMessages(), 4000);
+      },
+      close() {
+        document.getElementById('chat-modal-overlay').classList.add('hidden');
+        this.isOpen = false;
+        if (this.interval) clearInterval(this.interval);
+      },
+      async loadMessages() {
+        if (!currentUser) return;
+        const { data } = await sbClient
+          .from('support_messages')
+          .select('*')
+          .or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`)
+          .order('created_at', { ascending: true });
+
+        const container = document.getElementById('chat-modal-messages');
+        if (!data || data.length === 0) {
+          container.innerHTML = `
+            <div class="chat-bubble theirs">
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+              <div class="chat-time-tag">Support Desk</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = data.map(m => {
+          const isMine = m.sender_id === currentUser.id;
+          const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return `
+            <div class="chat-bubble ${isMine ? 'mine' : 'theirs'}">
+              ${m.message}
+              <div class="chat-time-tag">${isMine ? 'You' : 'Admin'} • ${time}</div>
+            </div>
+          `;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+      }
+    };
+
+    document.getElementById('chat-modal-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chat-modal-input');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+      input.value = "";
+
+      const { error } = await sbClient.from('support_messages').insert([{
+        user_id: currentUser.id,
+        sender_id: currentUser.id,
+        sender_role: 'player',
+        message: text
+      }]);
+
+      if (error) {
+        Toast.show(error.message, "error");
+      } else {
+        ChatModal.loadMessages();
+      }
+    };
+
+    // ==========================================
+    // 7. DRAGGABLE BOT LOGIC (TOUCH & MOUSE SUPPORT)
+    // ==========================================
+    function setupDraggableBot() {
+      const widget = document.getElementById('admin-float-widget');
+      let isDragging = false;
+      let startX, startY, origX, origY;
+      let hasMoved = false;
+
+      function onStart(e) {
+        isDragging = true;
+        hasMoved = false;
+        const touch = e.touches ? e.touches[0] : e;
+        startX = touch.clientX;
+        startY = touch.clientY;
+
+        const rect = widget.getBoundingClientRect();
+        origX = rect.left;
+        origY = rect.top;
+      }
+
+      function onMove(e) {
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+          hasMoved = true;
+        }
+
+        let newX = origX + dx;
+        let newY = origY + dy;
+
+        const container = document.getElementById('app-container');
+        const cRect = container.getBoundingClientRect();
+
+        newX = Math.max(cRect.left + 5, Math.min(newX, cRect.right - 65));
+        newY = Math.max(cRect.top + 50, Math.min(newY, cRect.bottom - 130));
+
+        widget.style.left = (newX - cRect.left) + 'px';
+        widget.style.top = (newY - cRect.top) + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function onEnd() {
+        isDragging = false;
+      }
+
+      widget.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onEnd);
+
+      widget.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      widget.addEventListener('click', () => {
+        if (!hasMoved) {
+          ChatModal.open();
+        }
+      });
+    }
+
+    // ==========================================
+    // 8. INITIALIZATION
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('btn-hamburger').onclick = () => Drawer.open();
@@ -1086,6 +1319,7 @@
         Router.navigate('home');
       };
 
+      setupDraggableBot();
       await syncAuthAndProfile();
       Router.navigate('home');
     });
