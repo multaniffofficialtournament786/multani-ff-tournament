@@ -121,7 +121,8 @@
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 20s linear infinite; }
+    /* SPEED SLOWED DOWN FROM 20s to 38s */
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 38s linear infinite; }
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
     .bottom-nav { 
@@ -738,13 +739,12 @@
         const isJoined = userJoinedTournamentIds.has(t.id);
         const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
 
-        // Format Date, Day and Time nicely from match_date
         let formattedDateTime = 'Upcoming';
         if (t.match_date) {
           const d = new Date(t.match_date);
           const optionsDate = { weekday: 'short', month: 'short', day: 'numeric' };
-          const dateStr = d.toLocaleDateString('en-US', optionsDate); // e.g. "Mon, Sep 14"
-          const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // e.g. "10:00 AM"
+          const dateStr = d.toLocaleDateString('en-US', optionsDate);
+          const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           formattedDateTime = `${dateStr} • ${timeStr}`;
         }
 
@@ -842,7 +842,6 @@
             </div>
           `}
 
-          <!-- DOWNLOAD OFFICIAL APP BUTTON -->
           <div style="margin-bottom: 16px;">
             <a href="https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
@@ -861,7 +860,6 @@
           <div class="section-title"><span>Available Tournaments</span></div>
           <div>${buildTournamentCardsHTML(activeTournaments)}</div>
 
-          <!-- SOCIAL MEDIA FOOTER LINKS -->
           <div class="social-footer">
             <p>Connect With Us</p>
             <div class="social-icons-row">
@@ -986,9 +984,10 @@
             <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
           </div>
 
+          <!-- UPDATED MATCH RULES AS REQUESTED -->
           <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Apni profile mein apni real Free Fire ID aur active WhatsApp number lazmi add karein—Booyah karne par winner se prize ke liye sirf WhatsApp par hi rabta kiya jaye ga!'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
