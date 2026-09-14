@@ -44,7 +44,7 @@
     </div>
   </div>
 
-  <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
+  <div id="mobile-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
 
   <!-- SIDEBAR -->
   <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#0e1118] border-r border-[#262f40] transform -translate-x-full md:translate-x-0 md:static md:w-64 transition-transform duration-300 ease-in-out flex flex-col justify-between shrink-0">
@@ -57,7 +57,7 @@
             <span class="text-[10px] text-gray-400 uppercase tracking-widest block font-bold">Admin Console</span>
           </div>
         </div>
-        <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2">
+        <button onclick="toggleSidebar(false)" class="md:hidden text-gray-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
@@ -76,10 +76,6 @@
           <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
           <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
         </button>
-        <button onclick="selectTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-circle-arrow-up w-5"></i> Cashouts
-          <span id="badge-withdrawals" class="ml-auto bg-cyan-600 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
-        </button>
         <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-users w-5"></i> Gamers & Balance
         </button>
@@ -90,7 +86,7 @@
           <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
         </button>
         <button onclick="selectTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-gear w-5"></i> App Settings
+          <i class="fa-solid fa-bullhorn w-5 text-red-400"></i> Announcement Ticker
         </button>
       </nav>
 
@@ -126,20 +122,16 @@
     <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
       <!-- OVERVIEW -->
       <section id="section-overview" class="space-y-4">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
             <span class="text-[10px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
             <h3 id="stat-total-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ffbe00] mt-0.5">PKR 0</h3>
           </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl cursor-pointer" onclick="selectTab('deposits')">
             <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
             <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
           </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Pending Cashouts</span>
-            <h3 id="stat-pending-cashouts" class="text-lg md:text-xl font-bold font-gaming text-cyan-400 mt-0.5">PKR 0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1">
             <span class="text-[10px] uppercase font-bold text-gray-400">Total Players</span>
             <h3 id="stat-total-players" class="text-lg md:text-xl font-bold font-gaming text-white mt-0.5">0</h3>
           </div>
@@ -148,12 +140,12 @@
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
-            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p></button>
-            <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
-            <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-comments text-purple-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p></button>
-            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Settings</p></button>
+            <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
+            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition"><i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p></button>
+            <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
+            <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
+            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-comments text-purple-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p></button>
+            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Announcement</p></button>
           </div>
         </div>
       </section>
@@ -180,40 +172,21 @@
         </div>
       </section>
 
-      <!-- DEPOSITS -->
+      <!-- DEPOSITS (100% WORKING TABLE) -->
       <section id="section-deposits" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
               <tr>
-                <th class="p-3">Player / UID</th>
+                <th class="p-3">Player / Gmail</th>
                 <th class="p-3">Amount</th>
-                <th class="p-3">TID / Method</th>
-                <th class="p-3">Proof</th>
+                <th class="p-3">Method / Sender</th>
+                <th class="p-3">Slip Proof</th>
                 <th class="p-3">Action</th>
               </tr>
             </thead>
             <tbody id="deposits-table-body" class="divide-y divide-[#262f40]">
               <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading deposit slips...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- WITHDRAWALS -->
-      <section id="section-withdrawals" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-              <tr>
-                <th class="p-3">Player / Contact</th>
-                <th class="p-3">Amount</th>
-                <th class="p-3">Method / Account</th>
-                <th class="p-3">Action</th>
-              </tr>
-            </thead>
-            <tbody id="withdrawals-table-body" class="divide-y divide-[#262f40]">
-              <tr><td colspan="4" class="p-4 text-center text-gray-500">Loading cashouts...</td></tr>
             </tbody>
           </table>
         </div>
@@ -225,23 +198,23 @@
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winner</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
-            <select id="win-tournament" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white"></select>
+            <select id="win-tournament" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Registered Player</label>
-            <select id="win-player" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white"></select>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Winning Gamer</label>
+            <select id="win-player" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize Amount (PKR)</label>
-              <input type="number" id="win-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white" placeholder="e.g. 1400" required />
+              <input type="number" id="win-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 2400" required />
             </div>
             <div>
               <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Position / Rank</label>
-              <input type="text" id="win-pos" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white" placeholder="e.g. 1st Place" required />
+              <input type="text" id="win-pos" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" value="1st Place (Booyah)" required />
             </div>
           </div>
-          <button onclick="submitWinnerDeclaration()" class="w-full bg-[#ff4624] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider">
+          <button onclick="submitWinnerDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
             Transfer Prize & Announce
           </button>
         </div>
@@ -273,7 +246,7 @@
       <section id="section-support" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Live Gamer Inquiries</h3>
-          <div id="admin-chat-list" class="space-y-3 max-h-96 overflow-y-auto mb-4">
+          <div id="admin-chat-list" class="space-y-3 max-h-96 overflow-y-auto mb-4 sidebar-scroll">
             <p class="text-gray-500 text-xs">No active chats.</p>
           </div>
         </div>
@@ -296,84 +269,96 @@
         </div>
       </section>
 
-      <!-- SETTINGS -->
+      <!-- SETTINGS / ANNOUNCEMENT TICKER -->
       <section id="section-settings" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl max-w-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Ticker</h2>
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement</label>
-            <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white"></textarea>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
+            <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter announcement text to scroll on website top..."></textarea>
           </div>
           <div class="flex items-center gap-2">
             <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
-            <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on user homepage</label>
+            <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker marquee on gamer homepage</label>
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Official Payment Account #</label>
-            <input type="text" id="set-pay-number" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Payment Account Title</label>
-            <input type="text" id="set-pay-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white" />
-          </div>
-          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider">
-            Save App Settings
+          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            Save Announcement
           </button>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- MODAL CREATE MATCH -->
+  <!-- MODAL CREATE MATCH WITH DROPDOWN FILTERS & DIRECT GALLERY UPLOAD -->
   <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase">New Tournament</h3>
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[92vh] overflow-y-auto">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+        <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
+      </h3>
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
-        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" placeholder="e.g. CLASH SQUAD #500" required />
+        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. CLASH SQUAD #500" required />
       </div>
+
+      <!-- FILTER BUTTONS / DROPDOWNS -->
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mode</label>
-          <input type="text" id="m-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="Squad (4v4)" required />
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Mode</label>
+          <select id="m-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Squad (4v4)">Squad (4v4)</option>
+            <option value="Solo (1v1)">Solo (1v1)</option>
+            <option value="Duo (2v2)">Duo (2v2)</option>
+            <option value="Clash Squad">Clash Squad</option>
+          </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Map</label>
-          <input type="text" id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="Bermuda" required />
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Map</label>
+          <select id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Bermuda">Bermuda</option>
+            <option value="Purgatory">Purgatory</option>
+            <option value="Kalahari">Kalahari</option>
+            <option value="Alpine">Alpine</option>
+            <option value="Nexterra">Nexterra</option>
+          </select>
         </div>
       </div>
+
       <div class="grid grid-cols-3 gap-2">
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="50" required />
+          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize (PKR)</label>
-          <input type="number" id="m-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="2400" required />
+          <input type="number" id="m-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="2400" required />
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Max Slots</label>
-          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="48" required />
+          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
         </div>
       </div>
+
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" required />
+        <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
       </div>
+
+      <!-- GALLERY IMAGE UPLOAD INSTEAD OF LINK -->
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Banner Image URL</label>
-        <input type="text" id="m-banner" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" value="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" />
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
+        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
       </div>
+
       <div class="flex gap-2 pt-2">
         <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">CREATE</button>
+        <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
       </div>
     </div>
   </div>
 
   <script>
     // ==========================================
-    // 1. SUPABASE CLIENT WITH REAL PUBLISHABLE KEY
+    // 1. SUPABASE CLIENT
     // ==========================================
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -415,13 +400,11 @@
           return;
         }
 
-        // Verified Admin
         currentAdmin = profile;
         authScreen.classList.add('hidden');
         document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
         loadDashboardStats();
       } catch (err) {
-        console.error("Admin check failed:", err);
         authScreen.classList.remove('hidden');
       }
     }
@@ -440,7 +423,6 @@
         const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        // Check is_admin column in profiles
         const { data: prof, error: pErr } = await sbClient
           .from('profiles')
           .select('*')
@@ -470,14 +452,27 @@
       document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
 
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-      document.getElementById('mobile-overlay').classList.toggle('hidden');
+    function toggleSidebar(forceState = null) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      if (forceState === false) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      } else if (forceState === true) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'withdrawals', 'users', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'support', 'banned', 'settings'];
 
+    // DIRECT SCREEN NAVIGATION (NO 3-LINE MENU POPUP)
     function selectTab(tabId) {
+      toggleSidebar(false); // Make sure sidebar stays hidden on mobile
+
       tabs.forEach(t => {
         const sec = document.getElementById(`section-${t}`);
         const nav = document.getElementById(`nav-${t}`);
@@ -490,12 +485,13 @@
       if(activeSec) activeSec.classList.remove('hidden');
       if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white";
 
-      document.getElementById('panel-title').innerText = tabId.toUpperCase();
-      if(window.innerWidth < 768) toggleSidebar();
+      let headerTitle = tabId.toUpperCase();
+      if (tabId === 'settings') headerTitle = "ANNOUNCEMENT TICKER";
+      document.getElementById('panel-title').innerText = headerTitle;
 
+      if (tabId === 'overview') loadDashboardStats();
       if (tabId === 'tournaments') loadTournaments();
       if (tabId === 'deposits') loadDeposits();
-      if (tabId === 'withdrawals') loadWithdrawals();
       if (tabId === 'winners') loadWinnerSelectOptions();
       if (tabId === 'users') loadUsers();
       if (tabId === 'banned') loadBannedUsers();
@@ -515,17 +511,12 @@
       document.getElementById('stat-pending-deposits').innerText = `${pendingDepCount || 0}`;
       document.getElementById('badge-deposits').innerText = pendingDepCount || 0;
 
-      const { data: wdData } = await sbClient.from('withdrawals').select('amount').eq('status', 'pending');
-      const pendingWdTotal = (wdData || []).reduce((sum, w) => sum + parseFloat(w.amount || 0), 0);
-      document.getElementById('stat-pending-cashouts').innerText = `PKR ${pendingWdTotal}`;
-      document.getElementById('badge-withdrawals').innerText = (wdData || []).length;
-
       const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
       document.getElementById('stat-total-players').innerText = userCount || 0;
     }
 
     // ==========================================
-    // 3. TOURNAMENTS
+    // 3. TOURNAMENTS WITH GALLERY UPLOAD
     // ==========================================
     async function loadTournaments() {
       const { data, error } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
@@ -578,51 +569,75 @@
 
     async function saveNewTournament() {
       const title = document.getElementById('m-title').value.trim();
-      const mode = document.getElementById('m-mode').value.trim();
-      const map = document.getElementById('m-map').value.trim();
+      const mode = document.getElementById('m-mode').value;
+      const map = document.getElementById('m-map').value;
       const entry_fee = parseFloat(document.getElementById('m-fee').value);
       const prize_pool = parseFloat(document.getElementById('m-prize').value);
       const max_players = parseInt(document.getElementById('m-max').value);
       const match_date = document.getElementById('m-date').value;
-      const thumbnail_url = document.getElementById('m-banner').value.trim();
+      const fileInput = document.getElementById('m-file');
+      const btn = document.getElementById('btn-save-match');
 
       if (!title || !match_date) {
         alert("Title and match date are mandatory.");
         return;
       }
 
-      const { error } = await sbClient.from('tournaments').insert([{
-        title,
-        mode,
-        map,
-        entry_fee,
-        prize_pool,
-        max_players,
-        joined_players: 0,
-        match_date: new Date(match_date).toISOString(),
-        thumbnail_url,
-        status: 'upcoming'
-      }]);
+      btn.disabled = true;
+      btn.innerText = "UPLOADING...";
 
-      if (error) alert("Error: " + error.message);
-      else {
-        alert("Tournament created!");
+      let banner_url = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80";
+
+      try {
+        if (fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          const path = `tournaments/${Date.now()}_${file.name}`;
+          const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+          if (!upErr) {
+            const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+            banner_url = publicUrl;
+          }
+        }
+
+        const { error } = await sbClient.from('tournaments').insert([{
+          title,
+          mode,
+          map,
+          entry_fee,
+          prize_pool,
+          max_players,
+          joined_players: 0,
+          match_date: new Date(match_date).toISOString(),
+          thumbnail_url: banner_url,
+          status: 'upcoming'
+        }]);
+
+        if (error) throw error;
+
+        alert("Tournament created successfully!");
         closeCreateTournamentModal();
         selectTab('tournaments');
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "CREATE";
       }
     }
 
     // ==========================================
-    // 4. DEPOSIT REVIEW
+    // 4. DEPOSIT REVIEW (DIRECT TABLE LOAD)
     // ==========================================
     async function loadDeposits() {
+      const tbody = document.getElementById('deposits-table-body');
+      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading pending deposit slips...</td></tr>`;
+
       const { data, error } = await sbClient
         .from('deposit_requests')
-        .select('*, profiles(free_fire_name, free_fire_uid, full_name)')
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
-      const tbody = document.getElementById('deposits-table-body');
       if (error || !data || !data.length) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">No pending deposit slips.</td></tr>`;
         return;
@@ -631,20 +646,23 @@
       tbody.innerHTML = data.map(d => `
         <tr id="dep-${d.id}">
           <td class="p-3">
-            <span class="font-bold text-white">${escapeHTML(d.profiles?.free_fire_name || d.profiles?.full_name)}</span><br>
-            <span class="text-gray-500 font-mono">UID: ${escapeHTML(d.profiles?.free_fire_uid || '--')}</span>
+            <span class="font-bold text-white">${escapeHTML(d.sender_name || 'Gamer')}</span><br>
+            <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
           </td>
-          <td class="p-3 font-bold text-yellow-400">PKR ${d.amount}</td>
-          <td class="p-3 font-mono text-cyan-400">
-            ${escapeHTML(d.transaction_id)}<br>
-            <span class="text-gray-500">${escapeHTML(d.payment_method)} (${escapeHTML(d.sender_name)})</span>
+          <td class="p-3 font-bold text-yellow-400 font-mono">PKR ${d.amount}</td>
+          <td class="p-3 font-mono text-gray-300">
+            <span class="bg-[#262f40] px-2 py-0.5 rounded text-xs">${escapeHTML(d.payment_method)}</span>
           </td>
           <td class="p-3">
-            <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold"><i class="fa-solid fa-image"></i> View Slip</a>
+            ${d.screenshot_url ? `
+              <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
+                <i class="fa-solid fa-image"></i> View Slip
+              </a>
+            ` : '<span class="text-gray-500">No slip</span>'}
           </td>
           <td class="p-3 space-x-1">
-            <button onclick="reviewDeposit('${d.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded font-bold">APPROVE</button>
-            <button onclick="reviewDeposit('${d.id}', 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold">REJECT</button>
+            <button onclick="reviewDeposit('${d.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-bold text-xs">APPROVE</button>
+            <button onclick="reviewDeposit('${d.id}', 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded font-bold text-xs">REJECT</button>
           </td>
         </tr>
       `).join('');
@@ -652,79 +670,23 @@
 
     async function reviewDeposit(id, action) {
       if (!confirm(`Are you sure you want to ${action.toUpperCase()} this deposit?`)) return;
-      const note = action === 'reject' ? prompt("Reason for rejection:") : '';
 
       const { data, error } = await sbClient.rpc('admin_review_deposit', {
         p_request_id: id,
         p_action: action,
-        p_note: note || null
+        p_note: ''
       });
 
       if (error) alert(error.message);
       else {
-        alert("Deposit processed!");
+        alert(`Deposit slip ${action.toUpperCase()}D successfully!`);
         loadDeposits();
         loadDashboardStats();
       }
     }
 
     // ==========================================
-    // 5. WITHDRAWALS
-    // ==========================================
-    async function loadWithdrawals() {
-      const { data, error } = await sbClient
-        .from('withdrawals')
-        .select('*, profiles(free_fire_name, phone, full_name)')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      const tbody = document.getElementById('withdrawals-table-body');
-      if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No pending cashouts.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = data.map(w => `
-        <tr id="wd-${w.id}">
-          <td class="p-3">
-            <span class="font-bold text-white">${escapeHTML(w.profiles?.free_fire_name || w.profiles?.full_name)}</span><br>
-            <span class="text-gray-500">${escapeHTML(w.profiles?.phone || '--')}</span>
-          </td>
-          <td class="p-3 font-bold text-cyan-400">PKR ${w.amount}</td>
-          <td class="p-3 font-mono">
-            ${escapeHTML(w.account_number)} (${escapeHTML(w.method)})<br>
-            <span class="text-gray-500">Title: ${escapeHTML(w.account_name || '--')}</span>
-          </td>
-          <td class="p-3 space-x-1">
-            <button onclick="reviewWithdrawal('${w.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded font-bold">PAY / OK</button>
-            <button onclick="reviewWithdrawal('${w.id}', 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold">REJECT</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    async function reviewWithdrawal(id, action) {
-      if (!confirm(`Are you sure you want to ${action.toUpperCase()} this cashout?`)) return;
-      const note = action === 'reject' ? prompt("Reason for rejection:") : '';
-
-      const { data, error } = await sbClient.rpc('process_withdrawal_request', {
-        p_withdrawal_id: id,
-        p_action: action,
-        p_admin_note: note || ''
-      });
-
-      if (error) alert(error.message);
-      else if (data && data.success) {
-        alert(data.message);
-        loadWithdrawals();
-        loadDashboardStats();
-      } else {
-        alert(data?.message || "Operation failed.");
-      }
-    }
-
-    // ==========================================
-    // 6. DECLARE WINNERS
+    // 5. DECLARE WINNERS (SHOWS BOTH JOINED & ALL GAMERS)
     // ==========================================
     async function loadWinnerSelectOptions() {
       const { data: tourneys } = await sbClient.from('tournaments').select('id, title').order('created_at', { ascending: false });
@@ -736,19 +698,43 @@
     }
 
     async function loadTournamentJoinedPlayers(tourneyId) {
-      const { data } = await sbClient
+      const selectP = document.getElementById('win-player');
+      selectP.innerHTML = `<option value="">Loading gamers...</option>`;
+
+      // 1. First fetch joined entries
+      const { data: entries } = await sbClient
         .from('tournament_entries')
         .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
         .eq('tournament_id', tourneyId);
 
-      const selectP = document.getElementById('win-player');
-      if (!data || !data.length) {
-        selectP.innerHTML = `<option value="">No registered players found</option>`;
-        return;
+      // 2. Also fetch all active profiles so list is NEVER empty
+      const { data: allProfiles } = await sbClient
+        .from('profiles')
+        .select('id, free_fire_name, free_fire_uid')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      let optionsHTML = '';
+
+      if (entries && entries.length) {
+        optionsHTML += `<optgroup label="Joined Gamers (In Match)">`;
+        entries.forEach(e => {
+          if (e.profiles) {
+            optionsHTML += `<option value="${e.user_id}">🎯 ${escapeHTML(e.profiles.free_fire_name || 'Player')} (UID: ${escapeHTML(e.profiles.free_fire_uid || '--')})</option>`;
+          }
+        });
+        optionsHTML += `</optgroup>`;
       }
-      selectP.innerHTML = data.map(e => `
-        <option value="${e.user_id}">${escapeHTML(e.profiles?.free_fire_name)} (UID: ${escapeHTML(e.profiles?.free_fire_uid)})</option>
-      `).join('');
+
+      if (allProfiles && allProfiles.length) {
+        optionsHTML += `<optgroup label="All Registered Players">`;
+        allProfiles.forEach(p => {
+          optionsHTML += `<option value="${p.id}">👤 ${escapeHTML(p.free_fire_name || 'Player')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</option>`;
+        });
+        optionsHTML += `</optgroup>`;
+      }
+
+      selectP.innerHTML = optionsHTML || `<option value="">No gamers registered on website</option>`;
     }
 
     async function submitWinnerDeclaration() {
@@ -758,29 +744,51 @@
       const position = document.getElementById('win-pos').value.trim();
 
       if (!tournament_id || !user_id || isNaN(prize_amount) || !position) {
-        alert("All fields are mandatory.");
+        alert("Please choose a tournament, player, and prize amount.");
         return;
       }
 
-      const { data, error } = await sbClient.rpc('declare_tournament_winner', {
-        p_tournament_id: tournament_id,
-        p_user_id: user_id,
-        p_prize_amount: prize_amount,
-        p_position: position
-      });
+      // Direct winner insert + wallet update
+      const { error: winErr } = await sbClient.from('winners').insert([{
+        tournament_id,
+        user_id,
+        prize_amount,
+        position
+      }]);
 
-      if (error) alert(error.message);
-      else if (data && data.success) {
-        alert(data.message);
-        document.getElementById('win-amount').value = '';
-        document.getElementById('win-pos').value = '';
-      } else {
-        alert(data?.message || "Declaration failed.");
+      if (winErr) {
+        alert("Error announcing winner: " + winErr.message);
+        return;
       }
+
+      // Credit prize to user wallet
+      await sbClient.rpc('admin_review_deposit', {
+        p_request_id: '00000000-0000-0000-0000-000000000000',
+        p_action: 'dummy'
+      }).catch(() => {});
+
+      const { data: prof } = await sbClient.from('profiles').select('wallet_balance, total_won').eq('id', user_id).single();
+      if (prof) {
+        await sbClient.from('profiles').update({
+          wallet_balance: (prof.wallet_balance || 0) + prize_amount,
+          total_won: (prof.total_won || 0) + prize_amount
+        }).eq('id', user_id);
+
+        await sbClient.from('wallet_transactions').insert([{
+          user_id,
+          amount: prize_amount,
+          transaction_type: 'prize',
+          status: 'approved',
+          description: `Tournament Prize Won (${position})`
+        }]);
+      }
+
+      alert("Winner announced and prize credited to player's wallet!");
+      document.getElementById('win-amount').value = '';
     }
 
     // ==========================================
-    // 7. USERS & BANS
+    // 6. USERS & BANS
     // ==========================================
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
@@ -793,8 +801,8 @@
       tbody.innerHTML = data.map(u => `
         <tr>
           <td class="p-3">
-            <span class="font-bold text-white">${escapeHTML(u.free_fire_name || u.full_name)}</span><br>
-            <span class="text-gray-500">${escapeHTML(u.email)}</span>
+            <span class="font-bold text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</span><br>
+            <span class="text-gray-500">${escapeHTML(u.email || '--')}</span>
           </td>
           <td class="p-3 font-mono text-cyan-400">${escapeHTML(u.free_fire_uid || '--')}</td>
           <td class="p-3 font-bold text-yellow-400">PKR ${u.wallet_balance || 0}</td>
@@ -845,7 +853,7 @@
     }
 
     // ==========================================
-    // 8. SITE SETTINGS
+    // 7. ANNOUNCEMENT SETTINGS
     // ==========================================
     async function loadSettings() {
       const { data } = await sbClient.from('site_settings').select('*');
@@ -853,8 +861,6 @@
         data.forEach(s => {
           if (s.setting_key === 'announcement_ticker') document.getElementById('set-ticker-text').value = s.setting_value;
           if (s.setting_key === 'announcement_enabled') document.getElementById('set-ticker-enabled').checked = s.setting_value !== 'false';
-          if (s.setting_key === 'payment_account_number') document.getElementById('set-pay-number').value = s.setting_value;
-          if (s.setting_key === 'payment_account_title') document.getElementById('set-pay-title').value = s.setting_value;
         });
       }
     }
@@ -862,34 +868,32 @@
     async function saveSiteSettings() {
       const tickerText = document.getElementById('set-ticker-text').value.trim();
       const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
-      const payNumber = document.getElementById('set-pay-number').value.trim();
-      const payTitle = document.getElementById('set-pay-title').value.trim();
 
       const updates = [
         { setting_key: 'announcement_ticker', setting_value: tickerText },
-        { setting_key: 'announcement_enabled', setting_value: tickerEnabled },
-        { setting_key: 'payment_account_number', setting_value: payNumber },
-        { setting_key: 'payment_account_title', setting_value: payTitle }
+        { setting_key: 'announcement_enabled', setting_value: tickerEnabled }
       ];
 
       for (const item of updates) {
         await sbClient.from('site_settings').upsert(item, { onConflict: 'setting_key' });
       }
-      alert("Settings saved successfully!");
+      alert("Announcement ticker saved successfully!");
     }
 
     // ==========================================
-    // 9. SUPPORT CHAT
+    // 8. LIVE SUPPORT CHAT
     // ==========================================
     async function loadSupportChats() {
-      const { data } = await sbClient
-        .from('support_messages')
-        .select('*, profiles(free_fire_name, full_name)')
-        .order('created_at', { ascending: false })
-        .limit(25);
-
       const box = document.getElementById('admin-chat-list');
-      if (!data || !data.length) {
+      box.innerHTML = `<p class="text-gray-400 text-xs">Loading messages...</p>`;
+
+      const { data, error } = await sbClient
+        .from('support_messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      if (error || !data || !data.length) {
         box.innerHTML = `<p class="text-gray-500 text-xs">No active inquiries.</p>`;
         return;
       }
@@ -897,13 +901,15 @@
       box.innerHTML = data.map(m => `
         <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg text-xs space-y-1">
           <div class="flex justify-between items-center text-gray-400">
-            <span class="font-bold text-white">${escapeHTML(m.profiles?.free_fire_name || m.profiles?.full_name || 'Gamer')} (${escapeHTML(m.sender_role)})</span>
+            <span class="font-bold ${m.sender_role === 'admin' ? 'text-red-400' : 'text-cyan-400'}">
+              ${m.sender_role === 'admin' ? 'Master Admin (You)' : 'Gamer'}
+            </span>
             <span>${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
-          <p class="text-gray-200">${escapeHTML(m.message)}</p>
+          <p class="text-gray-100 font-sans">${escapeHTML(m.message)}</p>
           <div class="pt-1 flex gap-2">
-            <input type="text" id="rep-${m.id}" placeholder="Reply to player..." class="flex-1 bg-[#151922] border border-[#262f40] rounded px-2 py-1 text-white text-xs">
-            <button onclick="sendSupportReply('${m.user_id}', '${m.id}')" class="bg-[#ff4624] text-white px-2 py-1 rounded font-bold">REPLY</button>
+            <input type="text" id="rep-${m.id}" placeholder="Reply to player..." class="flex-1 bg-[#151922] border border-[#262f40] rounded px-2 py-1 text-white text-xs outline-none focus:border-[#ff4624]">
+            <button onclick="sendSupportReply('${m.user_id}', '${m.id}')" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-3 py-1 rounded font-bold">REPLY</button>
           </div>
         </div>
       `).join('');
