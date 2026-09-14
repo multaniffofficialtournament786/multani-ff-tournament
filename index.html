@@ -116,7 +116,7 @@
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
-    /* DRAGGABLE FLOATING BOT WIDGET (ZONG BOT STYLE) */
+    /* DRAGGABLE BOT WIDGET */
     #admin-float-widget {
       position: absolute;
       bottom: 120px;
@@ -162,7 +162,7 @@
       border: 1px solid rgba(255,255,255,0.3);
     }
 
-    /* REAL CHAT DIALOG MODAL */
+    /* REAL CHAT MODAL */
     #chat-modal-overlay {
       position: absolute;
       inset: 0;
@@ -393,10 +393,10 @@
 
     <main id="app-view" class="main-content"></main>
 
-    <!-- DRAGGABLE FLOATING BOT WIDGET -->
+    <!-- DRAGGABLE BOT WIDGET -->
     <div id="admin-float-widget">
       <div class="bot-bubble">
-        <img src="https://cdn-icons-png.flation.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
       </div>
       <span class="bot-badge-tag">ADMIN</span>
     </div>
@@ -407,7 +407,7 @@
         <div class="chat-dialog-header">
           <div class="chat-user-header">
             <div class="chat-avatar-status">
-              <div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs text-white" style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">MLT</div>
+              <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">MLT</div>
               <span class="chat-online-dot"></span>
             </div>
             <div>
@@ -434,7 +434,7 @@
       </div>
     </div>
 
-    <!-- FIXED BOTTOM NAV (ALWAYS VISIBLE) -->
+    <!-- FIXED BOTTOM NAV -->
     <nav id="bottom-nav" class="bottom-nav">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
@@ -1047,25 +1047,139 @@
       document.getElementById('signup-form').classList.toggle('hidden', isLogin);
     }
 
+    // ==========================================
+    // 5. PROFILE VIEW (FULL EDIT & PHOTO UPLOAD)
+    // ==========================================
     function renderProfile() {
       if (!currentUser) { Router.navigate('login'); return; }
-      const p = currentProfile;
+      const p = currentProfile || {};
+      const avatarSrc = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <div class="player-hero-card" style="text-align:center;">
-            <img src="${p?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto; object-fit:cover;" />
-            <h2 style="font-family:var(--font-gaming); font-size:22px;">${p?.free_fire_name || p?.full_name || 'Player'}</h2>
-            <span class="uid-tag">UID: ${p?.free_fire_uid || '--'}</span>
-          </div>
-          <div class="player-hero-card">
-            <div style="font-size:13px; line-height:2;">
-              <div>Full Name: <strong>${p?.full_name || '--'}</strong></div>
-              <div>Email: <strong>${p?.email || '--'}</strong></div>
-              <div>Phone: <strong>${p?.phone || '--'}</strong></div>
+          <!-- AVATAR UPLOAD SECTION -->
+          <div class="player-hero-card" style="text-align:center; position:relative;">
+            <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
+              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
+              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #0e1118;">
+                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+              </label>
+              <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
             </div>
+            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${p.free_fire_name || p.full_name || 'Soldier'}</h2>
+            <span class="uid-tag"><i class="fa-solid fa-id-badge"></i> UID: ${p.free_fire_uid || '--'}</span>
+          </div>
+
+          <!-- EDIT PROFILE FORM -->
+          <div class="player-hero-card">
+            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-user-pen"></i> Edit Profile Details
+            </h3>
+
+            <form id="edit-profile-form" onsubmit="saveUserProfile(event)">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="prof-fullname" class="form-input" value="${p.full_name || ''}" placeholder="Enter full name" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Free Fire In-Game Name (IGN)</label>
+                <input type="text" id="prof-ign" class="form-input" value="${p.free_fire_name || ''}" placeholder="e.g. MLT・HAMZA★" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Free Fire UID</label>
+                <input type="text" id="prof-uid" class="form-input" value="${p.free_fire_uid || ''}" placeholder="e.g. 2984189312" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">WhatsApp Mobile #</label>
+                <input type="text" id="prof-phone" class="form-input" value="${p.phone || ''}" placeholder="e.g. 03001234567" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email (Read-Only)</label>
+                <input type="email" class="form-input" value="${p.email || currentUser.email}" style="opacity:0.6; cursor:not-allowed;" readonly />
+              </div>
+
+              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
+                <i class="fa-solid fa-check"></i> SAVE CHANGES
+              </button>
+            </form>
           </div>
         </div>
       `;
+    }
+
+    async function uploadAvatarPhoto(input) {
+      const file = input.files[0];
+      if (!file || !currentUser) return;
+
+      Loader.show("Uploading photo...");
+      try {
+        const fileExt = file.name.split('.').pop();
+        const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await sbClient.storage
+          .from('deposit-screenshots')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = sbClient.storage
+          .from('deposit-screenshots')
+          .getPublicUrl(filePath);
+
+        const { error: updateError } = await sbClient
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', currentUser.id);
+
+        if (updateError) throw updateError;
+
+        document.getElementById('profile-display-avatar').src = publicUrl;
+        Toast.show("Profile photo updated successfully!", "success");
+        await syncAuthAndProfile();
+      } catch (err) {
+        Toast.show(err.message || "Failed to upload photo.", "error");
+      } finally {
+        Loader.hide();
+      }
+    }
+
+    async function saveUserProfile(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const fullName = document.getElementById('prof-fullname').value.trim();
+      const ign = document.getElementById('prof-ign').value.trim();
+      const uid = document.getElementById('prof-uid').value.trim();
+      const phone = document.getElementById('prof-phone').value.trim();
+      const btn = document.getElementById('btn-save-profile');
+
+      btn.disabled = true;
+      Loader.show("Saving profile...");
+
+      try {
+        const { error } = await sbClient.from('profiles').update({
+          full_name: fullName,
+          free_fire_name: ign,
+          free_fire_uid: uid,
+          phone: phone,
+          updated_at: new Date().toISOString()
+        }).eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        Toast.show("Profile updated successfully!", "success");
+        await syncAuthAndProfile();
+        renderProfile();
+      } catch (err) {
+        Toast.show(err.message || "Failed to update profile.", "error");
+      } finally {
+        btn.disabled = false;
+        Loader.hide();
+      }
     }
 
     async function renderLeaderboard() {
@@ -1149,7 +1263,7 @@
     }
 
     // ==========================================
-    // 5. DRAWER LOGIC
+    // 6. DRAWER LOGIC
     // ==========================================
     const Drawer = {
       open() {
@@ -1163,7 +1277,7 @@
     };
 
     // ==========================================
-    // 6. REAL CHAT MODAL LOGIC & POLLING
+    // 7. REAL CHAT MODAL LOGIC & POLLING
     // ==========================================
     const ChatModal = {
       isOpen: false,
@@ -1239,7 +1353,7 @@
     };
 
     // ==========================================
-    // 7. DRAGGABLE BOT LOGIC (TOUCH & MOUSE SUPPORT)
+    // 8. DRAGGABLE BOT LOGIC
     // ==========================================
     function setupDraggableBot() {
       const widget = document.getElementById('admin-float-widget');
@@ -1304,7 +1418,7 @@
     }
 
     // ==========================================
-    // 8. INITIALIZATION
+    // 9. INITIALIZATION
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('btn-hamburger').onclick = () => Drawer.open();
