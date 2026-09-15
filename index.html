@@ -961,11 +961,32 @@
           </div>
 
           ${isJoined ? `
-            <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:10px 12px; margin-bottom: 12px;">
-              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700;">Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}</div>
-              <div style="font-size:12px; font-family:monospace; margin-top:4px; display:flex; justify-content:space-between;">
-                <div>Room ID: <strong style="color:var(--accent-cyan);">${t.room_id || 'Pending (Wait for match)'}</strong></div>
-                <div>Pass: <strong style="color:var(--accent-cyan);">${t.room_password || '••••••••'}</strong></div>
+            <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom: 12px;">
+              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700; margin-bottom: 8px;">
+                Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}
+              </div>
+              
+              <!-- Room ID aur Password Alag Alag Boxes -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
+                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
+                  <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
+                    ${t.room_id || 'Pending'}
+                  </div>
+                </div>
+                <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
+                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Password</div>
+                  <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
+                    ${t.room_password || '••••••••'}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Blue Line aur Darmiyan mein required text -->
+              <div style="border-top: 1px solid var(--accent-cyan); padding-top: 8px; text-align: center;">
+                <p style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
+                  Room id aur pw match se 10.15 mint pehle yaha bhj diya jaega
+                </p>
               </div>
             </div>
           ` : ''}
@@ -1353,7 +1374,6 @@
       };
     }
 
-    // FORGOT PASSWORD FLOW RENDERER
     function renderForgotPassword() {
       const view = document.getElementById('app-view');
       view.innerHTML = `
@@ -1363,7 +1383,6 @@
             <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">RESET PASSWORD</h3>
           </div>
 
-          <!-- STEP 1: SEND OTP / EMAIL -->
           <form id="forgot-email-form">
             <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
               <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Enter your registered Gmail address to receive the password reset OTP code.</p>
@@ -1375,7 +1394,6 @@
             </div>
           </form>
 
-          <!-- STEP 2: VERIFY OTP & NEW PASSWORD -->
           <form id="forgot-verify-form" class="hidden">
             <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
               <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
@@ -1401,137 +1419,52 @@
         </div>
       `;
 
-      // Updated forgot-email-form handler using send-reset-otp edge function
       document.getElementById('forgot-email-form').onsubmit = async (e) => {
         e.preventDefault();
-
         const email = document.getElementById('fg-email').value.trim();
-
-        if (!email) {
-          Toast.show("Please enter your Gmail address.", "error");
-          return;
-        }
-
+        if (!email) { Toast.show("Please enter your Gmail address.", "error"); return; }
         Loader.show("Sending secure OTP to Gmail...");
 
         try {
-          const { data, error } = await sbClient.functions.invoke(
-            "send-reset-otp",
-            {
-              body: {
-                email: email
-              }
-            }
-          );
-
+          const { data, error } = await sbClient.functions.invoke("send-reset-otp", { body: { email: email } });
           Loader.hide();
-
-          if (error) {
-            throw new Error(
-              error.message || "Failed to send OTP."
-            );
-          }
-
-          if (!data || data.success !== true) {
-            throw new Error(
-              data?.message || data?.error || "Failed to send OTP."
-            );
-          }
+          if (error) throw new Error(error.message || "Failed to send OTP.");
+          if (!data || data.success !== true) throw new Error(data?.message || data?.error || "Failed to send OTP.");
 
           window.resetEmailTarget = email;
-
-          Toast.show(
-            "6-digit OTP sent to your Gmail!",
-            "success"
-          );
-
-          document
-            .getElementById('forgot-email-form')
-            .classList.add('hidden');
-
-          document
-            .getElementById('forgot-verify-form')
-            .classList.remove('hidden');
-
+          Toast.show("6-digit OTP sent to your Gmail!", "success");
+          document.getElementById('forgot-email-form').classList.add('hidden');
+          document.getElementById('forgot-verify-form').classList.remove('hidden');
         } catch (err) {
           Loader.hide();
-
-          Toast.show(
-            err.message || "Unable to send OTP. Please try again.",
-            "error"
-          );
+          Toast.show(err.message || "Unable to send OTP. Please try again.", "error");
         }
       };
 
       document.getElementById('forgot-verify-form').onsubmit = async (e) => {
         e.preventDefault();
-
         const token = document.getElementById('fg-otp').value.trim();
         const newPassword = document.getElementById('fg-newpass').value;
         const confPassword = document.getElementById('fg-confpass').value;
 
-        if (!/^\d{6}$/.test(token)) {
-          Toast.show("Please enter the 6-digit OTP.", "error");
-          return;
-        }
-
-        if (newPassword.length < 8) {
-          Toast.show("Password must be at least 8 characters.", "error");
-          return;
-        }
-
-        if (newPassword !== confPassword) {
-          Toast.show("New password and confirm password do not match!", "error");
-          return;
-        }
-
-        if (!window.resetEmailTarget) {
-          Toast.show("Please request a new OTP first.", "error");
-          return;
-        }
+        if (!/^\d{6}$/.test(token)) { Toast.show("Please enter the 6-digit OTP.", "error"); return; }
+        if (newPassword.length < 8) { Toast.show("Password must be at least 8 characters.", "error"); return; }
+        if (newPassword !== confPassword) { Toast.show("New password and confirm password do not match!", "error"); return; }
+        if (!window.resetEmailTarget) { Toast.show("Please request a new OTP first.", "error"); return; }
 
         Loader.show("Verifying OTP & Updating password...");
-
         try {
-          const { data, error } = await sbClient.functions.invoke(
-            "verify-reset-otp",
-            {
-              body: {
-                email: window.resetEmailTarget,
-                otp: token,
-                new_password: newPassword
-              }
-            }
-          );
-
+          const { data, error } = await sbClient.functions.invoke("verify-reset-otp", { body: { email: window.resetEmailTarget, otp: token, new_password: newPassword } });
           Loader.hide();
+          if (error) throw new Error(error.message || "OTP verification failed.");
+          if (!data || data.success !== true) throw new Error(data?.message || "Invalid or expired OTP.");
 
-          if (error) {
-            throw new Error(error.message || "OTP verification failed.");
-          }
-
-          if (!data || data.success !== true) {
-            throw new Error(
-              data?.message || "Invalid or expired OTP."
-            );
-          }
-
-          Toast.show(
-            "Password changed successfully! Please login.",
-            "success"
-          );
-
+          Toast.show("Password changed successfully! Please login.", "success");
           window.resetEmailTarget = null;
-
           Router.navigate("login");
-
         } catch (err) {
           Loader.hide();
-
-          Toast.show(
-            err.message || "Invalid OTP or failed to update password.",
-            "error"
-          );
+          Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
         }
       };
     }
