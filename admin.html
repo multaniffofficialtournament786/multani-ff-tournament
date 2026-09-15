@@ -181,25 +181,11 @@
         </div>
       </section>
 
-      <!-- DEPOSITS (Fixed Full Screen & No Side Scroll) -->
-      <section id="section-deposits" class="space-y-4 hidden w-full">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden p-3 md:p-4 w-full max-w-full">
-          <div class="overflow-x-auto w-full">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-              <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-                <tr>
-                  <th class="p-2.5 md:p-3">Player / Gmail</th>
-                  <th class="p-2.5 md:p-3">Amount</th>
-                  <th class="p-2.5 md:p-3">Method / Sender</th>
-                  <th class="p-2.5 md:p-3">Slip Proof</th>
-                  <th class="p-2.5 md:p-3">Action</th>
-                </tr>
-              </thead>
-              <tbody id="deposits-table-body" class="divide-y divide-[#262f40]">
-                <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading deposit slips...</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- DEPOSITS (Converted to Full Screen Responsive Cards Layout) -->
+      <section id="section-deposits" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
+        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
         </div>
       </section>
 
@@ -272,22 +258,11 @@
         </div>
       </section>
 
-      <!-- BANNED (Fixed Full Screen & No Side Scroll) -->
-      <section id="section-banned" class="space-y-4 hidden w-full">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 md:p-4 w-full max-w-full overflow-hidden">
-          <div class="overflow-x-auto w-full">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-              <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-                <tr>
-                  <th class="p-2.5 md:p-3">Player</th>
-                  <th class="p-2.5 md:p-3">UID</th>
-                  <th class="p-2.5 md:p-3">Email</th>
-                  <th class="p-2.5 md:p-3">Action</th>
-                </tr>
-              </thead>
-              <tbody id="banned-table-body" class="divide-y divide-[#262f40]"></tbody>
-            </table>
-          </div>
+      <!-- BANNED -->
+      <section id="section-banned" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Banned Players</h3>
+        <div id="banned-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading banned players...</p>
         </div>
       </section>
 
@@ -921,8 +896,8 @@
     }
 
     async function loadDeposits() {
-      const tbody = document.getElementById('deposits-table-body');
-      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading pending deposit slips...</td></tr>`;
+      const container = document.getElementById('deposits-cards-container');
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading pending deposit slips...</p>`;
 
       const { data, error } = await sbClient
         .from('deposit_requests')
@@ -931,32 +906,34 @@
         .order('created_at', { ascending: false });
 
       if (error || !data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">No pending deposit slips.</td></tr>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips.</p>`;
         return;
       }
 
-      tbody.innerHTML = data.map(d => `
-        <tr id="dep-${d.id}">
-          <td class="p-2.5 md:p-3">
-            <span class="font-bold text-white">${escapeHTML(d.sender_name || 'Gamer')}</span><br>
-            <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
-          </td>
-          <td class="p-2.5 md:p-3 font-bold text-yellow-400 font-mono">PKR ${d.amount}</td>
-          <td class="p-2.5 md:p-3 font-mono text-gray-300">
-            <span class="bg-[#262f40] px-2 py-0.5 rounded text-xs">${escapeHTML(d.payment_method)}</span>
-          </td>
-          <td class="p-2.5 md:p-3">
+      container.innerHTML = data.map(d => `
+        <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || 'Gamer')}</h4>
+              <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
+            </div>
+            <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
+            <span class="text-gray-400 text-[10px] uppercase font-bold">Method: <strong class="text-white">${escapeHTML(d.payment_method)}</strong></span>
             ${d.screenshot_url ? `
               <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
                 <i class="fa-solid fa-image"></i> View Slip
               </a>
-            ` : '<span class="text-gray-500">No slip</span>'}
-          </td>
-          <td class="p-2.5 md:p-3 space-x-1">
-            <button onclick="reviewDeposit('${d.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-bold text-xs">APPROVE</button>
-            <button onclick="reviewDeposit('${d.id}', 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded font-bold text-xs">REJECT</button>
-          </td>
-        </tr>
+            ` : '<span class="text-gray-500 text-[10px]">No slip</span>'}
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="reviewDeposit('${d.id}', 'approve')" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded font-bold text-xs uppercase">APPROVE</button>
+            <button onclick="reviewDeposit('${d.id}', 'reject')" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-1.5 rounded font-bold text-xs uppercase">REJECT</button>
+          </div>
+        </div>
       `).join('');
     }
 
@@ -1191,20 +1168,19 @@
 
     async function loadBannedUsers() {
       const { data } = await sbClient.from('profiles').select('*').eq('is_banned', true);
-      const tbody = document.getElementById('banned-table-body');
+      const container = document.getElementById('banned-cards-container');
       if (!data || !data.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No players currently banned.</td></tr>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players currently banned.</p>`;
         return;
       }
-      tbody.innerHTML = data.map(b => `
-        <tr>
-          <td class="p-2.5 md:p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
-          <td class="p-2.5 md:p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
-          <td class="p-2.5 md:p-3">${escapeHTML(b.email)}</td>
-          <td class="p-2.5 md:p-3">
-            <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold text-xs">UNBAN</button>
-          </td>
-        </tr>
+      container.innerHTML = data.map(b => `
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
+          <div>
+            <h4 class="font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</h4>
+            <p class="text-red-400 font-mono text-[11px]">UID: ${escapeHTML(b.free_fire_uid || '--')}</p>
+          </div>
+          <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase">UNBAN</button>
+        </div>
       `).join('');
     }
 
