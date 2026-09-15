@@ -1387,12 +1387,12 @@
 
               <div class="form-group">
                 <label class="form-label">New Password</label>
-                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 6 characters" minlength="6" required />
+                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 characters" minlength="8" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="6" required />
+                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="8" required />
               </div>
 
               <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
@@ -1406,7 +1406,6 @@
         const email = document.getElementById('fg-email').value.trim();
         Loader.show("Sending OTP to Gmail...");
         
-        // ADDED redirectTo parameter here to fix the 404 error permanently!
         const { error } = await sbClient.auth.resetPasswordForEmail(email, {
           redirectTo: 'https://multaniffofficialtournament786.github.io/multani-ff-tournament/#/home',
         });
@@ -1422,36 +1421,76 @@
         }
       };
 
+      // Updated forgot-verify-form handler requested by user
       document.getElementById('forgot-verify-form').onsubmit = async (e) => {
         e.preventDefault();
+
         const token = document.getElementById('fg-otp').value.trim();
         const newPassword = document.getElementById('fg-newpass').value;
         const confPassword = document.getElementById('fg-confpass').value;
+
+        if (!/^\d{6}$/.test(token)) {
+          Toast.show("Please enter the 6-digit OTP.", "error");
+          return;
+        }
+
+        if (newPassword.length < 8) {
+          Toast.show("Password must be at least 8 characters.", "error");
+          return;
+        }
 
         if (newPassword !== confPassword) {
           Toast.show("New password and confirm password do not match!", "error");
           return;
         }
 
-        Loader.show("Verifying & Updating password...");
+        if (!window.resetEmailTarget) {
+          Toast.show("Please request a new OTP first.", "error");
+          return;
+        }
+
+        Loader.show("Verifying OTP & Updating password...");
+
         try {
-          const { error: verifyErr } = await sbClient.auth.verifyOtp({
-            email: window.resetEmailTarget,
-            token: token,
-            type: 'recovery'
-          });
-
-          if (verifyErr) throw verifyErr;
-
-          const { error: updateErr } = await sbClient.auth.updateUser({ password: newPassword });
-          if (updateErr) throw updateErr;
+          const { data, error } = await sbClient.functions.invoke(
+            "verify-reset-otp",
+            {
+              body: {
+                email: window.resetEmailTarget,
+                otp: token,
+                new_password: newPassword
+              }
+            }
+          );
 
           Loader.hide();
-          Toast.show("Password changed successfully! Please login.", "success");
-          Router.navigate('login');
+
+          if (error) {
+            throw new Error(error.message || "OTP verification failed.");
+          }
+
+          if (!data || data.success !== true) {
+            throw new Error(
+              data?.message || "Invalid or expired OTP."
+            );
+          }
+
+          Toast.show(
+            "Password changed successfully! Please login.",
+            "success"
+          );
+
+          window.resetEmailTarget = null;
+
+          Router.navigate("login");
+
         } catch (err) {
           Loader.hide();
-          Toast.show(err.message || "Invalid OTP or failed to update.", "error");
+
+          Toast.show(
+            err.message || "Invalid OTP or failed to update password.",
+            "error"
+          );
         }
       };
     }
@@ -1487,7 +1526,7 @@
               <i class="fa-solid fa-user-pen"></i> Edit Profile Details
             </h3>
 
-            <form id="edit-profile-form" onsubmit="saveUserProfile(event)">
+            <form id="edit-profile-form" onsave="saveUserProfile(event)">
               <div class="form-group">
                 <label class="form-label">Full Name</label>
                 <input type="text" id="prof-fullname" class="form-input" value="${p.full_name || ''}" placeholder="Enter full name" required />
@@ -1513,7 +1552,7 @@
                 <input type="email" class="form-input" value="${p.email || currentUser.email}" style="opacity:0.6; cursor:not-allowed;" readonly />
               </div>
 
-              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
+              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;" onclick="saveUserProfile(event)">
                 <i class="fa-solid fa-check"></i> SAVE CHANGES
               </button>
             </form>
@@ -1559,7 +1598,7 @@
       const phone = document.getElementById('prof-phone').value.trim();
       const btn = document.getElementById('btn-save-profile');
 
-      btn.disabled = true;
+      if(btn) btn.disabled = true;
       Loader.show("Saving profile...");
 
       try {
@@ -1579,7 +1618,7 @@
       } catch (err) {
         Toast.show(err.message || "Failed to update profile.", "error");
       } finally {
-        btn.disabled = false;
+        if(btn) btn.disabled = false;
         Loader.hide();
       }
     }
