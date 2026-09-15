@@ -140,9 +140,15 @@
             <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
             <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
           </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Total Players</span>
-            <h3 id="stat-total-players" class="text-lg md:text-xl font-bold font-gaming text-white mt-0.5">0</h3>
+          <!-- TOTAL PLAYERS BOX WITH LIST BUTTON -->
+          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
+              <h3 id="stat-total-players" class="text-lg md:text-xl font-bold font-gaming text-white mt-0.5">0</h3>
+            </div>
+            <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-2 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+              <i class="fa-solid fa-list-ul"></i> LIST
+            </button>
           </div>
         </div>
 
@@ -181,7 +187,7 @@
         </div>
       </section>
 
-      <!-- DEPOSITS (Converted to Full Screen Responsive Cards Layout) -->
+      <!-- DEPOSITS -->
       <section id="section-deposits" class="space-y-3 hidden w-full">
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
         <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
@@ -285,6 +291,21 @@
       </section>
     </div>
   </main>
+
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST -->
+  <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-users text-[#ff4624]"></i> All Registered Players
+        </h3>
+        <button onclick="closeAllPlayersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2.5 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: PLAYERS LIST -->
   <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -612,6 +633,65 @@
         quickSup.innerText = supCount;
         quickSup.classList.toggle('hidden', supCount === 0);
       }
+    }
+
+    async function openAllPlayersModal() {
+      const modal = document.getElementById('modal-all-players');
+      const body = document.getElementById('modal-all-players-body');
+      modal.classList.remove('hidden');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading players list...</p>`;
+
+      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+
+      if (error || !data || !data.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No players found.</p>`;
+        return;
+      }
+
+      body.innerHTML = data.map(u => {
+        const waNumber = u.phone || '';
+        let waLink = '#';
+        if (waNumber) {
+          let cleanNum = waNumber.replace(/[^0-9]/g, '');
+          if (cleanNum.startsWith('0')) {
+            cleanNum = '92' + cleanNum.substring(1);
+          }
+          const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin.");
+          waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
+        }
+
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+                ${u.is_banned ? 'BANNED' : 'ACTIVE'}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
+              <span class="text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No WhatsApp added')}</span>
+              ${waNumber ? `
+                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 shadow">
+                  <i class="fa-brands fa-whatsapp"></i> Chat
+                </a>
+              ` : ''}
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
+              <span>Balance: <strong class="text-yellow-400">PKR ${u.wallet_balance || 0}</strong></span>
+              <span>Matches: <strong>${u.total_matches || 0}</strong></span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function closeAllPlayersModal() {
+      document.getElementById('modal-all-players').classList.add('hidden');
     }
 
     async function loadTournaments() {
