@@ -1401,27 +1401,68 @@
         </div>
       `;
 
+      // Updated forgot-email-form handler using send-reset-otp edge function
       document.getElementById('forgot-email-form').onsubmit = async (e) => {
         e.preventDefault();
-        const email = document.getElementById('fg-email').value.trim();
-        Loader.show("Sending OTP to Gmail...");
-        
-        const { error } = await sbClient.auth.resetPasswordForEmail(email, {
-          redirectTo: 'https://multaniffofficialtournament786.github.io/multani-ff-tournament/#/home',
-        });
-        Loader.hide();
 
-        if (error) {
-          Toast.show(error.message, "error");
-        } else {
-          Toast.show("OTP sent to your Gmail inbox!", "success");
+        const email = document.getElementById('fg-email').value.trim();
+
+        if (!email) {
+          Toast.show("Please enter your Gmail address.", "error");
+          return;
+        }
+
+        Loader.show("Sending secure OTP to Gmail...");
+
+        try {
+          const { data, error } = await sbClient.functions.invoke(
+            "send-reset-otp",
+            {
+              body: {
+                email: email
+              }
+            }
+          );
+
+          Loader.hide();
+
+          if (error) {
+            throw new Error(
+              error.message || "Failed to send OTP."
+            );
+          }
+
+          if (!data || data.success !== true) {
+            throw new Error(
+              data?.message || data?.error || "Failed to send OTP."
+            );
+          }
+
           window.resetEmailTarget = email;
-          document.getElementById('forgot-email-form').classList.add('hidden');
-          document.getElementById('forgot-verify-form').classList.remove('hidden');
+
+          Toast.show(
+            "6-digit OTP sent to your Gmail!",
+            "success"
+          );
+
+          document
+            .getElementById('forgot-email-form')
+            .classList.add('hidden');
+
+          document
+            .getElementById('forgot-verify-form')
+            .classList.remove('hidden');
+
+        } catch (err) {
+          Loader.hide();
+
+          Toast.show(
+            err.message || "Unable to send OTP. Please try again.",
+            "error"
+          );
         }
       };
 
-      // Updated forgot-verify-form handler requested by user
       document.getElementById('forgot-verify-form').onsubmit = async (e) => {
         e.preventDefault();
 
@@ -1526,7 +1567,7 @@
               <i class="fa-solid fa-user-pen"></i> Edit Profile Details
             </h3>
 
-            <form id="edit-profile-form" onsave="saveUserProfile(event)">
+            <form id="edit-profile-form">
               <div class="form-group">
                 <label class="form-label">Full Name</label>
                 <input type="text" id="prof-fullname" class="form-input" value="${p.full_name || ''}" placeholder="Enter full name" required />
@@ -1552,13 +1593,15 @@
                 <input type="email" class="form-input" value="${p.email || currentUser.email}" style="opacity:0.6; cursor:not-allowed;" readonly />
               </div>
 
-              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;" onclick="saveUserProfile(event)">
+              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
                 <i class="fa-solid fa-check"></i> SAVE CHANGES
               </button>
             </form>
           </div>
         </div>
       `;
+
+      document.getElementById('edit-profile-form').onsubmit = saveUserProfile;
     }
 
     async function uploadAvatarPhoto(input) {
