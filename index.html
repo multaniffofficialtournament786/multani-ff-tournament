@@ -1406,7 +1406,10 @@
         const email = document.getElementById('fg-email').value.trim();
         Loader.show("Sending OTP to Gmail...");
         
-        const { error } = await sbClient.auth.resetPasswordForEmail(email);
+        // ADDED redirectTo parameter here to fix the 404 error permanently!
+        const { error } = await sbClient.auth.resetPasswordForEmail(email, {
+          redirectTo: 'https://multaniffofficialtournament786.github.io/multani-ff-tournament/#/home',
+        });
         Loader.hide();
 
         if (error) {
