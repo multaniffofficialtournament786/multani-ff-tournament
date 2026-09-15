@@ -650,6 +650,7 @@
 
       body.innerHTML = data.map(u => {
         const waNumber = u.phone || '';
+        const userEmail = u.email || 'No email added';
         let waLink = '#';
         if (waNumber) {
           let cleanNum = waNumber.replace(/[^0-9]/g, '');
@@ -670,6 +671,11 @@
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
                 ${u.is_banned ? 'BANNED' : 'ACTIVE'}
               </span>
+            </div>
+
+            <!-- GMAIL SHOW ROW -->
+            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
+              <span class="text-gray-300 font-mono"><i class="fa-solid fa-envelope text-red-400 mr-1.5"></i> ${escapeHTML(userEmail)}</span>
             </div>
 
             <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
