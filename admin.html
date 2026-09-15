@@ -128,7 +128,7 @@
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
+    <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
       <!-- DASHBOARD OVERVIEW -->
       <section id="section-overview" class="space-y-4">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -176,34 +176,36 @@
           <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
         </div>
 
-        <div id="tournaments-cards-container" class="space-y-3 max-w-2xl">
+        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
       </section>
 
-      <!-- DEPOSITS -->
-      <section id="section-deposits" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-x-auto p-4 max-w-3xl">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-              <tr>
-                <th class="p-3">Player / Gmail</th>
-                <th class="p-3">Amount</th>
-                <th class="p-3">Method / Sender</th>
-                <th class="p-3">Slip Proof</th>
-                <th class="p-3">Action</th>
-              </tr>
-            </thead>
-            <tbody id="deposits-table-body" class="divide-y divide-[#262f40]">
-              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading deposit slips...</td></tr>
-            </tbody>
-          </table>
+      <!-- DEPOSITS (Fixed Full Screen & No Side Scroll) -->
+      <section id="section-deposits" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl overflow-hidden p-3 md:p-4 w-full max-w-full">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+              <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
+                <tr>
+                  <th class="p-2.5 md:p-3">Player / Gmail</th>
+                  <th class="p-2.5 md:p-3">Amount</th>
+                  <th class="p-2.5 md:p-3">Method / Sender</th>
+                  <th class="p-2.5 md:p-3">Slip Proof</th>
+                  <th class="p-2.5 md:p-3">Action</th>
+                </tr>
+              </thead>
+              <tbody id="deposits-table-body" class="divide-y divide-[#262f40]">
+                <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading deposit slips...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <!-- WINNERS -->
       <section id="section-winners" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winner</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
@@ -232,14 +234,14 @@
       <!-- USERS & WALLET EDIT -->
       <section id="section-users" class="space-y-3 hidden">
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
-        <div id="users-cards-container" class="space-y-3 max-w-2xl">
+        <div id="users-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
         </div>
       </section>
 
       <!-- SUPPORT -->
       <section id="section-support" class="space-y-4 hidden">
-        <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-xl">
+        <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
             <span><i class="fa-solid fa-comments text-purple-400 mr-2"></i> Player Support Inboxes</span>
             <span id="inbox-count" class="text-xs font-mono text-cyan-400 font-normal">0 Chats</span>
@@ -249,7 +251,7 @@
           </div>
         </div>
 
-        <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-xl hidden flex flex-col h-[520px]">
+        <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl hidden flex flex-col h-[520px]">
           <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
             <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
               <i class="fa-solid fa-arrow-left"></i> All Chats
@@ -270,26 +272,28 @@
         </div>
       </section>
 
-      <!-- BANNED -->
-      <section id="section-banned" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 max-w-3xl overflow-x-auto">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
-              <tr>
-                <th class="p-3">Player</th>
-                <th class="p-3">UID</th>
-                <th class="p-3">Email</th>
-                <th class="p-3">Action</th>
-              </tr>
-            </thead>
-            <tbody id="banned-table-body" class="divide-y divide-[#262f40]"></tbody>
-          </table>
+      <!-- BANNED (Fixed Full Screen & No Side Scroll) -->
+      <section id="section-banned" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 md:p-4 w-full max-w-full overflow-hidden">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+              <thead class="bg-[#0e1118] text-gray-400 uppercase font-mono">
+                <tr>
+                  <th class="p-2.5 md:p-3">Player</th>
+                  <th class="p-2.5 md:p-3">UID</th>
+                  <th class="p-2.5 md:p-3">Email</th>
+                  <th class="p-2.5 md:p-3">Action</th>
+                </tr>
+              </thead>
+              <tbody id="banned-table-body" class="divide-y divide-[#262f40]"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <!-- SETTINGS -->
       <section id="section-settings" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
@@ -933,22 +937,22 @@
 
       tbody.innerHTML = data.map(d => `
         <tr id="dep-${d.id}">
-          <td class="p-3">
+          <td class="p-2.5 md:p-3">
             <span class="font-bold text-white">${escapeHTML(d.sender_name || 'Gamer')}</span><br>
             <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
           </td>
-          <td class="p-3 font-bold text-yellow-400 font-mono">PKR ${d.amount}</td>
-          <td class="p-3 font-mono text-gray-300">
+          <td class="p-2.5 md:p-3 font-bold text-yellow-400 font-mono">PKR ${d.amount}</td>
+          <td class="p-2.5 md:p-3 font-mono text-gray-300">
             <span class="bg-[#262f40] px-2 py-0.5 rounded text-xs">${escapeHTML(d.payment_method)}</span>
           </td>
-          <td class="p-3">
+          <td class="p-2.5 md:p-3">
             ${d.screenshot_url ? `
               <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
                 <i class="fa-solid fa-image"></i> View Slip
               </a>
             ` : '<span class="text-gray-500">No slip</span>'}
           </td>
-          <td class="p-3 space-x-1">
+          <td class="p-2.5 md:p-3 space-x-1">
             <button onclick="reviewDeposit('${d.id}', 'approve')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-bold text-xs">APPROVE</button>
             <button onclick="reviewDeposit('${d.id}', 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded font-bold text-xs">REJECT</button>
           </td>
@@ -1194,10 +1198,10 @@
       }
       tbody.innerHTML = data.map(b => `
         <tr>
-          <td class="p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
-          <td class="p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
-          <td class="p-3">${escapeHTML(b.email)}</td>
-          <td class="p-3">
+          <td class="p-2.5 md:p-3 font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</td>
+          <td class="p-2.5 md:p-3 font-mono text-red-400">${escapeHTML(b.free_fire_uid || '--')}</td>
+          <td class="p-2.5 md:p-3">${escapeHTML(b.email)}</td>
+          <td class="p-2.5 md:p-3">
             <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold text-xs">UNBAN</button>
           </td>
         </tr>
