@@ -120,8 +120,9 @@
     }
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 50s linear infinite; }
+    ..ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 25s linear infinite; }
+@keyframes marquee { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
     .bottom-nav { 
