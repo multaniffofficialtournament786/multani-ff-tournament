@@ -358,6 +358,11 @@
           <input type="number" id="edit-t-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
         </div>
       </div>
+      <!-- ADDED MATCH DATE FIELD IN EDIT MODAL -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
+        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+      </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
         <button onclick="saveEditedTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
@@ -673,7 +678,6 @@
               </span>
             </div>
 
-            <!-- GMAIL SHOW ROW -->
             <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
               <span class="text-gray-300 font-mono"><i class="fa-solid fa-envelope text-red-400 mr-1.5"></i> ${escapeHTML(userEmail)}</span>
             </div>
@@ -836,6 +840,16 @@
       document.getElementById('edit-t-map').value = t.map;
       document.getElementById('edit-t-fee').value = t.entry_fee;
       document.getElementById('edit-t-prize').value = t.prize_pool;
+      
+      // Load existing match_date into input formatted for datetime-local
+      if (t.match_date) {
+        const dateObj = new Date(t.match_date);
+        const localIsoString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        document.getElementById('edit-t-date').value = localIsoString;
+      } else {
+        document.getElementById('edit-t-date').value = '';
+      }
+
       document.getElementById('modal-edit-tournament').classList.remove('hidden');
     }
 
@@ -850,14 +864,26 @@
       const map = document.getElementById('edit-t-map').value;
       const entry_fee = parseFloat(document.getElementById('edit-t-fee').value);
       const prize_pool = parseFloat(document.getElementById('edit-t-prize').value);
+      const match_date_val = document.getElementById('edit-t-date').value;
 
-      const { error } = await sbClient.from('tournaments').update({
-        title, mode, map, entry_fee, prize_pool
-      }).eq('id', id);
+      const updateData = {
+        title, 
+        mode, 
+        map, 
+        entry_fee, 
+        prize_pool,
+        updated_at: new Date().toISOString()
+      };
+
+      if (match_date_val) {
+        updateData.match_date = new Date(match_date_val).toISOString();
+      }
+
+      const { error } = await sbClient.from('tournaments').update(updateData).eq('id', id);
 
       if (error) alert(error.message);
       else {
-        alert("Tournament updated!");
+        alert("Tournament updated successfully!");
         closeEditModal();
         loadTournaments();
       }
@@ -1169,7 +1195,6 @@
               </span>
             </div>
 
-            <!-- WHATSAPP CONTACT ROW -->
             <div class="flex items-center justify-between bg-[rgba(0,230,118,0.08)] border border-[rgba(0,230,118,0.3)] rounded-lg px-3 py-2">
               <span class="text-xs text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No phone added')}</span>
               ${waNumber ? `
