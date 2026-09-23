@@ -878,6 +878,19 @@
         const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
         const currentStatus = (t.status || 'upcoming').toUpperCase();
 
+        // Format Date, Time and Day from t.match_date
+        let dateStr = 'TBA';
+        let timeStr = '';
+        let dayStr = '';
+        if (t.match_date) {
+          const dObj = new Date(t.match_date);
+          if (!isNaN(dObj.getTime())) {
+            dateStr = dObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            timeStr = dObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            dayStr = dObj.toLocaleDateString(undefined, { weekday: 'short' });
+          }
+        }
+
         return `
           <div class="t-card-as8-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
             <div class="t-card-thumb-large">
@@ -896,7 +909,7 @@
                 <span style="font-family:var(--font-gaming); font-size:16px; font-weight:800; color:var(--accent-gold);">PKR ${t.prize_pool}</span>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-dim); border-top:1px solid #1f2636; padding-top:6px; margin-top:2px;">
-                <span>Slots: <strong style="color:#fff;">${t.joined_players || 0}/${t.max_players}</strong></span>
+                <span>Slots: <strong style="color:#fff;">${t.joined_players || 0}/${t.max_players}</strong> &nbsp;|&nbsp; <span style="color:var(--accent-gold);">${dayStr ? dayStr + ', ' : ''}${dateStr} ${timeStr ? '• ' + timeStr : ''}</span></span>
                 <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
               </div>
             </div>
