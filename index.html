@@ -2,469 +2,650 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MULTANI FF - Admin Console</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  
+  <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
+  <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
 
+  <!-- ADVANCED SEO META TAGS -->
+  <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
+  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
+  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire, Multani FF official website, Free Fire daily esports tournament Pakistan, Multani FF gaming zone" />
+  <meta name="author" content="Muhammad Nadeem" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0a0f" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <style>
-    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-    .font-gaming { font-family: 'Rajdhani', sans-serif; }
-    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
+    :root {
+      --bg-base: #06070a;
+      --bg-surface: #0e1118;
+      --bg-card: #151922;
+      --border-color: #262f40;
+      --primary: #ff4624;
+      --primary-glow: rgba(255, 70, 36, 0.45);
+      --accent-cyan: #00f0ff;
+      --accent-cyan-glow: rgba(0, 240, 255, 0.4);
+      --accent-gold: #ffbe00;
+      --accent-gold-glow: rgba(255, 190, 0, 0.4);
+      --success: #00e676;
+      --danger: #ff1744;
+      --text-main: #f3f4f6;
+      --text-muted: #8e9bb0;
+      --text-dim: #5c687a;
+      --header-height: 56px;
+      --bottom-nav-height: 64px;
+      --max-app-width: 430px;
+      --font-gaming: 'Rajdhani', sans-serif;
+      --font-ui: 'Inter', sans-serif;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
+    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100dvh; display: flex; justify-content: center; align-items: center; user-select: none; }
+    
+    #app-container { 
+      width: 100%; 
+      max-width: var(--max-app-width); 
+      height: 100dvh; 
+      background-color: var(--bg-base); 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); 
+    }
+    @media (min-width: 431px) { #app-container { height: 94vh; border-radius: 28px; border: 1px solid #1f2636; } }
+
+    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .header-bar { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
+    .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); position: relative; }
+    .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
+    .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .sub-header-spacer { width: 38px; }
+
+    .drawer-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 150; }
+    .side-drawer { position: absolute; top: 0; left: -320px; width: 290px; height: 100%; background: var(--bg-surface); border-right: 1px solid var(--border-color); z-index: 200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+    .side-drawer.open { transform: translateX(320px); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .drawer-user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar-round { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .user-meta h3 { font-family: var(--font-gaming); font-size: 18px; color: var(--text-main); line-height: 1.1; }
+    .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
+    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
+    .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
+    .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
+    .drawer-link.logout-link { color: var(--danger); }
+    .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
+    .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+
+    .main-content { 
+      flex: 1; 
+      overflow-y: auto; 
+      overflow-x: hidden; 
+      padding-bottom: 85px; 
+      position: relative; 
+      -webkit-overflow-scrolling: touch; 
+    }
+    .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .announcement-box {
+      background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15));
+      border: 1px solid rgba(255, 70, 36, 0.35);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(255, 70, 36, 0.2);
+    }
+    .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    
+    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
+    .ticker-content { 
+      display: inline-block; 
+      font-family: var(--font-gaming); 
+      font-size: 13px; 
+      font-weight: 700; 
+      letter-spacing: 0.5px; 
+      color: #fff; 
+      padding-left: 100%;
+      animation: smoothTicker linear infinite;
+      animation-play-state: paused;
+    }
+    .ticker-content.active { animation-play-state: running; }
+
+    @keyframes smoothTicker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+  
+    .bottom-nav { 
+      height: var(--bottom-nav-height); 
+      background: rgba(14, 17, 24, 0.98); 
+      border-top: 1px solid var(--border-color); 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-around; 
+      padding: 0 8px; 
+      z-index: 110; 
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
+    .nav-item i { font-size: 18px; }
+    .nav-item.active { color: var(--primary); }
+
+    .category-scroll-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 2px 14px 2px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .category-scroll-container::-webkit-scrollbar { display: none; }
+    
+    .cat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      gap: 6px;
+    }
+    .cat-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2b1218, #150a0d);
+      border: 2px solid var(--primary);
+      box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold);
+      font-size: 18px;
+      transition: var(--transition);
+    }
+    .cat-circle:active { transform: scale(0.92); }
+    .cat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    #admin-float-widget {
+      position: absolute;
+      bottom: 120px;
+      right: 18px;
+      z-index: 300;
+      touch-action: none;
+      user-select: none;
+      cursor: grab;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+    #admin-float-widget:active { cursor: grabbing; }
+    .bot-bubble {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f293d, #0f131a);
+      border: 2px solid var(--primary);
+      box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
+    .bot-badge-tag {
+      margin-top: -6px;
+      background: #ff4624;
+      color: #fff;
+      font-family: var(--font-gaming);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .support-popup-menu {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+      animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .support-popup-menu.show { display: flex; }
+    @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    
+    .support-action-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffbe00, #ff9800);
+      border: 2px solid #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .support-action-btn:active { transform: scale(0.9); }
+
+    #chat-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .chat-dialog {
+      height: 82%;
+      background: #0e1118;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-top: 1.5px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .chat-dialog-header {
+      padding: 14px 16px;
+      background: #151922;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-user-header { display: flex; align-items: center; gap: 10px; }
+    .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
+    .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    
+    .chat-row { display: flex; flex-direction: column; width: 100%; }
+    .chat-row.mine { align-items: flex-end; }
+    .chat-row.theirs { align-items: flex-start; }
+    
+    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+    .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.theirs { background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
+    .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
+    .hero-profile-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
+    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
+    .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+    .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
+    .stat-val.gold { color: var(--accent-gold); }
+    .stat-val.green { color: var(--success); }
+    .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    
+    .tournaments-grid-as8 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .t-card-as8 {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .t-card-as8:active { transform: scale(0.96); }
+    .t-card-thumb-wrap {
+      width: 100%;
+      height: 95px;
+      position: relative;
+      background: #000;
+    }
+    .t-card-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .t-card-info-box {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #11151e;
+    }
+    .t-card-title-as8 {
+      font-family: var(--font-gaming);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .t-card-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .t-card-prize-as8 {
+      font-family: var(--font-gaming);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+
+    .room-slots-container {
+      background: #090c12;
+      border: 1.5px solid #262f40;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+    .room-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .slot-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      background: #131722;
+      border: 1px solid #1f2636;
+      border-radius: 6px;
+    }
+    .slot-card.occupied {
+      background: #1c2233;
+      border-color: var(--accent-cyan);
+    }
+    .slot-card.my-slot {
+      background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233);
+      border-color: var(--primary);
+    }
+    .slot-num {
+      font-family: var(--font-gaming);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      width: 22px;
+    }
+    .slot-card.occupied .slot-num { color: var(--accent-gold); }
+    .slot-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .slot-card.occupied .slot-name { color: #fff; }
+    .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
+
+    .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
+    .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
+    .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
+    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .tx-info h4 { font-size: 14px; font-weight: 600; }
+    .tx-info span { font-size: 11px; color: var(--text-dim); }
+    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; }
+    .tx-positive { color: var(--success); }
+    .tx-negative { color: var(--danger); }
+    .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+    .toast-msg.toast-success { border-color: var(--success); }
+    .toast-msg.toast-error { border-color: var(--danger); }
+    .toast-msg.toast-info { border-color: var(--accent-cyan); }
+    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
+    .hidden { display: none !important; }
+    .text-accent { color: var(--accent-cyan) !important; }
+    .text-gold { color: var(--accent-gold) !important; }
+    .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; }
+    
+    .social-footer {
+      background: #090c12;
+      border-top: 1px solid var(--border-color);
+      padding: 14px 16px;
+      text-align: center;
+      margin-top: 20px;
+      border-radius: var(--radius-sm);
+    }
+    .social-footer p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-family: var(--font-gaming);
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .social-icons-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .social-icon-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+      color: #fff;
+    }
+    .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
+    .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
+    .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
+    .social-icon-btn:active { transform: scale(0.95); }
   </style>
 </head>
-<body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative">
+<body>
 
-  <!-- AUTH OVERLAY -->
-  <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
-      <div class="text-center space-y-1">
-        <i class="fa-solid fa-shield-halved text-[#ff4624] text-4xl mb-2"></i>
-        <h2 class="font-gaming text-2xl font-bold tracking-wider text-white">MULTANI FF ADMIN</h2>
-        <p class="text-xs text-gray-400">Master Control Console</p>
+  <div id="app-container">
+    <header id="main-header" class="app-header">
+      <div id="master-header-bar" class="header-bar">
+        <button id="btn-hamburger" class="icon-btn" aria-label="Open Menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="brand-logo" onclick="Router.navigate('home')">
+          <span class="brand-sub">MULTANI FF</span>
+          <span class="brand-main">OFFICIAL</span>
+        </div>
+        <div class="header-actions">
+          <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share Website">
+            <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
+          </button>
+          <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
+            <i class="fa-solid fa-bell"></i>
+            <span id="header-notif-badge" class="hidden" style="position:absolute; top:6px; right:6px; width:9px; height:9px; background:var(--primary); border-radius:50%; border:1px solid #0e1118;"></span>
+          </button>
+          <button id="btn-header-profile" class="icon-btn avatar-btn" onclick="Router.navigate('profile')">
+            <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
+          </button>
+        </div>
       </div>
 
-      <form id="admin-login-form" class="space-y-3 pt-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Admin Email</label>
-          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
-          <div class="relative">
-            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
-            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-              <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
-            </button>
-          </div>
-        </div>
-        <button type="submit" id="btn-adm-login" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-          AUTHENTICATE CONSOLE
+      <div id="sub-header-bar" class="header-bar hidden">
+        <button id="btn-back" class="icon-btn back-btn" onclick="Router.back()">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back</span>
         </button>
-      </form>
-      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
-    </div>
-  </div>
-
-  <div id="mobile-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
-
-  <!-- SIDEBAR -->
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#0e1118] border-r border-[#262f40] transform -translate-x-full md:translate-x-0 md:static md:w-64 transition-transform duration-300 ease-in-out flex flex-col justify-between shrink-0">
-    <div class="flex flex-col h-full">
-      <div class="p-4 border-b border-[#262f40] flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-shield-halved text-[#ff4624] text-2xl"></i>
-          <div>
-            <h2 class="font-gaming text-xl font-bold tracking-wider text-white">MULTANI FF</h2>
-            <span class="text-[10px] text-gray-400 uppercase tracking-widest block font-bold">Admin Console</span>
-          </div>
-        </div>
-        <button onclick="toggleSidebar(false)" class="md:hidden text-gray-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <nav class="p-3 space-y-1 overflow-y-auto sidebar-scroll flex-1 text-sm">
-        <button onclick="selectTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white">
-          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
-        </button>
-        <button onclick="selectTab('tournaments')" id="nav-tournaments" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-trophy w-5"></i> Tournaments & Rooms
-        </button>
-        <button onclick="selectTab('winners')" id="nav-winners" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-medal w-5 text-yellow-400"></i> Declare Winners
-        </button>
-        <button onclick="selectTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
-          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
-        </button>
-        <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-users w-5"></i> Gamers & Balance
-        </button>
-        <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
-          <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
-        </button>
-        <button onclick="selectTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
-        </button>
-        <button onclick="selectTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-bullhorn w-5 text-red-400"></i> Announcement Ticker
-        </button>
-      </nav>
-
-      <div class="p-3 border-t border-[#262f40] flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img id="admin-user-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
-          <div class="text-xs">
-            <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
-            <p class="text-emerald-400 text-[10px]">Active Session</p>
-          </div>
-        </div>
-        <button onclick="adminSignOut()" title="Logout" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-power-off"></i></button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN VIEWPORT -->
-  <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-    <header class="h-14 bg-[#0e1118] border-b border-[#262f40] px-4 md:px-6 flex items-center justify-between shrink-0 z-30">
-      <div class="flex items-center gap-2">
-        <button id="btn-back-dashboard" onclick="selectTab('overview')" class="text-gray-300 hover:text-white bg-[#151922] border border-[#262f40] px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hidden">
-          <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Dashboard
-        </button>
-        <button id="btn-open-sidebar" onclick="toggleSidebar(true)" class="md:hidden text-white p-2 rounded-lg bg-[#151922] border border-[#262f40]">
-          <i class="fa-solid fa-bars text-lg"></i>
-        </button>
-        <h1 id="panel-title" class="font-gaming text-lg md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="openCreateTournamentModal()" class="bg-[#ff4624] text-white px-3 py-1.5 rounded-lg text-xs font-gaming font-bold tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">CREATE MATCH</span>
-        </button>
+        <h1 id="sub-header-title" class="sub-header-title">Page</h1>
+        <div class="sub-header-spacer"></div>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
-      <!-- DASHBOARD OVERVIEW -->
-      <section id="section-overview" class="space-y-4">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
-            <h3 id="stat-total-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ffbe00] mt-0.5">PKR 0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl cursor-pointer relative" onclick="selectTab('deposits')">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
-            <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1 flex items-center justify-between">
-            <div>
-              <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
-              <h3 id="stat-total-players" class="text-lg md:text-xl font-bold font-gaming text-white mt-0.5">0</h3>
-            </div>
-            <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-2 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
-              <i class="fa-solid fa-list-ul"></i> LIST
-            </button>
+    <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
+    <aside id="side-drawer" class="side-drawer">
+      <div class="drawer-header">
+        <div class="drawer-user-info">
+          <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-round" />
+          <div class="user-meta">
+            <h3 id="drawer-name">Guest Gamer</h3>
+            <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: --</span>
           </div>
         </div>
+        <button id="btn-close-drawer" class="icon-btn" onclick="Drawer.close()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
 
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
-          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
-            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
-              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i>
-              <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
-              <span id="quick-badge-deposits" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
-            <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition relative">
-              <i class="fa-solid fa-comments text-purple-400 text-lg"></i>
-              <p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p>
-              <span id="quick-badge-support" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
-          </div>
-        </div>
-      </section>
+      <nav class="drawer-nav">
+        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
+        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
+        <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
+        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
+        <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends</button>
+        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
+        <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="fa-solid fa-bell"></i> Notifications</span>
+          <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
+        </button>
+        <button onclick="shareWebsite()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
+        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
+        <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</button>
+        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
+        <div class="drawer-divider"></div>
+        <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </nav>
+      <div class="drawer-footer">
+        <p>MULTANI FF • OFFICIAL TOURNAMENT</p>
+      </div>
+    </aside>
 
-      <!-- TOURNAMENTS -->
-      <section id="section-tournaments" class="space-y-4 hidden">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1">
-          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
-          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Today</button>
-          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
-          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
-          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
-        </div>
+    <main id="app-view" class="main-content"></main>
 
-        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
-        </div>
-      </section>
+    <div id="admin-float-widget">
+      <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
+        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
+      </div>
 
-      <!-- DEPOSITS -->
-      <section id="section-deposits" class="space-y-3 hidden w-full">
-        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
-        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
-        </div>
-      </section>
+      <div id="support-popup-menu" class="support-popup-menu">
+        <a href="https://www.instagram.com/multani.ff.gaming?stkn=NnBiYTN1eTM0eXc1" target="_blank" class="support-action-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="support-action-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="support-action-btn" title="Facebook Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn" title="Admin Support Chat"><i class="fa-solid fa-headset"></i></div>
+      </div>
+      <span class="bot-badge-tag">MENU</span>
+    </div>
 
-      <!-- WINNERS -->
-      <section id="section-winners" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winner</h2>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
-            <select id="win-tournament" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Winning Gamer</label>
-            <div id="win-player-select-box" onclick="openVipPlayerSelectModal()" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-selected-player-text">Choose player...</span>
-              <i class="fa-solid fa-chevron-down text-gray-400"></i>
-            </div>
-            <input type="hidden" id="win-player" />
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize Amount (PKR)</label>
-              <input type="number" id="win-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 2400" required />
+    <div id="chat-modal-overlay" class="hidden">
+      <div class="chat-dialog">
+        <div class="chat-dialog-header">
+          <div class="chat-user-header">
+            <div class="chat-avatar-status" style="position:relative;">
+              <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">MLT</div>
+              <span class="chat-online-dot"></span>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Position / Rank</label>
-              <input type="text" id="win-pos" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" value="1st Place (Booyah)" required />
+              <h4 style="font-size:14px; font-weight:bold; color:#fff;">Multani FF Official Support</h4>
+              <p style="font-size:10px; color:#00e676;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> Online • Instant Help</p>
             </div>
           </div>
-          <button onclick="submitWinnerDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Transfer Prize & Announce
+          <button onclick="ChatModal.close()" class="icon-btn" style="color:#aaa;"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div id="chat-modal-messages" class="chat-dialog-body">
+          <div class="chat-row theirs">
+            <div class="chat-bubble theirs">
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+            </div>
+            <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+          </div>
+        </div>
+
+        <form id="chat-modal-form" class="chat-input-bar">
+          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
+          <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
+            <i class="fa-solid fa-paper-plane"></i>
           </button>
-        </div>
-      </section>
-
-      <!-- USERS & WALLET EDIT -->
-      <section id="section-users" class="space-y-3 hidden">
-        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
-          <input type="text" id="user-search-input" oninput="filterUsersList()" placeholder="Search name, UID, email..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
-        </div>
-        <div id="users-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
-        </div>
-      </section>
-
-      <!-- SUPPORT -->
-      <section id="section-support" class="space-y-4 hidden">
-        <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
-            <span><i class="fa-solid fa-comments text-purple-400 mr-2"></i> Player Support Inboxes</span>
-            <span id="inbox-count" class="text-xs font-mono text-cyan-400 font-normal">0 Chats</span>
-          </h3>
-          <div id="support-inbox-list" class="space-y-2">
-            <p class="text-gray-500 text-xs py-4 text-center">Loading players...</p>
-          </div>
-        </div>
-
-        <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl hidden flex flex-col h-[520px]">
-          <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
-            <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
-              <i class="fa-solid fa-arrow-left"></i> All Chats
-            </button>
-            <div class="flex items-center gap-2">
-              <img id="active-chat-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border border-[#ff4624]" />
-              <div class="text-center">
-                <h4 id="active-chat-username" class="font-bold text-sm text-white">Player</h4>
-                <p id="active-chat-uid" class="text-[10px] text-cyan-400 font-mono">UID: --</p>
-              </div>
-            </div>
-            <div class="w-8"></div>
-          </div>
-
-          <div id="active-chat-messages" class="flex-1 overflow-y-auto p-2 space-y-2.5 my-2 sidebar-scroll"></div>
-
-          <form id="admin-reply-form" class="flex gap-2 pt-2 border-t border-[#262f40]">
-            <input type="text" id="admin-reply-input" placeholder="Type message to player..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-[#ff4624]" autocomplete="off" required />
-            <button type="submit" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-4 py-2 rounded-lg font-bold text-xs font-gaming uppercase">SEND</button>
-          </form>
-        </div>
-      </section>
-
-      <!-- BANNED -->
-      <section id="section-banned" class="space-y-3 hidden w-full">
-        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Banned Players</h3>
-        <div id="banned-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading banned players...</p>
-        </div>
-      </section>
-
-      <!-- SETTINGS -->
-      <section id="section-settings" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
-            <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter announcement text..."></textarea>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
-            <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on gamer homepage</label>
-          </div>
-          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Save Announcement
-          </button>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST WITH COMPLETE PAYMENT BREAKDOWN -->
-  <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-users text-[#ff4624]"></i> All Registered Players
-        </h3>
-        <button onclick="closeAllPlayersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div class="relative">
-        <input type="text" id="all-players-search" oninput="filterAllPlayersModal()" placeholder="Search name, UID..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#ff4624]" />
-      </div>
-      <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2.5 p-1 sidebar-scroll">
-        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+        </form>
       </div>
     </div>
+
+    <nav id="bottom-nav" class="bottom-nav">
+      <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+      <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
+      <div class="nav-item" data-page="invite" onclick="Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i><span>Invite</span></div>
+      <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
+      <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+    </nav>
   </div>
 
-  <!-- MODAL: VIP PLAYER SELECTOR FOR WINNERS -->
-  <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-trophy text-yellow-400"></i> Select Winning Gamer
-        </h3>
-        <button onclick="closeVipPlayerSelectModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div>
-        <input type="text" id="vip-player-search" oninput="filterVipPlayerModal()" placeholder="Search player by name or UID..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
-      </div>
-      <div id="modal-vip-player-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
-        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: PLAYERS LIST -->
-  <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 id="modal-players-title" class="font-gaming text-lg font-bold text-white uppercase">Tournament Players</h3>
-        <button onclick="closePlayersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div id="modal-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll"></div>
-    </div>
-  </div>
-
-  <!-- MODAL: EDIT TOURNAMENT -->
-  <div id="modal-edit-tournament" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Tournament</h3>
-      <input type="hidden" id="edit-t-id" />
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Title</label>
-        <input type="text" id="edit-t-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mode</label>
-          <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
-            <option value="Squad (4v4)">Squad (4v4)</option>
-            <option value="Solo (1v1)">Solo (1v1)</option>
-            <option value="Duo (2v2)">Duo (2v2)</option>
-            <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf">Lone Wolf</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Map</label>
-          <select id="edit-t-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
-            <option value="Bermuda">Bermuda</option>
-            <option value="Purgatory">Purgatory</option>
-            <option value="Kalahari">Kalahari</option>
-            <option value="Alpine">Alpine</option>
-            <option value="Nexterra">Nexterra</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize (PKR)</label>
-          <input type="number" id="edit-t-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
-        </div>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button onclick="saveEditedTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: CREATE MATCH -->
-  <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[92vh] overflow-y-auto">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-        <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
-      </h3>
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
-        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. LONE WOLF #500" required />
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Mode</label>
-          <select id="m-mode" onchange="handleModeChange()" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-            <option value="Squad (4v4)">Squad (4v4)</option>
-            <option value="Solo (1v1)">Solo (1v1)</option>
-            <option value="Duo (2v2)">Duo (2v2)</option>
-            <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf">Lone Wolf</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Map</label>
-          <select id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-            <option value="Bermuda">Bermuda</option>
-            <option value="Purgatory">Purgatory</option>
-            <option value="Kalahari">Kalahari</option>
-            <option value="Alpine">Alpine</option>
-            <option value="Nexterra">Nexterra</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize (PKR)</label>
-          <input type="number" id="m-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="2400" required />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Max Slots</label>
-          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
-        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
-      </div>
-
-      <div class="flex gap-2 pt-2">
-        <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
-      </div>
-    </div>
+  <div id="toast-container" class="toast-container"></div>
+  <div id="global-loader" class="global-loader hidden">
+    <div class="spinner-flame"></div>
+    <span id="global-loader-text" class="loader-text">Loading...</span>
   </div>
 
   <script>
@@ -472,375 +653,199 @@
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentAdmin = null;
-    let activeChatPlayerId = null;
-    let chatInterval = null;
-    let loadedTournamentsList = [];
+    let currentUser = null;
+    let currentProfile = null;
+    let siteSettings = {};
+    let activeTournaments = [];
+    let userJoinedTournamentIds = new Set();
+    let unreadNotifCount = 0;
+    let unreadChatCount = 0;
     let currentTournamentFilter = 'all';
-    let globalAllPlayersCache = [];
-    let globalWinnerSelectPlayersCache = [];
 
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    if (refParam) {
+      localStorage.setItem('invited_by_ref', refParam);
     }
 
-    function togglePasswordVisibility() {
-      const passInput = document.getElementById('adm-pass');
-      const eyeIcon = document.getElementById('eye-icon');
-      if (passInput.type === 'password') {
-        passInput.type = 'text';
-        eyeIcon.className = 'fa-solid fa-eye-slash';
+    const Toast = {
+      show(msg, type = 'info') {
+        const c = document.getElementById('toast-container');
+        if (!c) return;
+        const t = document.createElement('div');
+        t.className = `toast-msg toast-${type}`;
+        t.innerText = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+      }
+    };
+
+    const Loader = {
+      show(text = "Loading...") {
+        const el = document.getElementById('global-loader');
+        const txt = document.getElementById('global-loader-text');
+        if (txt) txt.innerText = text;
+        if (el) el.classList.remove('hidden');
+      },
+      hide() {
+        const el = document.getElementById('global-loader');
+        if (el) el.classList.add('hidden');
+      }
+    };
+
+    function startAnnouncementTicker() {
+      setTimeout(() => {
+        const content = document.querySelector('.ticker-content');
+        if (content) {
+          const textLength = content.innerText.length;
+          const duration = Math.max(15, textLength * 0.18);
+          content.style.animationDuration = duration + 's';
+          content.classList.add('active');
+        }
+      }, 3000);
+    }
+
+    function shareWebsite() {
+      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${myUid}`;
+      const shareData = {
+        title: 'Multani FF Official Tournament',
+        text: 'Join Pakistan\'s Ultimate Free Fire Tournaments and Win Cash Prizes Daily!',
+        url: shareUrl
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(err => console.log('Share canceled'));
       } else {
-        passInput.type = 'password';
-        eyeIcon.className = 'fa-solid fa-eye';
+        navigator.clipboard.writeText(shareUrl);
+        Toast.show("Unique invite link copied to clipboard!", "success");
       }
     }
 
-    async function checkAdminAuth() {
-      const authScreen = document.getElementById('admin-auth-screen');
-      const authMsg = document.getElementById('admin-auth-msg');
-
+    async function syncAuthAndProfile() {
       try {
-        const { data: { session }, error: sessionError } = await sbClient.auth.getSession();
-        if (sessionError || !session) {
-          authScreen.classList.remove('hidden');
-          return;
+        const { data: { user } } = await sbClient.auth.getUser();
+        currentUser = user;
+        if (user) {
+          const [profRes, entryRes, notifRes, chatRes] = await Promise.all([
+            sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+            sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
+            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin').eq('is_read', false)
+          ]);
+          currentProfile = profRes.data;
+          userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
+          unreadNotifCount = notifRes.count || 0;
+          unreadChatCount = chatRes.count || 0;
+        } else {
+          currentProfile = null;
+          userJoinedTournamentIds.clear();
+          unreadNotifCount = 0;
+          unreadChatCount = 0;
         }
-
-        const { data: profile, error } = await sbClient
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error || !profile || !profile.is_admin) {
-          authScreen.classList.remove('hidden');
-          authMsg.innerText = "Access denied: Account is not authorized as an Administrator.";
-          authMsg.classList.remove('hidden');
-          await sbClient.auth.signOut();
-          return;
-        }
-
-        currentAdmin = profile;
-        authScreen.classList.add('hidden');
-        document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
-        if (profile.avatar_url) {
-          document.getElementById('admin-user-avatar').src = profile.avatar_url;
-        }
-        loadDashboardStats();
-      } catch (err) {
-        authScreen.classList.remove('hidden');
+        updateDrawerUI();
+        updateNotificationBadges();
+      } catch (e) {
+        console.error("Auth sync error:", e);
       }
     }
 
-    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('adm-email').value.trim();
-      const password = document.getElementById('adm-pass').value;
-      const btn = document.getElementById('btn-adm-login');
-      const msg = document.getElementById('admin-auth-msg');
+    function updateNotificationBadges() {
+      const bellBadge = document.getElementById('header-notif-badge');
+      const drawerBadge = document.getElementById('drawer-notif-badge');
+      const floatChatBadge = document.getElementById('float-chat-badge');
 
-      btn.disabled = true;
-      msg.classList.add('hidden');
-
-      try {
-        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-
-        const { data: prof, error: pErr } = await sbClient
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
-        if (pErr || !prof || !prof.is_admin) {
-          await sbClient.auth.signOut();
-          throw new Error("Unauthorized: This account lacks master admin privileges.");
-        }
-
-        currentAdmin = prof;
-        document.getElementById('admin-auth-screen').classList.add('hidden');
-        document.getElementById('admin-user-name').innerText = prof.free_fire_name || prof.full_name || 'Master Admin';
-        if (prof.avatar_url) {
-          document.getElementById('admin-user-avatar').src = prof.avatar_url;
-        }
-        loadDashboardStats();
-      } catch (err) {
-        msg.innerText = err.message || "Failed to authenticate.";
-        msg.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
+      if (bellBadge) bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
+      if (drawerBadge) {
+        drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
+        drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
       }
-    });
-
-    async function adminSignOut() {
-      await sbClient.auth.signOut();
-      currentAdmin = null;
-      document.getElementById('admin-auth-screen').classList.remove('hidden');
+      if (floatChatBadge) {
+        floatChatBadge.classList.toggle('hidden', unreadChatCount === 0);
+        floatChatBadge.innerText = unreadChatCount;
+      }
     }
 
-    function toggleSidebar(forceState = null) {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('mobile-overlay');
-      if (forceState === false) {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-      } else if (forceState === true) {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
+    function updateDrawerUI() {
+      const dName = document.getElementById('drawer-name');
+      const dUid = document.getElementById('drawer-uid');
+      const hAvatar = document.getElementById('header-avatar-img');
+      const dAvatar = document.getElementById('drawer-avatar');
+      const avatarUrl = currentProfile?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
+      if (hAvatar) hAvatar.src = avatarUrl;
+      if (dAvatar) dAvatar.src = avatarUrl;
+
+      if (currentUser && currentProfile) {
+        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.full_name || 'Soldier';
+        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
       } else {
-        sidebar.classList.toggle('-translate-x-full');
-        overlay.classList.toggle('hidden');
+        if (dName) dName.innerText = 'Guest Gamer';
+        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-user"></i> Login / Register`;
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'support', 'banned', 'settings'];
+    const Router = {
+      history: ['home'],
+      async navigate(page, id = null, pushHistory = true) {
+        Drawer.close();
+        await syncAuthAndProfile();
+        
+        if (pushHistory && this.history[this.history.length - 1] !== page) {
+          this.history.push(page);
+          history.pushState({ page, id }, '', '#' + page);
+        }
 
-    function selectTab(tabId, pushHistory = true) {
-      toggleSidebar(false);
+        const isSub = (page !== 'home');
+        const masterHeader = document.getElementById('master-header-bar');
+        const subHeader = document.getElementById('sub-header-bar');
+        const subTitle = document.getElementById('sub-header-title');
 
-      if (pushHistory && history.state?.tab !== tabId) {
-        history.pushState({ tab: tabId }, '', '#' + tabId);
+        if (isSub) {
+          masterHeader.classList.add('hidden');
+          subHeader.classList.remove('hidden');
+          subTitle.innerText = page.toUpperCase();
+        } else {
+          masterHeader.classList.remove('hidden');
+          subHeader.classList.add('hidden');
+        }
+
+        document.querySelectorAll('.nav-item').forEach(el => {
+          el.classList.toggle('active', el.getAttribute('data-page') === page);
+        });
+
+        if (page === 'home') renderHome();
+        else if (page === 'tournaments') renderTournaments();
+        else if (page === 'tournament_detail') renderTournamentDetail(id);
+        else if (page === 'wallet') renderWallet();
+        else if (page === 'deposit') renderDeposit();
+        else if (page === 'invite') renderInvite();
+        else if (page === 'login') renderAuth();
+        else if (page === 'profile') renderProfile();
+        else if (page === 'winners') renderWinners();
+        else if (page === 'leaderboard') renderLeaderboard();
+        else if (page === 'notifications') renderNotifications();
+        else if (page === 'rules') renderRules();
+        else if (page === 'about') renderAbout();
+      },
+      async back() {
+        if (this.history.length > 1) {
+          this.history.pop();
+          const prev = this.history[this.history.length - 1];
+          await this.navigate(prev, null, false);
+        } else {
+          await this.navigate('home', null, false);
+        }
       }
-
-      tabs.forEach(t => {
-        const sec = document.getElementById(`section-${t}`);
-        const nav = document.getElementById(`nav-${t}`);
-        if(sec) sec.classList.add('hidden');
-        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition";
-      });
-
-      const activeSec = document.getElementById(`section-${tabId}`);
-      const activeNav = document.getElementById(`nav-${tabId}`);
-      if(activeSec) activeSec.classList.remove('hidden');
-      if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white";
-
-      const backBtn = document.getElementById('btn-back-dashboard');
-      const openSideBtn = document.getElementById('btn-open-sidebar');
-
-      if (tabId === 'overview') {
-        document.getElementById('panel-title').innerText = "DASHBOARD";
-        backBtn.classList.add('hidden');
-        openSideBtn.classList.remove('hidden');
-        loadDashboardStats();
-      } else {
-        document.getElementById('panel-title').innerText = tabId.toUpperCase();
-        backBtn.classList.remove('hidden');
-        openSideBtn.classList.add('hidden');
-      }
-
-      if (tabId === 'tournaments') loadTournaments();
-      if (tabId === 'deposits') loadDeposits();
-      if (tabId === 'winners') loadWinnerSelectOptions();
-      if (tabId === 'users') loadUsers();
-      if (tabId === 'banned') loadBannedUsers();
-      if (tabId === 'settings') loadSettings();
-      if (tabId === 'support') loadSupportInbox();
-    }
+    };
 
     window.addEventListener('popstate', (e) => {
-      const targetTab = e.state?.tab || 'overview';
-      selectTab(targetTab, false);
+      if (Router.history.length > 1) {
+        Router.history.pop();
+        const prev = Router.history[Router.history.length - 1] || 'home';
+        Router.navigate(prev, null, false);
+      }
     });
-
-    async function loadDashboardStats() {
-      const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
-      const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
-      document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
-
-      const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const pendingCount = pendingDepCount || 0;
-      
-      document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
-      
-      const badgeDep = document.getElementById('badge-deposits');
-      if (badgeDep) {
-        badgeDep.innerText = pendingCount;
-        badgeDep.classList.toggle('hidden', pendingCount === 0);
-      }
-
-      const quickDep = document.getElementById('quick-badge-deposits');
-      if (quickDep) {
-        quickDep.innerText = pendingCount;
-        quickDep.classList.toggle('hidden', pendingCount === 0);
-      }
-
-      const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
-      document.getElementById('stat-total-players').innerText = userCount || 0;
-
-      const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false);
-      const supCount = supportCount || 0;
-
-      const badgeSup = document.getElementById('badge-support');
-      if (badgeSup) {
-        badgeSup.innerText = supCount;
-        badgeSup.classList.toggle('hidden', supCount === 0);
-      }
-
-      const quickSup = document.getElementById('quick-badge-support');
-      if (quickSup) {
-        quickSup.innerText = supCount;
-        quickSup.classList.toggle('hidden', supCount === 0);
-      }
-    }
-
-    async function openAllPlayersModal() {
-      const modal = document.getElementById('modal-all-players');
-      const body = document.getElementById('modal-all-players-body');
-      modal.classList.remove('hidden');
-      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading players list...</p>`;
-
-      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
-
-      if (error || !data || !data.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No players found.</p>`;
-        return;
-      }
-
-      const [depRes, entryRes] = await Promise.all([
-        sbClient.from('deposit_requests').select('user_id, amount, status').eq('status', 'approved'),
-        sbClient.from('tournament_entries').select('user_id')
-      ]);
-
-      const depositMap = {};
-      (depRes.data || []).forEach(d => {
-        depositMap[d.user_id] = (depositMap[d.user_id] || 0) + parseFloat(d.amount || 0);
-      });
-
-      const matchMap = {};
-      (entryRes.data || []).forEach(e => {
-        matchMap[e.user_id] = (matchMap[e.user_id] || 0) + 1;
-      });
-
-      const refCountMap = {};
-      data.forEach(u => {
-        if (u.referred_by) {
-          refCountMap[u.referred_by] = (refCountMap[u.referred_by] || 0) + 1;
-        }
-      });
-
-      globalAllPlayersCache = data.map(u => ({
-        ...u,
-        computedDeposit: depositMap[u.id] || 0,
-        computedMatches: matchMap[u.id] || u.total_matches || 0,
-        computedReferrals: refCountMap[u.free_fire_uid] || 0
-      }));
-
-      renderAllPlayersList(globalAllPlayersCache);
-    }
-
-    function renderAllPlayersList(list) {
-      const body = document.getElementById('modal-all-players-body');
-      if (!list.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No matching players found.</p>`;
-        return;
-      }
-
-      body.innerHTML = list.map(u => {
-        const waNumber = u.phone || '';
-        const userEmail = u.email || 'No email added';
-        const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        let waLink = '#';
-        if (waNumber) {
-          let cleanNum = waNumber.replace(/[^0-9]/g, '');
-          if (cleanNum.startsWith('0')) cleanNum = '92' + cleanNum.substring(1);
-          const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin.");
-          waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
-        }
-
-        const refEarnings = (u.computedReferrals || 0) * 5;
-
-        return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2.5 text-xs">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
-                <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                  <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-                ${u.is_banned ? 'BANNED' : 'ACTIVE'}
-              </span>
-            </div>
-
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] grid grid-cols-2 gap-2 text-[11px]">
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Total Deposit:</span>
-                <strong class="text-yellow-400 font-gaming text-xs">PKR ${u.computedDeposit}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Matches Joined:</span>
-                <strong class="text-white font-gaming text-xs">${u.computedMatches}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Prize Winnings:</span>
-                <strong class="text-emerald-400 font-gaming text-xs">PKR ${u.total_won || 0}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Referral Earnings:</span>
-                <strong class="text-cyan-400 font-gaming text-xs">PKR ${refEarnings} (${u.computedReferrals || 0} refs)</strong>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
-              <span class="text-gray-300 font-mono"><i class="fa-solid fa-envelope text-red-400 mr-1.5"></i> ${escapeHTML(userEmail)}</span>
-            </div>
-
-            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
-              <span class="text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No WhatsApp added')}</span>
-              ${waNumber ? `
-                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 shadow">
-                  <i class="fa-brands fa-whatsapp"></i> Chat
-                </a>
-              ` : ''}
-            </div>
-
-            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
-              <span>Wallet Balance: <strong class="text-yellow-400">PKR ${u.wallet_balance || 0}</strong></span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function filterAllPlayersModal() {
-      const q = document.getElementById('all-players-search').value.toLowerCase().trim();
-      if (!q) {
-        renderAllPlayersList(globalAllPlayersCache);
-        return;
-      }
-      const filtered = globalAllPlayersCache.filter(u => 
-        (u.free_fire_name && u.free_fire_name.toLowerCase().includes(q)) ||
-        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
-        (u.free_fire_uid && u.free_fire_uid.toLowerCase().includes(q)) ||
-        (u.email && u.email.toLowerCase().includes(q))
-      );
-      renderAllPlayersList(filtered);
-    }
-
-    function closeAllPlayersModal() {
-      document.getElementById('modal-all-players').classList.add('hidden');
-    }
-
-    async function loadTournaments() {
-      const container = document.getElementById('tournaments-cards-container');
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading tournaments...</p>`;
-
-      const { data, error } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tournaments found.</p>`;
-        return;
-      }
-      loadedTournamentsList = data;
-      renderTournamentsList();
-    }
 
     function filterTournaments(status) {
       currentTournamentFilter = status;
@@ -848,20 +853,22 @@
         const btn = document.getElementById(`filter-btn-${s}`);
         if (btn) {
           if (s === status) {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap";
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow";
           } else {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
           }
         }
       });
-      renderTournamentsList();
+      renderTournamentsListUI();
     }
 
-    function renderTournamentsList() {
+    function renderTournamentsListUI() {
       const container = document.getElementById('tournaments-cards-container');
+      if (!container) return;
+
       const todayStr = new Date().toISOString().split('T')[0];
 
-      const filtered = loadedTournamentsList.filter(t => {
+      const filtered = activeTournaments.filter(t => {
         const currentStatus = (t.status || 'upcoming').toLowerCase();
         const tDateStr = t.match_date ? new Date(t.match_date).toISOString().split('T')[0] : '';
 
@@ -871,835 +878,1273 @@
       });
 
       if (!filtered.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No matches found for '${currentTournamentFilter}'.</p>`;
+        container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No matches found for '${currentTournamentFilter}'.</p></div>`;
         return;
       }
 
       container.innerHTML = filtered.map(t => {
+        const isJoined = userJoinedTournamentIds.has(t.id);
+        const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
         const currentStatus = (t.status || 'upcoming').toUpperCase();
+
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3 relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div class="pr-28">
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2.5 cursor-pointer hover:border-[#ff4624] transition relative overflow-hidden" onclick="Router.navigate('tournament_detail', '${t.id}')">
+            <div class="flex items-center gap-3">
+              <img src="${imgUrl}" style="width:75px; height:75px; object-fit:cover; border-radius:8px;" />
+              <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1">
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold font-gaming ${currentStatus === 'LIVE' ? 'bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse' : currentStatus === 'COMPLETED' ? 'bg-gray-700 text-gray-300' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40'}">
                     ${currentStatus}
                   </span>
+                  ${isJoined ? `<span class="bg-[#00e676] text-black text-[9px] font-extrabold px-1.5 py-0.5 rounded">JOINED</span>` : ''}
                 </div>
-                <h3 class="font-gaming text-base md:text-lg font-bold text-white leading-tight">${escapeHTML(t.title)}</h3>
-                <div class="flex flex-wrap gap-2 text-[11px] text-gray-400 mt-1">
-                  <span class="text-cyan-400 font-bold">${escapeHTML(t.mode)}</span> • 
-                  <span>${escapeHTML(t.map)}</span> • 
-                  <span class="text-yellow-400 font-bold">PKR ${t.prize_pool}</span>
+                <h4 class="font-gaming text-sm font-bold text-white truncate">${t.title}</h4>
+                <div class="text-[11px] text-gray-400 mt-0.5">
+                  <span class="text-cyan-400 font-bold">${t.mode}</span> • <span>${t.map}</span>
                 </div>
-              </div>
-              <div class="absolute top-4 right-4">
-                <select onchange="updateTournamentStatus('${t.id}', this.value)" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-[10px] font-bold uppercase text-white outline-none">
-                  <option value="upcoming" ${currentStatus === 'UPCOMING' ? 'selected' : ''}>Upcoming</option>
-                  <option value="live" ${currentStatus === 'LIVE' ? 'selected' : ''}>Live</option>
-                  <option value="completed" ${currentStatus === 'COMPLETED' ? 'selected' : ''}>Completed</option>
-                </select>
               </div>
             </div>
-
-            <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
-              <div>
-                <span class="text-gray-500 text-[10px] uppercase font-bold block">Room ID</span>
-                <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" placeholder="Set Room ID" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs outline-none">
-              </div>
-              <div>
-                <span class="text-gray-500 text-[10px] uppercase font-bold block">Password</span>
-                <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" placeholder="Set Pass" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs outline-none">
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between gap-1 pt-1 flex-wrap">
-              <div class="text-xs font-mono text-gray-400">
-                Slots: <span class="text-white font-bold">${t.joined_players || 0}/${t.max_players}</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <button onclick="updateTournamentCredentials('${t.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-2.5 py-1 rounded text-xs font-bold font-gaming">SET ROOM</button>
-                <button onclick="viewTournamentPlayers('${t.id}', '${escapeHTML(t.title)}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded text-xs font-bold">PLAYERS</button>
-                <button onclick="openEditModal('${t.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                <button onclick="deleteTournament('${t.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-              </div>
+            <div class="flex items-center justify-between pt-2 border-t border-[#262f40] text-xs">
+              <span class="text-gray-400">Slots: <strong class="text-white">${t.joined_players || 0}/${t.max_players}</strong></span>
+              <span class="font-gaming font-bold text-yellow-400">PKR ${t.prize_pool}</span>
+              <span class="font-bold ${t.entry_fee == 0 ? 'text-cyan-400' : 'text-yellow-400'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    async function updateTournamentStatus(id, newStatus) {
-      const { error } = await sbClient.from('tournaments').update({
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      }).eq('id', id);
+    function renderTournamentsHTMLBlock() {
+      return `
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-3" style="scrollbar-width:none;">
+          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow">All Matches</button>
+          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Today</button>
+          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
+          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
+          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
+        </div>
+        <div id="tournaments-cards-container" class="space-y-3">
+          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
+        </div>
+      `;
+    }
 
-      if (error) {
-        alert("Failed to update status: " + error.message);
-      } else {
-        const item = loadedTournamentsList.find(x => x.id === id);
-        if (item) item.status = newStatus;
-        renderTournamentsList();
+    async function renderHome() {
+      Loader.show("Loading arena...");
+      try {
+        const [settingsRes, tourRes] = await Promise.all([
+          sbClient.from('site_settings').select('*'),
+          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
+        ]);
+        if (settingsRes.data) {
+          settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
+        }
+        activeTournaments = tourRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
+      Loader.hide();
+
+      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "" };
+      const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
+      const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
+      const displayPhone = p.phone || 'No WhatsApp added';
+
+      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
+
+      const view = document.getElementById('app-view');
+
+      view.innerHTML = `
+        <div class="view-container">
+          <div class="announcement-box">
+            <i class="fa-solid fa-bullhorn"></i>
+            <div class="ticker-viewport">
+              <div class="ticker-content">${tickerText}</div>
+            </div>
+          </div>
+
+          ${!currentUser ? `
+            <div class="player-hero-card" style="border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="color:var(--text-main); font-family:var(--font-gaming); font-size:18px;">JOIN THE BATTLE</h3>
+                <p style="font-size:11px; color:var(--text-muted);">Sign up to participate & win real cash prizes</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="Router.navigate('login')">LOGIN</button>
+            </div>
+          ` : `
+            <div class="player-hero-card">
+              <div class="hero-profile-row" style="margin-bottom:10px;">
+                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
+                <div class="hero-details">
+                  <h2>${displayName}</h2>
+                  <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${displayUid}</span>
+                  <div style="font-size: 12px; color: var(--success); margin-top: 3px; font-weight: 600;">
+                    <i class="fa-brands fa-whatsapp"></i> ${displayPhone}
+                  </div>
+                </div>
+              </div>
+              <div class="hero-stats-grid">
+                <div class="stat-box"><span class="stat-label">Balance</span><span class="stat-val gold">PKR ${p.wallet_balance || 0}</span></div>
+                <div class="stat-box"><span class="stat-label">Won</span><span class="stat-val green">PKR ${p.total_won || 0}</span></div>
+                <div class="stat-box"><span class="stat-label">Matches</span><span class="stat-val">${p.total_matches || 0}</span></div>
+              </div>
+            </div>
+          `}
+
+          <div style="margin-bottom: 16px;">
+            <a href="https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
+              <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
+            </a>
+          </div>
+
+          <div class="category-scroll-container">
+            <div class="cat-item" onclick="Router.navigate('tournaments')">
+              <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
+              <span class="cat-label">Matches</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('deposit')">
+              <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
+              <span class="cat-label">Add Cash</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('winners')">
+              <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
+              <span class="cat-label">Winners</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
+              <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
+              <span class="cat-label">Wallet</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
+              <div class="cat-circle"><i class="fa-solid fa-receipt" style="color:#00e676;"></i></div>
+              <span class="cat-label">Payment Record</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('leaderboard')">
+              <div class="cat-circle"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i></div>
+              <span class="cat-label">Top List</span>
+            </div>
+          </div>
+
+          <div class="section-title"><span>Available Tournaments</span></div>
+          <div>${renderTournamentsHTMLBlock()}</div>
+
+          <div class="social-footer">
+            <p>Connect With Us</p>
+            <div class="social-icons-row">
+              <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
+                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+              </a>
+              <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="social-icon-btn tiktok">
+                <i class="fa-brands fa-tiktok text-sm"></i> TikTok
+              </a>
+              <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="social-icon-btn youtube">
+                <i class="fa-brands fa-youtube text-sm"></i> YouTube
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      currentTournamentFilter = 'all';
+      renderTournamentsListUI();
+      startAnnouncementTicker();
+    }
+
+    async function renderTournaments() {
+      Loader.show("Loading arena matches...");
+      try {
+        const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+        activeTournaments = data || [];
+      } catch (e) {
+        console.error(e);
+      }
+      Loader.hide();
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-trophy text-gold"></i> Active Tournaments & Rooms</span></div>
+          <div>${renderTournamentsHTMLBlock()}</div>
+        </div>
+      `;
+
+      currentTournamentFilter = 'all';
+      renderTournamentsListUI();
+    }
+
+    async function renderInvite() {
+      const uniqueRefCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${uniqueRefCode}`;
+
+      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your link to start earning!</p>`;
+      if (currentUser && currentProfile) {
+        const { data: refUsers } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, created_at').eq('referred_by', currentProfile.free_fire_uid);
+        if (refUsers && refUsers.length > 0) {
+          invitedListHTML = refUsers.map(u => `
+            <div class="tx-item">
+              <div class="tx-info">
+                <h4>${u.free_fire_name || 'Gamer'}</h4>
+                <span>UID: ${u.free_fire_uid || '--'} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+              </div>
+              <div class="tx-amount tx-positive">+5 Coins</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); padding: 16px; text-align: center; margin-bottom: 14px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight: 700;">Today's Income</div>
+            <div style="font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0 12px 0;">Rs 0.00</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--text-muted);">Registers</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--accent-cyan);">0</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--text-muted);">Valid Referral</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--success);">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="player-hero-card" style="padding: 16px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px; text-transform: uppercase;">Share with your friends</div>
+            
+            <div style="display: flex; gap: 8px; align-items: center; background: #0a0e16; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
+              <input type="text" id="ref-link-input" value="${shareUrl}" style="background: transparent; border: none; color: #fff; font-size: 11px; width: 100%; outline: none;" readonly />
+              <button onclick="navigator.clipboard.writeText('${shareUrl}'); Toast.show('Permanent invite link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" class="support-action-btn" style="background:#1877f2; color:#fff; font-size:16px;"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Join%20Multani%20FF%20Tournaments" target="_blank" class="support-action-btn" style="background:#0088cc; color:#fff; font-size:16px;"><i class="fa-brands fa-telegram"></i></a>
+              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('Join Multani FF Tournaments and win prizes: ' + shareUrl)}" target="_blank" class="support-action-btn" style="background:#25d366; color:#fff; font-size:16px;"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+          </div>
+
+          <div class="section-title"><span>Invited List</span></div>
+          <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
+            ${invitedListHTML}
+          </div>
+
+          <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
+            <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
+            <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Revenue Goals & 6 Coins Reward</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for direct invite + 1 Coin when your invited friend invites someone else (Total 6 Coins setup)!</p>
+          </div>
+        </div>
+      `;
+    }
+
+    async function renderLeaderboard() {
+      Loader.show("Loading leaderboard...");
+      const { data } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, total_won').order('total_won', { ascending: false }).limit(20);
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (!data || !data.length) {
+        view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Leaderboard</span></div>
+          ${data.map((l, idx) => `
+            <div class="tx-item">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
+                <div>
+                  <h4>${l.free_fire_name || 'Player'}</h4>
+                  <span style="font-size:11px; color:var(--accent-cyan);">UID: ${l.free_fire_uid || '--'}</span>
+                </div>
+              </div>
+              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function renderTournamentDetail(id) {
+      Loader.show("Fetching tournament...");
+      await syncAuthAndProfile();
+
+      const [tRes, entriesRes, winRes] = await Promise.all([
+        sbClient.from('tournaments').select('*').eq('id', id).single(),
+        sbClient.from('tournament_entries').select('slot_number, user_id, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id),
+        sbClient.from('winners').select('position, prize_amount, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id)
+      ]);
+      Loader.hide();
+
+      const t = tRes.data;
+      if (!t) {
+        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><p>Tournament not found.</p></div>`;
+        return;
+      }
+
+      const isCompleted = (t.status || '').toLowerCase() === 'completed';
+      const entries = entriesRes.data || [];
+      const occupiedSlots = {};
+      let mySlotNumber = null;
+
+      entries.forEach(e => {
+        occupiedSlots[e.slot_number] = e.profiles?.free_fire_name || 'Gamer';
+        if (currentUser && e.user_id === currentUser.id) {
+          mySlotNumber = e.slot_number;
+        }
+      });
+
+      const isJoined = mySlotNumber !== null || userJoinedTournamentIds.has(t.id);
+      const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
+
+      let slotsHTML = '';
+      const totalSlots = t.max_players || 12;
+      for (let i = 1; i <= totalSlots; i++) {
+        const isOccupied = !!occupiedSlots[i];
+        const isMine = (mySlotNumber === i);
+        const name = isMine ? (currentProfile?.free_fire_name || 'YOU') : (occupiedSlots[i] || 'Empty Slot');
+
+        slotsHTML += `
+          <div class="slot-card ${isOccupied ? 'occupied' : ''} ${isMine ? 'my-slot' : ''}">
+            <span class="slot-num">${i}</span>
+            <i class="fa-solid ${isOccupied ? 'fa-user' : 'fa-plus'} text-[10px]" style="color:${isMine ? 'var(--primary)' : (isOccupied ? 'var(--accent-cyan)' : 'var(--text-dim)')}"></i>
+            <span class="slot-name">${name}</span>
+          </div>
+        `;
+      }
+
+      let winnerInfoHTML = '';
+      if (isCompleted && winRes.data && winRes.data.length > 0) {
+        winnerInfoHTML = `
+          <div style="background:rgba(255,190,0,0.1); border:1px solid var(--accent-gold); border-radius:var(--radius-sm); padding:12px; margin-bottom:12px;">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winner Declared</div>
+            ${winRes.data.map(w => `
+              <div style="font-size:13px; font-weight:bold; color:#fff;">
+                ${w.profiles?.free_fire_name || 'Winner'} (UID: ${w.profiles?.free_fire_uid || '--'}) - ${w.position} [PKR ${w.prize_amount}]
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="margin-bottom: 12px; padding: 12px; text-align: center;">
+            <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
+            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${t.title}</h2>
+            <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
+              <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+              <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
+              <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
+            </div>
+          </div>
+
+          ${winnerInfoHTML}
+
+          ${isJoined && !isCompleted ? `
+            <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom: 12px;">
+              <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700; margin-bottom: 8px;">
+                Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
+                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
+                  <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
+                    ${t.room_id || 'Pending'}
+                  </div>
+                </div>
+                <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
+                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Password</div>
+                  <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
+                    ${t.room_password || '••••••••'}
+                  </div>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid var(--accent-cyan); padding-top: 8px; text-align: center;">
+                <p style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
+                  Room id aur pw match se 10.15 mint pehle yaha bhj diya jaega
+                </p>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="room-slots-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #1f2636; padding-bottom:6px;">
+              <span style="font-family:var(--font-gaming); font-size:12px; font-weight:bold; color:var(--accent-gold); text-transform:uppercase;">
+                <i class="fa-solid fa-gamepad mr-1"></i> Room Slots (${t.joined_players || 0}/${t.max_players})
+              </span>
+              <span style="font-size:10px; color:var(--text-dim);">Map: ${t.map}</span>
+            </div>
+            <div class="room-slots-grid">${slotsHTML}</div>
+          </div>
+
+          <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
+            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
+          </div>
+
+          <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
+          </div>
+
+          <div style="position: sticky; bottom: 10px;">
+            ${isCompleted ? `
+              <button class="btn btn-secondary" style="background:#262f40; color:#aaa; cursor:default;" disabled>
+                <i class="fa-solid fa-lock"></i> MATCH COMPLETED (LOCKED)
+              </button>
+            ` : (isJoined ? `
+              <button class="btn btn-secondary" style="cursor: default;" disabled>
+                <i class="fa-solid fa-check-double text-green-400"></i> YOU ARE IN! ${mySlotNumber ? 'SLOT #' + mySlotNumber : ''}
+              </button>
+            ` : `
+              <button id="btn-join-match" class="btn btn-primary">
+                <i class="fa-solid fa-shield-virus"></i> JOIN MATCH (${t.entry_fee} PKR)
+              </button>
+            `)}
+          </div>
+        </div>
+      `;
+
+      if (!isJoined && !isCompleted) {
+        document.getElementById('btn-join-match').onclick = async () => {
+          if (!currentUser) {
+            Toast.show("Please login first", "info");
+            Router.navigate('login');
+            return;
+          }
+
+          if (!confirm(`Join match? PKR ${t.entry_fee} will be deducted from your wallet.`)) return;
+
+          Loader.show("Reserving slot...");
+          const { data, error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
+          Loader.hide();
+
+          if (error) {
+            Toast.show(error.message, "error");
+          } else {
+            Toast.show("Slot booked successfully!", "success");
+            await syncAuthAndProfile();
+            renderTournamentDetail(t.id);
+          }
+        };
       }
     }
 
-    async function updateTournamentCredentials(id) {
-      const room_id = document.getElementById(`rid-${id}`).value.trim();
-      const room_password = document.getElementById(`rpass-${id}`).value.trim();
+    async function renderWinners() {
+      Loader.show("Loading winners...");
+      const { data: winnersData, error } = await sbClient.from('winners').select('*').order('created_at', { ascending: false });
 
-      const { error } = await sbClient.from('tournaments').update({
-        room_id,
-        room_password,
-        updated_at: new Date().toISOString()
-      }).eq('id', id);
-
-      if (error) alert("Update failed: " + error.message);
-      else alert("Credentials saved successfully!");
-    }
-
-    async function deleteTournament(id) {
-      if (!confirm("Are you sure you want to delete this tournament permanently?")) return;
-      const { error } = await sbClient.from('tournaments').delete().eq('id', id);
-      if (error) alert("Failed: " + error.message);
-      else {
-        alert("Tournament deleted.");
-        loadTournaments();
+      if (error || !winnersData || !winnersData.length) {
+        Loader.hide();
+        document.getElementById('app-view').innerHTML = `
+          <div class="view-container empty-state">
+            <i class="fa-solid fa-medal text-gold"></i>
+            <h3>No Winners Declared Yet</h3>
+            <p>Admin will announce tournament winners right here!</p>
+          </div>
+        `;
+        return;
       }
+
+      const userIds = winnersData.map(w => w.user_id || w.player_id).filter(Boolean);
+      const tourneyIds = winnersData.map(w => w.tournament_id).filter(Boolean);
+
+      const [profRes, tourRes] = await Promise.all([
+        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').in('id', userIds),
+        sbClient.from('tournaments').select('id, title').in('id', tourneyIds)
+      ]);
+
+      const profMap = {};
+      (profRes.data || []).forEach(p => { profMap[p.id] = p; });
+
+      const tourMap = {};
+      (tourRes.data || []).forEach(t => { tourMap[t.id] = t; });
+
+      Loader.hide();
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-trophy text-gold"></i> Hall of Champions</span></div>
+          ${winnersData.map(w => {
+            const uId = w.user_id || w.player_id;
+            const p = profMap[uId] || {};
+            const t = tourMap[w.tournament_id] || {};
+            return `
+              <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div>
+                  <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-crown"></i> ${w.position || '1st Place (Booyah)'}</span>
+                  <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${p.free_fire_name || 'Champion'}</h3>
+                  <div style="font-size:11px; color:var(--text-dim);">UID: ${p.free_fire_uid || '--'}</div>
+                  <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${t.title || 'Tournament'}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
+                  <div style="font-family:var(--font-gaming); font-size:22px; font-weight:800; color:var(--accent-gold);">PKR ${w.prize_amount}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
-    function openEditModal(id) {
-      const t = loadedTournamentsList.find(x => x.id === id);
-      if (!t) return;
-      document.getElementById('edit-t-id').value = t.id;
-      document.getElementById('edit-t-title').value = t.title;
-      document.getElementById('edit-t-mode').value = t.mode;
-      document.getElementById('edit-t-map').value = t.map;
-      document.getElementById('edit-t-fee').value = t.entry_fee;
-      document.getElementById('edit-t-prize').value = t.prize_pool;
+    async function renderWallet() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      Loader.show("Loading payment records...");
+      await syncAuthAndProfile();
       
-      if (t.match_date) {
-        const dateObj = new Date(t.match_date);
-        const localIsoString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-        document.getElementById('edit-t-date').value = localIsoString;
+      const [txRes, depRes] = await Promise.all([
+        sbClient.from('wallet_transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sbClient.from('deposit_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+      ]);
+      Loader.hide();
+
+      const deposits = depRes.data || [];
+      const txs = txRes.data || [];
+
+      const depositSlipsHtml = deposits.length ? deposits.map(d => {
+        let badgeColor = 'background:#ff9800; color:#000;';
+        if (d.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
+        if (d.status === 'rejected') badgeColor = 'background:#ff1744; color:#fff;';
+
+        return `
+          <div class="tx-item" style="border-left: 3px solid ${d.status === 'approved' ? '#00e676' : (d.status === 'rejected' ? '#ff1744' : '#ff9800')};">
+            <div class="tx-info">
+              <h4>Deposit (${d.payment_method})</h4>
+              <span>Email: <strong>${d.transaction_id}</strong> • ${new Date(d.created_at).toLocaleDateString()}</span>
+            </div>
+            <div style="text-align:right;">
+              <div class="tx-amount tx-positive">PKR ${d.amount}</div>
+              <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${d.status}</span>
+            </div>
+          </div>
+        `;
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No deposit requests submitted.</p>`;
+
+      const txHtml = txs.length ? txs.map(tx => {
+        const isPrize = tx.transaction_type === 'prize' || (tx.description && tx.description.toLowerCase().includes('prize'));
+        const isPositive = tx.amount > 0 || isPrize;
+
+        return `
+          <div class="tx-item" style="${isPrize ? 'border-left: 3px solid var(--accent-gold);' : ''}">
+            <div class="tx-info">
+              <h4>${isPrize ? '🏆 ' + (tx.description || 'Tournament Prize Won') : (tx.description || tx.transaction_type)}</h4>
+              <span>${new Date(tx.created_at).toLocaleString()}</span>
+            </div>
+            <div class="tx-amount ${isPositive ? 'tx-positive' : 'tx-negative'}">${isPositive ? '+' : ''}${tx.amount} PKR</div>
+          </div>
+        `;
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="wallet-hero">
+            <span class="wallet-balance-title">Current Balance</span>
+            <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
+            <button class="btn btn-primary" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
+          </div>
+
+          <div class="section-title"><span>Your Deposit Slips (Live Status)</span></div>
+          <div>${depositSlipsHtml}</div>
+
+          <div class="section-title" style="margin-top:20px;"><span>Wallet Activity</span></div>
+          <div>${txHtml}</div>
+        </div>
+      `;
+    }
+
+    function renderDeposit() {
+      if (!currentUser) { Router.navigate('login'); return; }
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="margin-bottom:14px;">
+            <h4 id="dep-box-header" style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Details</h4>
+            <div id="dep-box-number" style="font-size:18px; font-weight:bold; color:var(--accent-cyan);">03186815926</div>
+            <div id="dep-box-title" style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)</div>
+          </div>
+
+          <form id="dep-form">
+            <div class="form-group">
+              <label class="form-label">Deposit Amount (PKR)</label>
+              <input type="number" id="dp-amount" class="form-input" placeholder="e.g. 100" required min="10" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Payment Method</label>
+              <select id="dp-method" class="form-input" onchange="updatePaymentDetailsDisplay(this.value)" required>
+                <option value="Easypaisa">Easypaisa</option>
+                <option value="SadaPay">SadaPay</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Sender Account Name</label>
+              <input type="text" id="dp-sender" class="form-input" placeholder="Your account title name" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Your Gmail Address</label>
+              <input type="email" id="dp-gmail" class="form-input" value="${currentUser.email || ''}" placeholder="e.g. yourname@gmail.com" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Payment Screenshot</label>
+              <input type="file" id="dp-file" class="form-input" accept="image/*" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:8px;">SUBMIT DEPOSIT SLIP</button>
+          </form>
+        </div>
+      `;
+
+      document.getElementById('dep-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const file = document.getElementById('dp-file').files[0];
+        if (!file) return;
+
+        Loader.show("Uploading deposit slip...");
+        try {
+          const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+
+          const { error: dbError } = await sbClient.from('deposit_requests').insert([{
+            user_id: currentUser.id,
+            amount: parseFloat(document.getElementById('dp-amount').value),
+            payment_method: document.getElementById('dp-method').value,
+            sender_name: document.getElementById('dp-sender').value,
+            transaction_id: document.getElementById('dp-gmail').value,
+            screenshot_url: publicUrl,
+            status: 'pending'
+          }]);
+
+          if (dbError) throw dbError;
+
+          Loader.hide();
+          Toast.show("Slip submitted! Check Payment Record for status.", "success");
+          Router.navigate('wallet');
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message, "error");
+        }
+      };
+    }
+
+    function updatePaymentDetailsDisplay(method) {
+      const numEl = document.getElementById('dep-box-number');
+      const titleEl = document.getElementById('dep-box-title');
+      if (method === 'SadaPay') {
+        numEl.innerText = "03281926729";
+        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (SadaPay)";
       } else {
-        document.getElementById('edit-t-date').value = '';
+        numEl.innerText = "03186815926";
+        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)";
       }
-
-      document.getElementById('modal-edit-tournament').classList.remove('hidden');
     }
 
-    function closeEditModal() {
-      document.getElementById('modal-edit-tournament').classList.add('hidden');
-    }
+    function renderAuth() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div style="display:flex; gap:10px; margin-bottom:16px;">
+            <button id="tab-login-btn" class="btn btn-primary btn-sm" style="flex:1;" onclick="toggleAuth(true)">LOGIN</button>
+            <button id="tab-signup-btn" class="btn btn-secondary btn-sm" style="flex:1;" onclick="toggleAuth(false)">REGISTER</button>
+          </div>
 
-    async function saveEditedTournament() {
-      const id = document.getElementById('edit-t-id').value;
-      const title = document.getElementById('edit-t-title').value.trim();
-      const mode = document.getElementById('edit-t-mode').value;
-      const map = document.getElementById('edit-t-map').value;
-      const entry_fee = parseFloat(document.getElementById('edit-t-fee').value);
-      const prize_pool = parseFloat(document.getElementById('edit-t-prize').value);
-      const match_date_val = document.getElementById('edit-t-date').value;
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="log-email" class="form-input" required />
+            </div>
+            <div class="form-group" style="margin-bottom:4px;">
+              <label class="form-label">Password</label>
+              <input type="password" id="log-pass" class="form-input" required />
+            </div>
+            <div style="text-align:right; margin-bottom:14px;">
+              <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--accent-cyan); cursor:pointer; font-weight:600;">Forgot Password?</span>
+            </div>
+            <button type="submit" class="btn btn-primary">SIGN IN</button>
+          </form>
 
-      const updateData = {
-        title, 
-        mode, 
-        map, 
-        entry_fee, 
-        prize_pool,
-        updated_at: new Date().toISOString()
+          <form id="signup-form" class="hidden">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="reg-name" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Free Fire In-Game Name</label>
+              <input type="text" id="reg-ign" class="form-input" placeholder="e.g. MLT・HAMZA★" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Free Fire UID (Permanent)</label>
+              <input type="text" id="reg-uid" class="form-input" placeholder="e.g. 2984189312" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Mobile #</label>
+              <input type="text" id="reg-phone" class="form-input" placeholder="03001234567" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="reg-email" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="reg-pass" class="form-input" minlength="6" required />
+            </div>
+            <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
+          </form>
+        </div>
+      `;
+
+      document.getElementById('login-form').onsubmit = async (e) => {
+        e.preventDefault();
+        Loader.show("Signing in...");
+        const { error } = await sbClient.auth.signInWithPassword({
+          email: document.getElementById('log-email').value,
+          password: document.getElementById('log-pass').value
+        });
+        Loader.hide();
+
+        if (error) Toast.show(error.message, "error");
+        else {
+          Toast.show("Welcome back!", "success");
+          await syncAuthAndProfile();
+          Router.navigate('home');
+        }
       };
 
-      if (match_date_val) {
-        updateData.match_date = new Date(match_date_val).toISOString();
-      }
+      document.getElementById('signup-form').onsubmit = async (e) => {
+        e.preventDefault();
+        Loader.show("Validating details...");
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-pass').value;
+        const name = document.getElementById('reg-name').value;
+        const ign = document.getElementById('reg-ign').value;
+        const uid = document.getElementById('reg-uid').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
 
-      const { error } = await sbClient.from('tournaments').update(updateData).eq('id', id);
+        try {
+          const { data: existingProfiles } = await sbClient
+            .from('profiles')
+            .select('free_fire_uid, email, phone')
+            .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
 
-      if (error) alert(error.message);
-      else {
-        alert("Tournament updated successfully!");
-        closeEditModal();
-        loadTournaments();
-      }
-    }
+          if (existingProfiles && existingProfiles.length > 0) {
+            Loader.hide();
+            const match = existingProfiles[0];
+            if (match.free_fire_uid === uid) {
+              Toast.show("Error: This Free Fire UID is already registered!", "error");
+            } else if (match.email === email) {
+              Toast.show("Error: This Email address is already registered!", "error");
+            } else if (match.phone === phone) {
+              Toast.show("Error: This WhatsApp number is already registered!", "error");
+            } else {
+              Toast.show("Error: Duplicate credentials found!", "error");
+            }
+            return;
+          }
 
-    async function viewTournamentPlayers(tId, tTitle) {
-      document.getElementById('modal-players-title').innerText = `${tTitle} - Players`;
-      const body = document.getElementById('modal-players-body');
-      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading joined players...</p>`;
-      document.getElementById('modal-players').classList.remove('hidden');
+          Loader.show("Registering account...");
+          const { data, error } = await sbClient.auth.signUp({ email, password });
+          if (error) {
+            Loader.hide();
+            Toast.show(error.message, "error");
+            return;
+          }
 
-      const { data, error } = await sbClient
-        .from('tournament_entries')
-        .select('id, user_id, slot_number, profiles(id, free_fire_name, free_fire_uid, avatar_url, is_banned)')
-        .eq('tournament_id', tId);
+          if (data.user) {
+            const invitedByRef = localStorage.getItem('invited_by_ref') || null;
+            await sbClient.from('profiles').upsert([{
+              id: data.user.id,
+              email,
+              full_name: name,
+              free_fire_name: ign,
+              free_fire_uid: uid,
+              phone: phone,
+              referred_by: invitedByRef,
+              wallet_balance: 0,
+              is_banned: false,
+              is_admin: false
+            }]);
+            
+            if (invitedByRef) {
+              localStorage.removeItem('invited_by_ref');
+            }
 
-      if (error || !data || !data.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players have joined this match yet.</p>`;
-        return;
-      }
-
-      body.innerHTML = data.map(e => {
-        const p = e.profiles || {};
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        return `
-          <div class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] rounded-lg text-xs">
-            <div class="flex items-center gap-2.5">
-              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
-              <div>
-                <span class="font-bold text-white">Slot #${e.slot_number || '--'} • ${escapeHTML(p.free_fire_name || 'Gamer')}</span>
-                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="kickPlayerFromMatch('${e.id}', '${tId}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold">KICK</button>
-              <button onclick="banPlayerFromPlatform('${e.user_id}', ${!p.is_banned})" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">
-                ${p.is_banned ? 'UNBAN' : 'BAN'}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function closePlayersModal() { document.getElementById('modal-players').classList.add('hidden'); }
-
-    async function kickPlayerFromMatch(entryId, tId) {
-      if (!confirm("Kick this player from match? Slot will be released.")) return;
-      const { error } = await sbClient.from('tournament_entries').delete().eq('id', entryId);
-      if (error) {
-        alert("Kick failed: " + error.message);
-      } else {
-        const { data: t } = await sbClient.from('tournaments').select('joined_players').eq('id', tId).single();
-        if (t && t.joined_players > 0) {
-          await sbClient.from('tournaments').update({ joined_players: t.joined_players - 1 }).eq('id', tId);
+            Loader.hide();
+            Toast.show("Account registered successfully!", "success");
+            await syncAuthAndProfile();
+            Router.navigate('home');
+          }
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message || "Registration validation failed.", "error");
         }
-        alert("Player kicked and slot released successfully.");
-        closePlayersModal();
-        loadTournaments();
+      };
+    }
+
+    function renderForgotPassword() {
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
+        <div class="view-container">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+            <button class="icon-btn" onclick="Router.navigate('login')" style="width:34px; height:34px;"><i class="fa-solid fa-arrow-left"></i></button>
+            <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">RESET PASSWORD</h3>
+          </div>
+
+          <form id="forgot-email-form">
+            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Enter your registered Gmail address to receive the password reset OTP code.</p>
+              <div class="form-group">
+                <label class="form-label">Gmail Address</label>
+                <input type="email" id="fg-email" class="form-input" placeholder="e.g. yourname@gmail.com" required />
+              </div>
+              <button type="submit" class="btn btn-primary">SEND OTP TO GMAIL</button>
+            </div>
+          </form>
+
+          <form id="forgot-verify-form" class="hidden">
+            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
+              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
+              
+              <div class="form-group">
+                <label class="form-label">Enter OTP Code</label>
+                <input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP code" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 characters" minlength="8" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="8" required />
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      document.getElementById('forgot-email-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('fg-email').value.trim();
+        if (!email) { Toast.show("Please enter your Gmail address.", "error"); return; }
+        Loader.show("Sending secure OTP to Gmail...");
+
+        try {
+          const { data, error } = await sbClient.functions.invoke("send-reset-otp", { body: { email: email } });
+          Loader.hide();
+          if (error) throw new Error(error.message || "Failed to send OTP.");
+          if (!data || data.success !== true) throw new Error(data?.message || data?.error || "Failed to send OTP.");
+
+          window.resetEmailTarget = email;
+          Toast.show("6-digit OTP sent to your Gmail!", "success");
+          document.getElementById('forgot-email-form').classList.add('hidden');
+          document.getElementById('forgot-verify-form').classList.remove('hidden');
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message || "Unable to send OTP. Please try again.", "error");
+        }
+      };
+
+      document.getElementById('forgot-verify-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const token = document.getElementById('fg-otp').value.trim();
+        const newPassword = document.getElementById('fg-newpass').value;
+        const confPassword = document.getElementById('fg-confpass').value;
+
+        if (!/^\d{6}$/.test(token)) { Toast.show("Please enter the 6-digit OTP.", "error"); return; }
+        if (newPassword.length < 8) { Toast.show("Password must be at least 8 characters.", "error"); return; }
+        if (newPassword !== confPassword) { Toast.show("New password and confirm password do not match!", "error"); return; }
+        if (!window.resetEmailTarget) { Toast.show("Please request a new OTP first.", "error"); return; }
+
+        Loader.show("Verifying OTP & Updating password...");
+        try {
+          const { data, error } = await sbClient.functions.invoke("verify-reset-otp", { body: { email: window.resetEmailTarget, otp: token, new_password: newPassword } });
+          Loader.hide();
+          if (error) throw new Error(error.message || "OTP verification failed.");
+          if (!data || data.success !== true) throw new Error(data?.message || "Invalid or expired OTP.");
+
+          Toast.show("Password changed successfully! Please login.", "success");
+          window.resetEmailTarget = null;
+          Router.navigate("login");
+        } catch (err) {
+          Loader.hide();
+          Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
+        }
+      };
+    }
+
+    function toggleAuth(isLogin) {
+      document.getElementById('tab-login-btn').className = isLogin ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+      document.getElementById('tab-signup-btn').className = !isLogin ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+      document.getElementById('login-form').classList.toggle('hidden', !isLogin);
+      document.getElementById('signup-form').classList.toggle('hidden', isLogin);
+    }
+
+    function renderProfile() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      const p = currentProfile || {};
+      const avatarSrc = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="text-align:center; position:relative;">
+            <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
+              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
+              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #0e1118;">
+                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+              </label>
+              <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
+            </div>
+            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${p.free_fire_name || p.full_name || 'Soldier'}</h2>
+            <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${p.free_fire_uid || '--'}</span>
+          </div>
+
+          <div class="player-hero-card">
+            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-user-pen"></i> Edit Profile Details
+            </h3>
+
+            <form id="edit-profile-form">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="prof-fullname" class="form-input" value="${p.full_name || ''}" placeholder="Enter full name" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Free Fire In-Game Name (IGN)</label>
+                <input type="text" id="prof-ign" class="form-input" value="${p.free_fire_name || ''}" placeholder="e.g. MLT・HAMZA★" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Free Fire UID (Permanent)</label>
+                <input type="text" class="form-input" value="${p.free_fire_uid || ''}" style="opacity:0.6; cursor:not-allowed;" readonly />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">WhatsApp Mobile #</label>
+                <input type="text" id="prof-phone" class="form-input" value="${p.phone || ''}" placeholder="e.g. 03001234567" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email (Read-Only)</label>
+                <input type="email" class="form-input" value="${p.email || currentUser.email}" style="opacity:0.6; cursor:not-allowed;" readonly />
+              </div>
+
+              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
+                <i class="fa-solid fa-check"></i> SAVE CHANGES
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('edit-profile-form').onsubmit = saveUserProfile;
+    }
+
+    async function uploadAvatarPhoto(input) {
+      const file = input.files[0];
+      if (!file || !currentUser) return;
+
+      Loader.show("Uploading photo...");
+      try {
+        const fileExt = file.name.split('.').pop();
+        const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file, { upsert: true });
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
+
+        const { error: updateError } = await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+        if (updateError) throw updateError;
+
+        document.getElementById('profile-display-avatar').src = publicUrl;
+        Toast.show("Profile photo updated successfully!", "success");
+        await syncAuthAndProfile();
+      } catch (err) {
+        Toast.show(err.message || "Failed to upload photo.", "error");
+      } finally {
+        Loader.hide();
       }
     }
 
-    async function banPlayerFromPlatform(userId, newBanStatus) {
-      if (!confirm(`Are you sure you want to ${newBanStatus ? 'BAN' : 'UNBAN'} this player?`)) return;
-      const { error } = await sbClient.from('profiles').update({ is_banned: newBanStatus }).eq('id', userId);
-      if (error) alert(error.message);
-      else alert(`Player ${newBanStatus ? 'BANNED' : 'UNBANNED'} successfully.`);
-    }
+    async function saveUserProfile(e) {
+      e.preventDefault();
+      if (!currentUser) return;
 
-    function openCreateTournamentModal() { document.getElementById('modal-match').classList.remove('hidden'); }
-    function closeCreateTournamentModal() { document.getElementById('modal-match').classList.add('hidden'); }
+      const fullName = document.getElementById('prof-fullname').value.trim();
+      const ign = document.getElementById('prof-ign').value.trim();
+      const phone = document.getElementById('prof-phone').value.trim();
+      const btn = document.getElementById('btn-save-profile');
 
-    function handleModeChange() {
-      const mode = document.getElementById('m-mode').value;
-      const mapSelect = document.getElementById('m-map');
-      const maxSlotsInput = document.getElementById('m-max');
-
-      if (mode === 'Lone Wolf') {
-        mapSelect.value = 'Bermuda';
-        mapSelect.disabled = true;
-        mapSelect.classList.add('opacity-50', 'cursor-not-allowed');
-
-        maxSlotsInput.value = '2';
-        maxSlotsInput.readOnly = true;
-        maxSlotsInput.classList.add('opacity-50', 'cursor-not-allowed');
-      } else {
-        mapSelect.disabled = false;
-        mapSelect.classList.remove('opacity-50', 'cursor-not-allowed');
-
-        maxSlotsInput.readOnly = false;
-        maxSlotsInput.classList.remove('opacity-50', 'cursor-not-allowed');
-      }
-    }
-
-    async function saveNewTournament() {
-      const title = document.getElementById('m-title').value.trim();
-      const mode = document.getElementById('m-mode').value;
-      const map = mode === 'Lone Wolf' ? 'Lone Wolf' : document.getElementById('m-map').value;
-      const entry_fee = parseFloat(document.getElementById('m-fee').value);
-      const prize_pool = parseFloat(document.getElementById('m-prize').value);
-      const max_players = mode === 'Lone Wolf' ? 2 : parseInt(document.getElementById('m-max').value);
-      const match_date = document.getElementById('m-date').value;
-      const fileInput = document.getElementById('m-file');
-      const btn = document.getElementById('btn-save-match');
-
-      if (!title || !match_date) {
-        alert("Title and match date are mandatory.");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "UPLOADING...";
-
-      let banner_url = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80";
+      if(btn) btn.disabled = true;
+      Loader.show("Saving profile...");
 
       try {
-        if (fileInput.files && fileInput.files[0]) {
-          const file = fileInput.files[0];
-          const path = `tournaments/${Date.now()}_${file.name}`;
-          const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
-          if (!upErr) {
-            const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
-            banner_url = publicUrl;
-          }
-        }
-
-        const { error } = await sbClient.from('tournaments').insert([{
-          title,
-          mode,
-          map,
-          entry_fee,
-          prize_pool,
-          max_players,
-          joined_players: 0,
-          match_date: new Date(match_date).toISOString(),
-          thumbnail_url: banner_url,
-          status: 'upcoming'
-        }]);
+        const { error } = await sbClient.from('profiles').update({
+          full_name: fullName,
+          free_fire_name: ign,
+          phone: phone,
+          updated_at: new Date().toISOString()
+        }).eq('id', currentUser.id);
 
         if (error) throw error;
 
-        alert("Tournament created successfully!");
-        closeCreateTournamentModal();
-        selectTab('tournaments');
+        Toast.show("Profile updated successfully!", "success");
+        await syncAuthAndProfile();
+        renderProfile();
       } catch (err) {
-        alert("Error: " + err.message);
+        Toast.show(err.message || "Failed to update profile.", "error");
       } finally {
-        btn.disabled = false;
-        btn.innerText = "CREATE";
+        if(btn) btn.disabled = false;
+        Loader.hide();
       }
     }
 
-    async function loadDeposits() {
-      const container = document.getElementById('deposits-cards-container');
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading pending deposit slips...</p>`;
+    async function renderNotifications() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      Loader.show("Loading notifications...");
+      
+      const [notifRes] = await Promise.all([
+        sbClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sbClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false)
+      ]);
+      
+      unreadNotifCount = 0;
+      updateNotificationBadges();
+      Loader.hide();
 
-      const { data, error } = await sbClient
-        .from('deposit_requests')
-        .select('*, profiles(free_fire_name, avatar_url)')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips.</p>`;
+      const data = notifRes.data;
+      if (!data || !data.length) {
+        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
         return;
       }
 
-      container.innerHTML = data.map(d => {
-        const p = d.profiles || {};
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        return `
-          <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
-                <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || p.free_fire_name || 'Gamer')}</h4>
-                  <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
-                </div>
-              </div>
-              <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
-            </div>
-
-            <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
-              <span class="text-gray-400 text-[10px] uppercase font-bold">Method: <strong class="text-white">${escapeHTML(d.payment_method)}</strong></span>
-              ${d.screenshot_url ? `
-                <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
-                  <i class="fa-solid fa-image"></i> View Slip
-                </a>
-              ` : '<span class="text-gray-500 text-[10px]">No slip</span>'}
-            </div>
-
-            <div class="flex items-center gap-2 pt-1">
-              <button onclick="reviewDeposit('${d.id}', 'approve')" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded font-bold text-xs uppercase">APPROVE</button>
-              <button onclick="reviewDeposit('${d.id}', 'reject')" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-1.5 rounded font-bold text-xs uppercase">REJECT</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function reviewDeposit(id, action) {
-      if (!confirm(`Are you sure you want to ${action.toUpperCase()} this deposit?`)) return;
-
-      const { data, error } = await sbClient.rpc('admin_review_deposit', {
-        p_request_id: id,
-        p_action: action,
-        p_note: ''
-      });
-
-      if (error) alert(error.message);
-      else {
-        alert(`Deposit slip ${action.toUpperCase()}D successfully!`);
-        loadDeposits();
-        loadDashboardStats();
-      }
-    }
-
-    async function loadWinnerSelectOptions() {
-      const { data: tourneys } = await sbClient.from('tournaments').select('id, title').order('created_at', { ascending: false });
-      const selectT = document.getElementById('win-tournament');
-      selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${escapeHTML(t.title)}</option>`).join('');
-
-      const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url').order('created_at', { ascending: false });
-      globalWinnerSelectPlayersCache = profiles || [];
-
-      if (globalWinnerSelectPlayersCache.length > 0) {
-        const firstP = globalWinnerSelectPlayersCache[0];
-        document.getElementById('win-player').value = firstP.id;
-        document.getElementById('win-selected-player-text').innerHTML = `🎯 ${escapeHTML(firstP.free_fire_name || 'Player')} (UID: ${escapeHTML(firstP.free_fire_uid || '--')})`;
-      }
-    }
-
-    function openVipPlayerSelectModal() {
-      const modal = document.getElementById('modal-vip-player-select');
-      modal.classList.remove('hidden');
-      renderVipPlayerModalList(globalWinnerSelectPlayersCache);
-    }
-
-    function closeVipPlayerSelectModal() {
-      document.getElementById('modal-vip-player-select').classList.add('hidden');
-    }
-
-    function renderVipPlayerModalList(list) {
-      const body = document.getElementById('modal-vip-player-body');
-      if (!list.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players found.</p>`;
-        return;
-      }
-
-      body.innerHTML = list.map(p => {
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        return `
-          <div onclick="selectVipWinningPlayer('${p.id}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}','${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
-            <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
-              <div>
-                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')}</h4>
-                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          ${data.map(n => `
+            <div class="tx-item" style="border-left: 3px solid var(--primary);">
+              <div class="tx-info">
+                <h4>${n.title}</h4>
+                <p style="font-size:12px; color:var(--text-muted);">${n.message}</p>
+                <span>${new Date(n.created_at).toLocaleString()}</span>
               </div>
             </div>
-            <i class="fa-solid fa-circle-check text-gray-600"></i>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function filterVipPlayerModal() {
-      const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
-      if (!q) {
-        renderVipPlayerModalList(globalWinnerSelectPlayersCache);
-        return;
-      }
-      const filtered = globalWinnerSelectPlayersCache.filter(p =>
-        (p.free_fire_name && p.free_fire_name.toLowerCase().includes(q)) ||
-        (p.free_fire_uid && p.free_fire_uid.toLowerCase().includes(q))
-      );
-      renderVipPlayerModalList(filtered);
-    }
-
-    function selectVipWinningPlayer(id, name, uid, avatarUrl) {
-      document.getElementById('win-player').value = id;
-      document.getElementById('win-selected-player-text').innerHTML = `
-        <div class="flex items-center gap-2">
-          <img src="${avatarUrl}" class="w-5 h-5 rounded-full object-cover border border-[#ff4624]" />
-          <span>🎯 ${name} (UID: ${uid})</span>
+          `).join('')}
         </div>
       `;
-      closeVipPlayerSelectModal();
     }
 
-    async function submitWinnerDeclaration() {
-      const tournament_id = document.getElementById('win-tournament').value;
-      const user_id = document.getElementById('win-player').value;
-      const prize_amount = parseFloat(document.getElementById('win-amount').value);
-      const position = document.getElementById('win-pos').value.trim();
-
-      if (!tournament_id || !user_id || isNaN(prize_amount) || !position) {
-        alert("Please choose a tournament, player, and prize amount.");
-        return;
-      }
-
-      const { error: winErr } = await sbClient.from('winners').insert([{
-        tournament_id,
-        user_id,
-        prize_amount,
-        position
-      }]);
-
-      if (winErr) {
-        alert("Error announcing winner: " + winErr.message);
-        return;
-      }
-
-      const { data: prof } = await sbClient.from('profiles').select('wallet_balance, total_won').eq('id', user_id).single();
-      if (prof) {
-        await sbClient.from('profiles').update({
-          wallet_balance: (prof.wallet_balance || 0) + prize_amount,
-          total_won: (prof.total_won || 0) + prize_amount
-        }).eq('id', user_id);
-
-        await sbClient.from('wallet_transactions').insert([{
-          user_id,
-          amount: prize_amount,
-          transaction_type: 'prize',
-          status: 'approved',
-          description: `Tournament Prize Won (${position})`
-        }]);
-
-        await sbClient.from('notifications').insert([{
-          user_id: user_id,
-          title: "Tournament Won!",
-          message: `Congratulations! You won PKR ${prize_amount} (${position}). Prize credited to your wallet.`
-        }]);
-      }
-
-      alert("Winner announced and prize credited to player's wallet!");
-      document.getElementById('win-amount').value = '';
+    function renderRules() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card">
+            <h3 style="color:var(--primary); font-family:var(--font-gaming); margin-bottom:6px;">Fair Play Mandatory</h3>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">No hacks, emulators, or teaming allowed. Violators will be banned permanently with forfeiture of wallet balance.</p>
+          </div>
+          <div class="player-hero-card" style="margin-top:10px;">
+            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:6px;">Permanent Slot Policy</h3>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">Once a slot is reserved, funds are locked and slot registration is non-refundable.</p>
+          </div>
+        </div>
+      `;
     }
 
-    let globalUsersCache = [];
-
-    async function loadUsers() {
-      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
-      if (error || !data) {
-        document.getElementById('users-cards-container').innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players registered.</p>`;
-        return;
-      }
-      globalUsersCache = data;
-      renderUsersList(globalUsersCache);
+    function renderAbout() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container" style="text-align:center;">
+          <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and instant winner prizes.</p>
+        </div>
+      `;
     }
 
-    function filterUsersList() {
-      const q = document.getElementById('user-search-input').value.toLowerCase().trim();
-      if (!q) {
-        renderUsersList(globalUsersCache);
-        return;
+    const Drawer = {
+      open() {
+        document.getElementById('side-drawer').classList.add('open');
+        document.getElementById('drawer-overlay').classList.remove('hidden');
+      },
+      close() {
+        document.getElementById('side-drawer').classList.remove('open');
+        document.getElementById('drawer-overlay').classList.add('hidden');
       }
-      const filtered = globalUsersCache.filter(u =>
-        (u.free_fire_name && u.free_fire_name.toLowerCase().includes(q)) ||
-        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
-        (u.free_fire_uid && u.free_fire_uid.toLowerCase().includes(q)) ||
-        (u.email && u.email.toLowerCase().includes(q))
-      );
-      renderUsersList(filtered);
+    };
+
+    function toggleSupportMenu(forceState) {
+      const menu = document.getElementById('support-popup-menu');
+      if (!menu) return;
+      const shouldShow = typeof forceState === 'boolean' ? forceState : !menu.classList.contains('show');
+      menu.classList.toggle('show', shouldShow);
     }
 
-    function renderUsersList(list) {
-      const container = document.getElementById('users-cards-container');
-      if (!list.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No gamers found.</p>`;
-        return;
-      }
+    const ChatModal = {
+      isOpen: false,
+      interval: null,
+      async open() {
+        if (!currentUser) {
+          Toast.show("Please sign in to chat with admin", "info");
+          Router.navigate('login');
+          return;
+        }
+        document.getElementById('chat-modal-overlay').classList.remove('hidden');
+        this.isOpen = true;
+        
+        await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', currentUser.id).eq('sender_role', 'admin').eq('is_read', false);
 
-      container.innerHTML = list.map(u => {
-        const waNumber = u.phone || '';
-        const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        let waLink = '#';
-        if (waNumber) {
-          let cleanNum = waNumber.replace(/[^0-9]/g, '');
-          if (cleanNum.startsWith('0')) cleanNum = '92' + cleanNum.substring(1);
-          const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin regarding your tournament or wallet details.");
-          waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
+        await this.loadMessages();
+        await syncAuthAndProfile();
+
+        this.interval = setInterval(() => this.loadMessages(), 3500);
+      },
+      close() {
+        document.getElementById('chat-modal-overlay').classList.add('hidden');
+        this.isOpen = false;
+        if (this.interval) clearInterval(this.interval);
+        syncAuthAndProfile();
+      },
+      async loadMessages() {
+        if (!currentUser) return;
+        const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
+
+        const container = document.getElementById('chat-modal-messages');
+        if (!data || data.length === 0) {
+          container.innerHTML = `
+            <div class="chat-row theirs">
+              <div class="chat-bubble theirs">
+                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+              </div>
+              <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+            </div>
+          `;
+          return;
         }
 
-        return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
-                <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                  <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-                ${u.is_banned ? 'BANNED' : 'ACTIVE'}
-              </span>
-            </div>
+        container.innerHTML = data.map(m => {
+          const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
+          const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            <div class="flex items-center justify-between bg-[rgba(0,230,118,0.08)] border border-[rgba(0,230,118,0.3)] rounded-lg px-3 py-2">
-              <span class="text-xs text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No phone added')}</span>
-              ${waNumber ? `
-                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 shadow">
-                  <i class="fa-brands fa-whatsapp text-sm"></i> Chat
-                </a>
-              ` : '<span class="text-[10px] text-gray-500">No WhatsApp</span>'}
-            </div>
-
-            <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
-              <div>
-                <span class="text-[10px] text-gray-400 uppercase font-bold block">Current Balance</span>
-                <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${u.wallet_balance || 0}</span>
+          return `
+            <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
+              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
+                ${m.message}
               </div>
-              <div class="flex items-center gap-1.5">
-                <input type="number" id="bal-${u.id}" value="${u.wallet_balance || 0}" class="w-24 bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-white font-mono text-xs outline-none focus:border-[#ff4624]" />
-                <button onclick="updatePlayerBalance('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold font-gaming">UPDATE</button>
+              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
+                ${isMe ? 'You' : 'Admin Support'} • ${time}
               </div>
             </div>
-
-            <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
-              <span>Won: <strong class="text-emerald-400">PKR ${u.total_won || 0}</strong></span>
-              <span>Matches: <strong>${u.total_matches || 0}</strong></span>
-              <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" class="${u.is_banned ? 'bg-emerald-600' : 'bg-red-600'} text-white px-2.5 py-0.5 rounded font-bold text-[10px]">
-                ${u.is_banned ? 'UNBAN' : 'BAN'}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function updatePlayerBalance(userId) {
-      const newBalInput = document.getElementById(`bal-${userId}`);
-      const newBalance = parseFloat(newBalInput.value);
-
-      if (isNaN(newBalance)) {
-        alert("Please enter a valid amount.");
-        return;
+          `;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
       }
+    };
 
-      if (!confirm(`Update player balance to PKR ${newBalance}?`)) return;
+    document.getElementById('chat-modal-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chat-modal-input');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+      input.value = "";
 
-      const { error } = await sbClient.from('profiles').update({
-        wallet_balance: newBalance,
-        updated_at: new Date().toISOString()
-      }).eq('id', userId);
-
-      if (error) {
-        alert("Failed to update balance: " + error.message);
-        return;
-      }
-
-      await sbClient.from('notifications').insert([{
-        user_id: userId,
-        title: "Wallet Balance Updated",
-        message: `Admin has updated your wallet balance. Your current balance is now PKR ${newBalance}.`
+      const { error } = await sbClient.from('support_messages').insert([{
+        user_id: currentUser.id,
+        sender_id: currentUser.id,
+        sender_role: 'player',
+        message: text,
+        is_read: false
       }]);
 
-      await sbClient.from('wallet_transactions').insert([{
-        user_id: userId,
-        amount: newBalance,
-        transaction_type: 'admin_adjustment',
-        status: 'approved',
-        description: 'Admin balance adjustment'
-      }]);
+      if (error) Toast.show(error.message, "error");
+      else ChatModal.loadMessages();
+    };
 
-      alert("Balance updated successfully & notification sent to player!");
-      loadUsers();
-    }
+    function setupDraggableBot() {
+      const widget = document.getElementById('admin-float-widget');
+      const mainBtn = document.getElementById('float-main-btn');
+      let isDragging = false;
+      let startX, startY, origX, origY;
+      let hasMoved = false;
 
-    async function toggleBanUser(userId, newStatus) {
-      if (!confirm(`Are you sure you want to ${newStatus ? 'BAN' : 'UNBAN'} this player?`)) return;
-      const { error } = await sbClient.from('profiles').update({ is_banned: newStatus }).eq('id', userId);
-      if (error) alert(error.message);
-      else {
-        alert("Player ban status updated.");
-        loadUsers();
-        loadBannedUsers();
-      }
-    }
+      function onStart(e) {
+        isDragging = true;
+        hasMoved = false;
+        const touch = e.touches ? e.touches[0] : e;
+        startX = touch.clientX;
+        startY = touch.clientY;
 
-    async function loadBannedUsers() {
-      const { data } = await sbClient.from('profiles').select('*').eq('is_banned', true);
-      const container = document.getElementById('banned-cards-container');
-      if (!data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players currently banned.</p>`;
-        return;
-      }
-      container.innerHTML = data.map(b => {
-        const avatarUrl = b.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
-            <div class="flex items-center gap-2.5">
-              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
-              <div>
-                <h4 class="font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</h4>
-                <p class="text-red-400 font-mono text-[11px]">UID: ${escapeHTML(b.free_fire_uid || '--')}</p>
-              </div>
-            </div>
-            <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase">UNBAN</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function loadSupportInbox() {
-      const inboxList = document.getElementById('support-inbox-list');
-      inboxList.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
-
-      const { data: msgs, error } = await sbClient
-        .from('support_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !msgs || !msgs.length) {
-        inboxList.innerHTML = `<p class="text-gray-500 text-xs py-6 text-center">No inquiries yet.</p>`;
-        document.getElementById('inbox-count').innerText = "0 Chats";
-        return;
+        const rect = widget.getBoundingClientRect();
+        origX = rect.left;
+        origY = rect.top;
       }
 
-      const threadMap = {};
-      msgs.forEach(m => {
-        const uId = m.user_id || m.sender_id;
-        if (!threadMap[uId]) {
-          threadMap[uId] = {
-            userId: uId,
-            lastMsg: m.message,
-            lastTime: m.created_at,
-            unreadCount: 0
-          };
-        }
-        if (m.sender_role === 'player' && !m.is_read) {
-          threadMap[uId].unreadCount++;
+      function onMove(e) {
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
+
+        let newX = origX + dx;
+        let newY = origY + dy;
+
+        const container = document.getElementById('app-container');
+        const cRect = container.getBoundingClientRect();
+
+        newX = Math.max(cRect.left + 5, Math.min(newX, cRect.right - 65));
+        newY = Math.max(cRect.top + 50, Math.min(newY, cRect.bottom - 130));
+
+        widget.style.left = (newX - cRect.left) + 'px';
+        widget.style.top = (newY - cRect.top) + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function onEnd() { isDragging = false; }
+
+      widget.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onEnd);
+      widget.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      mainBtn.addEventListener('click', (e) => {
+        if (!hasMoved) {
+          toggleSupportMenu();
         }
       });
-
-      const userIds = Object.keys(threadMap);
-      document.getElementById('inbox-count').innerText = `${userIds.length} Players`;
-
-      const { data: profiles } = await sbClient
-        .from('profiles')
-        .select('id, free_fire_name, free_fire_uid, avatar_url')
-        .in('id', userIds);
-
-      const profMap = {};
-      (profiles || []).forEach(p => { profMap[p.id] = p; });
-
-      inboxList.innerHTML = userIds.map(uid => {
-        const item = threadMap[uid];
-        const p = profMap[uid] || {};
-        const name = p.free_fire_name || 'Gamer';
-        const ign = p.free_fire_uid || '--';
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        const time = new Date(item.lastTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        return `
-          <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(ign)}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
-            <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
-              <div>
-                <h4 class="font-bold text-xs text-white">${escapeHTML(name)}</h4>
-                <p class="text-[10px] text-gray-400 truncate max-w-[170px]">${escapeHTML(item.lastMsg)}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-[9px] text-gray-500">${time}</span>
-              <div class="mt-1">
-                ${item.unreadCount > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${item.unreadCount}</span>` : ''}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
-    async function openPlayerChat(userId, name, uid, avatarUrl) {
-      activeChatPlayerId = userId;
-      document.getElementById('active-chat-username').innerText = name;
-      document.getElementById('active-chat-uid').innerText = `UID: ${uid}`;
-      document.getElementById('active-chat-avatar').src = avatarUrl;
-      document.getElementById('support-inbox-view').classList.add('hidden');
-      document.getElementById('support-chat-view').classList.remove('hidden');
+    window.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('btn-hamburger').onclick = () => Drawer.open();
 
-      await sbClient.from('support_messages')
-        .update({ is_read: true })
-        .eq('user_id', userId)
-        .eq('sender_role', 'player')
-        .eq('is_read', false);
+      document.getElementById('btn-drawer-logout').onclick = async () => {
+        Drawer.close();
+        await sbClient.auth.signOut();
+        currentUser = null;
+        currentProfile = null;
+        userJoinedTournamentIds.clear();
+        updateDrawerUI();
+        Toast.show("Logged out successfully", "info");
+        Router.navigate('home');
+      };
 
-      loadDashboardStats();
-
-      await renderActiveChatMessages();
-      if (chatInterval) clearInterval(chatInterval);
-      chatInterval = setInterval(renderActiveChatMessages, 3500);
-    }
-
-    function closePlayerChat() {
-      if (chatInterval) clearInterval(chatInterval);
-      activeChatPlayerId = null;
-      document.getElementById('support-chat-view').classList.add('hidden');
-      document.getElementById('support-inbox-view').classList.remove('hidden');
-      loadSupportInbox();
-      loadDashboardStats();
-    }
-
-    async function renderActiveChatMessages() {
-      if (!activeChatPlayerId) return;
-      const { data } = await sbClient
-        .from('support_messages')
-        .select('*')
-        .or(`user_id.eq.${activeChatPlayerId},sender_id.eq.${activeChatPlayerId}`)
-        .order('created_at', { ascending: true });
-
-      const box = document.getElementById('active-chat-messages');
-      if (!data || !data.length) {
-        box.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No messages in thread.</p>`;
-        return;
-      }
-
-      box.innerHTML = data.map(m => {
-        const isAdmin = m.sender_role === 'admin';
-        return `
-          <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
-            <div class="max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${isAdmin ? 'bg-[#ff4624] text-white rounded-br-none' : 'bg-[#06070a] border border-[#262f40] text-gray-200 rounded-bl-none'}">
-              ${escapeHTML(m.message)}
-            </div>
-            <span class="text-[9px] text-gray-500 mt-1 font-mono">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-        `;
-      }).join('');
-      box.scrollTop = box.scrollHeight;
-    }
-
-    document.getElementById('admin-reply-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const input = document.getElementById('admin-reply-input');
-      const text = input.value.trim();
-      if (!text || !activeChatPlayerId) return;
-
-      input.value = '';
-      const { error } = await sbClient.from('support_messages').insert([{
-        user_id: activeChatPlayerId,
-        sender_id: currentAdmin.id,
-        sender_role: 'admin',
-        message: text,
-        is_read: true
-      }]);
-
-      if (error) alert("Send error: " + error.message);
-      else renderActiveChatMessages();
-    });
-
-    async function loadSettings() {
-      const { data } = await sbClient.from('site_settings').select('*');
-      if (data) {
-        data.forEach(s => {
-          if (s.setting_key === 'announcement_ticker') document.getElementById('set-ticker-text').value = s.setting_value;
-          if (s.setting_key === 'announcement_enabled') document.getElementById('set-ticker-enabled').checked = s.setting_value !== 'false';
-        });
-      }
-    }
-
-    async function saveSiteSettings() {
-      const tickerText = document.getElementById('set-ticker-text').value.trim();
-      const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
-
-      const updates = [
-        { setting_key: 'announcement_ticker', setting_value: tickerText },
-        { setting_key: 'announcement_enabled', setting_value: tickerEnabled }
-      ];
-
-      for (const item of updates) {
-        await sbClient.from('site_settings').upsert(item, { onConflict: 'setting_key' });
-      }
-      alert("Announcement ticker saved successfully!");
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      checkAdminAuth();
+      setupDraggableBot();
+      await syncAuthAndProfile();
+      Router.navigate('home');
     });
   </script>
 </body>
