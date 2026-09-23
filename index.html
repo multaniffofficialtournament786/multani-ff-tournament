@@ -142,10 +142,54 @@
       left: 0;
       right: 0;
     }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 25%; transition: var(--transition); cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
+    /* HORIZONTAL SCROLLABLE CATEGORY BUTTONS */
+    .category-scroll-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 2px 14px 2px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .category-scroll-container::-webkit-scrollbar { display: none; }
+    
+    .cat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      gap: 6px;
+    }
+    .cat-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2b1218, #150a0d);
+      border: 2px solid var(--primary);
+      box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold);
+      font-size: 18px;
+      transition: var(--transition);
+    }
+    .cat-circle:active { transform: scale(0.92); }
+    .cat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    /* DRAGGABLE ADMIN FLOATING SUPPORT WIDGET & EXPANDABLE MENU */
     #admin-float-widget {
       position: absolute;
       bottom: 120px;
@@ -155,7 +199,7 @@
       user-select: none;
       cursor: grab;
       display: flex;
-      flex-direction: column;
+      flex-direction: column-reverse;
       align-items: center;
     }
     #admin-float-widget:active { cursor: grabbing; }
@@ -186,6 +230,34 @@
       text-transform: uppercase;
       border: 1px solid rgba(255,255,255,0.3);
     }
+    .support-popup-menu {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+      animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .support-popup-menu.show { display: flex; }
+    @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    
+    .support-action-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffbe00, #ff9800);
+      border: 2px solid #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .support-action-btn:active { transform: scale(0.9); }
 
     #chat-modal-overlay {
       position: absolute;
@@ -251,70 +323,66 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    .quick-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
-    .action-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition); }
-    .action-card i { font-size: 20px; color: var(--primary); }
-    .action-card span { font-size: 11px; font-weight: 600; text-align: center; }
+    /* AS8-STYLE COMPACT TOURNAMENT CARDS (IMAGE ON TOP, DETAILS BELOW) */
+    .tournaments-grid-as8 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .t-card-as8 {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .t-card-as8:active { transform: scale(0.96); }
+    .t-card-thumb-wrap {
+      width: 100%;
+      height: 95px;
+      position: relative;
+      background: #000;
+    }
+    .t-card-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .t-card-info-box {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #11151e;
+    }
+    .t-card-title-as8 {
+      font-family: var(--font-gaming);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .t-card-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .t-card-prize-as8 {
+      font-family: var(--font-gaming);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
 
-    /* TOURNAMENT CARD STYLES */
-    .tournament-card { 
-      border: 1px solid rgba(255, 255, 255, 0.18) !important; 
-      border-radius: 16px !important; 
-      overflow: hidden !important; 
-      margin-bottom: 16px !important; 
-      position: relative !important; 
-      height: 250px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-end !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.85) !important;
-    }
-    .t-card-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.35) 100%);
-      z-index: 2;
-    }
-    .t-badge { 
-      position: absolute; 
-      top: 12px; 
-      right: 12px; 
-      padding: 4px 10px; 
-      border-radius: 6px; 
-      font-family: var(--font-gaming); 
-      font-size: 11px; 
-      font-weight: 800; 
-      text-transform: uppercase; 
-      z-index: 4;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-    }
-    .badge-live { background: var(--danger); color: #fff; }
-    .badge-upcoming { background: var(--accent-cyan); color: #000; }
-    .badge-joined { background: #00e676; color: #000; border: 1.5px solid #fff; }
-
-    .t-glass-details { 
-      position: relative !important;
-      z-index: 3 !important;
-      padding: 10px 14px 12px 14px !important; 
-      background: rgba(10, 14, 22, 0.1) !important;
-      backdrop-filter: blur(4px) !important;
-      -webkit-backdrop-filter: blur(4px) !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-    }
-    .t-title { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; margin-bottom: 5px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
-    .t-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
-    .spec-pill { font-size: 11px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.25); padding: 3px 8px; border-radius: 4px; color: #cbd5e1; }
-    .spec-pill strong { color: #fff; }
-    .t-slot-progress-wrap { margin-bottom: 6px; }
-    .t-slot-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.22); border-radius: 3px; overflow: hidden; margin-top: 3px; }
-    .t-slot-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--primary)); }
-    .t-footer-grid { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.25); padding-top: 8px; }
-    .t-prize { font-family: var(--font-gaming); font-size: 17px; font-weight: 800; color: var(--accent-gold); text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-    .t-fee { font-size: 11px; color: #cbd5e1; }
-    
     /* FREE FIRE ROOM SLOTS GRID */
     .room-slots-container {
       background: #090c12;
@@ -487,6 +555,7 @@
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
           <span><i class="fa-solid fa-bell"></i> Notifications</span>
@@ -506,13 +575,22 @@
 
     <main id="app-view" class="main-content"></main>
 
-    <!-- DRAGGABLE BOT WIDGET -->
+    <!-- DRAGGABLE BOT WIDGET WITH EXPANDABLE SOCIAL/SUPPORT MENU -->
     <div id="admin-float-widget">
-      <div class="bot-bubble">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Admin Support Bot" />
+      <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
         <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
       </div>
-      <span class="bot-badge-tag">ADMIN</span>
+
+      <div id="support-popup-menu" class="support-popup-menu">
+        <a href="https://www.instagram.com/multani.ff.gaming?stkn=NnBiYTN1eTM0eXc1" target="_blank" class="support-action-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="support-action-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="support-action-btn" title="Facebook Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn" title="Admin Support Chat"><i class="fa-solid fa-headset"></i></div>
+      </div>
+      <span class="bot-badge-tag">MENU</span>
     </div>
 
     <!-- REAL CHAT MODAL -->
@@ -550,10 +628,11 @@
       </div>
     </div>
 
-    <!-- FIXED BOTTOM NAV -->
+    <!-- FIXED BOTTOM NAV (5 ITEMS: Home, Matches, Invite, Winners, Wallet) -->
     <nav id="bottom-nav" class="bottom-nav">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
+      <div class="nav-item" data-page="invite" onclick="Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i><span>Invite</span></div>
       <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
       <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
@@ -714,6 +793,7 @@
         else if (page === 'tournament_detail') renderTournamentDetail(id);
         else if (page === 'wallet') renderWallet();
         else if (page === 'deposit') renderDeposit();
+        else if (page === 'invite') renderInvite();
         else if (page === 'login') renderAuth();
         else if (page === 'profile') renderProfile();
         else if (page === 'winners') renderWinners();
@@ -737,50 +817,33 @@
       if (!list || !list.length) {
         return `<div class="empty-state"><i class="fa-solid fa-trophy"></i><p>No active matches found.</p></div>`;
       }
-      return list.map(t => {
-        const pct = Math.min(100, Math.round(((t.joined_players || 0) / t.max_players) * 100));
-        const isJoined = userJoinedTournamentIds.has(t.id);
-        const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
+      return `
+        <div class="tournaments-grid-as8">
+          ${list.map(t => {
+            const isJoined = userJoinedTournamentIds.has(t.id);
+            const imgUrl = t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80';
 
-        let formattedDateTime = 'Upcoming';
-        if (t.match_date) {
-          const d = new Date(t.match_date);
-          const optionsDate = { weekday: 'short', month: 'short', day: 'numeric' };
-          const dateStr = d.toLocaleDateString('en-US', optionsDate);
-          const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          formattedDateTime = `${dateStr} • ${timeStr}`;
-        }
-
-        return `
-          <div class="tournament-card" onclick="Router.navigate('tournament_detail', '${t.id}')" style="background-image: url('${imgUrl}'); cursor:pointer;">
-            <div class="t-card-overlay"></div>
-            ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
-
-            <div class="t-glass-details">
-              <h3 class="t-title">${t.title}</h3>
-              <div class="t-specs">
-                <span class="spec-pill">Mode: <strong>${t.mode}</strong></span>
-                <span class="spec-pill">Map: <strong>${t.map}</strong></span>
-                <span class="spec-pill"><i class="fa-solid fa-calendar-days"></i> ${formattedDateTime}</span>
-              </div>
-              <div class="t-slot-progress-wrap">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#cbd5e1;">
-                  <span>Slots: ${t.joined_players || 0}/${t.max_players}</span>
-                  <span>${pct}%</span>
+            return `
+              <div class="t-card-as8" onclick="Router.navigate('tournament_detail', '${t.id}')">
+                <div class="t-card-thumb-wrap">
+                  <img src="${imgUrl}" alt="${t.title}" />
+                  ${isJoined ? `<span style="position:absolute; top:4px; right:4px; background:#00e676; color:#000; font-size:9px; font-weight:800; padding:2px 5px; border-radius:4px;">JOINED</span>` : ''}
                 </div>
-                <div class="t-slot-bar"><div class="t-slot-fill" style="width: ${pct}%"></div></div>
-              </div>
-              <div class="t-footer-grid">
-                <div>
-                  <div class="t-fee">Entry: <span class="${t.entry_fee == 0 ? 'text-accent' : 'text-gold'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-                  <div class="t-prize">Prize: ${t.prize_pool} PKR</div>
+                <div class="t-card-info-box">
+                  <h4 class="t-card-title-as8">${t.title}</h4>
+                  <div class="t-card-meta-row">
+                    <span>Slots: ${t.joined_players || 0}/${t.max_players}</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+                    <span class="t-card-prize-as8">PKR ${t.prize_pool}</span>
+                    <span style="font-size:10px; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'}; font-weight:700;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
+                  </div>
                 </div>
-                <button class="btn btn-primary btn-sm" style="padding:6px 12px; font-size:12px;">${isJoined ? 'VIEW ROOM' : 'VIEW DETAILS'}</button>
               </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     async function renderHome() {
@@ -852,13 +915,32 @@
             </a>
           </div>
 
-          <div class="quick-actions-grid">
-            <div onclick="Router.navigate('tournaments')" class="action-card"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-            <div onclick="Router.navigate('deposit')" class="action-card"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i><span>Add Cash</span></div>
-            <div onclick="Router.navigate('winners')" class="action-card"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i><span>Winners</span></div>
-            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i><span>Wallet</span></div>
-            <div onclick="Router.navigate('wallet')" class="action-card"><i class="fa-solid fa-receipt" style="color:#00e676;"></i><span>Payment Record</span></div>
-            <div onclick="Router.navigate('leaderboard')" class="action-card"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i><span>Top List</span></div>
+          <!-- HORIZONTAL SCROLLABLE CATEGORY SLIDER (6 OLD BUTTONS) -->
+          <div class="category-scroll-container">
+            <div class="cat-item" onclick="Router.navigate('tournaments')">
+              <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
+              <span class="cat-label">Matches</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('deposit')">
+              <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
+              <span class="cat-label">Add Cash</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('winners')">
+              <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
+              <span class="cat-label">Winners</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
+              <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
+              <span class="cat-label">Wallet</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
+              <div class="cat-circle"><i class="fa-solid fa-receipt" style="color:#00e676;"></i></div>
+              <span class="cat-label">Payment Record</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('leaderboard')">
+              <div class="cat-circle"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i></div>
+              <span class="cat-label">Top List</span>
+            </div>
           </div>
 
           <div class="section-title"><span>Available Tournaments</span></div>
@@ -871,10 +953,10 @@
               <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
                 <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
               </a>
-              <a href="https://www.tiktok.com/@multaniffgaming" target="_blank" class="social-icon-btn tiktok">
+              <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="social-icon-btn tiktok">
                 <i class="fa-brands fa-tiktok text-sm"></i> TikTok
               </a>
-              <a href="https://www.youtube.com/@Multaniff-b2k" target="_blank" class="social-icon-btn youtube">
+              <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="social-icon-btn youtube">
                 <i class="fa-brands fa-youtube text-sm"></i> YouTube
               </a>
             </div>
@@ -897,6 +979,70 @@
         <div class="view-container">
           <div class="section-title"><span><i class="fa-solid fa-trophy text-gold"></i> Active Tournaments & Rooms</span></div>
           <div>${buildTournamentCardsHTML(activeTournaments)}</div>
+        </div>
+      `;
+    }
+
+    async function renderInvite() {
+      const refCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || 'MLT5041';
+      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${refCode}`;
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); padding: 16px; text-align: center; margin-bottom: 14px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight: 700;">Today's Income</div>
+            <div style="font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0 12px 0;">Rs 0.00</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--text-muted);">Registers</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--accent-cyan);">0</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--text-muted);">Valid Referral</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--success);">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="player-hero-card" style="padding: 16px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px; text-transform: uppercase;">Share with your friends</div>
+            
+            <div style="display: flex; gap: 8px; align-items: center; background: #0a0e16; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
+              <input type="text" id="ref-link-input" value="${shareUrl}" style="background: transparent; border: none; color: #fff; font-size: 11px; width: 100%; outline: none;" readonly />
+              <button onclick="navigator.clipboard.writeText('${shareUrl}'); Toast.show('Invite link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" class="support-action-btn" style="background:#1877f2; color:#fff; font-size:16px;"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Join%20Multani%20FF%20Tournaments" target="_blank" class="support-action-btn" style="background:#0088cc; color:#fff; font-size:16px;"><i class="fa-brands fa-telegram"></i></a>
+              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('Join Multani FF Tournaments and win prizes: ' + shareUrl)}" target="_blank" class="support-action-btn" style="background:#25d366; color:#fff; font-size:16px;"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+          </div>
+
+          <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
+            <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
+            <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Revenue Goals & 6 Coins Reward</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for direct invite + 1 Coin when your invited friend invites someone else (Total 6 Coins setup)!</p>
+          </div>
+
+          <div class="player-hero-card" style="padding: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 8px;">Rewards Released to Date</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">Invitation Rewards</div>
+                <div style="font-size: 10px; color: var(--text-dim);">2,244 claimed</div>
+              </div>
+              <div style="font-family: var(--font-gaming); font-size: 16px; font-weight: 800; color: var(--accent-gold);">Rs 2,908,072.00</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">Achievement Rewards</div>
+                <div style="font-size: 10px; color: var(--text-dim);">Milestone bonuses</div>
+              </div>
+              <div style="font-family: var(--font-gaming); font-size: 16px; font-weight: 800; color: var(--success);">Rs 1,220,800.00</div>
+            </div>
+          </div>
         </div>
       `;
     }
@@ -950,17 +1096,13 @@
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
-          <div class="tournament-card" style="background-image: url('${imgUrl}'); margin-bottom: 12px; height: 190px !important;">
-            <div class="t-card-overlay"></div>
-            ${isJoined ? `<span class="t-badge badge-joined"><i class="fa-solid fa-check"></i> JOINED</span>` : `<span class="t-badge badge-${t.status}">${t.status}</span>`}
-            
-            <div class="t-glass-details">
-              <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px;">${t.title}</h2>
-              <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5);">
-                <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-                <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
-                <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
-              </div>
+          <div class="player-hero-card" style="margin-bottom: 12px; padding: 12px; text-align: center;">
+            <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
+            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px;">${t.title}</h2>
+            <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
+              <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+              <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
+              <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
             </div>
           </div>
 
@@ -970,7 +1112,6 @@
                 Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}
               </div>
               
-              <!-- Room ID aur Password Alag Alag Boxes -->
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
                 <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
                   <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
@@ -986,7 +1127,6 @@
                 </div>
               </div>
 
-              <!-- Blue Line aur Darmiyan mein required text -->
               <div style="border-top: 1px solid var(--accent-cyan); padding-top: 8px; text-align: center;">
                 <p style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
                   Room id aur pw match se 10.15 mint pehle yaha bhj diya jaega
@@ -1701,6 +1841,13 @@
       }
     };
 
+    function toggleSupportMenu(forceState) {
+      const menu = document.getElementById('support-popup-menu');
+      if (!menu) return;
+      const shouldShow = typeof forceState === 'boolean' ? forceState : !menu.classList.contains('show');
+      menu.classList.toggle('show', shouldShow);
+    }
+
     const ChatModal = {
       isOpen: false,
       interval: null,
@@ -1783,6 +1930,7 @@
 
     function setupDraggableBot() {
       const widget = document.getElementById('admin-float-widget');
+      const mainBtn = document.getElementById('float-main-btn');
       let isDragging = false;
       let startX, startY, origX, origY;
       let hasMoved = false;
@@ -1831,8 +1979,10 @@
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
-      widget.addEventListener('click', () => {
-        if (!hasMoved) ChatModal.open();
+      mainBtn.addEventListener('click', (e) => {
+        if (!hasMoved) {
+          toggleSupportMenu();
+        }
       });
     }
 
