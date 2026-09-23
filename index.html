@@ -669,7 +669,6 @@
     let unreadNotifCount = 0;
     let unreadChatCount = 0;
 
-    // Detect and save referral code from URL if present
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
     if (refParam) {
@@ -1175,7 +1174,7 @@
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom: 12px; padding: 12px; text-align: center;">
             <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
-            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px;">${t.title}</h2>
+            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${t.title}</h2>
             <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
               <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
               <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
