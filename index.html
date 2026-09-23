@@ -1161,25 +1161,8 @@
       if (!currentUser) return;
       Loader.show("Claiming bonus...");
       try {
-        const { data: targetUser } = await sbClient.from('profiles').select('id, ref_claimed, free_fire_uid').eq('id', referredUserId).single();
-        if (!targetUser || targetUser.ref_claimed) {
-          throw new Error("Yeh bonus pehle hi claim ho chuka hai.");
-        }
-
-        const { error: markErr } = await sbClient.from('profiles').update({ ref_claimed: true }).eq('id', referredUserId);
-        if (markErr) throw markErr;
-
-        const newBal = (currentProfile.wallet_balance || 0) + amount;
-        const { error: updateBalErr } = await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', currentUser.id);
-        if (updateBalErr) throw updateBalErr;
-
-        await sbClient.from('wallet_transactions').insert([{
-          user_id: currentUser.id,
-          amount: amount,
-          transaction_type: 'referral_bonus',
-          status: 'approved',
-          description: `Referral Claimed (UID: ${targetUser.free_fire_uid})`
-        }]);
+        const { error } = await sbClient.rpc('claim_referral_bonus', { p_referred_user_id: referredUserId });
+        if (error) throw error;
 
         Loader.hide();
         Toast.show("Successfully claimed +5 coins to your wallet!", "success");
@@ -1459,42 +1442,55 @@
       ]);
       Loader.hide();
 
-      const deposits = depRes.data || [];
-      const txs = txRes.data || [];
+      // Combined and sorted by date (newest first)
+      const deposits = (depRes.data || []).map(d => ({
+        ...d,
+        sortDate: new Date(d.created_at).getTime(),
+        isDeposit: true
+      }));
 
-      const depositSlipsHtml = deposits.length ? deposits.map(d => {
-        let badgeColor = 'background:#ff9800; color:#000;';
-        if (d.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
-        if (d.status === 'rejected') badgeColor = 'background:#ff1744; color:#fff;';
+      const transactions = (txRes.data || []).map(tx => ({
+        ...tx,
+        sortDate: new Date(tx.created_at).getTime(),
+        isDeposit: false
+      }));
 
-        return `
-          <div class="tx-item" style="border-left: 3px solid ${d.status === 'approved' ? '#00e676' : (d.status === 'rejected' ? '#ff1744' : '#ff9800')};">
-            <div class="tx-info">
-              <h4>Deposit (${d.payment_method})</h4>
-              <span>Email: <strong>${d.transaction_id}</strong> • ${new Date(d.created_at).toLocaleDateString()}</span>
+      const combinedHistory = [...deposits, ...transactions].sort((a, b) => b.sortDate - a.sortDate);
+
+      const historyHtml = combinedHistory.length ? combinedHistory.map(item => {
+        if (item.isDeposit) {
+          let badgeColor = 'background:#ff9800; color:#000;';
+          if (item.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
+          if (item.status === 'rejected') badgeColor = 'background:#ff1744; color:#fff;';
+
+          return `
+            <div class="tx-item" style="border-left: 3px solid ${item.status === 'approved' ? '#00e676' : (item.status === 'rejected' ? '#ff1744' : '#ff9800')};">
+              <div class="tx-info">
+                <h4>Deposit (${item.payment_method})</h4>
+                <span>Email: <strong>${item.transaction_id}</strong> • ${new Date(item.created_at).toLocaleString()}</span>
+              </div>
+              <div style="text-align:right;">
+                <div class="tx-amount tx-positive">PKR ${item.amount}</div>
+                <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${item.status}</span>
+              </div>
             </div>
-            <div style="text-align:right;">
-              <div class="tx-amount tx-positive">PKR ${d.amount}</div>
-              <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${d.status}</span>
-            </div>
-          </div>
-        `;
-      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No deposit requests submitted.</p>`;
+          `;
+        } else {
+          const isPrize = item.transaction_type === 'prize' || (item.description && item.description.toLowerCase().includes('prize'));
+          const isReferral = item.transaction_type === 'referral_bonus' || (item.description && item.description.toLowerCase().includes('referral'));
+          const isPositive = item.amount > 0 || isPrize || isReferral;
 
-      const txHtml = txs.length ? txs.map(tx => {
-        const isPrize = tx.transaction_type === 'prize' || (tx.description && tx.description.toLowerCase().includes('prize'));
-        const isPositive = tx.amount > 0 || isPrize;
-
-        return `
-          <div class="tx-item" style="${isPrize ? 'border-left: 3px solid var(--accent-gold);' : ''}">
-            <div class="tx-info">
-              <h4>${isPrize ? '🏆 ' + (tx.description || 'Tournament Prize Won') : (tx.description || tx.transaction_type)}</h4>
-              <span>${new Date(tx.created_at).toLocaleString()}</span>
+          return `
+            <div class="tx-item" style="${isPrize || isReferral ? 'border-left: 3px solid var(--accent-gold);' : ''}">
+              <div class="tx-info">
+                <h4>${isPrize ? '🏆 ' + (item.description || 'Tournament Prize Won') : (isReferral ? '🎁 ' + (item.description || 'Referral Bonus Claimed') : (item.description || item.transaction_type))}</h4>
+                <span>${new Date(item.created_at).toLocaleString()}</span>
+              </div>
+              <div class="tx-amount ${isPositive ? 'tx-positive' : 'tx-negative'}">${isPositive ? '+' : ''}${item.amount} PKR</div>
             </div>
-            <div class="tx-amount ${isPositive ? 'tx-positive' : 'tx-negative'}">${isPositive ? '+' : ''}${tx.amount} PKR</div>
-          </div>
-        `;
-      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction logs.</p>`;
+          `;
+        }
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction history found.</p>`;
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1504,11 +1500,8 @@
             <button class="btn btn-primary" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
           </div>
 
-          <div class="section-title"><span>Your Deposit Slips (Live Status)</span></div>
-          <div>${depositSlipsHtml}</div>
-
-          <div class="section-title" style="margin-top:20px;"><span>Wallet Activity</span></div>
-          <div>${txHtml}</div>
+          <div class="section-title"><span>Transaction History (Newest First)</span></div>
+          <div>${historyHtml}</div>
         </div>
       `;
     }
