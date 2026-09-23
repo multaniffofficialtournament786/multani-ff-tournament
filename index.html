@@ -1066,9 +1066,17 @@
       const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${uniqueRefCode}`;
 
       let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your link to start earning!</p>`;
-      if (currentUser && currentProfile) {
+      let totalRegisters = 0;
+      let validReferrals = 0;
+      let totalIncome = 0;
+
+      if (currentUser && currentProfile && currentProfile.free_fire_uid) {
         const { data: refUsers } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, created_at').eq('referred_by', currentProfile.free_fire_uid);
         if (refUsers && refUsers.length > 0) {
+          totalRegisters = refUsers.length;
+          validReferrals = refUsers.length;
+          totalIncome = validReferrals * 5; // 5 coins/rupees per referral setup
+          
           invitedListHTML = refUsers.map(u => `
             <div class="tx-item">
               <div class="tx-info">
@@ -1085,16 +1093,16 @@
         <div class="view-container">
           <div class="player-hero-card" style="background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); padding: 16px; text-align: center; margin-bottom: 14px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight: 700;">Today's Income</div>
-            <div style="font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0 12px 0;">Rs 0.00</div>
+            <div style="font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0 12px 0;">Rs ${totalIncome}.00</div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
                 <div style="font-size: 10px; color: var(--text-muted);">Registers</div>
-                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--accent-cyan);">0</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--accent-cyan);">${totalRegisters}</div>
               </div>
               <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
                 <div style="font-size: 10px; color: var(--text-muted);">Valid Referral</div>
-                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--success);">0</div>
+                <div style="font-family: var(--font-gaming); font-size: 18px; font-weight: 700; color: var(--success);">${validReferrals}</div>
               </div>
             </div>
           </div>
