@@ -122,6 +122,9 @@
         <h1 id="panel-title" class="font-gaming text-lg md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="hardRefreshPage()" title="Hard Refresh" class="bg-[#151922] border border-[#262f40] text-cyan-400 hover:bg-cyan-500 hover:text-black px-2.5 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">REFRESH</span>
+        </button>
         <button onclick="openCreateTournamentModal()" class="bg-[#ff4624] text-white px-3 py-1.5 rounded-lg text-xs font-gaming font-bold tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">CREATE MATCH</span>
         </button>
@@ -352,10 +355,15 @@
 
   <!-- MODAL: PLAYERS LIST -->
   <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 id="modal-players-title" class="font-gaming text-lg font-bold text-white uppercase">Tournament Players</h3>
-        <button onclick="closePlayersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40] gap-3">
+        <h3 id="modal-players-title" class="font-gaming text-sm sm:text-base font-bold text-white uppercase break-words leading-tight flex-1">Tournament Players</h3>
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="closePlayersModal()" class="bg-[#151922] border border-[#262f40] hover:bg-[#ff4624] text-gray-300 hover:text-white px-2.5 py-1 rounded text-xs font-bold font-gaming transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> BACK
+          </button>
+          <button onclick="closePlayersModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
       </div>
       <div id="modal-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll"></div>
     </div>
@@ -505,6 +513,10 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    function hardRefreshPage() {
+      window.location.reload(true);
     }
 
     function togglePasswordVisibility() {
@@ -667,7 +679,6 @@
     });
 
     async function loadDashboardStats() {
-      // Direct fetch all deposit requests to avoid column mismatch errors
       const { data: allDeps } = await sbClient.from('deposit_requests').select('*');
       const safeDeps = allDeps || [];
 
@@ -1067,7 +1078,7 @@
     }
 
     async function viewTournamentPlayers(tId, tTitle) {
-      document.getElementById('modal-players-title').innerText = `${tTitle} - Players`;
+      document.getElementById('modal-players-title').innerText = `${tTitle} - PLAYERS`;
       const body = document.getElementById('modal-players-body');
       body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading joined players...</p>`;
       document.getElementById('modal-players').classList.remove('hidden');
