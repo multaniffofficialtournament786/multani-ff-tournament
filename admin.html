@@ -98,7 +98,7 @@
 
       <div class="p-3 border-t border-[#262f40] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs">MLT</div>
+          <img id="admin-user-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
           <div class="text-xs">
             <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
             <p class="text-emerald-400 text-[10px]">Active Session</p>
@@ -140,7 +140,6 @@
             <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
             <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
           </div>
-          <!-- TOTAL PLAYERS BOX WITH LIST BUTTON -->
           <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1 flex items-center justify-between">
             <div>
               <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
@@ -205,7 +204,11 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Winning Gamer</label>
-            <select id="win-player" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+            <div id="win-player-select-box" onclick="openVipPlayerSelectModal()" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white cursor-pointer flex items-center justify-between">
+              <span id="win-selected-player-text">Choose player...</span>
+              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            </div>
+            <input type="hidden" id="win-player" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -225,7 +228,10 @@
 
       <!-- USERS & WALLET EDIT -->
       <section id="section-users" class="space-y-3 hidden">
-        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
+          <input type="text" id="user-search-input" oninput="filterUsersList()" placeholder="Search name, UID, email..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+        </div>
         <div id="users-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
         </div>
@@ -248,9 +254,12 @@
             <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
               <i class="fa-solid fa-arrow-left"></i> All Chats
             </button>
-            <div class="text-center">
-              <h4 id="active-chat-username" class="font-bold text-sm text-white">Player</h4>
-              <p id="active-chat-uid" class="text-[10px] text-cyan-400 font-mono">UID: --</p>
+            <div class="flex items-center gap-2">
+              <img id="active-chat-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border border-[#ff4624]" />
+              <div class="text-center">
+                <h4 id="active-chat-username" class="font-bold text-sm text-white">Player</h4>
+                <p id="active-chat-uid" class="text-[10px] text-cyan-400 font-mono">UID: --</p>
+              </div>
             </div>
             <div class="w-8"></div>
           </div>
@@ -292,7 +301,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST -->
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST WITH COMPLETE PAYMENT BREAKDOWN -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
@@ -301,7 +310,28 @@
         </h3>
         <button onclick="closeAllPlayersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
+      <div class="relative">
+        <input type="text" id="all-players-search" oninput="filterAllPlayersModal()" placeholder="Search name, UID..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
       <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2.5 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VIP PLAYER SELECTOR FOR WINNERS -->
+  <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-yellow-400"></i> Select Winning Gamer
+        </h3>
+        <button onclick="closeVipPlayerSelectModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div>
+        <input type="text" id="vip-player-search" oninput="filterVipPlayerModal()" placeholder="Search player by name or UID..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+      <div id="modal-vip-player-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
         <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
       </div>
     </div>
@@ -335,6 +365,7 @@
             <option value="Solo (1v1)">Solo (1v1)</option>
             <option value="Duo (2v2)">Duo (2v2)</option>
             <option value="Clash Squad">Clash Squad</option>
+            <option value="Lone Wolf">Lone Wolf</option>
           </select>
         </div>
         <div>
@@ -358,7 +389,6 @@
           <input type="number" id="edit-t-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
         </div>
       </div>
-      <!-- ADDED MATCH DATE FIELD IN EDIT MODAL -->
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
@@ -378,7 +408,7 @@
       </h3>
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
-        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. CLASH SQUAD #500" required />
+        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. LONE WOLF #500" required />
       </div>
 
       <div class="grid grid-cols-2 gap-2">
@@ -389,6 +419,7 @@
             <option value="Solo (1v1)">Solo (1v1)</option>
             <option value="Duo (2v2)">Duo (2v2)</option>
             <option value="Clash Squad">Clash Squad</option>
+            <option value="Lone Wolf">Lone Wolf</option>
           </select>
         </div>
         <div>
@@ -445,6 +476,8 @@
     let chatInterval = null;
     let loadedTournamentsList = [];
     let currentTournamentFilter = 'all';
+    let globalAllPlayersCache = [];
+    let globalWinnerSelectPlayersCache = [];
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -495,6 +528,9 @@
         currentAdmin = profile;
         authScreen.classList.add('hidden');
         document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
+        if (profile.avatar_url) {
+          document.getElementById('admin-user-avatar').src = profile.avatar_url;
+        }
         loadDashboardStats();
       } catch (err) {
         authScreen.classList.remove('hidden');
@@ -529,6 +565,9 @@
         currentAdmin = prof;
         document.getElementById('admin-auth-screen').classList.add('hidden');
         document.getElementById('admin-user-name').innerText = prof.free_fire_name || prof.full_name || 'Master Admin';
+        if (prof.avatar_url) {
+          document.getElementById('admin-user-avatar').src = prof.avatar_url;
+        }
         loadDashboardStats();
       } catch (err) {
         msg.innerText = err.message || "Failed to authenticate.";
@@ -561,8 +600,12 @@
 
     const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'support', 'banned', 'settings'];
 
-    function selectTab(tabId) {
+    function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
+
+      if (pushHistory && history.state?.tab !== tabId) {
+        history.pushState({ tab: tabId }, '', '#' + tabId);
+      }
 
       tabs.forEach(t => {
         const sec = document.getElementById(`section-${t}`);
@@ -598,6 +641,11 @@
       if (tabId === 'settings') loadSettings();
       if (tabId === 'support') loadSupportInbox();
     }
+
+    window.addEventListener('popstate', (e) => {
+      const targetTab = e.state?.tab || 'overview';
+      selectTab(targetTab, false);
+    });
 
     async function loadDashboardStats() {
       const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
@@ -653,36 +701,101 @@
         return;
       }
 
-      body.innerHTML = data.map(u => {
+      // Fetch deposit records and entries/referrals for complete payment breakdown
+      const [depRes, entryRes] = await Promise.all([
+        sbClient.from('deposit_requests').select('user_id, amount, status').eq('status', 'approved'),
+        sbClient.from('tournament_entries').select('user_id')
+      ]);
+
+      const depositMap = {};
+      (depRes.data || []).forEach(d => {
+        depositMap[d.user_id] = (depositMap[d.user_id] || 0) + parseFloat(d.amount || 0);
+      });
+
+      const matchMap = {};
+      (entryRes.data || []).forEach(e => {
+        matchMap[e.user_id] = (matchMap[e.user_id] || 0) + 1;
+      });
+
+      // Count referrals
+      const refCountMap = {};
+      data.forEach(u => {
+        if (u.referred_by) {
+          refCountMap[u.referred_by] = (refCountMap[u.referred_by] || 0) + 1;
+        }
+      });
+
+      globalAllPlayersCache = data.map(u => ({
+        ...u,
+        computedDeposit: depositMap[u.id] || 0,
+        computedMatches: matchMap[u.id] || u.total_matches || 0,
+        computedReferrals: refCountMap[u.free_fire_uid] || 0
+      }));
+
+      renderAllPlayersList(globalAllPlayersCache);
+    }
+
+    function renderAllPlayersList(list) {
+      const body = document.getElementById('modal-all-players-body');
+      if (!list.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No matching players found.</p>`;
+        return;
+      }
+
+      body.innerHTML = list.map(u => {
         const waNumber = u.phone || '';
         const userEmail = u.email || 'No email added';
+        const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         let waLink = '#';
         if (waNumber) {
           let cleanNum = waNumber.replace(/[^0-9]/g, '');
-          if (cleanNum.startsWith('0')) {
-            cleanNum = '92' + cleanNum.substring(1);
-          }
+          if (cleanNum.startsWith('0')) cleanNum = '92' + cleanNum.substring(1);
           const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin.");
           waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
         }
 
+        const refEarnings = (u.computedReferrals || 0) * 5; // 5 coins/rupees per referral setup
+
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2 text-xs">
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2.5 text-xs">
             <div class="flex items-center justify-between">
-              <div>
-                <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+              <div class="flex items-center gap-2.5">
+                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                  <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+                </div>
               </div>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
                 ${u.is_banned ? 'BANNED' : 'ACTIVE'}
               </span>
             </div>
 
-            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
+            <!-- PAYMENT RECORD BREAKDOWN -->
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] grid grid-cols-2 gap-2 text-[11px]">
+              <div>
+                <span class="text-gray-400 text-[10px] block uppercase font-bold">Total Deposit:</span>
+                <strong class="text-yellow-400 font-gaming text-xs">PKR ${u.computedDeposit}</strong>
+              </div>
+              <div>
+                <span class="text-gray-400 text-[10px] block uppercase font-bold">Matches Joined:</span>
+                <strong class="text-white font-gaming text-xs">${u.computedMatches}</strong>
+              </div>
+              <div>
+                <span class="text-gray-400 text-[10px] block uppercase font-bold">Prize Winnings:</span>
+                <strong class="text-emerald-400 font-gaming text-xs">PKR ${u.total_won || 0}</strong>
+              </div>
+              <div>
+                <span class="text-gray-400 text-[10px] block uppercase font-bold">Referral Earnings:</span>
+                <strong class="text-cyan-400 font-gaming text-xs">PKR ${refEarnings} (${u.computedReferrals || 0} refs)</strong>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
               <span class="text-gray-300 font-mono"><i class="fa-solid fa-envelope text-red-400 mr-1.5"></i> ${escapeHTML(userEmail)}</span>
             </div>
 
-            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
+            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
               <span class="text-[#00e676] font-mono font-bold"><i class="fa-brands fa-whatsapp"></i> ${escapeHTML(waNumber || 'No WhatsApp added')}</span>
               ${waNumber ? `
                 <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 shadow">
@@ -692,12 +805,26 @@
             </div>
 
             <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
-              <span>Balance: <strong class="text-yellow-400">PKR ${u.wallet_balance || 0}</strong></span>
-              <span>Matches: <strong>${u.total_matches || 0}</strong></span>
+              <span>Wallet Balance: <strong class="text-yellow-400">PKR ${u.wallet_balance || 0}</strong></span>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function filterAllPlayersModal() {
+      const q = document.getElementById('all-players-search').value.toLowerCase().trim();
+      if (!q) {
+        renderAllPlayersList(globalAllPlayersCache);
+        return;
+      }
+      const filtered = globalAllPlayersCache.filter(u => 
+        (u.free_fire_name && u.free_fire_name.toLowerCase().includes(q)) ||
+        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+        (u.free_fire_uid && u.free_fire_uid.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q))
+      );
+      renderAllPlayersList(filtered);
     }
 
     function closeAllPlayersModal() {
@@ -841,7 +968,6 @@
       document.getElementById('edit-t-fee').value = t.entry_fee;
       document.getElementById('edit-t-prize').value = t.prize_pool;
       
-      // Load existing match_date into input formatted for datetime-local
       if (t.match_date) {
         const dateObj = new Date(t.match_date);
         const localIsoString = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
@@ -897,7 +1023,7 @@
 
       const { data, error } = await sbClient
         .from('tournament_entries')
-        .select('id, user_id, slot_number, profiles(id, free_fire_name, free_fire_uid, is_banned)')
+        .select('id, user_id, slot_number, profiles(id, free_fire_name, free_fire_uid, avatar_url, is_banned)')
         .eq('tournament_id', tId);
 
       if (error || !data || !data.length) {
@@ -905,20 +1031,27 @@
         return;
       }
 
-      body.innerHTML = data.map(e => `
-        <div class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] rounded-lg text-xs">
-          <div>
-            <span class="font-bold text-white">Slot #${e.slot_number || '--'} • ${escapeHTML(e.profiles?.free_fire_name || 'Gamer')}</span>
-            <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(e.profiles?.free_fire_uid || '--')}</p>
+      body.innerHTML = data.map(e => {
+        const p = e.profiles || {};
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        return `
+          <div class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] rounded-lg text-xs">
+            <div class="flex items-center gap-2.5">
+              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
+              <div>
+                <span class="font-bold text-white">Slot #${e.slot_number || '--'} • ${escapeHTML(p.free_fire_name || 'Gamer')}</span>
+                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="kickPlayerFromMatch('${e.id}', '${tId}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold">KICK</button>
+              <button onclick="banPlayerFromPlatform('${e.user_id}', ${!p.is_banned})" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">
+                ${p.is_banned ? 'UNBAN' : 'BAN'}
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button onclick="kickPlayerFromMatch('${e.id}', '${tId}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold">KICK</button>
-            <button onclick="banPlayerFromPlatform('${e.user_id}', ${!e.profiles?.is_banned})" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">
-              ${e.profiles?.is_banned ? 'UNBAN' : 'BAN'}
-            </button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function closePlayersModal() { document.getElementById('modal-players').classList.add('hidden'); }
@@ -1013,7 +1146,7 @@
 
       const { data, error } = await sbClient
         .from('deposit_requests')
-        .select('*')
+        .select('*, profiles(free_fire_name, avatar_url)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -1022,31 +1155,38 @@
         return;
       }
 
-      container.innerHTML = data.map(d => `
-        <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <div>
-              <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || 'Gamer')}</h4>
-              <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
+      container.innerHTML = data.map(d => {
+        const p = d.profiles || {};
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        return `
+          <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || p.free_fire_name || 'Gamer')}</h4>
+                  <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
+                </div>
+              </div>
+              <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
             </div>
-            <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
-          </div>
 
-          <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
-            <span class="text-gray-400 text-[10px] uppercase font-bold">Method: <strong class="text-white">${escapeHTML(d.payment_method)}</strong></span>
-            ${d.screenshot_url ? `
-              <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
-                <i class="fa-solid fa-image"></i> View Slip
-              </a>
-            ` : '<span class="text-gray-500 text-[10px]">No slip</span>'}
-          </div>
+            <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
+              <span class="text-gray-400 text-[10px] uppercase font-bold">Method: <strong class="text-white">${escapeHTML(d.payment_method)}</strong></span>
+              ${d.screenshot_url ? `
+                <a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-image"></i> View Slip
+                </a>
+              ` : '<span class="text-gray-500 text-[10px]">No slip</span>'}
+            </div>
 
-          <div class="flex items-center gap-2 pt-1">
-            <button onclick="reviewDeposit('${d.id}', 'approve')" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded font-bold text-xs uppercase">APPROVE</button>
-            <button onclick="reviewDeposit('${d.id}', 'reject')" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-1.5 rounded font-bold text-xs uppercase">REJECT</button>
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="reviewDeposit('${d.id}', 'approve')" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded font-bold text-xs uppercase">APPROVE</button>
+              <button onclick="reviewDeposit('${d.id}', 'reject')" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-1.5 rounded font-bold text-xs uppercase">REJECT</button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function reviewDeposit(id, action) {
@@ -1071,46 +1211,73 @@
       const selectT = document.getElementById('win-tournament');
       selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${escapeHTML(t.title)}</option>`).join('');
 
-      selectT.onchange = () => loadTournamentJoinedPlayers(selectT.value);
-      if (tourneys && tourneys.length) loadTournamentJoinedPlayers(tourneys[0].id);
+      // Load all players for VIP select modal
+      const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url').order('created_at', { ascending: false });
+      globalWinnerSelectPlayersCache = profiles || [];
+
+      if (globalWinnerSelectPlayersCache.length > 0) {
+        const firstP = globalWinnerSelectPlayersCache[0];
+        document.getElementById('win-player').value = firstP.id;
+        document.getElementById('win-selected-player-text').innerHTML = `🎯 ${escapeHTML(firstP.free_fire_name || 'Player')} (UID: ${escapeHTML(firstP.free_fire_uid || '--')})`;
+      }
     }
 
-    async function loadTournamentJoinedPlayers(tourneyId) {
-      const selectP = document.getElementById('win-player');
-      selectP.innerHTML = `<option value="">Loading gamers...</option>`;
+    function openVipPlayerSelectModal() {
+      const modal = document.getElementById('modal-vip-player-select');
+      modal.classList.remove('hidden');
+      renderVipPlayerModalList(globalWinnerSelectPlayersCache);
+    }
 
-      const { data: entries } = await sbClient
-        .from('tournament_entries')
-        .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
-        .eq('tournament_id', tourneyId);
+    function closeVipPlayerSelectModal() {
+      document.getElementById('modal-vip-player-select').classList.add('hidden');
+    }
 
-      const { data: allProfiles } = await sbClient
-        .from('profiles')
-        .select('id, free_fire_name, free_fire_uid')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      let optionsHTML = '';
-
-      if (entries && entries.length) {
-        optionsHTML += `<optgroup label="Joined Gamers (In Match)">`;
-        entries.forEach(e => {
-          if (e.profiles) {
-            optionsHTML += `<option value="${e.user_id}">🎯 ${escapeHTML(e.profiles.free_fire_name || 'Player')} (UID: ${escapeHTML(e.profiles.free_fire_uid || '--')})</option>`;
-          }
-        });
-        optionsHTML += `</optgroup>`;
+    function renderVipPlayerModalList(list) {
+      const body = document.getElementById('modal-vip-player-body');
+      if (!list.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players found.</p>`;
+        return;
       }
 
-      if (allProfiles && allProfiles.length) {
-        optionsHTML += `<optgroup label="All Registered Players">`;
-        allProfiles.forEach(p => {
-          optionsHTML += `<option value="${p.id}">👤 ${escapeHTML(p.free_fire_name || 'Player')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</option>`;
-        });
-        optionsHTML += `</optgroup>`;
-      }
+      body.innerHTML = list.map(p => {
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        return `
+          <div onclick="selectVipWinningPlayer('${p.id}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}','${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
+            <div class="flex items-center gap-3">
+              <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
+              <div>
+                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')}</h4>
+                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-circle-check text-gray-600"></i>
+          </div>
+        `;
+      }).join('');
+    }
 
-      selectP.innerHTML = optionsHTML || `<option value="">No gamers found</option>`;
+    function filterVipPlayerModal() {
+      const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
+      if (!q) {
+        renderVipPlayerModalList(globalWinnerSelectPlayersCache);
+        return;
+      }
+      const filtered = globalWinnerSelectPlayersCache.filter(p =>
+        (p.free_fire_name && p.free_fire_name.toLowerCase().includes(q)) ||
+        (p.free_fire_uid && p.free_fire_uid.toLowerCase().includes(q))
+      );
+      renderVipPlayerModalList(filtered);
+    }
+
+    function selectVipWinningPlayer(id, name, uid, avatarUrl) {
+      document.getElementById('win-player').value = id;
+      document.getElementById('win-selected-player-text').innerHTML = `
+        <div class="flex items-center gap-2">
+          <img src="${avatarUrl}" class="w-5 h-5 rounded-full object-cover border border-[#ff4624]" />
+          <span>🎯 ${name} (UID: ${uid})</span>
+        </div>
+      `;
+      closeVipPlayerSelectModal();
     }
 
     async function submitWinnerDeclaration() {
@@ -1162,23 +1329,47 @@
       document.getElementById('win-amount').value = '';
     }
 
+    let globalUsersCache = [];
+
     async function loadUsers() {
       const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+      if (error || !data) {
+        document.getElementById('users-cards-container').innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players registered.</p>`;
+        return;
+      }
+      globalUsersCache = data;
+      renderUsersList(globalUsersCache);
+    }
+
+    function filterUsersList() {
+      const q = document.getElementById('user-search-input').value.toLowerCase().trim();
+      if (!q) {
+        renderUsersList(globalUsersCache);
+        return;
+      }
+      const filtered = globalUsersCache.filter(u =>
+        (u.free_fire_name && u.free_fire_name.toLowerCase().includes(q)) ||
+        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+        (u.free_fire_uid && u.free_fire_uid.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q))
+      );
+      renderUsersList(filtered);
+    }
+
+    function renderUsersList(list) {
       const container = document.getElementById('users-cards-container');
-      
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players registered.</p>`;
+      if (!list.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No gamers found.</p>`;
         return;
       }
 
-      container.innerHTML = data.map(u => {
+      container.innerHTML = list.map(u => {
         const waNumber = u.phone || '';
+        const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         let waLink = '#';
         if (waNumber) {
           let cleanNum = waNumber.replace(/[^0-9]/g, '');
-          if (cleanNum.startsWith('0')) {
-            cleanNum = '92' + cleanNum.substring(1);
-          }
+          if (cleanNum.startsWith('0')) cleanNum = '92' + cleanNum.substring(1);
           const autoMsg = encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin regarding your tournament or wallet details.");
           waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
         }
@@ -1186,9 +1377,12 @@
         return `
           <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
             <div class="flex items-center justify-between">
-              <div>
-                <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+              <div class="flex items-center gap-2.5">
+                <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                  <p class="text-[11px] text-cyan-400 font-mono">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+                </div>
               </div>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
                 ${u.is_banned ? 'BANNED' : 'ACTIVE'}
@@ -1284,15 +1478,21 @@
         container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players currently banned.</p>`;
         return;
       }
-      container.innerHTML = data.map(b => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
-          <div>
-            <h4 class="font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</h4>
-            <p class="text-red-400 font-mono text-[11px]">UID: ${escapeHTML(b.free_fire_uid || '--')}</p>
+      container.innerHTML = data.map(b => {
+        const avatarUrl = b.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
+              <div>
+                <h4 class="font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</h4>
+                <p class="text-red-400 font-mono text-[11px]">UID: ${escapeHTML(b.free_fire_uid || '--')}</p>
+              </div>
+            </div>
+            <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase">UNBAN</button>
           </div>
-          <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase">UNBAN</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function loadSupportInbox() {
@@ -1331,7 +1531,7 @@
 
       const { data: profiles } = await sbClient
         .from('profiles')
-        .select('id, free_fire_name, free_fire_uid')
+        .select('id, free_fire_name, free_fire_uid, avatar_url')
         .in('id', userIds);
 
       const profMap = {};
@@ -1342,14 +1542,13 @@
         const p = profMap[uid] || {};
         const name = p.free_fire_name || 'Gamer';
         const ign = p.free_fire_uid || '--';
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         const time = new Date(item.lastTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
-          <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(ign)}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
+          <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(ign)}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-[#1f2636] border border-[#262f40] flex items-center justify-center font-bold text-xs text-white">
-                ${name.substring(0, 2).toUpperCase()}
-              </div>
+              <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
               <div>
                 <h4 class="font-bold text-xs text-white">${escapeHTML(name)}</h4>
                 <p class="text-[10px] text-gray-400 truncate max-w-[170px]">${escapeHTML(item.lastMsg)}</p>
@@ -1366,10 +1565,11 @@
       }).join('');
     }
 
-    async function openPlayerChat(userId, name, uid) {
+    async function openPlayerChat(userId, name, uid, avatarUrl) {
       activeChatPlayerId = userId;
       document.getElementById('active-chat-username').innerText = name;
       document.getElementById('active-chat-uid').innerText = `UID: ${uid}`;
+      document.getElementById('active-chat-avatar').src = avatarUrl;
       document.getElementById('support-inbox-view').classList.add('hidden');
       document.getElementById('support-chat-view').classList.remove('hidden');
 
