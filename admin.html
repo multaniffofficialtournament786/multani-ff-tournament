@@ -200,7 +200,7 @@
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winner</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
-            <select id="win-tournament" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+            <select id="win-tournament" onchange="loadJoinedPlayersForTournament(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Winning Gamer</label>
@@ -301,7 +301,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST WITH COMPLETE PAYMENT BREAKDOWN -->
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST WITH PAYMENT HISTORY BUTTON -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
@@ -315,6 +315,19 @@
       </div>
       <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2.5 p-1 sidebar-scroll">
         <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PLAYER PAYMENT HISTORY -->
+  <div id="modal-player-history" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 id="modal-history-title" class="font-gaming text-lg font-bold text-white uppercase">Player Payment History</h3>
+        <button onclick="closePlayerHistoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
       </div>
     </div>
   </div>
@@ -361,11 +374,12 @@
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mode</label>
           <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
-            <option value="Squad (4v4)">Squad (4v4)</option>
-            <option value="Solo (1v1)">Solo (1v1)</option>
-            <option value="Duo (2v2)">Duo (2v2)</option>
+            <option value="Squad">Squad</option>
+            <option value="Solo">Solo</option>
+            <option value="Duo">Duo</option>
             <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf">Lone Wolf</option>
+            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
+            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
           </select>
         </div>
         <div>
@@ -393,6 +407,10 @@
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
       </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Change Match Photo</label>
+        <input type="file" id="edit-t-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
+      </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
         <button onclick="saveEditedTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
@@ -414,12 +432,13 @@
       <div class="grid grid-cols-2 gap-2">
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Mode</label>
-          <select id="m-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-            <option value="Squad (4v4)">Squad (4v4)</option>
-            <option value="Solo (1v1)">Solo (1v1)</option>
-            <option value="Duo (2v2)">Duo (2v2)</option>
+          <select id="m-mode" onchange="handleAdminModeChange()" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Squad">Squad</option>
+            <option value="Solo">Solo</option>
+            <option value="Duo">Duo</option>
             <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf">Lone Wolf</option>
+            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
+            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
           </select>
         </div>
         <div>
@@ -701,37 +720,7 @@
         return;
       }
 
-      // Fetch deposit records and entries/referrals for complete payment breakdown
-      const [depRes, entryRes] = await Promise.all([
-        sbClient.from('deposit_requests').select('user_id, amount, status').eq('status', 'approved'),
-        sbClient.from('tournament_entries').select('user_id')
-      ]);
-
-      const depositMap = {};
-      (depRes.data || []).forEach(d => {
-        depositMap[d.user_id] = (depositMap[d.user_id] || 0) + parseFloat(d.amount || 0);
-      });
-
-      const matchMap = {};
-      (entryRes.data || []).forEach(e => {
-        matchMap[e.user_id] = (matchMap[e.user_id] || 0) + 1;
-      });
-
-      // Count referrals
-      const refCountMap = {};
-      data.forEach(u => {
-        if (u.referred_by) {
-          refCountMap[u.referred_by] = (refCountMap[u.referred_by] || 0) + 1;
-        }
-      });
-
-      globalAllPlayersCache = data.map(u => ({
-        ...u,
-        computedDeposit: depositMap[u.id] || 0,
-        computedMatches: matchMap[u.id] || u.total_matches || 0,
-        computedReferrals: refCountMap[u.free_fire_uid] || 0
-      }));
-
+      globalAllPlayersCache = data;
       renderAllPlayersList(globalAllPlayersCache);
     }
 
@@ -754,8 +743,6 @@
           waLink = `https://wa.me/${cleanNum}?text=${autoMsg}`;
         }
 
-        const refEarnings = (u.computedReferrals || 0) * 5; // 5 coins/rupees per referral setup
-
         return `
           <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2.5 text-xs">
             <div class="flex items-center justify-between">
@@ -771,28 +758,11 @@
               </span>
             </div>
 
-            <!-- PAYMENT RECORD BREAKDOWN -->
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] grid grid-cols-2 gap-2 text-[11px]">
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Total Deposit:</span>
-                <strong class="text-yellow-400 font-gaming text-xs">PKR ${u.computedDeposit}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Matches Joined:</span>
-                <strong class="text-white font-gaming text-xs">${u.computedMatches}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Prize Winnings:</span>
-                <strong class="text-emerald-400 font-gaming text-xs">PKR ${u.total_won || 0}</strong>
-              </div>
-              <div>
-                <span class="text-gray-400 text-[10px] block uppercase font-bold">Referral Earnings:</span>
-                <strong class="text-cyan-400 font-gaming text-xs">PKR ${refEarnings} (${u.computedReferrals || 0} refs)</strong>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
+            <div class="flex items-center justify-between bg-[#0e1118] px-3 py-2 rounded-lg">
               <span class="text-gray-300 font-mono"><i class="fa-solid fa-envelope text-red-400 mr-1.5"></i> ${escapeHTML(userEmail)}</span>
+              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black px-3 py-1 rounded text-xs font-bold font-gaming transition">
+                <i class="fa-solid fa-receipt mr-1"></i> Payment History
+              </button>
             </div>
 
             <div class="flex items-center justify-between bg-[#0e1118] px-3 py-1.5 rounded-lg">
@@ -806,10 +776,72 @@
 
             <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-[#262f40]">
               <span>Wallet Balance: <strong class="text-yellow-400">PKR ${u.wallet_balance || 0}</strong></span>
+              <span>Won: <strong class="text-emerald-400">PKR ${u.total_won || 0}</strong></span>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    async function openPlayerHistoryModal(userId, userName) {
+      const modal = document.getElementById('modal-player-history');
+      const title = document.getElementById('modal-history-title');
+      const body = document.getElementById('modal-history-body');
+
+      title.innerText = `${userName} - Payment History`;
+      modal.classList.remove('hidden');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading player history...</p>`;
+
+      const [txRes, depRes] = await Promise.all([
+        sbClient.from('wallet_transactions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        sbClient.from('deposit_requests').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+      ]);
+
+      const txs = txRes.data || [];
+      const deps = depRes.data || [];
+
+      if (!txs.length && !deps.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No payment history found for this player.</p>`;
+        return;
+      }
+
+      let html = '';
+      deps.forEach(d => {
+        html += `
+          <div class="bg-[#151922] border border-[#262f40] rounded-lg p-2.5 text-xs flex justify-between items-center">
+            <div>
+              <span class="text-yellow-400 font-bold block">Deposit (${escapeHTML(d.payment_method)})</span>
+              <span class="text-gray-400 text-[10px]">${new Date(d.created_at).toLocaleString()}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 font-bold font-gaming">+PKR ${d.amount}</span>
+              <span class="block text-[9px] uppercase font-bold text-cyan-400">${d.status}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      txs.forEach(tx => {
+        const isPos = tx.amount > 0;
+        html += `
+          <div class="bg-[#151922] border border-[#262f40] rounded-lg p-2.5 text-xs flex justify-between items-center">
+            <div>
+              <span class="text-white font-bold block">${escapeHTML(tx.description || tx.transaction_type)}</span>
+              <span class="text-gray-400 text-[10px]">${new Date(tx.created_at).toLocaleString()}</span>
+            </div>
+            <div class="text-right">
+              <span class="${isPos ? 'text-emerald-400' : 'text-red-400'} font-bold font-gaming">${isPos ? '+' : ''}PKR ${tx.amount}</span>
+              <span class="block text-[9px] uppercase font-bold text-gray-400">${tx.status || 'approved'}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    function closePlayerHistoryModal() {
+      document.getElementById('modal-player-history').classList.add('hidden');
     }
 
     function filterAllPlayersModal() {
@@ -967,6 +999,7 @@
       document.getElementById('edit-t-map').value = t.map;
       document.getElementById('edit-t-fee').value = t.entry_fee;
       document.getElementById('edit-t-prize').value = t.prize_pool;
+      document.getElementById('edit-t-file').value = '';
       
       if (t.match_date) {
         const dateObj = new Date(t.match_date);
@@ -991,6 +1024,7 @@
       const entry_fee = parseFloat(document.getElementById('edit-t-fee').value);
       const prize_pool = parseFloat(document.getElementById('edit-t-prize').value);
       const match_date_val = document.getElementById('edit-t-date').value;
+      const fileInput = document.getElementById('edit-t-file');
 
       const updateData = {
         title, 
@@ -1005,13 +1039,25 @@
         updateData.match_date = new Date(match_date_val).toISOString();
       }
 
-      const { error } = await sbClient.from('tournaments').update(updateData).eq('id', id);
+      try {
+        if (fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          const path = `tournaments/${Date.now()}_${file.name}`;
+          const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+          if (!upErr) {
+            const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+            updateData.thumbnail_url = publicUrl;
+          }
+        }
 
-      if (error) alert(error.message);
-      else {
+        const { error } = await sbClient.from('tournaments').update(updateData).eq('id', id);
+        if (error) throw error;
+
         alert("Tournament updated successfully!");
         closeEditModal();
         loadTournaments();
+      } catch (err) {
+        alert("Error: " + err.message);
       }
     }
 
@@ -1082,13 +1128,40 @@
     function openCreateTournamentModal() { document.getElementById('modal-match').classList.remove('hidden'); }
     function closeCreateTournamentModal() { document.getElementById('modal-match').classList.add('hidden'); }
 
+    function handleAdminModeChange() {
+      const mode = document.getElementById('m-mode').value;
+      const mapSelect = document.getElementById('m-map');
+      const maxSlotsInput = document.getElementById('m-max');
+
+      if (mode === 'Lone Wolf 1v1') {
+        mapSelect.value = 'Bermuda';
+        mapSelect.disabled = true;
+        mapSelect.classList.add('opacity-50', 'cursor-not-allowed');
+        maxSlotsInput.value = '2';
+        maxSlotsInput.readOnly = true;
+        maxSlotsInput.classList.add('opacity-50', 'cursor-not-allowed');
+      } else if (mode === 'Lone Wolf 2v2') {
+        mapSelect.value = 'Bermuda';
+        mapSelect.disabled = true;
+        mapSelect.classList.add('opacity-50', 'cursor-not-allowed');
+        maxSlotsInput.value = '4';
+        maxSlotsInput.readOnly = true;
+        maxSlotsInput.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        mapSelect.disabled = false;
+        mapSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+        maxSlotsInput.readOnly = false;
+        maxSlotsInput.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
     async function saveNewTournament() {
       const title = document.getElementById('m-title').value.trim();
       const mode = document.getElementById('m-mode').value;
-      const map = document.getElementById('m-map').value;
+      const map = (mode.startsWith('Lone Wolf')) ? 'Lone Wolf' : document.getElementById('m-map').value;
       const entry_fee = parseFloat(document.getElementById('m-fee').value);
       const prize_pool = parseFloat(document.getElementById('m-prize').value);
-      const max_players = parseInt(document.getElementById('m-max').value);
+      const max_players = mode === 'Lone Wolf 1v1' ? 2 : (mode === 'Lone Wolf 2v2' ? 4 : parseInt(document.getElementById('m-max').value));
       const match_date = document.getElementById('m-date').value;
       const fileInput = document.getElementById('m-file');
       const btn = document.getElementById('btn-save-match');
@@ -1211,14 +1284,27 @@
       const selectT = document.getElementById('win-tournament');
       selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${escapeHTML(t.title)}</option>`).join('');
 
-      // Load all players for VIP select modal
-      const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url').order('created_at', { ascending: false });
-      globalWinnerSelectPlayersCache = profiles || [];
+      if (tourneys && tourneys.length > 0) {
+        await loadJoinedPlayersForTournament(tourneys[0].id);
+      }
+    }
+
+    async function loadJoinedPlayersForTournament(tId) {
+      if (!tId) return;
+      const { data, error } = await sbClient
+        .from('tournament_entries')
+        .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+        .eq('tournament_id', tId);
+
+      globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
 
       if (globalWinnerSelectPlayersCache.length > 0) {
         const firstP = globalWinnerSelectPlayersCache[0];
         document.getElementById('win-player').value = firstP.id;
         document.getElementById('win-selected-player-text').innerHTML = `🎯 ${escapeHTML(firstP.free_fire_name || 'Player')} (UID: ${escapeHTML(firstP.free_fire_uid || '--')})`;
+      } else {
+        document.getElementById('win-player').value = '';
+        document.getElementById('win-selected-player-text').innerText = `No players joined this match yet`;
       }
     }
 
@@ -1235,7 +1321,7 @@
     function renderVipPlayerModalList(list) {
       const body = document.getElementById('modal-vip-player-body');
       if (!list.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players found.</p>`;
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
         return;
       }
 
