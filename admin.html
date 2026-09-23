@@ -1219,7 +1219,7 @@
 
       const { data, error } = await sbClient
         .from('deposit_requests')
-        .select('*, profiles(free_fire_name, avatar_url)')
+        .select('*')
         .ilike('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -1229,16 +1229,15 @@
       }
 
       container.innerHTML = data.map(d => {
-        const p = d.profiles || {};
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        const avatarUrl = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         return `
           <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
                 <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || p.free_fire_name || 'Gamer')}</h4>
-                  <span class="text-cyan-400 font-mono text-[11px]">${escapeHTML(d.transaction_id || '--')}</span>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || 'Gamer')}</h4>
+                  <span class="text-cyan-400 font-mono text-[11px]">Trx ID: ${escapeHTML(d.transaction_id || '--')}</span>
                 </div>
               </div>
               <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
