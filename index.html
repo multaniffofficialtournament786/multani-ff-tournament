@@ -122,7 +122,7 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 45s linear infinite; }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 12s linear infinite; animation-delay: 3s; }
     @keyframes marquee { 
       0% { transform: translate3d(100%, 0, 0); } 
       100% { transform: translate3d(-100%, 0, 0); } 
@@ -323,7 +323,7 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    /* AS8-STYLE COMPACT TOURNAMENT CARDS (IMAGE ON TOP, DETAILS BELOW) */
+    /* AS8-STYLE COMPACT TOURNAMENT CARDS */
     .tournaments-grid-as8 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -657,6 +657,13 @@
     let unreadNotifCount = 0;
     let unreadChatCount = 0;
 
+    // Detect and save referral code from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    if (refParam) {
+      localStorage.setItem('invited_by_ref', refParam);
+    }
+
     const Toast = {
       show(msg, type = 'info') {
         const c = document.getElementById('toast-container');
@@ -683,17 +690,19 @@
     };
 
     function shareWebsite() {
+      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${myUid}`;
       const shareData = {
         title: 'Multani FF Official Tournament',
         text: 'Join Pakistan\'s Ultimate Free Fire Tournaments and Win Cash Prizes Daily!',
-        url: window.location.origin + window.location.pathname
+        url: shareUrl
       };
 
       if (navigator.share) {
         navigator.share(shareData).catch(err => console.log('Share canceled'));
       } else {
-        navigator.clipboard.writeText(shareData.url);
-        Toast.show("Website link copied to clipboard!", "success");
+        navigator.clipboard.writeText(shareUrl);
+        Toast.show("Unique invite link copied to clipboard!", "success");
       }
     }
 
@@ -984,8 +993,25 @@
     }
 
     async function renderInvite() {
-      const refCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || 'MLT5041';
-      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${refCode}`;
+      const uniqueRefCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${uniqueRefCode}`;
+
+      // Fetch actual invited list from DB if user is logged in
+      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your link to start earning!</p>`;
+      if (currentUser && currentProfile) {
+        const { data: refUsers } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, created_at').eq('referred_by', currentProfile.free_fire_uid);
+        if (refUsers && refUsers.length > 0) {
+          invitedListHTML = refUsers.map(u => `
+            <div class="tx-item">
+              <div class="tx-info">
+                <h4>${u.free_fire_name || 'Gamer'}</h4>
+                <span>UID: ${u.free_fire_uid || '--'} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+              </div>
+              <div class="tx-amount tx-positive">+5 Coins</div>
+            </div>
+          `).join('');
+        }
+      }
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1010,7 +1036,7 @@
             
             <div style="display: flex; gap: 8px; align-items: center; background: #0a0e16; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
               <input type="text" id="ref-link-input" value="${shareUrl}" style="background: transparent; border: none; color: #fff; font-size: 11px; width: 100%; outline: none;" readonly />
-              <button onclick="navigator.clipboard.writeText('${shareUrl}'); Toast.show('Invite link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
+              <button onclick="navigator.clipboard.writeText('${shareUrl}'); Toast.show('Permanent invite link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
@@ -1020,29 +1046,46 @@
             </div>
           </div>
 
+          <div class="section-title"><span>Invited List</span></div>
+          <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
+            ${invitedListHTML}
+          </div>
+
           <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
             <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
             <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Revenue Goals & 6 Coins Reward</h3>
             <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for direct invite + 1 Coin when your invited friend invites someone else (Total 6 Coins setup)!</p>
           </div>
+        </div>
+      `;
+    }
 
-          <div class="player-hero-card" style="padding: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 8px;">Rewards Released to Date</div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">Invitation Rewards</div>
-                <div style="font-size: 10px; color: var(--text-dim);">2,244 claimed</div>
+    async function renderLeaderboard() {
+      Loader.show("Loading leaderboard...");
+      const { data } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, total_won').order('total_won', { ascending: false }).limit(20);
+      Loader.hide();
+
+      const view = document.getElementById('app-view');
+      if (!data || !data.length) {
+        view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
+        return;
+      }
+
+      view.innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Leaderboard</span></div>
+          ${data.map((l, idx) => `
+            <div class="tx-item">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
+                <div>
+                  <h4>${l.free_fire_name || 'Player'}</h4>
+                  <span style="font-size:11px; color:var(--accent-cyan);">UID: ${l.free_fire_uid || '--'}</span>
+                </div>
               </div>
-              <div style="font-family: var(--font-gaming); font-size: 16px; font-weight: 800; color: var(--accent-gold);">Rs 2,908,072.00</div>
+              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">Achievement Rewards</div>
-                <div style="font-size: 10px; color: var(--text-dim);">Milestone bonuses</div>
-              </div>
-              <div style="font-family: var(--font-gaming); font-size: 16px; font-weight: 800; color: var(--success);">Rs 1,220,800.00</div>
-            </div>
-          </div>
+          `).join('')}
         </div>
       `;
     }
@@ -1444,7 +1487,7 @@
               <input type="text" id="reg-ign" class="form-input" placeholder="e.g. MLT・HAMZA★" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Free Fire UID</label>
+              <label class="form-label">Free Fire UID (Permanent)</label>
               <input type="text" id="reg-uid" class="form-input" placeholder="e.g. 2984189312" required />
             </div>
             <div class="form-group">
@@ -1483,37 +1526,71 @@
 
       document.getElementById('signup-form').onsubmit = async (e) => {
         e.preventDefault();
-        Loader.show("Registering...");
-        const email = document.getElementById('reg-email').value;
+        Loader.show("Validating details...");
+        const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-pass').value;
         const name = document.getElementById('reg-name').value;
         const ign = document.getElementById('reg-ign').value;
-        const uid = document.getElementById('reg-uid').value;
-        const phone = document.getElementById('reg-phone').value;
+        const uid = document.getElementById('reg-uid').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
 
-        const { data, error } = await sbClient.auth.signUp({ email, password });
-        if (error) {
-          Loader.hide();
-          Toast.show(error.message, "error");
-          return;
-        }
+        // Check for duplicates in profiles table (UID, Email, Phone)
+        try {
+          const { data: existingProfiles, error: checkError } = await sbClient
+            .from('profiles')
+            .select('free_fire_uid, email, phone')
+            .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
 
-        if (data.user) {
-          await sbClient.from('profiles').upsert([{
-            id: data.user.id,
-            email,
-            full_name: name,
-            free_fire_name: ign,
-            free_fire_uid: uid,
-            phone: phone,
-            wallet_balance: 0,
-            is_banned: false,
-            is_admin: false
-          }]);
+          if (existingProfiles && existingProfiles.length > 0) {
+            Loader.hide();
+            const match = existingProfiles[0];
+            if (match.free_fire_uid === uid) {
+              Toast.show("Error: This Free Fire UID is already registered!", "error");
+            } else if (match.email === email) {
+              Toast.show("Error: This Email address is already registered!", "error");
+            } else if (match.phone === phone) {
+              Toast.show("Error: This WhatsApp number is already registered!", "error");
+            } else {
+              Toast.show("Error: Duplicate credentials found!", "error");
+            }
+            return;
+          }
+
+          Loader.show("Registering account...");
+          const { data, error } = await sbClient.auth.signUp({ email, password });
+          if (error) {
+            Loader.hide();
+            Toast.show(error.message, "error");
+            return;
+          }
+
+          if (data.user) {
+            const invitedByRef = localStorage.getItem('invited_by_ref') || null;
+            await sbClient.from('profiles').upsert([{
+              id: data.user.id,
+              email,
+              full_name: name,
+              free_fire_name: ign,
+              free_fire_uid: uid,
+              phone: phone,
+              referred_by: invitedByRef,
+              wallet_balance: 0,
+              is_banned: false,
+              is_admin: false
+            }]);
+            
+            if (invitedByRef) {
+              localStorage.removeItem('invited_by_ref');
+            }
+
+            Loader.hide();
+            Toast.show("Account registered successfully!", "success");
+            await syncAuthAndProfile();
+            Router.navigate('home');
+          }
+        } catch (err) {
           Loader.hide();
-          Toast.show("Account registered successfully!", "success");
-          await syncAuthAndProfile();
-          Router.navigate('home');
+          Toast.show(err.message || "Registration validation failed.", "error");
         }
       };
     }
@@ -1656,8 +1733,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Free Fire UID</label>
-                <input type="text" id="prof-uid" class="form-input" value="${p.free_fire_uid || ''}" placeholder="e.g. 2984189312" required />
+                <label class="form-label">Free Fire UID (Permanent)</label>
+                <input type="text" class="form-input" value="${p.free_fire_uid || ''}" style="opacity:0.6; cursor:not-allowed;" readonly />
               </div>
 
               <div class="form-group">
@@ -1714,7 +1791,6 @@
 
       const fullName = document.getElementById('prof-fullname').value.trim();
       const ign = document.getElementById('prof-ign').value.trim();
-      const uid = document.getElementById('prof-uid').value.trim();
       const phone = document.getElementById('prof-phone').value.trim();
       const btn = document.getElementById('btn-save-profile');
 
@@ -1725,7 +1801,6 @@
         const { error } = await sbClient.from('profiles').update({
           full_name: fullName,
           free_fire_name: ign,
-          free_fire_uid: uid,
           phone: phone,
           updated_at: new Date().toISOString()
         }).eq('id', currentUser.id);
@@ -1741,35 +1816,6 @@
         if(btn) btn.disabled = false;
         Loader.hide();
       }
-    }
-
-    async function renderLeaderboard() {
-      Loader.show("Loading leaderboard...");
-      const { data } = await sbClient.from('profiles').select('free_fire_name, total_won, total_wins').order('total_won', { ascending: false }).limit(20);
-      Loader.hide();
-
-      const view = document.getElementById('app-view');
-      if (!data || !data.length) {
-        view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
-        return;
-      }
-
-      view.innerHTML = `
-        <div class="view-container">
-          ${data.map((l, idx) => `
-            <div class="tx-item">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
-                <div>
-                  <h4>${l.free_fire_name || 'Player'}</h4>
-                  <span style="font-size:11px; color:var(--text-dim);">${l.total_wins || 0} Wins</span>
-                </div>
-              </div>
-              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
     }
 
     async function renderNotifications() {
