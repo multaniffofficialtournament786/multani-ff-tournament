@@ -511,7 +511,7 @@
           <span class="brand-main">OFFICIAL</span>
         </div>
         <div class="header-actions">
-          <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share Website">
+          <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share App">
             <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
           </button>
           <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
@@ -653,6 +653,8 @@
     let unreadChatCount = 0;
     let currentTournamentFilter = 'all';
 
+    const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
+
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
     if (refParam) {
@@ -698,18 +700,19 @@
 
     function shareWebsite() {
       const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${myUid}`;
+      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
+      
       const shareData = {
         title: 'Multani FF Official Tournament',
-        text: 'Join Pakistan\'s Ultimate Free Fire Tournaments and Win Cash Prizes Daily!',
-        url: shareUrl
+        text: shareText,
+        url: APK_DOWNLOAD_LINK
       };
 
       if (navigator.share) {
         navigator.share(shareData).catch(err => console.log('Share canceled'));
       } else {
-        navigator.clipboard.writeText(shareUrl);
-        Toast.show("Unique invite link copied to clipboard!", "success");
+        navigator.clipboard.writeText(shareText);
+        Toast.show("App download link & referral code copied!", "success");
       }
     }
 
@@ -995,7 +998,7 @@
           `}
 
           <div style="margin-bottom: 16px;">
-            <a href="https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
+            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
             </a>
           </div>
@@ -1074,10 +1077,7 @@
     }
 
     async function renderInvite() {
-      const uniqueRefCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${uniqueRefCode}`;
-
-      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your link to start earning!</p>`;
+      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your app link to start earning!</p>`;
       let totalRegisters = 0;
       let validReferrals = 0;
       let totalIncome = 0;
@@ -1129,17 +1129,17 @@
           </div>
 
           <div class="player-hero-card" style="padding: 16px; margin-bottom: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px; text-transform: uppercase;">Share with your friends</div>
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px; text-transform: uppercase;">Share App With Friends</div>
             
             <div style="display: flex; gap: 8px; align-items: center; background: #0a0e16; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
-              <input type="text" id="ref-link-input" value="${shareUrl}" style="background: transparent; border: none; color: #fff; font-size: 11px; width: 100%; outline: none;" readonly />
-              <button onclick="navigator.clipboard.writeText('${shareUrl}'); Toast.show('Permanent invite link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
+              <input type="text" id="ref-link-input" value="${APK_DOWNLOAD_LINK}" style="background: transparent; border: none; color: #fff; font-size: 11px; width: 100%; outline: none;" readonly />
+              <button onclick="navigator.clipboard.writeText('${APK_DOWNLOAD_LINK}'); Toast.show('App download link copied!', 'success');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-copy"></i></button>
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
-              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" class="support-action-btn" style="background:#1877f2; color:#fff; font-size:16px;"><i class="fa-brands fa-facebook-f"></i></a>
-              <a href="https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Join%20Multani%20FF%20Tournaments" target="_blank" class="support-action-btn" style="background:#0088cc; color:#fff; font-size:16px;"><i class="fa-brands fa-telegram"></i></a>
-              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('Join Multani FF Tournaments and win prizes: ' + shareUrl)}" target="_blank" class="support-action-btn" style="background:#25d366; color:#fff; font-size:16px;"><i class="fa-brands fa-whatsapp"></i></a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}" target="_blank" class="support-action-btn" style="background:#1877f2; color:#fff; font-size:16px;"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=Download%20Multani%20FF%20App" target="_blank" class="support-action-btn" style="background:#0088cc; color:#fff; font-size:16px;"><i class="fa-brands fa-telegram"></i></a>
+              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('Download Multani FF Official App: ' + APK_DOWNLOAD_LINK)}" target="_blank" class="support-action-btn" style="background:#25d366; color:#fff; font-size:16px;"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
           </div>
 
@@ -1442,7 +1442,6 @@
       ]);
       Loader.hide();
 
-      // Combined and sorted by date (newest first)
       const deposits = (depRes.data || []).map(d => ({
         ...d,
         sortDate: new Date(d.created_at).getTime(),
