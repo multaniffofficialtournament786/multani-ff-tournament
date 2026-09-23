@@ -667,12 +667,17 @@
     });
 
     async function loadDashboardStats() {
-      const { data: depData } = await sbClient.from('deposit_requests').select('amount').eq('status', 'approved');
-      const totalDeposits = (depData || []).reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
+      // Direct fetch all deposit requests to avoid column mismatch errors
+      const { data: allDeps } = await sbClient.from('deposit_requests').select('*');
+      const safeDeps = allDeps || [];
+
+      const totalDeposits = safeDeps
+        .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
+        .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
       document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
 
-      const { count: pendingDepCount } = await sbClient.from('deposit_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const pendingCount = pendingDepCount || 0;
+      const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
+      const pendingCount = pendingList.length;
       
       document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
       
@@ -1223,15 +1228,14 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        alert("DB Error: " + error.message);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading deposits: ${error.message}</p>`;
         return;
       }
 
-      // Sirf wo data filter karein jiska status pending ho (chahe uppercase ho ya lowercase)
       const pendingData = (data || []).filter(d => d.status && d.status.toString().toLowerCase() === 'pending');
 
       if (!pendingData.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips found in table. Total rows: ${(data || []).length}</p>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips found.</p>`;
         return;
       }
 
