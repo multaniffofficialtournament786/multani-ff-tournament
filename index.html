@@ -333,7 +333,6 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    /* ORIGINAL AS8-STYLE LARGE TOURNAMENT CARDS */
     .tournaments-stack-as8 {
       display: flex;
       flex-direction: column;
@@ -1591,6 +1590,10 @@
               <label class="form-label">Password</label>
               <input type="password" id="reg-pass" class="form-input" minlength="6" required />
             </div>
+            <div class="form-group">
+              <label class="form-label">Referral Code (Optional UID)</label>
+              <input type="text" id="reg-ref" class="form-input" placeholder="Enter friend's UID (optional)" />
+            </div>
             <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
           </form>
         </div>
@@ -1622,6 +1625,7 @@
         const ign = document.getElementById('reg-ign').value;
         const uid = document.getElementById('reg-uid').value.trim();
         const phone = document.getElementById('reg-phone').value.trim();
+        const refInput = document.getElementById('reg-ref').value.trim();
 
         try {
           const { data: existingProfiles } = await sbClient
@@ -1644,6 +1648,17 @@
             return;
           }
 
+          let validReferrerUid = null;
+          if (refInput) {
+            const { data: refCheck } = await sbClient.from('profiles').select('free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
+            if (!refCheck) {
+              Loader.hide();
+              Toast.show("Yeh referral code available nahi hai, aap baghair referral ke bhi join kar sakte hain.", "error");
+              return;
+            }
+            validReferrerUid = refCheck.free_fire_uid;
+          }
+
           Loader.show("Registering account...");
           const { data, error } = await sbClient.auth.signUp({ email, password });
           if (error) {
@@ -1653,7 +1668,6 @@
           }
 
           if (data.user) {
-            const invitedByRef = localStorage.getItem('invited_by_ref') || null;
             await sbClient.from('profiles').upsert([{
               id: data.user.id,
               email,
@@ -1661,15 +1675,11 @@
               free_fire_name: ign,
               free_fire_uid: uid,
               phone: phone,
-              referred_by: invitedByRef,
+              referred_by: validReferrerUid,
               wallet_balance: 0,
               is_banned: false,
               is_admin: false
             }]);
-            
-            if (invitedByRef) {
-              localStorage.removeItem('invited_by_ref');
-            }
 
             Loader.hide();
             Toast.show("Account registered successfully!", "success");
@@ -1821,8 +1831,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Free Fire UID (Permanent)</label>
-                <input type="text" class="form-input" value="${p.free_fire_uid || ''}" style="opacity:0.6; cursor:not-allowed;" readonly />
+                <label class="form-label">Free Fire UID (Editable)</label>
+                <input type="text" id="prof-uid" class="form-input" value="${p.free_fire_uid || ''}" placeholder="Enter Free Fire UID" required />
               </div>
 
               <div class="form-group">
@@ -1831,8 +1841,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Email (Read-Only)</label>
-                <input type="email" class="form-input" value="${p.email || currentUser.email}" style="opacity:0.6; cursor:not-allowed;" readonly />
+                <label class="form-label">Email (Editable)</label>
+                <input type="email" id="prof-email" class="form-input" value="${p.email || currentUser.email}" placeholder="yourname@gmail.com" required />
               </div>
 
               <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
@@ -1879,16 +1889,39 @@
 
       const fullName = document.getElementById('prof-fullname').value.trim();
       const ign = document.getElementById('prof-ign').value.trim();
+      const newUid = document.getElementById('prof-uid').value.trim();
+      const newEmail = document.getElementById('prof-email').value.trim();
       const phone = document.getElementById('prof-phone').value.trim();
       const btn = document.getElementById('btn-save-profile');
 
-      if(btn) btn.disabled = true;
-      Loader.show("Saving profile...");
+      if (btn) btn.disabled = true;
+      Loader.show("Validating and saving profile...");
 
       try {
+        const { data: dupCheck } = await sbClient
+          .from('profiles')
+          .select('id, free_fire_uid, email')
+          .or(`free_fire_uid.eq.${newUid},email.eq.${newEmail}`);
+
+        if (dupCheck && dupCheck.length > 0) {
+          const conflict = dupCheck.find(x => x.id !== currentUser.id);
+          if (conflict) {
+            Loader.hide();
+            if (conflict.free_fire_uid === newUid) {
+              Toast.show("Error: This Free Fire UID is already used by another account!", "error");
+            } else {
+              Toast.show("Error: This Email is already used by another account!", "error");
+            }
+            if (btn) btn.disabled = false;
+            return;
+          }
+        }
+
         const { error } = await sbClient.from('profiles').update({
           full_name: fullName,
           free_fire_name: ign,
+          free_fire_uid: newUid,
+          email: newEmail,
           phone: phone,
           updated_at: new Date().toISOString()
         }).eq('id', currentUser.id);
@@ -1901,7 +1934,7 @@
       } catch (err) {
         Toast.show(err.message || "Failed to update profile.", "error");
       } finally {
-        if(btn) btn.disabled = false;
+        if (btn) btn.disabled = false;
         Loader.hide();
       }
     }
