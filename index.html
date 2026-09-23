@@ -364,6 +364,16 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
+    /* Pull to Refresh Indicator */
+    #pull-refresh-indicator {
+      text-align: center;
+      padding: 10px;
+      font-family: var(--font-gaming);
+      font-size: 12px;
+      color: var(--accent-cyan);
+      display: none;
+    }
+
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
     .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
@@ -652,7 +662,9 @@
       </div>
     </aside>
 
-    <main id="app-view" class="main-content"></main>
+    <main id="app-view" class="main-content">
+      <div id="pull-refresh-indicator">🔄 Pull down to refresh...</div>
+    </main>
 
     <div id="admin-float-widget">
       <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
@@ -1047,6 +1059,13 @@
             <div class="ticker-viewport">
               <div class="ticker-content">${tickerText}</div>
             </div>
+          </div>
+
+          <!-- BADA REFRESH BUTTON ON HOMEPAGE -->
+          <div style="margin-bottom: 12px;">
+            <button onclick="hardRefreshApp()" class="btn btn-secondary" style="background: linear-gradient(135deg, #151922, #1f2636); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); font-family: var(--font-gaming); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <i class="fa-solid fa-rotate" style="font-size: 16px;"></i> RELOAD / REFRESH APP DATA
+            </button>
           </div>
 
           ${!currentUser ? `
@@ -2266,6 +2285,55 @@
       else ChatModal.loadMessages();
     };
 
+    function setupPullToRefresh() {
+      const mainContent = document.querySelector('.main-content');
+      const indicator = document.getElementById('pull-refresh-indicator');
+      if (!mainContent || !indicator) return;
+
+      let startY = 0;
+      let pulling = false;
+
+      mainContent.addEventListener('touchstart', (e) => {
+        if (mainContent.scrollTop === 0) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        }
+      }, { passive: true });
+
+      mainContent.addEventListener('touchmove', (e) => {
+        if (!pulling) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+
+        if (diff > 70) {
+          indicator.style.display = 'block';
+        }
+      }, { passive: true });
+
+      mainContent.addEventListener('touchend', async (e) => {
+        if (!pulling) return;
+        pulling = false;
+        const endY = e.changedTouches[0].clientY;
+        if (endY - startY > 90) {
+          indicator.innerText = "🔄 Refreshing data...";
+          await hardRefreshApp();
+        } else {
+          indicator.style.display = 'none';
+        }
+      });
+    }
+
+    async function hardRefreshApp() {
+      Loader.show("Refreshing app...");
+      await syncAuthAndProfile();
+      const currentPage = Router.history[Router.history.length - 1] || 'home';
+      await Router.navigate(currentPage, null, false);
+      Loader.hide();
+      Toast.show("App refreshed successfully!", "success");
+      const indicator = document.getElementById('pull-refresh-indicator');
+      if (indicator) indicator.style.display = 'none';
+    }
+
     function setupDraggableBot() {
       const widget = document.getElementById('admin-float-widget');
       const mainBtn = document.getElementById('float-main-btn');
@@ -2338,7 +2406,8 @@
         Router.navigate('home');
       };
 
-      setupDraggablebot();
+      setupDraggableBot();
+      setupPullToRefresh();
       await syncAuthAndProfile();
       Router.navigate('home');
     });
