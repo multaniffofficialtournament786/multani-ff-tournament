@@ -1075,7 +1075,7 @@
         if (refUsers && refUsers.length > 0) {
           totalRegisters = refUsers.length;
           validReferrals = refUsers.length;
-          totalIncome = validReferrals * 5; // 5 coins/rupees per referral setup
+          totalIncome = validReferrals * 5; 
           
           invitedListHTML = refUsers.map(u => `
             <div class="tx-item">
@@ -1629,8 +1629,8 @@
         Loader.show("Validating details...");
         const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-pass').value;
-        const name = document.getElementById('reg-name').value;
-        const ign = document.getElementById('reg-ign').value;
+        const name = document.getElementById('reg-name').value.trim();
+        const ign = document.getElementById('reg-ign').value.trim();
         const uid = document.getElementById('reg-uid').value.trim();
         const phone = document.getElementById('reg-phone').value.trim();
         const refInput = document.getElementById('reg-ref').value.trim();
@@ -1658,7 +1658,7 @@
 
           let validReferrerUid = null;
           if (refInput) {
-            const { data: refCheck } = await sbClient.from('profiles').select('free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
+            const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid, wallet_balance').eq('free_fire_uid', refInput).maybeSingle();
             if (!refCheck) {
               Loader.hide();
               Toast.show("Yeh referral code available nahi hai, aap baghair referral ke bhi join kar sakte hain.", "error");
@@ -1691,8 +1691,23 @@
 
             if (profileError) throw profileError;
 
+            if (validReferrerUid) {
+              const { data: referrerProf } = await sbClient.from('profiles').select('id, wallet_balance').eq('free_fire_uid', validReferrerUid).maybeSingle();
+              if (referrerProf) {
+                const newBal = (referrerProf.wallet_balance || 0) + 5;
+                await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', referrerProf.id);
+                await sbClient.from('wallet_transactions').insert([{
+                  user_id: referrerProf.id,
+                  amount: 5,
+                  transaction_type: 'referral_bonus',
+                  status: 'approved',
+                  description: `Referral Bonus (UID: ${uid})`
+                }]);
+              }
+            }
+
             Loader.hide();
-            Toast.show("Account registered successfully!", "success");
+            Toast.show("Account registered and logged in successfully!", "success");
             await syncAuthAndProfile();
             Router.navigate('home');
           }
