@@ -1220,7 +1220,7 @@
       const { data, error } = await sbClient
         .from('deposit_requests')
         .select('*, profiles(free_fire_name, avatar_url)')
-        .eq('status', 'pending')
+        .ilike('status', 'pending')
         .order('created_at', { ascending: false });
 
       if (error || !data || !data.length) {
