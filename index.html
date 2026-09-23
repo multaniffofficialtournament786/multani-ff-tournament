@@ -121,7 +121,6 @@
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
-    /* NORMAL FIXED SPEED TICKER (STABLE SPEED REGARDLESS OF TEXT LENGTH) */
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
     .ticker-content { 
       display: inline-block; 
@@ -706,7 +705,6 @@
       setTimeout(() => {
         const content = document.querySelector('.ticker-content');
         if (content) {
-          // Calculate duration dynamically based on text width for fixed normal speed (approx 50px per second)
           const textLength = content.innerText.length;
           const duration = Math.max(15, textLength * 0.18);
           content.style.animationDuration = duration + 's';
@@ -797,12 +795,13 @@
 
     const Router = {
       history: ['home'],
-      async navigate(page, id = null) {
+      async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
         await syncAuthAndProfile();
         
-        if (this.history[this.history.length - 1] !== page) {
+        if (pushHistory && this.history[this.history.length - 1] !== page) {
           this.history.push(page);
+          history.pushState({ page, id }, '', '#' + page);
         }
 
         const isSub = (page !== 'home');
@@ -841,12 +840,20 @@
         if (this.history.length > 1) {
           this.history.pop();
           const prev = this.history[this.history.length - 1];
-          await this.navigate(prev);
+          await this.navigate(prev, null, false);
         } else {
-          await this.navigate('home');
+          await this.navigate('home', null, false);
         }
       }
     };
+
+    window.addEventListener('popstate', (e) => {
+      if (Router.history.length > 1) {
+        Router.history.pop();
+        const prev = Router.history[Router.history.length - 1] || 'home';
+        Router.navigate(prev, null, false);
+      }
+    });
 
     function buildTournamentCardsHTML(list) {
       if (!list || !list.length) {
