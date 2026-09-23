@@ -1658,6 +1658,11 @@
 
           let validReferrerUid = null;
           if (refInput) {
+            if (refInput === uid) {
+              Loader.hide();
+              Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
+              return;
+            }
             const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid, wallet_balance').eq('free_fire_uid', refInput).maybeSingle();
             if (!refCheck) {
               Loader.hide();
@@ -1824,6 +1829,7 @@
       if (!currentUser) { Router.navigate('login'); return; }
       const p = currentProfile || {};
       const avatarSrc = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+      const hasReferrer = !!p.referred_by;
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1868,6 +1874,12 @@
               <div class="form-group">
                 <label class="form-label">Email (Editable)</label>
                 <input type="email" id="prof-email" class="form-input" value="${p.email || currentUser.email}" placeholder="yourname@gmail.com" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Referral Code (UID)</label>
+                <input type="text" id="prof-ref" class="form-input" value="${p.referred_by || ''}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
+                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (5 coins reward)</span>'}
               </div>
 
               <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
@@ -1917,6 +1929,8 @@
       const newUid = document.getElementById('prof-uid').value.trim();
       const newEmail = document.getElementById('prof-email').value.trim();
       const phone = document.getElementById('prof-phone').value.trim();
+      const refInputEl = document.getElementById('prof-ref');
+      const newRef = refInputEl ? refInputEl.value.trim() : '';
       const btn = document.getElementById('btn-save-profile');
 
       if (btn) btn.disabled = true;
@@ -1942,6 +1956,35 @@
           }
         }
 
+        let verifiedReferredBy = currentProfile?.referred_by || null;
+
+        if (!currentProfile?.referred_by && newRef) {
+          if (newRef === newUid) {
+            Loader.hide();
+            Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
+            if (btn) btn.disabled = false;
+            return;
+          }
+          const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid, wallet_balance').eq('free_fire_uid', newRef).maybeSingle();
+          if (!refCheck) {
+            Loader.hide();
+            Toast.show("Yeh referral code available nahi hai!", "error");
+            if (btn) btn.disabled = false;
+            return;
+          }
+          verifiedReferredBy = refCheck.free_fire_uid;
+
+          const newBal = (refCheck.wallet_balance || 0) + 5;
+          await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', refCheck.id);
+          await sbClient.from('wallet_transactions').insert([{
+            user_id: refCheck.id,
+            amount: 5,
+            transaction_type: 'referral_bonus',
+            status: 'approved',
+            description: `Referral Bonus (UID: ${newUid})`
+          }]);
+        }
+
         const { error } = await sbClient.from('profiles').upsert([{
           id: currentUser.id,
           email: newEmail,
@@ -1949,6 +1992,7 @@
           free_fire_name: ign,
           free_fire_uid: newUid,
           phone: phone,
+          referred_by: verifiedReferredBy,
           updated_at: new Date().toISOString()
         }], { onConflict: 'id' });
 
