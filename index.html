@@ -121,11 +121,24 @@
     .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
-    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #fff; animation: marquee 12s linear infinite; animation-delay: 3s; }
-    @keyframes marquee { 
-      0% { transform: translate3d(100%, 0, 0); } 
-      100% { transform: translate3d(-100%, 0, 0); } 
+    /* NORMAL FIXED SPEED TICKER (STABLE SPEED REGARDLESS OF TEXT LENGTH) */
+    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
+    .ticker-content { 
+      display: inline-block; 
+      font-family: var(--font-gaming); 
+      font-size: 13px; 
+      font-weight: 700; 
+      letter-spacing: 0.5px; 
+      color: #fff; 
+      padding-left: 100%;
+      animation: smoothTicker linear infinite;
+      animation-play-state: paused;
+    }
+    .ticker-content.active { animation-play-state: running; }
+
+    @keyframes smoothTicker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
     }
   
     .bottom-nav { 
@@ -689,6 +702,19 @@
       }
     };
 
+    function startAnnouncementTicker() {
+      setTimeout(() => {
+        const content = document.querySelector('.ticker-content');
+        if (content) {
+          // Calculate duration dynamically based on text width for fixed normal speed (approx 50px per second)
+          const textLength = content.innerText.length;
+          const duration = Math.max(15, textLength * 0.18);
+          content.style.animationDuration = duration + 's';
+          content.classList.add('active');
+        }
+      }, 3000);
+    }
+
     function shareWebsite() {
       const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
       const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${myUid}`;
@@ -972,6 +998,8 @@
           </div>
         </div>
       `;
+
+      startAnnouncementTicker();
     }
 
     async function renderTournaments() {
@@ -996,7 +1024,6 @@
       const uniqueRefCode = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
       const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${uniqueRefCode}`;
 
-      // Fetch actual invited list from DB if user is logged in
       let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your link to start earning!</p>`;
       if (currentUser && currentProfile) {
         const { data: refUsers } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, created_at').eq('referred_by', currentProfile.free_fire_uid);
@@ -1534,7 +1561,6 @@
         const uid = document.getElementById('reg-uid').value.trim();
         const phone = document.getElementById('reg-phone').value.trim();
 
-        // Check for duplicates in profiles table (UID, Email, Phone)
         try {
           const { data: existingProfiles, error: checkError } = await sbClient
             .from('profiles')
