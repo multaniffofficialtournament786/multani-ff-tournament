@@ -313,6 +313,57 @@
     .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
     .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
 
+    /* Share Modal Styles */
+    #share-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(6px);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .share-sheet {
+      background: #0e1118;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-top: 1.5px solid var(--border-color);
+      padding: 20px 16px 35px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .share-options-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      text-align: center;
+    }
+    .share-app-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .share-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
     .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
@@ -511,7 +562,7 @@
           <span class="brand-main">OFFICIAL</span>
         </div>
         <div class="header-actions">
-          <button id="btn-header-share" class="icon-btn" onclick="shareWebsite()" title="Share App">
+          <button id="btn-header-share" class="icon-btn" onclick="openShareModal()" title="Share App">
             <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
           </button>
           <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
@@ -533,6 +584,36 @@
         <div class="sub-header-spacer"></div>
       </div>
     </header>
+
+    <!-- SHARE MODAL SHEET -->
+    <div id="share-modal-overlay" class="hidden">
+      <div class="share-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
+          <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff;">SHARE APP & EARN</h3>
+          <button onclick="closeShareModal()" class="icon-btn" style="width:30px; height:30px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 5 coins milenge!</p>
+        
+        <div class="share-options-grid">
+          <a id="share-whatsapp" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+            <span>WhatsApp</span>
+          </a>
+          <a id="share-facebook" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#1877f2;"><i class="fa-brands fa-facebook-f"></i></div>
+            <span>Facebook</span>
+          </a>
+          <a id="share-telegram" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#0088cc;"><i class="fa-brands fa-telegram"></i></div>
+            <span>Telegram</span>
+          </a>
+          <div onclick="copyShareText()" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:var(--accent-gold); color:#000;"><i class="fa-solid fa-copy"></i></div>
+            <span>Copy Link</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
     <aside id="side-drawer" class="side-drawer">
@@ -559,7 +640,7 @@
           <span><i class="fa-solid fa-bell"></i> Notifications</span>
           <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
         </button>
-        <button onclick="shareWebsite()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
+        <button onclick="openShareModal()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
         <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
         <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules</button>
         <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
@@ -655,12 +736,6 @@
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const refParam = urlParams.get('ref');
-    if (refParam) {
-      localStorage.setItem('invited_by_ref', refParam);
-    }
-
     const Toast = {
       show(msg, type = 'info') {
         const c = document.getElementById('toast-container');
@@ -698,21 +773,27 @@
       }, 3000);
     }
 
-    function shareWebsite() {
+    function openShareModal() {
       const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
       const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
-      
-      const shareData = {
-        title: 'Multani FF Official Tournament',
-        text: shareText
-      };
 
-      if (navigator.share) {
-        navigator.share(shareData).catch(err => console.log('Share canceled'));
-      } else {
-        navigator.clipboard.writeText(shareText);
-        Toast.show("App download link & referral code copied!", "success");
-      }
+      document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}`;
+      document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=${encodeURIComponent(shareText)}`;
+
+      document.getElementById('share-modal-overlay').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal-overlay').classList.add('hidden');
+    }
+
+    function copyShareText() {
+      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: ${myUid} when registering!`;
+      navigator.clipboard.writeText(shareText);
+      Toast.show("App link & referral code copied!", "success");
+      closeShareModal();
     }
 
     async function syncAuthAndProfile() {
@@ -1136,7 +1217,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
-              <button onclick="shareWebsite()" class="btn btn-primary btn-sm" style="background:#25d366; color:#fff;"><i class="fa-solid fa-share-nodes"></i> MORE SHARE OPTIONS</button>
+              <button onclick="openShareModal()" class="btn btn-primary btn-sm" style="background:#25d366; color:#fff;"><i class="fa-solid fa-share-nodes"></i> SHARE APP CHOOSE APP</button>
             </div>
           </div>
 
@@ -2257,7 +2338,7 @@
         Router.navigate('home');
       };
 
-      setupDraggableBot();
+      setupDraggablebot();
       await syncAuthAndProfile();
       Router.navigate('home');
     });
