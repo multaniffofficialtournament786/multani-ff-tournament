@@ -1220,15 +1220,22 @@
       const { data, error } = await sbClient
         .from('deposit_requests')
         .select('*')
-        .ilike('status', 'pending')
         .order('created_at', { ascending: false });
 
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips.</p>`;
+      if (error) {
+        alert("DB Error: " + error.message);
         return;
       }
 
-      container.innerHTML = data.map(d => {
+      // Sirf wo data filter karein jiska status pending ho (chahe uppercase ho ya lowercase)
+      const pendingData = (data || []).filter(d => d.status && d.status.toString().toLowerCase() === 'pending');
+
+      if (!pendingData.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips found in table. Total rows: ${(data || []).length}</p>`;
+        return;
+      }
+
+      container.innerHTML = pendingData.map(d => {
         const avatarUrl = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         return `
           <div id="dep-${d.id}" class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
