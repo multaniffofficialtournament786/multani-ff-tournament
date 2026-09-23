@@ -704,8 +704,7 @@
       
       const shareData = {
         title: 'Multani FF Official Tournament',
-        text: shareText,
-        url: APK_DOWNLOAD_LINK
+        text: shareText
       };
 
       if (navigator.share) {
@@ -1137,9 +1136,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
-              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}" target="_blank" class="support-action-btn" style="background:#1877f2; color:#fff; font-size:16px;"><i class="fa-brands fa-facebook-f"></i></a>
-              <a href="https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=Download%20Multani%20FF%20App" target="_blank" class="support-action-btn" style="background:#0088cc; color:#fff; font-size:16px;"><i class="fa-brands fa-telegram"></i></a>
-              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('Download Multani FF Official App: ' + APK_DOWNLOAD_LINK)}" target="_blank" class="support-action-btn" style="background:#25d366; color:#fff; font-size:16px;"><i class="fa-brands fa-whatsapp"></i></a>
+              <button onclick="shareWebsite()" class="btn btn-primary btn-sm" style="background:#25d366; color:#fff;"><i class="fa-solid fa-share-nodes"></i> MORE SHARE OPTIONS</button>
             </div>
           </div>
 
