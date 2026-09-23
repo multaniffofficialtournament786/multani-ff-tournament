@@ -1668,7 +1668,7 @@
           }
 
           if (data.user) {
-            await sbClient.from('profiles').upsert([{
+            const { error: profileError } = await sbClient.from('profiles').upsert([{
               id: data.user.id,
               email,
               full_name: name,
@@ -1680,6 +1680,8 @@
               is_banned: false,
               is_admin: false
             }]);
+
+            if (profileError) throw profileError;
 
             Loader.hide();
             Toast.show("Account registered successfully!", "success");
@@ -1917,14 +1919,15 @@
           }
         }
 
-        const { error } = await sbClient.from('profiles').update({
+        const { error } = await sbClient.from('profiles').upsert([{
+          id: currentUser.id,
+          email: newEmail,
           full_name: fullName,
           free_fire_name: ign,
           free_fire_uid: newUid,
-          email: newEmail,
           phone: phone,
           updated_at: new Date().toISOString()
-        }).eq('id', currentUser.id);
+        }], { onConflict: 'id' });
 
         if (error) throw error;
 
