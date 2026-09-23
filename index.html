@@ -1071,21 +1071,30 @@
       let totalIncome = 0;
 
       if (currentUser && currentProfile && currentProfile.free_fire_uid) {
-        const { data: refUsers } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, created_at').eq('referred_by', currentProfile.free_fire_uid);
+        const { data: refUsers } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, created_at, ref_claimed').eq('referred_by', currentProfile.free_fire_uid).order('ref_claimed', { ascending: true }).order('created_at', { ascending: false });
+        
         if (refUsers && refUsers.length > 0) {
           totalRegisters = refUsers.length;
-          validReferrals = refUsers.length;
+          validReferrals = refUsers.filter(u => u.ref_claimed).length;
           totalIncome = validReferrals * 5; 
           
-          invitedListHTML = refUsers.map(u => `
-            <div class="tx-item">
-              <div class="tx-info">
-                <h4>${u.free_fire_name || 'Gamer'}</h4>
-                <span>UID: ${u.free_fire_uid || '--'} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+          invitedListHTML = refUsers.map(u => {
+            const isClaimed = u.ref_claimed;
+            return `
+              <div class="tx-item" style="${!isClaimed ? 'border-left: 3px solid var(--accent-gold);' : ''}">
+                <div class="tx-info">
+                  <h4>${u.free_fire_name || 'Gamer'}</h4>
+                  <span>UID: ${u.free_fire_uid || '--'} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+                </div>
+                <div>
+                  ${isClaimed ? 
+                    `<span style="font-size:11px; color:var(--success); font-weight:bold;"><i class="fa-solid fa-check"></i> Claimed (+5)</span>` : 
+                    `<button onclick="claimReferralBonus('${u.id}', 5)" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; padding:6px 12px; font-size:11px; font-weight:bold;">CLAIM +5</button>`
+                  }
+                </div>
               </div>
-              <div class="tx-amount tx-positive">+5 Coins</div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
       }
 
@@ -1122,7 +1131,7 @@
             </div>
           </div>
 
-          <div class="section-title"><span>Invited List</span></div>
+          <div class="section-title"><span>Invited List (Unclaimed on Top)</span></div>
           <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
             ${invitedListHTML}
           </div>
@@ -1134,6 +1143,40 @@
           </div>
         </div>
       `;
+    }
+
+    async function claimReferralBonus(referredUserId, amount) {
+      if (!currentUser) return;
+      Loader.show("Claiming bonus...");
+      try {
+        const { data: targetUser } = await sbClient.from('profiles').select('id, ref_claimed, free_fire_uid').eq('id', referredUserId).single();
+        if (!targetUser || targetUser.ref_claimed) {
+          throw new Error("Yeh bonus pehle hi claim ho chuka hai.");
+        }
+
+        const { error: markErr } = await sbClient.from('profiles').update({ ref_claimed: true }).eq('id', referredUserId);
+        if (markErr) throw markErr;
+
+        const newBal = (currentProfile.wallet_balance || 0) + amount;
+        const { error: updateBalErr } = await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', currentUser.id);
+        if (updateBalErr) throw updateBalErr;
+
+        await sbClient.from('wallet_transactions').insert([{
+          user_id: currentUser.id,
+          amount: amount,
+          transaction_type: 'referral_bonus',
+          status: 'approved',
+          description: `Referral Claimed (UID: ${targetUser.free_fire_uid})`
+        }]);
+
+        Loader.hide();
+        Toast.show("Successfully claimed +5 coins to your wallet!", "success");
+        await syncAuthAndProfile();
+        renderInvite();
+      } catch (err) {
+        Loader.hide();
+        Toast.show(err.message || "Failed to claim bonus.", "error");
+      }
     }
 
     async function renderLeaderboard() {
@@ -1663,7 +1706,7 @@
               Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
               return;
             }
-            const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid, wallet_balance').eq('free_fire_uid', refInput).maybeSingle();
+            const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
             if (!refCheck) {
               Loader.hide();
               Toast.show("Yeh referral code available nahi hai, aap baghair referral ke bhi join kar sakte hain.", "error");
@@ -1689,27 +1732,13 @@
               free_fire_uid: uid,
               phone: phone,
               referred_by: validReferrerUid,
+              ref_claimed: false,
               wallet_balance: 0,
               is_banned: false,
               is_admin: false
             }]);
 
             if (profileError) throw profileError;
-
-            if (validReferrerUid) {
-              const { data: referrerProf } = await sbClient.from('profiles').select('id, wallet_balance').eq('free_fire_uid', validReferrerUid).maybeSingle();
-              if (referrerProf) {
-                const newBal = (referrerProf.wallet_balance || 0) + 5;
-                await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', referrerProf.id);
-                await sbClient.from('wallet_transactions').insert([{
-                  user_id: referrerProf.id,
-                  amount: 5,
-                  transaction_type: 'referral_bonus',
-                  status: 'approved',
-                  description: `Referral Bonus (UID: ${uid})`
-                }]);
-              }
-            }
 
             Loader.hide();
             Toast.show("Account registered and logged in successfully!", "success");
@@ -1965,7 +1994,7 @@
             if (btn) btn.disabled = false;
             return;
           }
-          const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid, wallet_balance').eq('free_fire_uid', newRef).maybeSingle();
+          const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', newRef).maybeSingle();
           if (!refCheck) {
             Loader.hide();
             Toast.show("Yeh referral code available nahi hai!", "error");
@@ -1973,16 +2002,6 @@
             return;
           }
           verifiedReferredBy = refCheck.free_fire_uid;
-
-          const newBal = (refCheck.wallet_balance || 0) + 5;
-          await sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', refCheck.id);
-          await sbClient.from('wallet_transactions').insert([{
-            user_id: refCheck.id,
-            amount: 5,
-            transaction_type: 'referral_bonus',
-            status: 'approved',
-            description: `Referral Bonus (UID: ${newUid})`
-          }]);
         }
 
         const { error } = await sbClient.from('profiles').upsert([{
