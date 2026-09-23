@@ -333,16 +333,17 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    .tournaments-grid-as8 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+    /* ORIGINAL AS8-STYLE LARGE TOURNAMENT CARDS */
+    .tournaments-stack-as8 {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
       margin-bottom: 16px;
     }
-    .t-card-as8 {
+    .t-card-as8-large {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -350,46 +351,37 @@
       transition: var(--transition);
       position: relative;
     }
-    .t-card-as8:active { transform: scale(0.96); }
-    .t-card-thumb-wrap {
+    .t-card-as8-large:active { transform: scale(0.98); }
+    .t-card-thumb-large {
       width: 100%;
-      height: 95px;
+      height: 160px;
       position: relative;
       background: #000;
     }
-    .t-card-thumb-wrap img {
+    .t-card-thumb-large img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    .t-card-info-box {
-      padding: 8px;
+    .t-card-info-large {
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
       background: #11151e;
     }
-    .t-card-title-as8 {
+    .t-card-title-large {
       font-family: var(--font-gaming);
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 700;
       color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
-    .t-card-meta-row {
+    .t-card-meta-large {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    .t-card-prize-as8 {
-      font-family: var(--font-gaming);
       font-size: 12px;
-      font-weight: 800;
-      color: var(--accent-gold);
+      color: var(--text-muted);
     }
 
     .room-slots-container {
@@ -853,9 +845,9 @@
         const btn = document.getElementById(`filter-btn-${s}`);
         if (btn) {
           if (s === status) {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow";
+            btn.className = "px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow";
           } else {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
+            btn.className = "px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap";
           }
         }
       });
@@ -888,26 +880,26 @@
         const currentStatus = (t.status || 'upcoming').toUpperCase();
 
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 space-y-2.5 cursor-pointer hover:border-[#ff4624] transition relative overflow-hidden" onclick="Router.navigate('tournament_detail', '${t.id}')">
-            <div class="flex items-center gap-3">
-              <img src="${imgUrl}" style="width:75px; height:75px; object-fit:cover; border-radius:8px;" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold font-gaming ${currentStatus === 'LIVE' ? 'bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse' : currentStatus === 'COMPLETED' ? 'bg-gray-700 text-gray-300' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40'}">
-                    ${currentStatus}
-                  </span>
-                  ${isJoined ? `<span class="bg-[#00e676] text-black text-[9px] font-extrabold px-1.5 py-0.5 rounded">JOINED</span>` : ''}
-                </div>
-                <h4 class="font-gaming text-sm font-bold text-white truncate">${t.title}</h4>
-                <div class="text-[11px] text-gray-400 mt-0.5">
-                  <span class="text-cyan-400 font-bold">${t.mode}</span> • <span>${t.map}</span>
-                </div>
+          <div class="t-card-as8-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
+            <div class="t-card-thumb-large">
+              <img src="${imgUrl}" alt="${t.title}" />
+              <div style="position:absolute; top:8px; left:8px; display:flex; gap:6px;">
+                <span style="background:${currentStatus === 'LIVE' ? '#ff1744' : (currentStatus === 'COMPLETED' ? '#4b5563' : '#00f0ff')}; color:${currentStatus === 'LIVE' ? '#fff' : '#000'}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:4px; font-family:var(--font-gaming); text-transform:uppercase;">
+                  ${currentStatus}
+                </span>
+                ${isJoined ? `<span style="background:#00e676; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:4px; font-family:var(--font-gaming);">JOINED</span>` : ''}
               </div>
             </div>
-            <div class="flex items-center justify-between pt-2 border-t border-[#262f40] text-xs">
-              <span class="text-gray-400">Slots: <strong class="text-white">${t.joined_players || 0}/${t.max_players}</strong></span>
-              <span class="font-gaming font-bold text-yellow-400">PKR ${t.prize_pool}</span>
-              <span class="font-bold ${t.entry_fee == 0 ? 'text-cyan-400' : 'text-yellow-400'}">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
+            <div class="t-card-info-large">
+              <h4 class="t-card-title-large">${t.title}</h4>
+              <div class="t-card-meta-large">
+                <span style="color:var(--accent-cyan); font-weight:600;">${t.mode} • ${t.map}</span>
+                <span style="font-family:var(--font-gaming); font-size:16px; font-weight:800; color:var(--accent-gold);">PKR ${t.prize_pool}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-dim); border-top:1px solid #1f2636; padding-top:6px; margin-top:2px;">
+                <span>Slots: <strong style="color:#fff;">${t.joined_players || 0}/${t.max_players}</strong></span>
+                <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
+              </div>
             </div>
           </div>
         `;
@@ -917,13 +909,13 @@
     function renderTournamentsHTMLBlock() {
       return `
         <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-3" style="scrollbar-width:none;">
-          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow">All Matches</button>
-          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Today</button>
-          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
-          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
-          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
+          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow">All Matches</button>
+          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Today</button>
+          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Upcoming</button>
+          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Live</button>
+          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Completed</button>
         </div>
-        <div id="tournaments-cards-container" class="space-y-3">
+        <div id="tournaments-cards-container" class="tournaments-stack-as8">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
       `;
