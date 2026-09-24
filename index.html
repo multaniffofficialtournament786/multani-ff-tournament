@@ -106,29 +106,50 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .announcement-box {
-      background: linear-gradient(90deg, rgba(255, 70, 36, 0.15), rgba(0, 240, 255, 0.15));
-      border: 1px solid rgba(255, 70, 36, 0.35);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
+    /* LED DISPLAY SIGNBOARD STYLING WITH ROTATING GLOWING BORDER */
+    @keyframes borderRotate {
+      0% { border-image-source: linear-gradient(0deg, #ff1744, #00f0ff, #ffbe00, #00e676); }
+      50% { border-image-source: linear-gradient(180deg, #00e676, #ff1744, #00f0ff, #ffbe00); }
+      100% { border-image-source: linear-gradient(360deg, #ff1744, #00f0ff, #ffbe00, #00e676); }
+    }
+    @keyframes ledGlow {
+      0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
+      33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
+      66% { box-shadow: 0 0 12px #ffbe00, inset 0 0 10px rgba(0,230,118,0.3); }
+    }
+    .led-signboard {
+      background: #020305;
+      border: 3px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
       overflow: hidden;
-      box-shadow: 0 0 12px rgba(255, 70, 36, 0.2);
+      position: relative;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
+      animation: ledGlow 3s infinite ease-in-out;
+      background-image: radial-gradient(circle, #151c28 1px, transparent 1px);
+      background-size: 6px 6px; /* Dot-matrix grid pattern */
     }
-    .announcement-box i { color: var(--accent-gold); font-size: 14px; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    
+    .led-signboard i {
+      color: #ffbe00;
+      font-size: 16px;
+      filter: drop-shadow(0 0 6px #ffbe00);
+      animation: pulse 1s infinite;
+    }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
     .ticker-content { 
       display: inline-block; 
       font-family: var(--font-gaming); 
-      font-size: 13px; 
-      font-weight: 700; 
-      letter-spacing: 0.5px; 
-      color: #fff; 
+      font-size: 14px; 
+      font-weight: 800; 
+      letter-spacing: 1.5px; 
+      background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
       padding-left: 100%;
       animation: smoothTicker linear infinite;
       animation-play-state: paused;
@@ -383,7 +404,7 @@
     .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
     .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
     .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
-    .hero-profile-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
     .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
     .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
     .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
@@ -773,19 +794,15 @@
       }
     };
 
-    // --- ACTIVITY HEARTBEAT (UPDATES LAST SEEN AUTOMATICALLY) ---
     async function updateHeartbeat() {
       if (!currentUser) return;
       try {
         await sbClient.from('profiles').update({
           last_seen: new Date().toISOString()
         }).eq('id', currentUser.id);
-      } catch (err) {
-        // silent catch
-      }
+      } catch (err) {}
     }
 
-    // Run heartbeat every 45 seconds while app is open
     setInterval(updateHeartbeat, 45000);
 
     function startAnnouncementTicker() {
@@ -838,8 +855,6 @@
           userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
           unreadNotifCount = notifRes.count || 0;
           unreadChatCount = chatRes.count || 0;
-
-          // Update heartbeat immediately upon sync
           updateHeartbeat();
         } else {
           currentProfile = null;
@@ -1072,18 +1087,12 @@
 
       view.innerHTML = `
         <div class="view-container">
-          <div class="announcement-box">
-            <i class="fa-solid fa-bullhorn"></i>
+          <!-- LED DISPLAY SIGNBOARD WITH GLOWING ROTATING BORDER & COLORFUL TEXT -->
+          <div class="led-signboard">
+            <i class="fa-solid fa-bolt"></i>
             <div class="ticker-viewport">
               <div class="ticker-content">${tickerText}</div>
             </div>
-          </div>
-
-          <!-- BADA REFRESH BUTTON ON HOMEPAGE -->
-          <div style="margin-bottom: 12px;">
-            <button onclick="hardRefreshApp()" class="btn btn-secondary" style="background: linear-gradient(135deg, #151922, #1f2636); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); font-family: var(--font-gaming); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
-              <i class="fa-solid fa-rotate" style="font-size: 16px;"></i> RELOAD / REFRESH APP DATA
-            </button>
           </div>
 
           ${!currentUser ? `
@@ -1096,14 +1105,25 @@
             </div>
           ` : `
             <div class="player-hero-card">
-              <div class="hero-profile-row" style="margin-bottom:10px;">
-                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
-                <div class="hero-details">
-                  <h2>${displayName}</h2>
-                  <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${displayUid}</span>
-                  <div style="font-size: 12px; color: var(--success); margin-top: 3px; font-weight: 600;">
-                    <i class="fa-brands fa-whatsapp"></i> ${displayPhone}
+              <div class="hero-profile-row">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
+                  <div class="hero-details">
+                    <h2>${displayName}</h2>
+                    <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${displayUid}</span>
+                    <div style="font-size: 11px; color: var(--success); margin-top: 2px; font-weight: 600;">
+                      <i class="fa-brands fa-whatsapp"></i> ${displayPhone}
+                    </div>
                   </div>
+                </div>
+                <!-- TWO ROUND REFRESH BUTTONS -->
+                <div style="display:flex; gap:6px;">
+                  <button onclick="hardRefreshApp()" title="Refresh App" style="width:34px; height:34px; border-radius:50%; background:rgba(0,240,255,0.15); border:1px solid var(--accent-cyan); color:var(--accent-cyan); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition);">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                  </button>
+                  <button onclick="hardRefreshApp()" title="Reload Data" style="width:34px; height:34px; border-radius:50%; background:rgba(255,70,36,0.15); border:1px solid var(--primary); color:var(--primary); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition);">
+                    <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                  </button>
                 </div>
               </div>
               <div class="hero-stats-grid">
@@ -1114,9 +1134,10 @@
             </div>
           `}
 
+          <!-- SLIM DOWNLOAD OFFICIAL APP BUTTON -->
           <div style="margin-bottom: 16px;">
-            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4);">
-              <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
+            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="padding: 9px 16px; font-size: 14px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 240, 255, 0.3);">
+              <i class="fa-solid fa-cloud-arrow-down" style="font-size: 16px;"></i> DOWNLOAD OFFICIAL APP
             </a>
           </div>
 
