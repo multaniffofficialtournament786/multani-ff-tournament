@@ -773,6 +773,21 @@
       }
     };
 
+    // --- ACTIVITY HEARTBEAT (UPDATES LAST SEEN AUTOMATICALLY) ---
+    async function updateHeartbeat() {
+      if (!currentUser) return;
+      try {
+        await sbClient.from('profiles').update({
+          last_seen: new Date().toISOString()
+        }).eq('id', currentUser.id);
+      } catch (err) {
+        // silent catch
+      }
+    }
+
+    // Run heartbeat every 45 seconds while app is open
+    setInterval(updateHeartbeat, 45000);
+
     function startAnnouncementTicker() {
       setTimeout(() => {
         const content = document.querySelector('.ticker-content');
@@ -823,6 +838,9 @@
           userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
           unreadNotifCount = notifRes.count || 0;
           unreadChatCount = chatRes.count || 0;
+
+          // Update heartbeat immediately upon sync
+          updateHeartbeat();
         } else {
           currentProfile = null;
           userJoinedTournamentIds.clear();
