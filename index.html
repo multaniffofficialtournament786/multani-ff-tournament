@@ -1240,13 +1240,17 @@
           <div id="tutorials-scroll-box" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px; scroll-behavior: smooth;">
             ${siteTutorialsList.map(item => {
               const platformName = item.platform || 'YouTube';
-              let btnText = "WATCH TUTORIAL";
+              let btnText = "WATCH"; // Button text update kiya gaya hai
               let btnBg = "linear-gradient(135deg, #ff5733, #e62200)";
-              if (platformName === 'TikTok') { btnText = "WATCH ON TIKTOK"; btnBg = "linear-gradient(135deg, #00f0ff, #0077ff)"; }
-              else if (platformName === 'Facebook') { btnText = "WATCH ON FACEBOOK"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
-              else if (platformName === 'Instagram') { btnText = "VIEW ON INSTAGRAM"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
+              if (platformName === 'TikTok') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #00f0ff, #0077ff)"; }
+              else if (platformName === 'Facebook') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
+              else if (platformName === 'Instagram') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
 
               const bgImgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
+              
+              // Admin panel se edit hone wali do white lines (dynamic variables/fallback)
+              const line1 = item.line_1 || 'COMPLETE STEP-BY-STEP WEBSITE GUIDE';
+              const line2 = item.line_2 || 'Tap below to watch complete step-by-step guidance.';
 
               return `
                 <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0; ${bgImgStyle}">
@@ -1255,10 +1259,10 @@
                     <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
                   </div>
                   <div class="screenshot-title">${escapeHTML(item.title)}</div>
-                  <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${escapeHTML(platformName.toUpperCase())} GUIDE</div>
+                  <div class="screenshot-subtitle">${escapeHTML(line1)}</div>
                   
                   <div style="margin-bottom: 14px;">
-                    <p style="font-size:11px; color:#ffffff; font-weight:700; line-height:1.4; text-shadow: 0 1px 4px rgba(0,0,0,0.98);">Tap below to watch complete step-by-step guidance.</p>
+                    <p style="font-size:11px; color:#ffffff; font-weight:700; line-height:1.4; text-shadow: 0 1px 4px rgba(0,0,0,0.98);">${escapeHTML(line2)}</p>
                   </div>
 
                   <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
