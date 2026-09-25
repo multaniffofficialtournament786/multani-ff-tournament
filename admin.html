@@ -18,6 +18,7 @@
       0% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(1.15); }
       100% { opacity: 1; transform: scale(1); }
+    }
     .blink-heart { animation: blink-green 1.2s infinite ease-in-out; }
   </style>
 </head>
@@ -93,6 +94,9 @@
           <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
           <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
+        <button onclick="selectTab('tutorials')" id="nav-tutorials" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-video w-5 text-cyan-400"></i> Tutorials & Ads Manager
+        </button>
         <button onclick="selectTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
         </button>
@@ -127,7 +131,6 @@
         <h1 id="panel-title" class="font-gaming text-base md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
       </div>
 
-      <!-- NAVBAR PROMINENT ROUNDED BUTTON FOR PLAYERS LIST -->
       <div class="flex items-center gap-2">
         <button onclick="openAllPlayersModal()" class="bg-gradient-to-r from-[#ff4624] to-[#ff8424] hover:from-[#e03a1a] hover:to-[#e0721a] text-white px-4 py-1.5 rounded-full text-xs font-gaming font-bold tracking-wider shadow-lg shadow-[#ff4624]/20 border border-[#ff6a3c] flex items-center gap-2 transition transform active:scale-95">
           <i class="fa-solid fa-users-line text-sm"></i>
@@ -177,11 +180,7 @@
             </button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('support')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition relative">
-              <i class="fa-solid fa-comments text-purple-400 text-lg"></i>
-              <p class="text-[11px] font-bold mt-1 text-gray-200">Chat</p>
-              <span id="quick-badge-support" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
+            <button onclick="selectTab('tutorials')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-video text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Tutorials</p></button>
             <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
           </div>
         </div>
@@ -252,6 +251,41 @@
         </div>
       </section>
 
+      <!-- TUTORIALS & ADS MANAGER (NEW SECTION) -->
+      <section id="section-tutorials" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+            <i class="fa-solid fa-video text-cyan-400"></i> Manage Video Tutorials & Ads
+          </h2>
+          <input type="hidden" id="edit-tutorial-id" />
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Video Title / Ad Title</label>
+            <input type="text" id="tut-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. HOW TO DEPOSIT COINS" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">YouTube / Target Link</label>
+            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/..." required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card / Banner Photo</label>
+            <input type="file" id="tut-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="resetTutorialForm()" id="btn-cancel-tut" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
+            <button onclick="saveTutorialCard()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+              SAVE TUTORIAL / AD CARD
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3 w-full max-w-full md:max-w-xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Carousel Cards</h3>
+          <div id="admin-tutorials-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading cards...</p>
+          </div>
+        </div>
+      </section>
+
       <!-- SUPPORT -->
       <section id="section-support" class="space-y-4 hidden">
         <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl">
@@ -316,7 +350,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST (TIKTOK STYLE WITH REAL DP, GREEN BLINKING HEART, LAST SEEN & JOIN DATE) -->
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST (WITH EMAIL & PASSWORD DISPLAY FOR ADMIN) -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
@@ -536,8 +570,6 @@
       const diffMin = Math.floor(diffSec / 60);
       const diffHours = Math.floor(diffMin / 60);
       const diffDays = Math.floor(diffHours / 24);
-      const diffWeeks = Math.floor(diffDays / 7);
-      const diffMonths = Math.floor(diffDays / 30);
 
       const timeFormatted = past.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -545,8 +577,6 @@
       if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago (${timeFormatted})`;
       if (diffDays === 1) return `1 day ago ${timeFormatted}`;
       if (diffDays < 7) return `${diffDays} day ago ${timeFormatted}`;
-      if (diffWeeks < 4) return `${diffWeeks} week ago active`;
-      if (diffMonths < 12) return `${diffMonths} month ago active`;
       return `${past.toLocaleDateString()} at ${timeFormatted}`;
     }
 
@@ -664,7 +694,7 @@
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'tutorials', 'support', 'banned', 'settings'];
 
     function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
@@ -703,6 +733,7 @@
       if (tabId === 'deposits') loadDeposits();
       if (tabId === 'winners') loadWinnerSelectOptions();
       if (tabId === 'users') loadUsers();
+      if (tabId === 'tutorials') loadTutorialsManager();
       if (tabId === 'banned') loadBannedUsers();
       if (tabId === 'settings') loadSettings();
       if (tabId === 'support') loadSupportInbox();
@@ -758,6 +789,100 @@
       }
     }
 
+    /* TUTORIALS & ADS MANAGER FUNCTIONS */
+    async function loadTutorialsManager() {
+      const listContainer = document.getElementById('admin-tutorials-list');
+      listContainer.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading cards...</p>`;
+
+      const { data, error } = await sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false });
+      if (error || !data || !data.length) {
+        listContainer.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No tutorial cards created yet.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = data.map(item => `
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-3">
+            <img src="${item.photo_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80'}" class="w-12 h-12 rounded-lg object-cover border border-[#262f40]" />
+            <div>
+              <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
+              <p class="text-cyan-400 font-mono text-[11px] truncate max-w-[200px]">${escapeHTML(item.link)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="editTutorialCard('${item.id}', '${escapeHTML(item.title)}', '${escapeHTML(item.link)}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteTutorialCard('${item.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function saveTutorialCard() {
+      const id = document.getElementById('edit-tutorial-id').value;
+      const title = document.getElementById('tut-title').value.trim();
+      const link = document.getElementById('tut-link').value.trim();
+      const fileInput = document.getElementById('tut-file');
+
+      if (!title || !link) {
+        alert("Title and Link are required.");
+        return;
+      }
+
+      let photo_url = null;
+      try {
+        if (fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          const path = `tutorials/${Date.now()}_${file.name}`;
+          const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+          if (!upErr) {
+            const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+            photo_url = publicUrl;
+          }
+        }
+
+        const payload = { title, link };
+        if (photo_url) payload.photo_url = photo_url;
+
+        if (id) {
+          const { error } = await sbClient.from('site_tutorials').update(payload).eq('id', id);
+          if (error) throw error;
+          alert("Tutorial card updated successfully!");
+        } else {
+          const { error } = await sbClient.from('site_tutorials').insert([payload]);
+          if (error) throw error;
+          alert("Tutorial card created successfully!");
+        }
+
+        resetTutorialForm();
+        loadTutorialsManager();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    function editTutorialCard(id, title, link) {
+      document.getElementById('edit-tutorial-id').value = id;
+      document.getElementById('tut-title').value = title;
+      document.getElementById('tut-link').value = link;
+      document.getElementById('btn-cancel-tut').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetTutorialForm() {
+      document.getElementById('edit-tutorial-id').value = '';
+      document.getElementById('tut-title').value = '';
+      document.getElementById('tut-link').value = '';
+      document.getElementById('tut-file').value = '';
+      document.getElementById('btn-cancel-tut').classList.add('hidden');
+    }
+
+    async function deleteTutorialCard(id) {
+      if (!confirm("Delete this tutorial/ad card?")) return;
+      const { error } = await sbClient.from('site_tutorials').delete().eq('id', id);
+      if (error) alert("Failed: " + error.message);
+      else loadTutorialsManager();
+    }
+
     async function openAllPlayersModal() {
       const modal = document.getElementById('modal-all-players');
       const body = document.getElementById('modal-all-players-body');
@@ -787,9 +912,9 @@
       body.innerHTML = list.map(u => {
         const waNumber = u.phone || '';
         const userEmail = u.email || 'No email added';
+        const userPass = u.password || u.raw_app_meta_data?.password || 'Saved securely in Auth';
         const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
-        // Active check: considered active if last seen within past 5 minutes or simulated
         const lastSeenTime = u.last_seen || u.updated_at || u.created_at;
         const diffMinutes = lastSeenTime ? (now - new Date(lastSeenTime)) / (1000 * 60) : 999;
         const isActiveNow = diffMinutes <= 5;
@@ -806,7 +931,6 @@
 
         return `
           <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-3 sm:p-3.5 space-y-2.5 text-xs transition hover:border-[#ff4624]/50">
-            <!-- TikTok Style Header with Avatar DP -->
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div class="relative shrink-0">
@@ -827,18 +951,20 @@
               </div>
             </div>
 
-            <!-- Details: Email, WhatsApp, Join Date & Last Seen -->
+            <!-- EMAIL & PASSWORD DISPLAY (ADMIN ASSISTANCE) -->
             <div class="bg-[#0e1118] p-2.5 rounded-xl space-y-1.5 text-[11px] border border-[#262f40]/50">
               <div class="flex items-center justify-between">
-                <span class="text-gray-400 truncate"><i class="fa-solid fa-envelope text-red-400 mr-1.5 w-4"></i> ${escapeHTML(userEmail)}</span>
-                <span class="text-gray-400 shrink-0 font-mono">Joined: <strong class="text-gray-200">${joinDateFormatted}</strong></span>
+                <span class="text-gray-300 truncate"><i class="fa-solid fa-envelope text-red-400 mr-1.5 w-4"></i> Gmail: <strong class="text-white">${escapeHTML(userEmail)}</strong></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-300 truncate"><i class="fa-solid fa-key text-yellow-400 mr-1.5 w-4"></i> Password: <strong class="text-yellow-400 font-mono">${escapeHTML(u.password || 'Registered via Auth')}</strong></span>
               </div>
               <div class="flex items-center justify-between pt-1 border-t border-[#262f40]/40">
+                <span class="text-gray-400 font-mono">Joined: ${joinDateFormatted}</span>
                 <span class="text-gray-300">Last Seen: <strong class="${isActiveNow ? 'text-[#00e676]' : 'text-yellow-400'}">${formatTimeAgo(lastSeenTime)}</strong></span>
               </div>
             </div>
 
-            <!-- Action Buttons: WhatsApp Chat & Payment History -->
             <div class="flex items-center gap-2 pt-0.5">
               ${waNumber ? `
                 <a href="${waLink}" target="_blank" class="flex-1 bg-[#25D366] hover:bg-[#1ebe57] text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
