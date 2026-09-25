@@ -917,6 +917,15 @@
       }
     };
 
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
     async function updateHeartbeat() {
       if (!currentUser) return;
       try {
@@ -1140,7 +1149,7 @@
         return `
           <div class="t-card-as8-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
             <div class="t-card-thumb-large">
-              <img src="${imgUrl}" alt="${t.title}" />
+              <img src="${imgUrl}" alt="${escapeHTML(t.title)}" />
               <div style="position:absolute; top:8px; left:8px; display:flex; gap:6px;">
                 <span style="background:${currentStatus === 'LIVE' ? '#ff1744' : (currentStatus === 'COMPLETED' ? '#4b5563' : '#00f0ff')}; color:${currentStatus === 'LIVE' ? '#fff' : '#000'}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:4px; font-family:var(--font-gaming); text-transform:uppercase;">
                   ${currentStatus}
@@ -1149,9 +1158,9 @@
               </div>
             </div>
             <div class="t-card-info-large">
-              <h4 class="t-card-title-large">${t.title}</h4>
+              <h4 class="t-card-title-large">${escapeHTML(t.title)}</h4>
               <div class="t-card-meta-large">
-                <span style="color:var(--accent-cyan); font-weight:600;">${t.mode} • ${t.map}</span>
+                <span style="color:var(--accent-cyan); font-weight:600;">${escapeHTML(t.mode)} • ${escapeHTML(t.map)}</span>
                 <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Booyah Prize: <strong style="font-family:var(--font-gaming); font-size:15px; color:var(--accent-gold);">PKR ${t.prize_pool}</strong></span>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-dim); border-top:1px solid #1f2636; padding-top:6px; margin-top:2px;">
@@ -1225,7 +1234,7 @@
                     <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
                   </div>
                   <div class="screenshot-title">${escapeHTML(item.title)}</div>
-                  <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${platformName.toUpperCase()} GUIDE</div>
+                  <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${escapeHTML(platformName.toUpperCase())} GUIDE</div>
                   
                   <div class="screenshot-content-row">
                     <p style="font-size:11px; color:var(--text-muted); line-height:1.4; flex:1;">Tap below to watch complete step-by-step guidance.</p>
@@ -1249,7 +1258,7 @@
           <div class="led-signboard">
             <i class="fa-solid fa-bolt"></i>
             <div class="ticker-viewport">
-              <div class="ticker-content">${tickerText}</div>
+              <div class="ticker-content">${escapeHTML(tickerText)}</div>
             </div>
           </div>
 
@@ -1268,10 +1277,10 @@
                 <div style="display:flex; align-items:center; gap:12px;">
                   <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
                   <div class="hero-details">
-                    <h2>${displayName}</h2>
-                    <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${displayUid}</span>
+                    <h2>${escapeHTML(displayName)}</h2>
+                    <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${escapeHTML(displayUid)}</span>
                     <div style="font-size: 11px; color: var(--success); margin-top: 2px; font-weight: 600;">
-                      <i class="fa-brands fa-whatsapp"></i> ${displayPhone}
+                      <i class="fa-brands fa-whatsapp"></i> ${escapeHTML(displayPhone)}
                     </div>
                   </div>
                 </div>
@@ -1390,8 +1399,8 @@
             return `
               <div class="tx-item" style="${!isClaimed ? 'border-left: 3px solid var(--accent-gold);' : ''}">
                 <div class="tx-info">
-                  <h4>${u.free_fire_name || 'Gamer'}</h4>
-                  <span>UID: ${u.free_fire_uid || '--'} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+                  <h4>${escapeHTML(u.free_fire_name || 'Gamer')}</h4>
+                  <span>UID: ${escapeHTML(u.free_fire_uid || '--')} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
                 </div>
                 <div>
                   ${isClaimed ? 
@@ -1486,8 +1495,8 @@
               <div style="display:flex; align-items:center; gap:12px;">
                 <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
                 <div>
-                  <h4>${l.free_fire_name || 'Player'}</h4>
-                  <span style="font-size:11px; color:var(--accent-cyan);">UID: ${l.free_fire_uid || '--'}</span>
+                  <h4>${escapeHTML(l.free_fire_name || 'Player')}</h4>
+                  <span style="font-size:11px; color:var(--accent-cyan);">UID: ${escapeHTML(l.free_fire_uid || '--')}</span>
                 </div>
               </div>
               <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
@@ -1540,7 +1549,7 @@
           <div class="slot-card ${isOccupied ? 'occupied' : ''} ${isMine ? 'my-slot' : ''}">
             <span class="slot-num">${i}</span>
             <i class="fa-solid ${isOccupied ? 'fa-user' : 'fa-plus'} text-[10px]" style="color:${isMine ? 'var(--primary)' : (isOccupied ? 'var(--accent-cyan)' : 'var(--text-dim)')}"></i>
-            <span class="slot-name">${name}</span>
+            <span class="slot-name">${escapeHTML(name)}</span>
           </div>
         `;
       }
@@ -1552,7 +1561,7 @@
             <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winner Declared</div>
             ${winRes.data.map(w => `
               <div style="font-size:13px; font-weight:bold; color:#fff;">
-                ${w.profiles?.free_fire_name || 'Winner'} (UID: ${w.profiles?.free_fire_uid || '--'}) - ${w.position} [PKR ${w.prize_amount}]
+                ${escapeHTML(w.profiles?.free_fire_name || 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR ${w.prize_amount}]
               </div>
             `).join('')}
           </div>
@@ -1564,7 +1573,7 @@
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom: 12px; padding: 12px; text-align: center;">
             <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
-            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${t.title}</h2>
+            <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${escapeHTML(t.title)}</h2>
             <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
               <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
               <div class="stat-box"><span class="stat-label">Booyah Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
@@ -1572,7 +1581,7 @@
             </div>
           </div>
 
-          <!-- MATCH & MATCH JOINING RULES DROPDOWN (VISIBLE BEFORE JOINING) -->
+          <!-- MATCH & MATCH JOINING RULES DROPDOWN -->
           <div class="rules-dropdown-container">
             <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
               <div style="display:flex; align-items:center; gap:8px;">
@@ -1588,28 +1597,22 @@
               <p><strong>3. ⏰ Be On Time:</strong> After joining a match, the player must be present in the room at the scheduled match time or before.</p>
               <p><strong>4. 🚫 No Show = No Refund:</strong> If a player joins a match but does not enter the room on time or misses the match, the entry fee/payment will NOT be refunded.</p>
               <p><strong>5. 🔐 Room ID & Password:</strong> Room ID and Password should only be used for the assigned match. Players must not share room details with unauthorized persons.</p>
-              <p><strong>6. 🚫 Wrong Room:</strong> Players are responsible for joining the correct room for their registered match. Joining the wrong room due to the player's own mistake will not make the entry fee refundable.</p>
-              <p><strong>7. 🔄 Duplicate Joining:</strong> A player cannot take multiple entries in the same match unless multiple entries are specifically allowed by the tournament.</p>
-              <p><strong>8. 💳 Entry Fee Deduction:</strong> The applicable entry fee may be deducted from the player's wallet when the player successfully joins the match.</p>
-              <p><strong>9. 📸 Technical Issues:</strong> If a player experiences a technical problem after joining, they should contact Support and provide relevant screenshots or other available evidence.</p>
+              <p><strong>6. 🚫 Wrong Room:</strong> Players are responsible for joining the correct room for their registered match.</p>
+              <p><strong>7. 🔄 Duplicate Joining:</strong> A player cannot take multiple entries in the same match unless allowed.</p>
+              <p><strong>8. 💳 Entry Fee Deduction:</strong> Fee will be deducted upon joining.</p>
+              <p><strong>9. 📸 Technical Issues:</strong> Contact support with screenshots if any issue occurs.</p>
 
               <div style="color:var(--accent-gold); font-weight:bold; margin:16px 0 6px 0;">🎯 2. MATCH RULES</div>
-              <p><strong>10. 🎮 Fair Play Required:</strong> Every player must participate fairly and follow all tournament rules.</p>
-              <p><strong>11. 🚫 Hacks & Cheats Prohibited:</strong> Hacks, scripts, injectors, unauthorized mods, cheats, or other tools that provide an unfair advantage are strictly prohibited.</p>
-              <p><strong>12. 🚫 Bug & Glitch Abuse:</strong> Intentionally exploiting game bugs or glitches to gain an unfair advantage is prohibited.</p>
-              <p><strong>13. 👤 Account Sharing:</strong> Players must participate using their own registered tournament account. Account sharing or allowing another person to play may result in disqualification.</p>
-              <p><strong>14. 📱 Supported Game Version:</strong> Players must use the supported/current game version required for the tournament. Modified or unauthorized game clients are prohibited.</p>
-              <p><strong>15. 📶 Internet & Device Responsibility:</strong> Players are responsible for their own internet connection, device, battery, and game performance.</p>
-              <p><strong>16. 🏆 Match Result:</strong> The final result will be confirmed after reviewing available game results, screenshots, match records, and other relevant evidence.</p>
-              <p><strong>17. 📸 Result Proof:</strong> If result proof is required, players must submit a clear screenshot or other requested evidence within the specified time.</p>
-              <p><strong>18. 🤝 Respect Other Players:</strong> Abusive language, harassment, threats, or disruptive behavior toward other players or tournament staff is prohibited.</p>
-              <p><strong>19. 🚫 Teaming / Unfair Collaboration:</strong> In Solo matches, intentionally teaming or collaborating with other players for an unfair advantage is strictly prohibited.</p>
-              <p><strong>20. ⚠️ Disqualification:</strong> A player who violates tournament rules may be disqualified from the match.</p>
-              <p><strong>21. 🛡️ Admin Verification:</strong> In cases of suspected cheating or rule violations, the tournament administration may review available evidence before making a decision.</p>
+              <p><strong>10. 🎮 Fair Play Required:</strong> Every player must participate fairly.</p>
+              <p><strong>11. 🚫 Hacks & Cheats Prohibited:</strong> Hacks, scripts, and injectors are strictly prohibited.</p>
+              <p><strong>12. 🚫 Bug & Glitch Abuse:</strong> Exploiting bugs is strictly prohibited.</p>
+              <p><strong>13. 👤 Account Sharing:</strong> Account sharing is not allowed.</p>
+              <p><strong>14. 📱 Supported Game Version:</strong> Use the official latest game version.</p>
+              <p><strong>15. 📶 Internet:</strong> Players are responsible for their own internet connectivity.</p>
+              <p><strong>16. 🏆 Match Result:</strong> Finalized after admin verification.</p>
 
               <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:12px 0; border-radius:4px; color:#ff8b8b;">
                 🔴 <strong>IMPORTANT NOTICE:</strong><br>
-                Before joining any match, carefully check the Match Name, Entry Fee, Date, Start Time, Mode, Room ID, Password, and applicable rules.<br>
                 ❌ <strong>NO SHOW = NO REFUND</strong>
               </div>
             </div>
@@ -1627,13 +1630,13 @@
                 <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
                   <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
                   <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
-                    ${t.room_id || 'Pending'}
+                    ${escapeHTML(t.room_id || 'Pending')}
                   </div>
                 </div>
                 <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
                   <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Password</div>
                   <div style="font-family: monospace; font-size: 14px; font-weight: bold; color: var(--accent-cyan); margin-top: 2px;">
-                    ${t.room_password || '••••••••'}
+                    ${escapeHTML(t.room_password || '••••••••')}
                   </div>
                 </div>
               </div>
@@ -1651,7 +1654,7 @@
               <span style="font-family:var(--font-gaming); font-size:12px; font-weight:bold; color:var(--accent-gold); text-transform:uppercase;">
                 <i class="fa-solid fa-gamepad mr-1"></i> Room Slots (${t.joined_players || 0}/${t.max_players})
               </span>
-              <span style="font-size:10px; color:var(--text-dim);">Map: ${t.map}</span>
+              <span style="font-size:10px; color:var(--text-dim);">Map: ${escapeHTML(t.map)}</span>
             </div>
             <div class="room-slots-grid">${slotsHTML}</div>
           </div>
@@ -1746,10 +1749,10 @@
             return `
               <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <div>
-                  <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-crown"></i> ${w.position || '1st Place (Booyah)'}</span>
-                  <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${p.free_fire_name || 'Champion'}</h3>
-                  <div style="font-size:11px; color:var(--text-dim);">UID: ${p.free_fire_uid || '--'}</div>
-                  <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${t.title || 'Tournament'}</div>
+                  <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-crown"></i> ${escapeHTML(w.position || '1st Place (Booyah)')}</span>
+                  <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${escapeHTML(p.free_fire_name || 'Champion')}</h3>
+                  <div style="font-size:11px; color:var(--text-dim);">UID: ${escapeHTML(p.free_fire_uid || '--')}</div>
+                  <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${escapeHTML(t.title || 'Tournament')}</div>
                 </div>
                 <div style="text-align:right;">
                   <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
@@ -1796,12 +1799,12 @@
           return `
             <div class="tx-item" style="border-left: 3px solid ${item.status === 'approved' ? '#00e676' : (item.status === 'rejected' ? '#ff1744' : '#ff9800')};">
               <div class="tx-info">
-                <h4>Deposit (${item.payment_method})</h4>
-                <span>Email: <strong>${item.transaction_id}</strong> • ${new Date(item.created_at).toLocaleString()}</span>
+                <h4>Deposit (${escapeHTML(item.payment_method)})</h4>
+                <span>Email: <strong>${escapeHTML(item.transaction_id)}</strong> • ${new Date(item.created_at).toLocaleString()}</span>
               </div>
               <div style="text-align:right;">
                 <div class="tx-amount tx-positive">PKR ${item.amount}</div>
-                <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${item.status}</span>
+                <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${badgeColor}">${escapeHTML(item.status)}</span>
               </div>
             </div>
           `;
@@ -1813,7 +1816,7 @@
           return `
             <div class="tx-item" style="${isPrize || isReferral ? 'border-left: 3px solid var(--accent-gold);' : ''}">
               <div class="tx-info">
-                <h4>${isPrize ? '🏆 ' + (item.description || 'Tournament Prize Won') : (isReferral ? '🎁 ' + (item.description || 'Referral Bonus Claimed') : (item.description || item.transaction_type))}</h4>
+                <h4>${escapeHTML(isPrize ? '🏆 ' + (item.description || 'Tournament Prize Won') : (isReferral ? '🎁 ' + (item.description || 'Referral Bonus Claimed') : (item.description || item.transaction_type)))}</h4>
                 <span>${new Date(item.created_at).toLocaleString()}</span>
               </div>
               <div class="tx-amount ${isPositive ? 'tx-positive' : 'tx-negative'}">${isPositive ? '+' : ''}${item.amount} PKR</div>
@@ -1859,23 +1862,10 @@
             <div class="rules-dropdown-content">
               <p><strong>1. 💰 Minimum Deposit:</strong> Wallet mein deposit karne ke liye minimum amount app mein diye gaye payment method ke mutabiq hoga.</p>
               <p><strong>2. 📸 Payment Screenshot لازمی:</strong> Payment complete karne ke baad transaction ka clear screenshot upload karna zaroori hai.</p>
-              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein. Ghalat information dene ki surat mein payment verify nahi ho sakegi.</p>
-              <p><strong>4. 💵 Screenshot Wali Exact Amount:</strong> Screenshot mein jitni payment amount clearly show ho rahi hai, app mein bhi exactly utni hi amount enter karna لازمی hai.</p>
-              <p><strong>5. 🚫 Ghalat Amount Enter Karna:</strong> Screenshot ki amount se zyada ya kam amount jaan-boojh kar enter karna strictly prohibited hai.</p>
-              <p><strong>6. ⏳ Payment Verification:</strong> Payment verification admin ke zariye ki jayegi. Verification mein kuch waqt lag sakta hai.</p>
-              <p><strong>7. 🚫 Fake Screenshot Prohibited:</strong> Fake, edited ya kisi doosre transaction ka screenshot upload karna strictly prohibited hai.</p>
-              <p><strong>8. ⚠️ Wrong Account Payment:</strong> Payment karne se pehle payment account/number ko carefully check karein.</p>
-              <p><strong>9. 🔄 Duplicate Payment:</strong> Ek hi transaction ko multiple times submit na karein.</p>
-              <p><strong>10. 💳 Wallet Balance:</strong> Payment successfully verify hone ke baad approved exact amount user ke tournament wallet mein add kiya jayega.</p>
-              <p><strong>11. 🏆 Tournament Entry:</strong> Tournament join karne ke liye required entry fee wallet balance se deduct ki jayegi.</p>
-              <p><strong>12. 🔒 Payment Security:</strong> Apna OTP, PIN, password ya account security information kisi ke saath share na karein.</p>
-              <p><strong>13. 📞 Payment Issue:</strong> Agar payment complete ho gayi ho lekin wallet mein amount show na ho, to Support section se contact karein.</p>
-              <p><strong>14. ❌ Unauthorized Refunds:</strong> Tournament join karne ke baad entry fee automatically refundable hogi.</p>
-              <p><strong>15. 📢 Admin Decision:</strong> Payment verification se related disputed cases mein transaction evidence check kiye jayenge.</p>
-              <p><strong>16. ✅ Important:</strong> Payment karne se pehle receiver/account details aur amount ko dobara verify karein.</p>
+              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein.</p>
               <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
                 🔴 <strong>IMPORTANT WARNING:</strong><br>
-                Screenshot mein jitni payment hai, sirf utni hi amount enter karein. Jaan-boojh kar ghalat amount enter karne wale user ka account permanently BAN kiya ja sakta hai.
+                Screenshot mein jitni payment hai, sirf utni hi amount enter karein.
               </div>
             </div>
           </div>
@@ -2084,7 +2074,7 @@
             const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
             if (!refCheck) {
               Loader.hide();
-              Toast.show("Yeh referral code available nahi hai, aap baghair referral ke bhi join kar sakte hain.", "error");
+              Toast.show("Yeh referral code available nahi hai!", "error");
               return;
             }
             validReferrerUid = refCheck.free_fire_uid;
@@ -2245,8 +2235,8 @@
               </label>
               <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
             </div>
-            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${p.free_fire_name || p.full_name || 'Soldier'}</h2>
-            <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${p.free_fire_uid || '--'}</span>
+            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${escapeHTML(p.free_fire_name || p.full_name || 'Soldier')}</h2>
+            <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
           </div>
 
           <div class="player-hero-card">
@@ -2257,32 +2247,32 @@
             <form id="edit-profile-form">
               <div class="form-group">
                 <label class="form-label">Full Name</label>
-                <input type="text" id="prof-fullname" class="form-input" value="${p.full_name || ''}" placeholder="Enter full name" required />
+                <input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" placeholder="Enter full name" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">Free Fire In-Game Name (IGN)</label>
-                <input type="text" id="prof-ign" class="form-input" value="${p.free_fire_name || ''}" placeholder="e.g. MLT・HAMZA★" required />
+                <input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" placeholder="e.g. MLT・HAMZA★" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">Free Fire UID (Editable)</label>
-                <input type="text" id="prof-uid" class="form-input" value="${p.free_fire_uid || ''}" placeholder="Enter Free Fire UID" required />
+                <input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" placeholder="Enter Free Fire UID" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">WhatsApp Mobile #</label>
-                <input type="text" id="prof-phone" class="form-input" value="${p.phone || ''}" placeholder="e.g. 03001234567" required />
+                <input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" placeholder="e.g. 03001234567" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">Email (Editable)</label>
-                <input type="email" id="prof-email" class="form-input" value="${p.email || currentUser.email}" placeholder="yourname@gmail.com" required />
+                <input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || currentUser.email)}" placeholder="yourname@gmail.com" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label">Referral Code (UID)</label>
-                <input type="text" id="prof-ref" class="form-input" value="${p.referred_by || ''}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
+                <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
                 ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (5 coins reward)</span>'}
               </div>
 
@@ -2427,8 +2417,8 @@
           ${data.map(n => `
             <div class="tx-item" style="border-left: 3px solid var(--primary);">
               <div class="tx-info">
-                <h4>${n.title}</h4>
-                <p style="font-size:12px; color:var(--text-muted);">${n.message}</p>
+                <h4>${escapeHTML(n.title)}</h4>
+                <p style="font-size:12px; color:var(--text-muted);">${escapeHTML(n.message)}</p>
                 <span>${new Date(n.created_at).toLocaleString()}</span>
               </div>
             </div>
@@ -2528,7 +2518,7 @@
           return `
             <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
               <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
-                ${m.message}
+                ${escapeHTML(m.message)}
               </div>
               <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
                 ${isMe ? 'You' : 'Admin Support'} • ${time}
