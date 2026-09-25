@@ -251,7 +251,7 @@
         </div>
       </section>
 
-      <!-- TUTORIALS & ADS MANAGER (NEW SECTION WITH AUTO PLATFORM DETECTION) -->
+      <!-- TUTORIALS & ADS MANAGER -->
       <section id="section-tutorials" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
@@ -350,7 +350,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST (WITH EMAIL & PASSWORD DISPLAY) -->
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
@@ -928,7 +928,6 @@
       body.innerHTML = list.map(u => {
         const waNumber = u.phone || '';
         const userEmail = u.email || 'No email added';
-        const userPass = u.password || u.raw_app_meta_data?.password || 'Saved securely in Auth';
         const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
         const lastSeenTime = u.last_seen || u.updated_at || u.created_at;
@@ -1960,7 +1959,7 @@
 
     async function saveSiteSettings() {
       const tickerText = document.getElementById('set-ticker-text').value.trim();
-      const tickerEnabled = document.getElementById('set-ticker-enabled'].checked ? 'true' : 'false';
+      const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
 
       const updates = [
         { setting_key: 'announcement_ticker', setting_value: tickerText },
