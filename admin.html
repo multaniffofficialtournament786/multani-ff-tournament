@@ -33,7 +33,7 @@
         <p class="text-xs text-gray-400">Master Control Console</p>
       </div>
 
-      <form id="admin-login-form" class="space-y-3 pt-2">
+      <form id="admin-login-form" class="space-y-3 pt-2" onsubmit="handleAdminLogin(event)">
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Admin Email</label>
           <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
@@ -42,7 +42,7 @@
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
           <div class="relative">
             <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
-            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
               <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
             </button>
           </div>
@@ -633,8 +633,8 @@
       }
     }
 
-    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    async function handleAdminLogin(e) {
+      if (e) e.preventDefault();
       const email = document.getElementById('adm-email').value.trim();
       const password = document.getElementById('adm-pass').value;
       const btn = document.getElementById('btn-adm-login');
@@ -671,7 +671,7 @@
       } finally {
         btn.disabled = false;
       }
-    });
+    }
 
     async function adminSignOut() {
       await sbClient.auth.signOut();
