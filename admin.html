@@ -251,7 +251,7 @@
         </div>
       </section>
 
-      <!-- TUTORIALS & ADS MANAGER (NEW SECTION) -->
+      <!-- TUTORIALS & ADS MANAGER (NEW SECTION WITH AUTO PLATFORM DETECTION) -->
       <section id="section-tutorials" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
@@ -263,8 +263,8 @@
             <input type="text" id="tut-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. HOW TO DEPOSIT COINS" required />
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">YouTube / Target Link</label>
-            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/..." required />
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link (Auto-detects YouTube, TikTok, FB, etc.)</label>
+            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/... or https://tiktok.com/..." required />
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card / Banner Photo</label>
@@ -350,7 +350,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ALL REGISTERED PLAYERS LIST (WITH EMAIL & PASSWORD DISPLAY FOR ADMIN) -->
+  <!-- MODAL: ALL REGISTERED PLAYERS LIST (WITH EMAIL & PASSWORD DISPLAY) -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
@@ -789,7 +789,17 @@
       }
     }
 
-    /* TUTORIALS & ADS MANAGER FUNCTIONS */
+    /* TUTORIALS & ADS MANAGER FUNCTIONS WITH AUTO PLATFORM DETECTION */
+    function detectPlatformType(url) {
+      if (!url) return { name: 'Website', icon: 'fa-globe' };
+      const lower = url.toLowerCase();
+      if (lower.includes('youtube.com') || lower.includes('youtu.be')) return { name: 'YouTube', icon: 'fa-youtube text-red-500' };
+      if (lower.includes('tiktok.com')) return { name: 'TikTok', icon: 'fa-tiktok text-cyan-400' };
+      if (lower.includes('facebook.com') || lower.includes('fb.watch')) return { name: 'Facebook', icon: 'fa-facebook text-blue-500' };
+      if (lower.includes('instagram.com')) return { name: 'Instagram', icon: 'fa-instagram text-pink-500' };
+      return { name: 'Website', icon: 'fa-globe text-yellow-400' };
+    }
+
     async function loadTutorialsManager() {
       const listContainer = document.getElementById('admin-tutorials-list');
       listContainer.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading cards...</p>`;
@@ -800,21 +810,26 @@
         return;
       }
 
-      listContainer.innerHTML = data.map(item => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-3">
-            <img src="${item.photo_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80'}" class="w-12 h-12 rounded-lg object-cover border border-[#262f40]" />
-            <div>
-              <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
-              <p class="text-cyan-400 font-mono text-[11px] truncate max-w-[200px]">${escapeHTML(item.link)}</p>
+      listContainer.innerHTML = data.map(item => {
+        const platform = detectPlatformType(item.link);
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <img src="${item.photo_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80'}" class="w-12 h-12 rounded-lg object-cover border border-[#262f40]" />
+              <div>
+                <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
+                <p class="text-gray-400 font-mono text-[11px] flex items-center gap-1.5 mt-0.5">
+                  <i class="fa-brands ${platform.icon}"></i> <span class="text-cyan-400">${platform.name}</span> • <span class="truncate max-w-[150px]">${escapeHTML(item.link)}</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="editTutorialCard('${item.id}', '${escapeHTML(item.title)}', '${escapeHTML(item.link)}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deleteTutorialCard('${item.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button onclick="editTutorialCard('${item.id}', '${escapeHTML(item.title)}', '${escapeHTML(item.link)}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteTutorialCard('${item.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function saveTutorialCard() {
@@ -840,7 +855,8 @@
           }
         }
 
-        const payload = { title, link };
+        const platformInfo = detectPlatformType(link);
+        const payload = { title, link, platform: platformInfo.name };
         if (photo_url) payload.photo_url = photo_url;
 
         if (id) {
@@ -951,7 +967,7 @@
               </div>
             </div>
 
-            <!-- EMAIL & PASSWORD DISPLAY (ADMIN ASSISTANCE) -->
+            <!-- EMAIL & PASSWORD DISPLAY -->
             <div class="bg-[#0e1118] p-2.5 rounded-xl space-y-1.5 text-[11px] border border-[#262f40]/50">
               <div class="flex items-center justify-between">
                 <span class="text-gray-300 truncate"><i class="fa-solid fa-envelope text-red-400 mr-1.5 w-4"></i> Gmail: <strong class="text-white">${escapeHTML(userEmail)}</strong></span>
@@ -1944,7 +1960,7 @@
 
     async function saveSiteSettings() {
       const tickerText = document.getElementById('set-ticker-text').value.trim();
-      const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
+      const tickerEnabled = document.getElementById('set-ticker-enabled'].checked ? 'true' : 'false';
 
       const updates = [
         { setting_key: 'announcement_ticker', setting_value: tickerText },
