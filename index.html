@@ -106,7 +106,7 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* UPDATED: FULL SCREEN BACKGROUND CARD STYLE */
+    /* FULL CARD BACKGROUND PHOTO STYLE */
     .screenshot-card {
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
@@ -118,12 +118,11 @@
       background-position: center;
       overflow: hidden;
     }
-    /* Dark gradient overlay so text remains fully readable over any background image */
     .screenshot-card::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(24, 29, 41, 0.92), rgba(15, 19, 26, 0.94));
+      background: linear-gradient(135deg, rgba(24, 29, 41, 0.88), rgba(15, 19, 26, 0.92));
       z-index: 1;
     }
     .screenshot-card > * {
@@ -172,22 +171,6 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 12px;
-    }
-    .screenshot-content-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .screenshot-img-box {
-      width: 100px;
-      height: 70px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 1px solid var(--border-color);
-      background: #000;
-      display: none; /* Hidden since background image covers the card now */
     }
 
     /* EXPANDABLE RULES STYLING */
@@ -1243,10 +1226,10 @@
               else if (platformName === 'Facebook') { btnText = "WATCH ON FACEBOOK"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
               else if (platformName === 'Instagram') { btnText = "VIEW ON INSTAGRAM"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
 
-              const bgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
+              const bgImgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
 
               return `
-                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0; ${bgStyle}">
+                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0; ${bgImgStyle}">
                   <div class="screenshot-card-header">
                     <div class="screenshot-card-logo"><i class="fa-solid fa-gamepad"></i></div>
                     <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
