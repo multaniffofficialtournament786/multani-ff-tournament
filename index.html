@@ -1183,18 +1183,19 @@
       Loader.show("Loading arena...");
       let siteTutorialsList = [];
       try {
-        const [settingsRes, tourRes, tutRes] = await Promise.all([
+        const [settingsRes, tourRes] = await Promise.all([
           sbClient.from('site_settings').select('*'),
-          sbClient.from('tournaments').select('*').order('created_at', { ascending: false }),
-          sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false })
+          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
         ]);
         if (settingsRes.data) {
           settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
         }
         activeTournaments = tourRes.data || [];
-        siteTutorialsList = tutRes.data || [];
+
+        const { data: tutData } = await sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false });
+        if (tutData) siteTutorialsList = tutData;
       } catch (e) {
-        console.error(e);
+        console.error("Home load error:", e);
       }
       Loader.hide();
 
