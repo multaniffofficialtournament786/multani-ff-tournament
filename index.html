@@ -106,12 +106,68 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* LED DISPLAY SIGNBOARD STYLING WITH ROTATING GLOWING BORDER */
-    @keyframes borderRotate {
-      0% { border-image-source: linear-gradient(0deg, #ff1744, #00f0ff, #ffbe00, #00e676); }
-      50% { border-image-source: linear-gradient(180deg, #00e676, #ff1744, #00f0ff, #ffbe00); }
-      100% { border-image-source: linear-gradient(360deg, #ff1744, #00f0ff, #ffbe00, #00e676); }
+    /* EXPANDABLE RULES STYLING */
+    .rules-dropdown-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      overflow: hidden;
     }
+    .rules-dropdown-header {
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: #1a1e29;
+      transition: var(--transition);
+    }
+    .rules-dropdown-header:hover { background: #222736; }
+    .rules-dropdown-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out, padding 0.3s ease;
+      padding: 0 14px;
+      background: #12151d;
+      font-size: 12px;
+      color: #c7cbd1;
+      line-height: 1.6;
+    }
+    .rules-dropdown-container.open .rules-dropdown-content {
+      max-height: 2500px;
+      padding: 12px 14px;
+    }
+    .rules-dropdown-container.open .rules-arrow {
+      transform: rotate(180deg);
+    }
+    .rules-arrow {
+      transition: transform 0.3s ease;
+      color: var(--accent-gold);
+      font-size: 12px;
+    }
+
+    /* CAROUSEL & BANNER ADS STYLING */
+    .carousel-card {
+      background: linear-gradient(135deg, #181d29, #0f131a);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dynamic-ad-banner {
+      background: #151922;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 14px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* LED DISPLAY SIGNBOARD STYLING WITH ROTATING GLOWING BORDER */
     @keyframes ledGlow {
       0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
       33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
@@ -131,13 +187,12 @@
       box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
       animation: ledGlow 3s infinite ease-in-out;
       background-image: radial-gradient(circle, #151c28 1px, transparent 1px);
-      background-size: 6px 6px; /* Dot-matrix grid pattern */
+      background-size: 6px 6px;
     }
     .led-signboard i {
       color: #ffbe00;
       font-size: 16px;
       filter: drop-shadow(0 0 6px #ffbe00);
-      animation: pulse 1s infinite;
     }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
     .ticker-content { 
@@ -385,7 +440,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
-    /* Pull to Refresh Indicator */
     #pull-refresh-indicator {
       text-align: center;
       padding: 10px;
@@ -972,9 +1026,9 @@
         const btn = document.getElementById(`filter-btn-${s}`);
         if (btn) {
           if (s === status) {
-            btn.className = "px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow";
+            btn.className = "px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow-lg border border-[#ff4624]";
           } else {
-            btn.className = "px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap";
+            btn.className = "px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap";
           }
         }
       });
@@ -1033,11 +1087,11 @@
               <h4 class="t-card-title-large">${t.title}</h4>
               <div class="t-card-meta-large">
                 <span style="color:var(--accent-cyan); font-weight:600;">${t.mode} • ${t.map}</span>
-                <span style="font-family:var(--font-gaming); font-size:16px; font-weight:800; color:var(--accent-gold);">PKR ${t.prize_pool}</span>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Booyah Prize: <strong style="font-family:var(--font-gaming); font-size:15px; color:var(--accent-gold);">PKR ${t.prize_pool}</strong></span>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-dim); border-top:1px solid #1f2636; padding-top:6px; margin-top:2px;">
                 <span>Slots: <strong style="color:#fff;">${t.joined_players || 0}/${t.max_players}</strong> &nbsp;|&nbsp; <span style="color:var(--accent-gold);">${dayStr ? dayStr + ', ' : ''}${dateStr} ${timeStr ? '• ' + timeStr : ''}</span></span>
-                <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span>
+                <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">Entry Fee: <strong style="color:#fff;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</strong></span>
               </div>
             </div>
           </div>
@@ -1048,11 +1102,11 @@
     function renderTournamentsHTMLBlock() {
       return `
         <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-3" style="scrollbar-width:none;">
-          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow">All Matches</button>
-          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Today</button>
-          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Upcoming</button>
-          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Live</button>
-          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-md text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Completed</button>
+          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#ff4624] text-white whitespace-nowrap shadow-lg border border-[#ff4624]">All Matches</button>
+          <button onclick="filterTournaments('today')" id="filter-btn-today" class="px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Today</button>
+          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Upcoming</button>
+          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Live</button>
+          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3.5 py-2 rounded-lg text-xs font-gaming font-bold bg-[#151922] text-gray-300 border border-[#262f40] whitespace-nowrap">Completed</button>
         </div>
         <div id="tournaments-cards-container" class="tournaments-stack-as8">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
@@ -1087,12 +1141,36 @@
 
       view.innerHTML = `
         <div class="view-container">
-          <!-- LED DISPLAY SIGNBOARD WITH GLOWING ROTATING BORDER & COLORFUL TEXT -->
           <div class="led-signboard">
             <i class="fa-solid fa-bolt"></i>
             <div class="ticker-viewport">
               <div class="ticker-content">${tickerText}</div>
             </div>
+          </div>
+
+          <!-- DYNAMIC ADMIN VIDEO TUTORIAL SLIDER / CAROUSEL CONTAINER -->
+          <div class="carousel-card" id="admin-video-carousel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-family:var(--font-gaming); font-size:14px; font-weight:700; color:var(--accent-gold);">🎬 HOW TO DEPOSIT COINS</span>
+              <span style="font-size:10px; color:var(--text-dim);">Tutorial Guide</span>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Complete step-by-step video guide for seamless wallet deposits & verification.</p>
+            <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #ff1744, #ff5722);">
+              <i class="fa-solid fa-play"></i> WATCH TUTORIAL
+            </a>
+          </div>
+
+          <!-- DYNAMIC ADMIN AD BANNER CONTAINER -->
+          <div class="dynamic-ad-banner" id="admin-ad-banner-box">
+            <div style="position:absolute; top:6px; right:8px; font-size:9px; background:#262f40; color:var(--accent-cyan); padding:1px 6px; border-radius:4px;">AD</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:50px; height:50px; background:#1e2533; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent-cyan); font-size:22px;"><i class="fa-solid fa-gamepad"></i></div>
+              <div style="text-align:left; flex:1;">
+                <h4 style="font-size:13px; font-weight:700; color:#fff;">Multani FF Tournament App</h4>
+                <p style="font-size:10px; color:var(--text-muted);">Play daily custom rooms & win big cash prizes!</p>
+              </div>
+            </div>
+            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary btn-sm" style="margin-top:10px; padding:6px 12px; font-size:11px;">INSTALL / DOWNLOAD</a>
           </div>
 
           ${!currentUser ? `
@@ -1116,7 +1194,6 @@
                     </div>
                   </div>
                 </div>
-                <!-- TWO ROUND REFRESH BUTTONS -->
                 <div style="display:flex; gap:6px;">
                   <button onclick="hardRefreshApp()" title="Refresh App" style="width:34px; height:34px; border-radius:50%; background:rgba(0,240,255,0.15); border:1px solid var(--accent-cyan); color:var(--accent-cyan); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition);">
                     <i class="fa-solid fa-rotate text-xs"></i>
@@ -1134,7 +1211,6 @@
             </div>
           `}
 
-          <!-- SLIM DOWNLOAD OFFICIAL APP BUTTON -->
           <div style="margin-bottom: 16px;">
             <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="padding: 9px 16px; font-size: 14px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 240, 255, 0.3);">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size: 16px;"></i> DOWNLOAD OFFICIAL APP
@@ -1168,9 +1244,6 @@
             </div>
           </div>
 
-          <div class="section-title"><span>Available Tournaments</span></div>
-          <div>${renderTournamentsHTMLBlock()}</div>
-
           <div class="social-footer">
             <p>Connect With Us</p>
             <div class="social-icons-row">
@@ -1188,8 +1261,6 @@
         </div>
       `;
 
-      currentTournamentFilter = 'all';
-      renderTournamentsListUI();
       startAnnouncementTicker();
     }
 
@@ -1409,9 +1480,52 @@
             <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
             <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${t.title}</h2>
             <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
-              <div class="stat-box"><span class="stat-label">Entry</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-              <div class="stat-box"><span class="stat-label">Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
+              <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
+              <div class="stat-box"><span class="stat-label">Booyah Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
               <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
+            </div>
+          </div>
+
+          <!-- MATCH & MATCH JOINING RULES DROPDOWN (VISIBLE BEFORE JOINING) -->
+          <div class="rules-dropdown-container">
+            <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px;">🏆</span>
+                <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">MATCH & MATCH JOINING RULES</span>
+              </div>
+              <span class="rules-arrow">&#9660;</span>
+            </div>
+            <div class="rules-dropdown-content">
+              <div style="color:var(--accent-gold); font-weight:bold; margin:10px 0 6px 0;">🎮 1. MATCH JOINING RULES</div>
+              <p><strong>1. 💰 Entry Fee:</strong> The required entry fee must be available in the player's tournament wallet before joining a match.</p>
+              <p><strong>2. ✅ Match Joining:</strong> Players must carefully check the match name, entry fee, date, time, mode, and other match details before joining.</p>
+              <p><strong>3. ⏰ Be On Time:</strong> After joining a match, the player must be present in the room at the scheduled match time or before.</p>
+              <p><strong>4. 🚫 No Show = No Refund:</strong> If a player joins a match but does not enter the room on time or misses the match, the entry fee/payment will NOT be refunded.</p>
+              <p><strong>5. 🔐 Room ID & Password:</strong> Room ID and Password should only be used for the assigned match. Players must not share room details with unauthorized persons.</p>
+              <p><strong>6. 🚫 Wrong Room:</strong> Players are responsible for joining the correct room for their registered match. Joining the wrong room due to the player's own mistake will not make the entry fee refundable.</p>
+              <p><strong>7. 🔄 Duplicate Joining:</strong> A player cannot take multiple entries in the same match unless multiple entries are specifically allowed by the tournament.</p>
+              <p><strong>8. 💳 Entry Fee Deduction:</strong> The applicable entry fee may be deducted from the player's wallet when the player successfully joins the match.</p>
+              <p><strong>9. 📸 Technical Issues:</strong> If a player experiences a technical problem after joining, they should contact Support and provide relevant screenshots or other available evidence.</p>
+
+              <div style="color:var(--accent-gold); font-weight:bold; margin:16px 0 6px 0;">🎯 2. MATCH RULES</div>
+              <p><strong>10. 🎮 Fair Play Required:</strong> Every player must participate fairly and follow all tournament rules.</p>
+              <p><strong>11. 🚫 Hacks & Cheats Prohibited:</strong> Hacks, scripts, injectors, unauthorized mods, cheats, or other tools that provide an unfair advantage are strictly prohibited.</p>
+              <p><strong>12. 🚫 Bug & Glitch Abuse:</strong> Intentionally exploiting game bugs or glitches to gain an unfair advantage is prohibited.</p>
+              <p><strong>13. 👤 Account Sharing:</strong> Players must participate using their own registered tournament account. Account sharing or allowing another person to play may result in disqualification.</p>
+              <p><strong>14. 📱 Supported Game Version:</strong> Players must use the supported/current game version required for the tournament. Modified or unauthorized game clients are prohibited.</p>
+              <p><strong>15. 📶 Internet & Device Responsibility:</strong> Players are responsible for their own internet connection, device, battery, and game performance.</p>
+              <p><strong>16. 🏆 Match Result:</strong> The final result will be confirmed after reviewing available game results, screenshots, match records, and other relevant evidence.</p>
+              <p><strong>17. 📸 Result Proof:</strong> If result proof is required, players must submit a clear screenshot or other requested evidence within the specified time.</p>
+              <p><strong>18. 🤝 Respect Other Players:</strong> Abusive language, harassment, threats, or disruptive behavior toward other players or tournament staff is prohibited.</p>
+              <p><strong>19. 🚫 Teaming / Unfair Collaboration:</strong> In Solo matches, intentionally teaming or collaborating with other players for an unfair advantage is strictly prohibited.</p>
+              <p><strong>20. ⚠️ Disqualification:</strong> A player who violates tournament rules may be disqualified from the match.</p>
+              <p><strong>21. 🛡️ Admin Verification:</strong> In cases of suspected cheating or rule violations, the tournament administration may review available evidence before making a decision.</p>
+
+              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:12px 0; border-radius:4px; color:#ff8b8b;">
+                🔴 <strong>IMPORTANT NOTICE:</strong><br>
+                Before joining any match, carefully check the Match Name, Entry Fee, Date, Start Time, Mode, Room ID, Password, and applicable rules.<br>
+                ❌ <strong>NO SHOW = NO REFUND</strong>
+              </div>
             </div>
           </div>
 
@@ -1459,11 +1573,6 @@
           <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
             <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
-          </div>
-
-          <div class="player-hero-card" style="margin-bottom: 16px; padding:10px 12px;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--danger); font-weight:bold;">Match Rules</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top:2px;">${t.rules || 'Mobile only. No hacks, emulators or teaming. Violators will be banned.'}</p>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -1652,6 +1761,39 @@
             <div id="dep-box-title" style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)</div>
           </div>
 
+          <!-- PAYMENT RULES EXPANDABLE DROPDOWN -->
+          <div class="rules-dropdown-container">
+            <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px;">💳</span>
+                <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">PAYMENT & DEPOSIT RULES</span>
+              </div>
+              <span class="rules-arrow">&#9660;</span>
+            </div>
+            <div class="rules-dropdown-content">
+              <p><strong>1. 💰 Minimum Deposit:</strong> Wallet mein deposit karne ke liye minimum amount app mein diye gaye payment method ke mutabiq hoga.</p>
+              <p><strong>2. 📸 Payment Screenshot لازمی:</strong> Payment complete karne ke baad transaction ka clear screenshot upload karna zaroori hai.</p>
+              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein. Ghalat information dene ki surat mein payment verify nahi ho sakegi.</p>
+              <p><strong>4. 💵 Screenshot Wali Exact Amount:</strong> Screenshot mein jitni payment amount clearly show ho rahi hai, app mein bhi exactly utni hi amount enter karna لازمی hai.</p>
+              <p><strong>5. 🚫 Ghalat Amount Enter Karna:</strong> Screenshot ki amount se zyada ya kam amount jaan-boojh kar enter karna strictly prohibited hai.</p>
+              <p><strong>6. ⏳ Payment Verification:</strong> Payment verification admin ke zariye ki jayegi. Verification mein kuch waqt lag sakta hai.</p>
+              <p><strong>7. 🚫 Fake Screenshot Prohibited:</strong> Fake, edited ya kisi doosre transaction ka screenshot upload karna strictly prohibited hai.</p>
+              <p><strong>8. ⚠️ Wrong Account Payment:</strong> Payment karne se pehle payment account/number ko carefully check karein.</p>
+              <p><strong>9. 🔄 Duplicate Payment:</strong> Ek hi transaction ko multiple times submit na karein.</p>
+              <p><strong>10. 💳 Wallet Balance:</strong> Payment successfully verify hone ke baad approved exact amount user ke tournament wallet mein add kiya jayega.</p>
+              <p><strong>11. 🏆 Tournament Entry:</strong> Tournament join karne ke liye required entry fee wallet balance se deduct ki jayegi.</p>
+              <p><strong>12. 🔒 Payment Security:</strong> Apna OTP, PIN, password ya account security information kisi ke saath share na karein.</p>
+              <p><strong>13. 📞 Payment Issue:</strong> Agar payment complete ho gayi ho lekin wallet mein amount show na ho, to Support section se contact karein.</p>
+              <p><strong>14. ❌ Unauthorized Refunds:</strong> Tournament join karne ke baad entry fee automatically refundable nahi hogi.</p>
+              <p><strong>15. 📢 Admin Decision:</strong> Payment verification se related disputed cases mein transaction evidence check kiye jayenge.</p>
+              <p><strong>16. ✅ Important:</strong> Payment karne se pehle receiver/account details aur amount ko dobara verify karein.</p>
+              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
+                🔴 <strong>IMPORTANT WARNING:</strong><br>
+                Screenshot mein jitni payment hai, sirf utni hi amount enter karein. Jaan-boojh kar ghalat amount enter karne wale user ka account permanently BAN kiya ja sakta hai.
+              </div>
+            </div>
+          </div>
+
           <form id="dep-form">
             <div class="form-group">
               <label class="form-label">Deposit Amount (PKR)</label>
@@ -1719,6 +1861,13 @@
           Toast.show(err.message, "error");
         }
       };
+    }
+
+    function toggleRulesDropdown(headerEl) {
+      const container = headerEl.closest('.rules-dropdown-container');
+      if (container) {
+        container.classList.toggle('open');
+      }
     }
 
     function updatePaymentDetailsDisplay(method) {
