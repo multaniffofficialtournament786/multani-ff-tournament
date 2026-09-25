@@ -106,7 +106,7 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* FULL CARD BACKGROUND PHOTO STYLE */
+    /* CLEAR BACKGROUND CARD STYLE (NO SHADOW/OVERLAY) */
     .screenshot-card {
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
@@ -117,13 +117,6 @@
       background-size: cover;
       background-position: center;
       overflow: hidden;
-    }
-    .screenshot-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(24, 29, 41, 0.88), rgba(15, 19, 26, 0.92));
-      z-index: 1;
     }
     .screenshot-card > * {
       position: relative;
@@ -1238,7 +1231,7 @@
                   <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${escapeHTML(platformName.toUpperCase())} GUIDE</div>
                   
                   <div style="margin-bottom: 14px;">
-                    <p style="font-size:11px; color:var(--text-muted); line-height:1.4;">Tap below to watch complete step-by-step guidance.</p>
+                    <p style="font-size:11px; color:#ffffff; font-weight:600; line-height:1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Tap below to watch complete step-by-step guidance.</p>
                   </div>
 
                   <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
