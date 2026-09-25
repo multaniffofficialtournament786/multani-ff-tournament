@@ -106,16 +106,31 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* EXACT SCREENSHOT STYLE CARDS */
+    /* UPDATED: FULL SCREEN BACKGROUND CARD STYLE */
     .screenshot-card {
-      background: linear-gradient(135deg, #181d29, #0f131a);
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
       padding: 16px;
       margin-bottom: 14px;
       position: relative;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
     }
+    /* Dark gradient overlay so text remains fully readable over any background image */
+    .screenshot-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(24, 29, 41, 0.92), rgba(15, 19, 26, 0.94));
+      z-index: 1;
+    }
+    .screenshot-card > * {
+      position: relative;
+      z-index: 2;
+    }
+
     .screenshot-card-header {
       display: flex;
       align-items: center;
@@ -172,6 +187,7 @@
       object-fit: cover;
       border: 1px solid var(--border-color);
       background: #000;
+      display: none; /* Hidden since background image covers the card now */
     }
 
     /* EXPANDABLE RULES STYLING */
@@ -1227,8 +1243,10 @@
               else if (platformName === 'Facebook') { btnText = "WATCH ON FACEBOOK"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
               else if (platformName === 'Instagram') { btnText = "VIEW ON INSTAGRAM"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
 
+              const bgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
+
               return `
-                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0;">
+                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0; ${bgStyle}">
                   <div class="screenshot-card-header">
                     <div class="screenshot-card-logo"><i class="fa-solid fa-gamepad"></i></div>
                     <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
@@ -1236,9 +1254,8 @@
                   <div class="screenshot-title">${escapeHTML(item.title)}</div>
                   <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${escapeHTML(platformName.toUpperCase())} GUIDE</div>
                   
-                  <div class="screenshot-content-row">
-                    <p style="font-size:11px; color:var(--text-muted); line-height:1.4; flex:1;">Tap below to watch complete step-by-step guidance.</p>
-                    ${item.photo_url ? `<img src="${item.photo_url}" class="screenshot-img-box" />` : ''}
+                  <div style="margin-bottom: 14px;">
+                    <p style="font-size:11px; color:var(--text-muted); line-height:1.4;">Tap below to watch complete step-by-step guidance.</p>
                   </div>
 
                   <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
