@@ -106,7 +106,7 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* CLEAR BACKGROUND CARD STYLE (NO SHADOW/OVERLAY) */
+    /* FULL CARD BACKGROUND PHOTO STYLE (NO SHADOW/OVERLAY) */
     .screenshot-card {
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
@@ -144,7 +144,7 @@
       font-family: var(--font-gaming);
       font-size: 11px;
       letter-spacing: 1px;
-      color: var(--text-muted);
+      color: #ffbe00;
       font-weight: 700;
     }
     .screenshot-title {
@@ -156,14 +156,16 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
     }
     .screenshot-subtitle {
       font-size: 10px;
       font-weight: 700;
-      color: var(--text-muted);
+      color: #ffffff;
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 12px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
     /* EXPANDABLE RULES STYLING */
@@ -1231,7 +1233,7 @@
                   <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${escapeHTML(platformName.toUpperCase())} GUIDE</div>
                   
                   <div style="margin-bottom: 14px;">
-                    <p style="font-size:11px; color:#ffffff; font-weight:600; line-height:1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Tap below to watch complete step-by-step guidance.</p>
+                    <p style="font-size:11px; color:#ffffff; font-weight:700; line-height:1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Tap below to watch complete step-by-step guidance.</p>
                   </div>
 
                   <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
