@@ -266,6 +266,17 @@
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link (Auto-detects YouTube, TikTok, FB, etc.)</label>
             <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/... or https://tiktok.com/..." required />
           </div>
+
+          <!-- DO WHITE LINES EDIT FIELDS -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 1 Text (Subtitle / Top Text)</label>
+            <input type="text" id="tut-line1" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. COMPLETE STEP-BY-STEP WEBSITE GUIDE" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 2 Text (Description / Detail Text)</label>
+            <input type="text" id="tut-line2" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Tap below to watch complete step-by-step guidance." />
+          </div>
+
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card / Banner Photo</label>
             <input type="file" id="tut-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
@@ -818,13 +829,15 @@
               <img src="${item.photo_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80'}" class="w-12 h-12 rounded-lg object-cover border border-[#262f40]" />
               <div>
                 <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
+                <p class="text-gray-400 text-[11px] truncate max-w-[180px]">Line 1: ${escapeHTML(item.line_1 || '--')}</p>
+                <p class="text-gray-400 text-[11px] truncate max-w-[180px]">Line 2: ${escapeHTML(item.line_2 || '--')}</p>
                 <p class="text-gray-400 font-mono text-[11px] flex items-center gap-1.5 mt-0.5">
-                  <i class="fa-brands ${platform.icon}"></i> <span class="text-cyan-400">${platform.name}</span> • <span class="truncate max-w-[150px]">${escapeHTML(item.link)}</span>
+                  <i class="fa-brands ${platform.icon}"></i> <span class="text-cyan-400">${platform.name}</span>
                 </p>
               </div>
             </div>
             <div class="flex items-center gap-1.5">
-              <button onclick="editTutorialCard('${item.id}', '${escapeHTML(item.title)}', '${escapeHTML(item.link)}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="editTutorialCard('${item.id}', '${escapeHTML(item.title)}', '${escapeHTML(item.link)}', '${escapeHTML(item.line_1 || '')}', '${escapeHTML(item.line_2 || '')}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
               <button onclick="deleteTutorialCard('${item.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
@@ -836,6 +849,8 @@
       const id = document.getElementById('edit-tutorial-id').value;
       const title = document.getElementById('tut-title').value.trim();
       const link = document.getElementById('tut-link').value.trim();
+      const line_1 = document.getElementById('tut-line1').value.trim();
+      const line_2 = document.getElementById('tut-line2').value.trim();
       const fileInput = document.getElementById('tut-file');
 
       if (!title || !link) {
@@ -856,7 +871,7 @@
         }
 
         const platformInfo = detectPlatformType(link);
-        const payload = { title, link, platform: platformInfo.name };
+        const payload = { title, link, line_1, line_2, platform: platformInfo.name };
         if (photo_url) payload.photo_url = photo_url;
 
         if (id) {
@@ -876,10 +891,12 @@
       }
     }
 
-    function editTutorialCard(id, title, link) {
+    function editTutorialCard(id, title, link, line1, line2) {
       document.getElementById('edit-tutorial-id').value = id;
       document.getElementById('tut-title').value = title;
       document.getElementById('tut-link').value = link;
+      document.getElementById('tut-line1').value = line1;
+      document.getElementById('tut-line2').value = line2;
       document.getElementById('btn-cancel-tut').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -888,6 +905,8 @@
       document.getElementById('edit-tutorial-id').value = '';
       document.getElementById('tut-title').value = '';
       document.getElementById('tut-link').value = '';
+      document.getElementById('tut-line1').value = '';
+      document.getElementById('tut-line2').value = '';
       document.getElementById('tut-file').value = '';
       document.getElementById('btn-cancel-tut').classList.add('hidden');
     }
@@ -966,7 +985,7 @@
               </div>
             </div>
 
-            <!-- EMAIL DISPLAY (PASSWORD REMOVED) -->
+            <!-- EMAIL DISPLAY -->
             <div class="bg-[#0e1118] p-2.5 rounded-xl space-y-1.5 text-[11px] border border-[#262f40]/50">
               <div class="flex items-center justify-between">
                 <span class="text-gray-300 truncate"><i class="fa-solid fa-envelope text-red-400 mr-1.5 w-4"></i> Gmail: <strong class="text-white">${escapeHTML(userEmail)}</strong></span>
