@@ -106,7 +106,7 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* 100% TRANSPARENT BACKGROUND PHOTO STYLE (NO DARK SHADE AT ALL) */
+    /* 100% CLEAR BACKGROUND PHOTO STYLE (NO SHADOW/OVERLAY) */
     .screenshot-card {
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
@@ -945,6 +945,29 @@
       }, 3000);
     }
 
+    // AUTO SCROLL FEATURE FOR TUTORIAL CARDS (Every 4.5 seconds)
+    let autoScrollInterval = null;
+    function setupTutorialsAutoScroll() {
+      if (autoScrollInterval) clearInterval(autoScrollInterval);
+      const container = document.getElementById('tutorials-scroll-box');
+      if (!container) return;
+
+      autoScrollInterval = setInterval(() => {
+        if (!document.body.contains(container)) {
+          clearInterval(autoScrollInterval);
+          return;
+        }
+        const cardWidth = container.querySelector('.screenshot-card')?.offsetWidth || 320;
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        
+        if (container.scrollLeft >= maxScrollLeft - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: cardWidth + 12, behavior: 'smooth' });
+        }
+      }, 4500);
+    }
+
     function openShareModal() {
       const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
       const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
@@ -1214,7 +1237,7 @@
       let tutorialsHtml = '';
       if (siteTutorialsList.length > 0) {
         tutorialsHtml = `
-          <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px;">
+          <div id="tutorials-scroll-box" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px; scroll-behavior: smooth;">
             ${siteTutorialsList.map(item => {
               const platformName = item.platform || 'YouTube';
               let btnText = "WATCH TUTORIAL";
@@ -1354,6 +1377,7 @@
       `;
 
       startAnnouncementTicker();
+      setupTutorialsAutoScroll();
     }
 
     async function renderTournaments() {
