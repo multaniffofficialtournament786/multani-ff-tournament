@@ -106,6 +106,74 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* EXACT SCREENSHOT STYLE CARDS */
+    .screenshot-card {
+      background: linear-gradient(135deg, #181d29, #0f131a);
+      border: 1.5px solid #ff770055;
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .screenshot-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .screenshot-card-logo {
+      width: 22px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+    }
+    .screenshot-brand-text {
+      font-family: var(--font-gaming);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .screenshot-title {
+      font-family: var(--font-gaming);
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffaa00;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .screenshot-subtitle {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .screenshot-content-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .screenshot-img-box {
+      width: 100px;
+      height: 70px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+      background: #000;
+    }
+
     /* EXPANDABLE RULES STYLING */
     .rules-dropdown-container {
       background: var(--bg-card);
@@ -145,26 +213,6 @@
       transition: transform 0.3s ease;
       color: var(--accent-gold);
       font-size: 12px;
-    }
-
-    /* CAROUSEL & BANNER ADS STYLING */
-    .carousel-card {
-      background: linear-gradient(135deg, #181d29, #0f131a);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-    .dynamic-ad-banner {
-      background: #151922;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 14px;
-      text-align: center;
-      position: relative;
     }
 
     /* VIP FILTER BUTTONS STYLING */
@@ -1133,15 +1181,18 @@
 
     async function renderHome() {
       Loader.show("Loading arena...");
+      let siteTutorialsList = [];
       try {
-        const [settingsRes, tourRes] = await Promise.all([
+        const [settingsRes, tourRes, tutRes] = await Promise.all([
           sbClient.from('site_settings').select('*'),
-          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
+          sbClient.from('tournaments').select('*').order('created_at', { ascending: false }),
+          sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false })
         ]);
         if (settingsRes.data) {
           settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
         }
         activeTournaments = tourRes.data || [];
+        siteTutorialsList = tutRes.data || [];
       } catch (e) {
         console.error(e);
       }
@@ -1153,10 +1204,42 @@
       const displayPhone = p.phone || 'No WhatsApp added';
 
       const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
-      const adminTutorialTitle = siteSettings.tutorial_title || '';
-      const adminTutorialLink = siteSettings.tutorial_link || '';
-      const adminAdTitle = siteSettings.ad_title || '';
-      const adminAdLink = siteSettings.ad_link || '';
+
+      let tutorialsHtml = '';
+      if (siteTutorialsList.length > 0) {
+        tutorialsHtml = `
+          <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px;">
+            ${siteTutorialsList.map(item => {
+              const platformName = item.platform || 'YouTube';
+              let btnText = "WATCH TUTORIAL";
+              let btnBg = "linear-gradient(135deg, #ff5733, #e62200)";
+              if (platformName === 'TikTok') { btnText = "WATCH ON TIKTOK"; btnBg = "linear-gradient(135deg, #00f0ff, #0077ff)"; }
+              else if (platformName === 'Facebook') { btnText = "WATCH ON FACEBOOK"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
+              else if (platformName === 'Instagram') { btnText = "VIEW ON INSTAGRAM"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
+
+              return `
+                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0;">
+                  <div class="screenshot-card-header">
+                    <div class="screenshot-card-logo"><i class="fa-solid fa-gamepad"></i></div>
+                    <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
+                  </div>
+                  <div class="screenshot-title">${escapeHTML(item.title)}</div>
+                  <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP ${platformName.toUpperCase()} GUIDE</div>
+                  
+                  <div class="screenshot-content-row">
+                    <p style="font-size:11px; color:var(--text-muted); line-height:1.4; flex:1;">Tap below to watch complete step-by-step guidance.</p>
+                    ${item.photo_url ? `<img src="${item.photo_url}" class="screenshot-img-box" />` : ''}
+                  </div>
+
+                  <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
+                    <i class="fa-solid fa-play"></i> ${btnText}
+                  </a>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
 
       const view = document.getElementById('app-view');
 
@@ -1243,32 +1326,8 @@
             </div>
           </div>
 
-          <!-- 4. DYNAMIC ADMIN VIDEO TUTORIAL & AD BANNER SHIFTED TO THE BOTTOM (NO FAKE DEFAULTS) -->
-          ${adminTutorialTitle ? `
-            <div class="carousel-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-family:var(--font-gaming); font-size:14px; font-weight:700; color:var(--accent-gold);">🎬 ${adminTutorialTitle}</span>
-                <span style="font-size:10px; color:var(--text-dim);">Tutorial Guide</span>
-              </div>
-              <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Complete step-by-step video guide.</p>
-              <a href="${adminTutorialLink || '#'}" target="_blank" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #ff1744, #ff5722);">
-                <i class="fa-solid fa-play"></i> WATCH TUTORIAL
-              </a>
-            </div>
-          ` : ''}
-
-          ${adminAdTitle ? `
-            <div class="dynamic-ad-banner">
-              <div style="position:absolute; top:6px; right:8px; font-size:9px; background:#262f40; color:var(--accent-cyan); padding:1px 6px; border-radius:4px;">AD</div>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <div style="width:50px; height:50px; background:#1e2533; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent-cyan); font-size:22px;"><i class="fa-solid fa-gamepad"></i></div>
-                <div style="text-align:left; flex:1;">
-                  <h4 style="font-size:13px; font-weight:700; color:#fff;">${adminAdTitle}</h4>
-                </div>
-              </div>
-              <a href="${adminAdLink || '#'}" target="_blank" class="btn btn-primary btn-sm" style="margin-top:10px; padding:6px 12px; font-size:11px;">INSTALL / DOWNLOAD</a>
-            </div>
-          ` : ''}
+          <!-- 4. DYNAMIC SCREENSHOT-STYLE CARDS AT THE BOTTOM -->
+          ${tutorialsHtml}
 
           <div class="social-footer">
             <p>Connect With Us</p>
@@ -1810,7 +1869,7 @@
               <p><strong>11. 🏆 Tournament Entry:</strong> Tournament join karne ke liye required entry fee wallet balance se deduct ki jayegi.</p>
               <p><strong>12. 🔒 Payment Security:</strong> Apna OTP, PIN, password ya account security information kisi ke saath share na karein.</p>
               <p><strong>13. 📞 Payment Issue:</strong> Agar payment complete ho gayi ho lekin wallet mein amount show na ho, to Support section se contact karein.</p>
-              <p><strong>14. ❌ Unauthorized Refunds:</strong> Tournament join karne ke baad entry fee automatically refundable nahi hogi.</p>
+              <p><strong>14. ❌ Unauthorized Refunds:</strong> Tournament join karne ke baad entry fee automatically refundable hogi.</p>
               <p><strong>15. 📢 Admin Decision:</strong> Payment verification se related disputed cases mein transaction evidence check kiye jayenge.</p>
               <p><strong>16. ✅ Important:</strong> Payment karne se pehle receiver/account details aur amount ko dobara verify karein.</p>
               <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
