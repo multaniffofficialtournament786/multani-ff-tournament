@@ -945,7 +945,6 @@
       }, 3000);
     }
 
-    // AUTO SCROLL FEATURE FOR TUTORIAL CARDS (Every 4.5 seconds)
     let autoScrollInterval = null;
     function setupTutorialsAutoScroll() {
       if (autoScrollInterval) clearInterval(autoScrollInterval);
@@ -1240,7 +1239,7 @@
           <div id="tutorials-scroll-box" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px; scroll-behavior: smooth;">
             ${siteTutorialsList.map(item => {
               const platformName = item.platform || 'YouTube';
-              let btnText = "WATCH"; // Button text update kiya gaya hai
+              let btnText = "WATCH";
               let btnBg = "linear-gradient(135deg, #ff5733, #e62200)";
               if (platformName === 'TikTok') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #00f0ff, #0077ff)"; }
               else if (platformName === 'Facebook') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #1877f2, #0d53c7)"; }
@@ -1248,7 +1247,6 @@
 
               const bgImgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
               
-              // Admin panel se edit hone wali do white lines (dynamic variables/fallback)
               const line1 = item.line_1 || 'COMPLETE STEP-BY-STEP WEBSITE GUIDE';
               const line2 = item.line_2 || 'Tap below to watch complete step-by-step guidance.';
 
@@ -1503,11 +1501,27 @@
 
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
-      const { data } = await sbClient.from('profiles').select('free_fire_name, free_fire_uid, total_won').order('total_won', { ascending: false }).limit(20);
+      
+      // Profiles aur approved deposit requests fetch kar rahe hain taaki total deposit calculate ho sake
+      const [profilesRes, depositsRes] = await Promise.all([
+        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url, total_won').order('total_won', { ascending: false }).limit(20),
+        sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
+      ]);
+
       Loader.hide();
 
+      const profiles = profilesRes.data || [];
+      const deposits = depositsRes.data || [];
+
+      // Har user ka total approved deposit amount map kar rahe hain
+      const depositMap = {};
+      deposits.forEach(d => {
+        if (!depositMap[d.user_id]) depositMap[d.user_id] = 0;
+        depositMap[d.user_id] += Number(d.amount || 0);
+      });
+
       const view = document.getElementById('app-view');
-      if (!data || !data.length) {
+      if (!profiles.length) {
         view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
         return;
       }
@@ -1515,18 +1529,27 @@
       view.innerHTML = `
         <div class="view-container">
           <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Leaderboard</span></div>
-          ${data.map((l, idx) => `
-            <div class="tx-item">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'};">#${idx + 1}</span>
-                <div>
-                  <h4>${escapeHTML(l.free_fire_name || 'Player')}</h4>
-                  <span style="font-size:11px; color:var(--accent-cyan);">UID: ${escapeHTML(l.free_fire_uid || '--')}</span>
+          ${profiles.map((l, idx) => {
+            const userTotalDeposit = depositMap[l.id] || 0;
+            const dpUrl = l.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+            
+            return `
+              <div class="tx-item" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span style="font-family:var(--font-gaming); font-size:18px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'}; min-width:24px;">#${idx + 1}</span>
+                  <img src="${dpUrl}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary); object-fit:cover;" />
+                  <div>
+                    <h4 style="font-size:14px; font-weight:700;">${escapeHTML(l.free_fire_name || 'Player')}</h4>
+                    <span style="font-size:11px; color:var(--accent-cyan);">UID: ${escapeHTML(l.free_fire_uid || '--')}</span>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:var(--font-gaming); font-size:15px; font-weight:700; color:var(--success);">Won: PKR ${l.total_won || 0}</div>
+                  <div style="font-size:11px; color:var(--accent-gold); font-weight:600;">Deposit: PKR ${userTotalDeposit}</div>
                 </div>
               </div>
-              <div style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:var(--success);">PKR ${l.total_won || 0}</div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       `;
     }
