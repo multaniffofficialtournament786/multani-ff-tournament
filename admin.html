@@ -653,7 +653,6 @@
     let loadedTournamentsList = [];
     let currentTournamentFilter = 'all';
     let globalAllPlayersCache = [];
-    let globalWinnerSelectPlayersCache = [];
     let activeSelectingPosition = 1;
     let selectedTournamentDetails = null;
 
@@ -1743,7 +1742,6 @@
     function filterVipPlayerModal() {
       const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
       if (!q) return;
-      // Filter logic can be added if needed, or left simple
     }
 
     function selectMultiWinningPlayer(id, name, uid, avatarUrl) {
