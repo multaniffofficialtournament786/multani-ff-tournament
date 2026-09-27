@@ -771,9 +771,15 @@
                 <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">Entry Fee: <strong style="color:#fff;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</strong></span>
               </div>
               <div style="margin-top: 6px;">
-                <button onclick="Router.navigate('tournament_detail', '${t.id}')" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px; font-size: 12px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800;">
-                  JOIN NOW
-                </button>
+                ${isJoined ? `
+                  <button class="btn btn-secondary btn-sm" style="width: 100%; padding: 8px; font-size: 12px; background: rgba(0,230,118,0.2); color: var(--success); border-color: rgba(0,230,118,0.4); cursor: default;" disabled>
+                    <i class="fa-solid fa-check"></i> YOU ARE IN
+                  </button>
+                ` : `
+                  <button onclick="Router.navigate('tournament_detail', '${t.id}')" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px; font-size: 12px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800;">
+                    JOIN NOW
+                  </button>
+                `}
               </div>
             </div>
           </div>
