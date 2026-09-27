@@ -1719,7 +1719,7 @@
 
       await sbClient.from('tournaments').update({ status: 'completed' }).eq('id', tournament_id);
 
-      alert("All winners announced, match automatically completed, and prizes credited successfully!");
+      alert("All winners announced, match completed, and prizes credited successfully!");
       loadDeclaredWinners();
       loadTournaments();
     }
