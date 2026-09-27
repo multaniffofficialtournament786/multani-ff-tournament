@@ -75,7 +75,6 @@
     .header-actions { display: flex; align-items: center; gap: 6px; }
     .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
     .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
-    .back-btn { width: auto; gap: 6px; font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: var(--text-muted); }
     .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .sub-header-spacer { width: 38px; }
 
@@ -449,7 +448,7 @@
       </div>
     </div>
 
-    <!-- JOIN COMMUNITY POPUP (UPDATED TO WHATSAPP CHANNEL) -->
+    <!-- JOIN COMMUNITY POPUP (WHATSAPP CHANNEL) -->
     <div id="community-popup-overlay" class="hidden" style="position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:700; display:flex; align-items:center; justify-content:center; padding:16px;">
       <div style="background:#0e1118; border:1.5px solid var(--border-color); border-radius:16px; padding:24px 20px; width:100%; max-width:340px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
         <div style="width:60px; height:60px; border-radius:50%; background:rgba(37, 211, 102, 0.15); border:2px solid #25d366; display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto; color:#25d366; font-size:28px;">
@@ -462,7 +461,7 @@
       </div>
     </div>
 
-    <nav id="bottom-nav" class="bottom-nav">
+    <nav id="bottom-nav" class="bottom-nav hidden">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
       <div class="nav-item" data-page="invite" onclick="Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i><span>Invite</span></div>
@@ -665,28 +664,42 @@
     }
 
     const Router = {
-      history: ['home'],
+      history: [],
       async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
         await syncAuthAndProfile();
-        
-        if (pushHistory && this.history[this.history.length - 1] !== page) {
+
+        // If not logged in and trying to access protected pages, force login view
+        if (!currentUser && page !== 'login') {
+          page = 'login';
+        }
+
+        if (pushHistory && (this.history.length === 0 || this.history[this.history.length - 1] !== page)) {
           this.history.push(page);
           history.pushState({ page, id }, '', '#' + page);
         }
 
-        const isSub = (page !== 'home');
+        const isLoginView = (page === 'login');
         const masterHeader = document.getElementById('master-header-bar');
         const subHeader = document.getElementById('sub-header-bar');
-        const subTitle = document.getElementById('sub-header-title');
+        const bottomNav = document.getElementById('bottom-nav');
 
-        if (isSub) {
-          masterHeader.classList.add('hidden');
-          subHeader.classList.remove('hidden');
-          subTitle.innerText = page.toUpperCase();
+        if (isLoginView) {
+          if (masterHeader) masterHeader.classList.add('hidden');
+          if (subHeader) subHeader.classList.add('hidden');
+          if (bottomNav) bottomNav.classList.add('hidden');
         } else {
-          masterHeader.classList.remove('hidden');
-          subHeader.classList.add('hidden');
+          const isSub = (page !== 'home');
+          if (isSub) {
+            if (masterHeader) masterHeader.classList.add('hidden');
+            if (subHeader) subHeader.classList.remove('hidden');
+            const subTitle = document.getElementById('sub-header-title');
+            if (subTitle) subTitle.innerText = page.toUpperCase();
+          } else {
+            if (masterHeader) masterHeader.classList.remove('hidden');
+            if (subHeader) subHeader.classList.add('hidden');
+          }
+          if (bottomNav) bottomNav.classList.remove('hidden');
         }
 
         document.querySelectorAll('.nav-item').forEach(el => {
@@ -713,7 +726,8 @@
           const prev = this.history[this.history.length - 1];
           await this.navigate(prev, null, false);
         } else {
-          await this.navigate('home', null, false);
+          const defaultPage = currentUser ? 'home' : 'login';
+          await this.navigate(defaultPage, null, false);
         }
       }
     };
@@ -721,7 +735,7 @@
     window.addEventListener('popstate', (e) => {
       if (Router.history.length > 1) {
         Router.history.pop();
-        const prev = Router.history[Router.history.length - 1] || 'home';
+        const prev = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
         Router.navigate(prev, null, false);
       }
     });
@@ -2300,7 +2314,7 @@
     async function hardRefreshApp() {
       Loader.show("Refreshing app...");
       await syncAuthAndProfile();
-      const currentPage = Router.history[Router.history.length - 1] || 'home';
+      const currentPage = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
       await Router.navigate(currentPage, null, false);
       Loader.hide();
       Toast.show("App refreshed successfully!", "success");
@@ -2377,13 +2391,21 @@
         userJoinedTournamentIds.clear();
         updateDrawerUI();
         Toast.show("Logged out successfully", "info");
-        Router.navigate('home');
+        Router.navigate('login');
       };
 
       setupDraggableBot();
       setupPullToRefresh();
+      
+      Loader.show("Checking session...");
       await syncAuthAndProfile();
-      Router.navigate('home');
+      Loader.hide();
+
+      if (currentUser) {
+        Router.navigate('home');
+      } else {
+        Router.navigate('login');
+      }
     });
   </script>
 </body>
