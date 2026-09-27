@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>MULTANI FF - Admin Console</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -208,57 +208,60 @@
         </div>
       </section>
 
-      <!-- WINNERS -->
+      <!-- WINNERS (COMPACT 2x2 GRID LAYOUT) -->
       <section id="section-winners" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
             <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
 
-          <!-- 1ST PLACE -->
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-            <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
-            <div onclick="openMultiPlayerSelectModal(1)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-p1-text">Choose player...</span>
-              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+          <!-- 2x2 GRID FOR 4 PRIZES -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- 1ST PLACE -->
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
+              <div onclick="openMultiPlayerSelectModal(1)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+                <span id="win-p1-text">Choose player...</span>
+                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+              </div>
+              <input type="hidden" id="win-u1" />
+              <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize Amount" />
             </div>
-            <input type="hidden" id="win-u1" />
-            <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize Amount" />
-          </div>
 
-          <!-- 2ND PLACE -->
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-            <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
-            <div onclick="openMultiPlayerSelectModal(2)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-p2-text">Choose player (Optional)...</span>
-              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            <!-- 2ND PLACE -->
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
+              <div onclick="openMultiPlayerSelectModal(2)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+                <span id="win-p2-text">Choose player (Optional)...</span>
+                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+              </div>
+              <input type="hidden" id="win-u2" />
+              <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize Amount" />
             </div>
-            <input type="hidden" id="win-u2" />
-            <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize Amount" />
-          </div>
 
-          <!-- 3RD PLACE -->
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-            <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
-            <div onclick="openMultiPlayerSelectModal(3)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-p3-text">Choose player (Optional)...</span>
-              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            <!-- 3RD PLACE -->
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
+              <div onclick="openMultiPlayerSelectModal(3)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+                <span id="win-p3-text">Choose player (Optional)...</span>
+                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+              </div>
+              <input type="hidden" id="win-u3" />
+              <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize Amount" />
             </div>
-            <input type="hidden" id="win-u3" />
-            <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize Amount" />
-          </div>
 
-          <!-- 4TH PLACE -->
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-            <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
-            <div onclick="openMultiPlayerSelectModal(4)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-p4-text">Choose player (Optional)...</span>
-              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            <!-- 4TH PLACE -->
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
+              <div onclick="openMultiPlayerSelectModal(4)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+                <span id="win-p4-text">Choose player (Optional)...</span>
+                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+              </div>
+              <input type="hidden" id="win-u4" />
+              <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize Amount" />
             </div>
-            <input type="hidden" id="win-u4" />
-            <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize Amount" />
           </div>
 
           <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
@@ -266,8 +269,8 @@
           </button>
         </div>
 
-        <!-- DECLARED WINNERS LIST -->
-        <div class="space-y-3 w-full max-w-full md:max-w-xl pt-2">
+        <!-- DECLARED WINNERS LIST WITH EDIT & DELETE -->
+        <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
           <div id="admin-declared-winners-list" class="space-y-3">
             <p class="text-gray-500 text-xs text-center py-4">Loading declared winners...</p>
@@ -426,7 +429,7 @@
     </div>
   </div>
 
-  <!-- MODAL: MULTI-POSITION PLAYER SELECTOR -->
+  <!-- MODAL: MULTI-POSITION PLAYER SELECTOR (AUTO CLOSE ON SELECT) -->
   <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
@@ -440,6 +443,22 @@
       </div>
       <div id="modal-vip-player-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
         <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT DECLARED WINNER -->
+  <div id="modal-edit-winner" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Winner Prize</h3>
+      <input type="hidden" id="edit-w-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize Amount (PKR)</label>
+        <input type="number" id="edit-w-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeEditWinnerModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveEditedWinner()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">UPDATE</button>
       </div>
     </div>
   </div>
@@ -1297,7 +1316,7 @@
 
     async function deleteTournament(id) {
       if (!confirm("Are you sure you want to delete this tournament permanently?")) return;
-      const { error } = await sbClient.from('tournaments').delete().eq('id', id);
+      const { error } = await sbClient.rpc('delete_tournament_safely', { p_tournament_id: id });
       if (error) alert("Failed: " + error.message);
       else {
         alert("Tournament deleted.");
@@ -1810,11 +1829,41 @@
               </div>
             </div>
             <div class="flex items-center gap-1.5">
+              <button onclick="openEditWinnerModal('${w.id}', ${w.prize_amount})" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-pen"></i></button>
               <button onclick="deleteDeclaredWinner('${w.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function openEditWinnerModal(winnerId, currentAmount) {
+      document.getElementById('edit-w-id').value = winnerId;
+      document.getElementById('edit-w-amount').value = currentAmount;
+      document.getElementById('modal-edit-winner').classList.remove('hidden');
+    }
+
+    function closeEditWinnerModal() {
+      document.getElementById('modal-edit-winner').classList.add('hidden');
+    }
+
+    async function saveEditedWinner() {
+      const winnerId = document.getElementById('edit-w-id').value;
+      const newAmount = parseFloat(document.getElementById('edit-w-amount').value);
+
+      if (isNaN(newAmount) || newAmount <= 0) {
+        alert("Please enter a valid prize amount.");
+        return;
+      }
+
+      const { error } = await sbClient.from('winners').update({ prize_amount: newAmount }).eq('id', winnerId);
+      if (error) {
+        alert("Failed to update winner: " + error.message);
+      } else {
+        alert("Winner prize updated successfully!");
+        closeEditWinnerModal();
+        loadDeclaredWinners();
+      }
     }
 
     async function deleteDeclaredWinner(winnerId) {
