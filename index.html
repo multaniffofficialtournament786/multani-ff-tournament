@@ -106,7 +106,6 @@
     .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* 100% CLEAR BACKGROUND PHOTO STYLE (NO SHADOW/OVERLAY) */
     .screenshot-card {
       border: 1.5px solid #ff770055;
       border-radius: var(--radius);
@@ -119,161 +118,34 @@
       background-position: center !important;
       overflow: hidden;
     }
-    .screenshot-card > * {
-      position: relative;
-      z-index: 2;
-    }
+    .screenshot-card > * { position: relative; z-index: 2; }
 
-    .screenshot-card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .screenshot-card-logo {
-      width: 22px;
-      height: 22px;
-      background: var(--primary);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: #fff;
-    }
-    .screenshot-brand-text {
-      font-family: var(--font-gaming);
-      font-size: 11px;
-      letter-spacing: 1px;
-      color: #ffbe00;
-      font-weight: 700;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-    }
-    .screenshot-title {
-      font-family: var(--font-gaming);
-      font-size: 22px;
-      font-weight: 800;
-      color: #ffaa00;
-      line-height: 1.1;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.98);
-    }
-    .screenshot-subtitle {
-      font-size: 10px;
-      font-weight: 700;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      text-shadow: 0 1px 5px rgba(0,0,0,0.98);
-    }
+    .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; }
+    .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
+    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-shadow: 0 1px 5px rgba(0,0,0,0.98); }
 
-    /* EXPANDABLE RULES STYLING */
-    .rules-dropdown-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      margin-bottom: 14px;
-      overflow: hidden;
-    }
-    .rules-dropdown-header {
-      padding: 12px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      background: #1a1e29;
-      transition: var(--transition);
-    }
+    .rules-dropdown-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 14px; overflow: hidden; }
+    .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; transition: var(--transition); }
     .rules-dropdown-header:hover { background: #222736; }
-    .rules-dropdown-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease-out, padding 0.3s ease;
-      padding: 0 14px;
-      background: #12151d;
-      font-size: 12px;
-      color: #c7cbd1;
-      line-height: 1.6;
-    }
-    .rules-dropdown-container.open .rules-dropdown-content {
-      max-height: 2500px;
-      padding: 12px 14px;
-    }
-    .rules-dropdown-container.open .rules-arrow {
-      transform: rotate(180deg);
-    }
-    .rules-arrow {
-      transition: transform 0.3s ease;
-      color: var(--accent-gold);
-      font-size: 12px;
-    }
+    .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
+    .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
+    .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
+    .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
 
-    /* VIP FILTER BUTTONS STYLING */
-    .filter-tab-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-family: var(--font-gaming);
-      font-size: 12px;
-      font-weight: 700;
-      background: var(--bg-card);
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-      white-space: nowrap;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .filter-tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
+    .filter-tab-btn { padding: 8px 14px; border-radius: 8px; font-family: var(--font-gaming); font-size: 12px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); }
+    .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px var(--primary-glow); }
 
-    /* LED DISPLAY SIGNBOARD STYLING WITH ROTATING GLOWING BORDER */
     @keyframes ledGlow {
       0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
       33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
       66% { box-shadow: 0 0 12px #ffbe00, inset 0 0 10px rgba(0,230,118,0.3); }
     }
-    .led-signboard {
-      background: #020305;
-      border: 3px solid transparent;
-      border-radius: 10px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
-      animation: ledGlow 3s infinite ease-in-out;
-      background-image: radial-gradient(circle, #151c28 1px, transparent 1px);
-      background-size: 6px 6px;
-    }
-    .led-signboard i {
-      color: #ffbe00;
-      font-size: 16px;
-      filter: drop-shadow(0 0 6px #ffbe00);
-    }
+    .led-signboard { background: #020305; border: 3px solid transparent; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; position: relative; box-shadow: 0 0 18px rgba(0, 240, 255, 0.35); animation: ledGlow 3s infinite ease-in-out; background-image: radial-gradient(circle, #151c28 1px, transparent 1px); background-size: 6px 6px; }
+    .led-signboard i { color: #ffbe00; font-size: 16px; filter: drop-shadow(0 0 6px #ffbe00); }
     .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
-    .ticker-content { 
-      display: inline-block; 
-      font-family: var(--font-gaming); 
-      font-size: 14px; 
-      font-weight: 800; 
-      letter-spacing: 1.5px; 
-      background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
-      padding-left: 100%;
-      animation: smoothTicker linear infinite;
-      animation-play-state: paused;
-    }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 14px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)); padding-left: 100%; animation: smoothTicker linear infinite; animation-play-state: paused; }
     .ticker-content.active { animation-play-state: running; }
 
     @keyframes smoothTicker {
@@ -281,165 +153,35 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
   
-    .bottom-nav { 
-      height: var(--bottom-nav-height); 
-      background: rgba(14, 17, 24, 0.98); 
-      border-top: 1px solid var(--border-color); 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-around; 
-      padding: 0 8px; 
-      z-index: 110; 
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-    }
+    .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 110; position: absolute; bottom: 0; left: 0; right: 0; }
     .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
-    .category-scroll-container {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding: 4px 2px 14px 2px;
-      margin-bottom: 14px;
-      scrollbar-width: none;
-    }
+    .category-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 14px; scrollbar-width: none; }
     .category-scroll-container::-webkit-scrollbar { display: none; }
     
-    .cat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      gap: 6px;
-    }
-    .cat-circle {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2b1218, #150a0d);
-      border: 2px solid var(--primary);
-      box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-gold);
-      font-size: 18px;
-      transition: var(--transition);
-    }
+    .cat-item { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; cursor: pointer; gap: 6px; }
+    .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
     .cat-circle:active { transform: scale(0.92); }
-    .cat-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-main);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
+    .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
-    #admin-float-widget {
-      position: absolute;
-      bottom: 120px;
-      right: 18px;
-      z-index: 300;
-      touch-action: none;
-      user-select: none;
-      cursor: grab;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-    }
+    #admin-float-widget { position: absolute; bottom: 120px; right: 18px; z-index: 300; touch-action: none; user-select: none; cursor: grab; display: flex; flex-direction: column-reverse; align-items: center; }
     #admin-float-widget:active { cursor: grabbing; }
-    .bot-bubble {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1f293d, #0f131a);
-      border: 2px solid var(--primary);
-      box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+    .bot-bubble { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #1f293d, #0f131a); border: 2px solid var(--primary); box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3); display: flex; align-items: center; justify-content: center; position: relative; }
     .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
-    .bot-badge-tag {
-      margin-top: -6px;
-      background: #ff4624;
-      color: #fff;
-      font-family: var(--font-gaming);
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 10px;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.3);
-    }
-    .support-popup-menu {
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 10px;
-      align-items: center;
-      animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .bot-badge-tag { margin-top: -6px; background: #ff4624; color: #fff; font-family: var(--font-gaming); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.3); }
+    .support-popup-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 10px; align-items: center; animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .support-popup-menu.show { display: flex; }
     @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
-    .support-action-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ffbe00, #ff9800);
-      border: 2px solid #fff;
-      color: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-      cursor: pointer;
-      text-decoration: none;
-      transition: var(--transition);
-    }
+    .support-action-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ffbe00, #ff9800); border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); cursor: pointer; text-decoration: none; transition: var(--transition); }
     .support-action-btn:active { transform: scale(0.9); }
 
-    #chat-modal-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(6px);
-      z-index: 400;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    .chat-dialog {
-      height: 82%;
-      background: #0e1118;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      border-top: 1.5px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    #chat-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 400; display: flex; flex-direction: column; justify-content: flex-end; }
+    .chat-dialog { height: 82%; background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .chat-dialog-header {
-      padding: 14px 16px;
-      background: #151922;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .chat-dialog-header { padding: 14px 16px; background: #151922; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
     .chat-user-header { display: flex; align-items: center; gap: 10px; }
     .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
     .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
@@ -454,65 +196,13 @@
     .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
     .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
 
-    /* Share Modal Styles */
-    #share-modal-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(6px);
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    .share-sheet {
-      background: #0e1118;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      border-top: 1.5px solid var(--border-color);
-      padding: 20px 16px 35px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .share-options-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      text-align: center;
-    }
-    .share-app-icon-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      text-decoration: none;
-      color: var(--text-main);
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .share-icon-circle {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
+    #share-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 500; display: flex; flex-direction: column; justify-content: flex-end; }
+    .share-sheet { background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); padding: 20px 16px 35px 16px; display: flex; flex-direction: column; gap: 16px; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .share-options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
+    .share-app-icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; color: var(--text-main); font-size: 11px; font-weight: 600; }
+    .share-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 
-    #pull-refresh-indicator {
-      text-align: center;
-      padding: 10px;
-      font-family: var(--font-gaming);
-      font-size: 12px;
-      color: var(--accent-cyan);
-      display: none;
-    }
+    #pull-refresh-indicator { text-align: center; padding: 10px; font-family: var(--font-gaming); font-size: 12px; color: var(--accent-cyan); display: none; }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
     .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
@@ -534,113 +224,33 @@
     .stat-val.green { color: var(--success); }
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
-    .tournaments-stack-as8 {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .t-card-as8-large {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-    }
-    .t-card-as8-large:active { transform: scale(0.98); }
-    .t-card-thumb-large {
-      width: 100%;
-      height: 160px;
-      position: relative;
-      background: #000;
-    }
-    .t-card-thumb-large img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .t-card-info-large {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: #11151e;
-    }
-    .t-card-title-large {
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .t-card-meta-large {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+    .tournaments-stack-as8 { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); position: relative; }
+    .t-card-thumb-large { width: 100%; height: 160px; position: relative; background: #000; cursor: pointer; }
+    .t-card-thumb-large img { width: 100%; height: 100%; object-fit: cover; }
+    .t-card-info-large { padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #11151e; }
+    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; }
+    .t-card-meta-large { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
 
-    .room-slots-container {
-      background: #090c12;
-      border: 1.5px solid #262f40;
-      border-radius: var(--radius-sm);
-      padding: 10px;
-      margin-bottom: 14px;
-    }
-    .room-slots-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .slot-card {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 8px;
-      background: #131722;
-      border: 1px solid #1f2636;
-      border-radius: 6px;
-    }
-    .slot-card.occupied {
-      background: #1c2233;
-      border-color: var(--accent-cyan);
-    }
-    .slot-card.my-slot {
-      background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233);
-      border-color: var(--primary);
-    }
-    .slot-num {
-      font-family: var(--font-gaming);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-dim);
-      width: 22px;
-    }
+    .room-slots-container { background: #090c12; border: 1.5px solid #262f40; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; }
+    .room-slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; }
+    .slot-card { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #131722; border: 1px solid #1f2636; border-radius: 6px; }
+    .slot-card.occupied { background: #1c2233; border-color: var(--accent-cyan); }
+    .slot-card.my-slot { background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233); border-color: var(--primary); }
+    .slot-num { font-family: var(--font-gaming); font-size: 12px; font-weight: 700; color: var(--text-dim); width: 22px; }
     .slot-card.occupied .slot-num { color: var(--accent-gold); }
-    .slot-name {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .slot-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .slot-card.occupied .slot-name { color: #fff; }
     .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
 
     .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
     .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
     .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
-    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .tx-info h4 { font-size: 14px; font-weight: 600; }
-    .tx-info span { font-size: 11px; color: var(--text-dim); }
-    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; }
+    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; overflow: hidden; word-break: break-word; }
+    .tx-info { flex: 1; min-width: 0; padding-right: 8px; }
+    .tx-info h4 { font-size: 14px; font-weight: 600; white-space: normal; overflow-wrap: break-word; }
+    .tx-info span { font-size: 11px; color: var(--text-dim); display: block; white-space: normal; overflow-wrap: break-word; }
+    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; flex-shrink: 0; }
     .tx-positive { color: var(--success); }
     .tx-negative { color: var(--danger); }
     .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
@@ -658,41 +268,10 @@
     .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; }
     
-    .social-footer {
-      background: #090c12;
-      border-top: 1px solid var(--border-color);
-      padding: 14px 16px;
-      text-align: center;
-      margin-top: 20px;
-      border-radius: var(--radius-sm);
-    }
-    .social-footer p {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      font-family: var(--font-gaming);
-      letter-spacing: 1px;
-      font-weight: 700;
-    }
-    .social-icons-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-    }
-    .social-icon-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: var(--transition);
-      border: 1px solid var(--border-color);
-      color: #fff;
-    }
+    .social-footer { background: #090c12; border-top: 1px solid var(--border-color); padding: 14px 16px; text-align: center; margin-top: 20px; border-radius: var(--radius-sm); }
+    .social-footer p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-family: var(--font-gaming); letter-spacing: 1px; font-weight: 700; }
+    .social-icons-row { display: flex; justify-content: center; gap: 12px; }
+    .social-icon-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; transition: var(--transition); border: 1px solid var(--border-color); color: #fff; }
     .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
     .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
     .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
@@ -1164,9 +743,15 @@
           }
         }
 
+        const p1 = t.prize_pool ? `1st: PKR ${t.prize_pool}` : '';
+        const p2 = t.prize_2 ? `2nd: PKR ${t.prize_2}` : '';
+        const p3 = t.prize_3 ? `3rd: PKR ${t.prize_3}` : '';
+        const p4 = t.prize_4 ? `4th: PKR ${t.prize_4}` : '';
+        const prizeSubText = [p1, p2, p3, p4].filter(Boolean).join(' • ');
+
         return `
-          <div class="t-card-as8-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
-            <div class="t-card-thumb-large">
+          <div class="t-card-as8-large">
+            <div class="t-card-thumb-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
               <img src="${imgUrl}" alt="${escapeHTML(t.title)}" />
               <div style="position:absolute; top:8px; left:8px; display:flex; gap:6px;">
                 <span style="background:${currentStatus === 'LIVE' ? '#ff1744' : (currentStatus === 'COMPLETED' ? '#4b5563' : '#00f0ff')}; color:${currentStatus === 'LIVE' ? '#fff' : '#000'}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:4px; font-family:var(--font-gaming); text-transform:uppercase;">
@@ -1176,14 +761,19 @@
               </div>
             </div>
             <div class="t-card-info-large">
-              <h4 class="t-card-title-large">${escapeHTML(t.title)}</h4>
+              <h4 class="t-card-title-large" onclick="Router.navigate('tournament_detail', '${t.id}')">${escapeHTML(t.title)}</h4>
               <div class="t-card-meta-large">
                 <span style="color:var(--accent-cyan); font-weight:600;">${escapeHTML(t.mode)} • ${escapeHTML(t.map)}</span>
-                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Booyah Prize: <strong style="font-family:var(--font-gaming); font-size:15px; color:var(--accent-gold);">PKR ${t.prize_pool}</strong></span>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);"><strong style="font-family:var(--font-gaming); font-size:13px; color:var(--accent-gold);">${prizeSubText}</strong></span>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-dim); border-top:1px solid #1f2636; padding-top:6px; margin-top:2px;">
                 <span>Slots: <strong style="color:#fff;">${t.joined_players || 0}/${t.max_players}</strong> &nbsp;|&nbsp; <span style="color:var(--accent-gold);">${dayStr ? dayStr + ', ' : ''}${dateStr} ${timeStr ? '• ' + timeStr : ''}</span></span>
                 <span style="font-weight:700; color:${t.entry_fee == 0 ? 'var(--accent-cyan)' : 'var(--accent-gold)'};">Entry Fee: <strong style="color:#fff;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</strong></span>
+              </div>
+              <div style="margin-top: 6px;">
+                <button onclick="Router.navigate('tournament_detail', '${t.id}')" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px; font-size: 12px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800;">
+                  JOIN NOW
+                </button>
               </div>
             </div>
           </div>
@@ -1246,7 +836,6 @@
               else if (platformName === 'Instagram') { btnText = "WATCH"; btnBg = "linear-gradient(135deg, #833ab4, #fd1d1d)"; }
 
               const bgImgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
-              
               const line1 = item.line_1 || 'COMPLETE STEP-BY-STEP WEBSITE GUIDE';
               const line2 = item.line_2 || 'Tap below to watch complete step-by-step guidance.';
 
@@ -1502,7 +1091,6 @@
     async function renderLeaderboard() {
       Loader.show("Loading leaderboard...");
       
-      // Profiles aur approved deposit requests fetch kar rahe hain taaki total deposit calculate ho sake
       const [profilesRes, depositsRes] = await Promise.all([
         sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url, total_won').order('total_won', { ascending: false }).limit(20),
         sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
@@ -1513,7 +1101,6 @@
       const profiles = profilesRes.data || [];
       const deposits = depositsRes.data || [];
 
-      // Har user ka total approved deposit amount map kar rahe hain
       const depositMap = {};
       deposits.forEach(d => {
         if (!depositMap[d.user_id]) depositMap[d.user_id] = 0;
@@ -1606,9 +1193,9 @@
       if (isCompleted && winRes.data && winRes.data.length > 0) {
         winnerInfoHTML = `
           <div style="background:rgba(255,190,0,0.1); border:1px solid var(--accent-gold); border-radius:var(--radius-sm); padding:12px; margin-bottom:12px;">
-            <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winner Declared</div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winners Declared</div>
             ${winRes.data.map(w => `
-              <div style="font-size:13px; font-weight:bold; color:#fff;">
+              <div style="font-size:13px; font-weight:bold; color:#fff; margin-top: 4px;">
                 ${escapeHTML(w.profiles?.free_fire_name || 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR ${w.prize_amount}]
               </div>
             `).join('')}
@@ -1616,15 +1203,22 @@
         `;
       }
 
+      const p1 = t.prize_pool ? `1st: PKR ${t.prize_pool}` : '';
+      const p2 = t.prize_2 ? `2nd: PKR ${t.prize_2}` : '';
+      const p3 = t.prize_3 ? `3rd: PKR ${t.prize_3}` : '';
+      const p4 = t.prize_4 ? `4th: PKR ${t.prize_4}` : '';
+      const prizeDetailsFull = [p1, p2, p3, p4].filter(Boolean).join(' • ');
+
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
           <div class="player-hero-card" style="margin-bottom: 12px; padding: 12px; text-align: center;">
             <img src="${imgUrl}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
             <h2 style="font-family: var(--font-gaming); font-size: 20px; font-weight: 800; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; line-height: 1.2;">${escapeHTML(t.title)}</h2>
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-gold); margin: 6px 0;">🏆 ${prizeDetailsFull}</div>
             <div class="hero-stats-grid" style="padding:6px; background:rgba(0,0,0,0.5); margin-top: 8px;">
               <div class="stat-box"><span class="stat-label">Entry Fee</span><span class="stat-val ${t.entry_fee == 0 ? 'green' : 'gold'}" style="font-size:14px;">${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'}</span></div>
-              <div class="stat-box"><span class="stat-label">Booyah Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
+              <div class="stat-box"><span class="stat-label">1st Prize</span><span class="stat-val green" style="font-size:14px;">PKR ${t.prize_pool}</span></div>
               <div class="stat-box"><span class="stat-label">Slots</span><span class="stat-val" style="font-size:14px;">${t.joined_players || 0}/${t.max_players}</span></div>
             </div>
           </div>
@@ -1709,7 +1303,7 @@
 
           <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
-            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 Only Booyah: Winner Takes Full Prize Pool!</div>
+            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 1st: PKR ${t.prize_pool || 0} | 2nd: PKR ${t.prize_2 || 0} | 3rd: PKR ${t.prize_3 || 0} | 4th: PKR ${t.prize_4 || 0}</div>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -1775,7 +1369,7 @@
       const tourneyIds = winnersData.map(w => w.tournament_id).filter(Boolean);
 
       const [profRes, tourRes] = await Promise.all([
-        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').in('id', userIds),
+        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url').in('id', userIds),
         sbClient.from('tournaments').select('id, title').in('id', tourneyIds)
       ]);
 
@@ -1794,17 +1388,22 @@
             const uId = w.user_id || w.player_id;
             const p = profMap[uId] || {};
             const t = tourMap[w.tournament_id] || {};
+            const dpUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
             return `
-              <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <div>
-                  <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-crown"></i> ${escapeHTML(w.position || '1st Place (Booyah)')}</span>
-                  <h3 style="margin-top:6px; font-family:var(--font-gaming); font-size:18px;">${escapeHTML(p.free_fire_name || 'Champion')}</h3>
-                  <div style="font-size:11px; color:var(--text-dim);">UID: ${escapeHTML(p.free_fire_uid || '--')}</div>
-                  <div style="font-size:11px; color:var(--accent-cyan); margin-top:2px;">${escapeHTML(t.title || 'Tournament')}</div>
+              <div class="player-hero-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px;">
+                <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1;">
+                  <img src="${dpUrl}" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--accent-gold); object-fit:cover; flex-shrink:0;" />
+                  <div style="min-width:0; flex:1;">
+                    <span class="spec-pill" style="background:var(--accent-gold); color:#000; font-weight:800; text-transform:uppercase; font-size:10px; padding:2px 6px; border-radius:4px;"><i class="fa-solid fa-crown"></i> ${escapeHTML(w.position || '1st Place')}</span>
+                    <h3 style="margin-top:4px; font-family:var(--font-gaming); font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(p.free_fire_name || 'Champion')}</h3>
+                    <div style="font-size:11px; color:var(--accent-cyan); font-family:monospace;">UID: ${escapeHTML(p.free_fire_uid || '--')}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(t.title || 'Tournament')}</div>
+                  </div>
                 </div>
-                <div style="text-align:right;">
-                  <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
-                  <div style="font-family:var(--font-gaming); font-size:22px; font-weight:800; color:var(--accent-gold);">PKR ${w.prize_amount}</div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Prize Won</div>
+                  <div style="font-family:var(--font-gaming); font-size:20px; font-weight:800; color:var(--accent-gold);">PKR ${w.prize_amount}</div>
                 </div>
               </div>
             `;
