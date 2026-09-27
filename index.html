@@ -1714,13 +1714,12 @@
               </form>
             `}
 
-            <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
-              <button onclick="Router.navigate('register')" class="btn" style="background:${!isLogin ? 'var(--primary)' : '#1f2636'}; color:#fff; border:1px solid var(--border-color);">
-                <i class="fa-solid fa-user-plus"></i> REGISTER (Naya Account Banayein)
-              </button>
-              <button onclick="Router.navigate('login')" class="btn" style="background:${isLogin ? 'var(--primary)' : '#1f2636'}; color:#fff; border:1px solid var(--border-color);">
-                <i class="fa-solid fa-right-to-bracket"></i> LOGIN (Pehle se Account Hai)
-              </button>
+            <div style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:16px;">
+              ${isLogin ? `
+                Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>
+              ` : `
+                Already have an account? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>
+              `}
             </div>
           </div>
         </div>
