@@ -276,18 +276,14 @@
     .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
     .social-icon-btn:active { transform: scale(0.95); }
 
-    /* BATTLE ARENA STYLE LOGIN OVERRIDES */
-    .arena-login-wrap { max-width: 380px; margin: 0 auto; padding: 10px 4px; }
+    /* ARENA AUTH STYLE OVERRIDES */
+    .arena-login-wrap { max-width: 380px; margin: 0 auto; padding: 20px 4px; }
     .arena-title { font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #ff5733; letter-spacing: 1.5px; text-align: center; margin-bottom: 4px; text-transform: uppercase; }
     .arena-subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
     .arena-input-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; transition: var(--transition); }
     .arena-input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
     .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
     .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
-    .arena-divider { display: flex; align-items: center; text-align: center; color: var(--text-dim); font-size: 11px; margin: 18px 0; text-transform: uppercase; letter-spacing: 1px; }
-    .arena-divider::before, .arena-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
-    .arena-divider::before { margin-right: 10px; }
-    .arena-divider::after { margin-left: 10px; }
   </style>
 </head>
 <body>
@@ -669,8 +665,7 @@
         Drawer.close();
         await syncAuthAndProfile();
 
-        // If not logged in and trying to access protected pages, force login view
-        if (!currentUser && page !== 'login') {
+        if (!currentUser && page !== 'login' && page !== 'register') {
           page = 'login';
         }
 
@@ -679,12 +674,12 @@
           history.pushState({ page, id }, '', '#' + page);
         }
 
-        const isLoginView = (page === 'login');
+        const isAuthView = (page === 'login' || page === 'register');
         const masterHeader = document.getElementById('master-header-bar');
         const subHeader = document.getElementById('sub-header-bar');
         const bottomNav = document.getElementById('bottom-nav');
 
-        if (isLoginView) {
+        if (isAuthView) {
           if (masterHeader) masterHeader.classList.add('hidden');
           if (subHeader) subHeader.classList.add('hidden');
           if (bottomNav) bottomNav.classList.add('hidden');
@@ -712,7 +707,7 @@
         else if (page === 'wallet') renderWallet();
         else if (page === 'deposit') renderDeposit();
         else if (page === 'invite') renderInvite();
-        else if (page === 'login') renderAuth();
+        else if (page === 'login' || page === 'register') renderAuth(page);
         else if (page === 'profile') renderProfile();
         else if (page === 'winners') renderWinners();
         else if (page === 'leaderboard') renderLeaderboard();
@@ -1656,187 +1651,183 @@
       }
     }
 
-    function renderAuth() {
+    function renderAuth(mode = 'login') {
+      const isLogin = (mode === 'login');
+
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="arena-login-wrap">
             <h2 class="arena-title">MULTANI FF ARENA</h2>
-            <p class="arena-subtitle">Sign in to enter the arena.</p>
+            <p class="arena-subtitle">${isLogin ? 'Sign in to enter the arena.' : 'Create an account to join tournaments.'}</p>
 
-            <form id="login-form">
-              <div class="arena-input-box">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="log-email" class="arena-field" placeholder="you@example.com" required />
-              </div>
+            ${isLogin ? `
+              <form id="login-form">
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-envelope"></i>
+                  <input type="email" id="log-email" class="arena-field" placeholder="you@example.com" required />
+                </div>
 
-              <div class="arena-input-box">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" id="log-pass" class="arena-field" placeholder="••••••••" required />
-                <i class="fa-solid fa-eye" style="cursor:pointer;" onclick="const p=document.getElementById('log-pass'); p.type=p.type==='password'?'text':'password';"></i>
-              </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-lock"></i>
+                  <input type="password" id="log-pass" class="arena-field" placeholder="••••••••" required />
+                  <i class="fa-solid fa-eye" style="cursor:pointer;" onclick="const p=document.getElementById('log-pass'); p.type=p.type==='password'?'text':'password';"></i>
+                </div>
 
-              <div style="text-align:right; margin-bottom:14px;">
-                <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
-              </div>
+                <div style="text-align:right; margin-bottom:14px;">
+                  <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
+                </div>
 
-              <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
+                <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
+              </form>
+            ` : `
+              <form id="signup-form">
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-user"></i>
+                  <input type="text" id="reg-name" class="arena-field" placeholder="Full Name" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-gamepad"></i>
+                  <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MLT・HAMZA★)" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-id-card"></i>
+                  <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-phone"></i>
+                  <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-envelope"></i>
+                  <input type="email" id="reg-email" class="arena-field" placeholder="you@example.com" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-lock"></i>
+                  <input type="password" id="reg-pass" class="arena-field" placeholder="Password (min 6 chars)" minlength="6" required />
+                </div>
+                <div class="arena-input-box">
+                  <i class="fa-solid fa-users"></i>
+                  <input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" />
+                </div>
 
-              <div class="arena-divider">or continue with</div>
+                <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">REGISTER</button>
+              </form>
+            `}
 
-              <button type="button" onclick="Toast.show('Google login coming soon!', 'info')" style="width:100%; background:#fff; color:#000; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; margin-bottom:14px;">
-                <i class="fa-brands fa-google" style="color:#ea4335;"></i> Continue with Google
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
+              <button onclick="Router.navigate('register')" class="btn" style="background:${!isLogin ? 'var(--primary)' : '#1f2636'}; color:#fff; border:1px solid var(--border-color);">
+                <i class="fa-solid fa-user-plus"></i> REGISTER (Naya Account Banayein)
               </button>
-
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:12px; color:var(--text-muted);">
-                <input type="checkbox" id="terms-chk" required style="accent-color:var(--primary);" />
-                <label for="terms-chk">I agree to the <span style="color:var(--primary); cursor:pointer;">Terms of Service</span> and <span style="color:var(--primary); cursor:pointer;">Privacy Policy</span>.</label>
-              </div>
-
-              <div style="text-align:center; font-size:12px; color:var(--text-muted);">
-                New to Multani FF Arena? <span onclick="toggleAuth(false)" style="color:var(--primary); font-weight:bold; cursor:pointer;">SIGN UP</span>
-              </div>
-            </form>
-
-            <form id="signup-form" class="hidden">
-              <div class="arena-input-box">
-                <i class="fa-solid fa-user"></i>
-                <input type="text" id="reg-name" class="arena-field" placeholder="Full Name" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid fa-gamepad"></i>
-                <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MLT・HAMZA★)" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid id-card"></i>
-                <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid fa-phone"></i>
-                <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="reg-email" class="arena-field" placeholder="you@example.com" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" id="reg-pass" class="arena-field" placeholder="Password (min 6 chars)" minlength="6" required />
-              </div>
-              <div class="arena-input-box">
-                <i class="fa-solid fa-users"></i>
-                <input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" />
-              </div>
-
-              <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">CREATE ACCOUNT</button>
-
-              <div style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:10px;">
-                Already have an account? <span onclick="toggleAuth(true)" style="color:var(--primary); font-weight:bold; cursor:pointer;">LOGIN</span>
-              </div>
-            </form>
+              <button onclick="Router.navigate('login')" class="btn" style="background:${isLogin ? 'var(--primary)' : '#1f2636'}; color:#fff; border:1px solid var(--border-color);">
+                <i class="fa-solid fa-right-to-bracket"></i> LOGIN (Pehle se Account Hai)
+              </button>
+            </div>
           </div>
         </div>
       `;
 
-      document.getElementById('login-form').onsubmit = async (e) => {
-        e.preventDefault();
-        Loader.show("Signing in...");
-        const { error } = await sbClient.auth.signInWithPassword({
-          email: document.getElementById('log-email').value,
-          password: document.getElementById('log-pass').value
-        });
-        Loader.hide();
+      if (isLogin) {
+        document.getElementById('login-form').onsubmit = async (e) => {
+          e.preventDefault();
+          Loader.show("Signing in...");
+          const { error } = await sbClient.auth.signInWithPassword({
+            email: document.getElementById('log-email').value,
+            password: document.getElementById('log-pass').value
+          });
+          Loader.hide();
 
-        if (error) Toast.show(error.message, "error");
-        else {
-          Toast.show("Welcome back!", "success");
-          await syncAuthAndProfile();
-          Router.navigate('home');
-        }
-      };
-
-      document.getElementById('signup-form').onsubmit = async (e) => {
-        e.preventDefault();
-        Loader.show("Validating details...");
-        const email = document.getElementById('reg-email').value.trim();
-        const password = document.getElementById('reg-pass').value;
-        const name = document.getElementById('reg-name').value.trim();
-        const ign = document.getElementById('reg-ign').value.trim();
-        const uid = document.getElementById('reg-uid').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const refInput = document.getElementById('reg-ref').value.trim();
-
-        try {
-          const { data: existingProfiles } = await sbClient
-            .from('profiles')
-            .select('free_fire_uid, email, phone')
-            .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
-
-          if (existingProfiles && existingProfiles.length > 0) {
-            Loader.hide();
-            const match = existingProfiles[0];
-            if (match.free_fire_uid === uid) {
-              Toast.show("Error: This Free Fire UID is already registered!", "error");
-            } else if (match.email === email) {
-              Toast.show("Error: This Email address is already registered!", "error");
-            } else if (match.phone === phone) {
-              Toast.show("Error: This WhatsApp number is already registered!", "error");
-            } else {
-              Toast.show("Error: Duplicate credentials found!", "error");
-            }
-            return;
-          }
-
-          let validReferrerUid = null;
-          if (refInput) {
-            if (refInput === uid) {
-              Loader.hide();
-              Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-              return;
-            }
-            const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
-            if (!refCheck) {
-              Loader.hide();
-              Toast.show("Yeh referral code available nahi hai!", "error");
-              return;
-            }
-            validReferrerUid = refCheck.free_fire_uid;
-          }
-
-          Loader.show("Registering account...");
-          const { data, error } = await sbClient.auth.signUp({ email, password });
-          if (error) {
-            Loader.hide();
-            Toast.show(error.message, "error");
-            return;
-          }
-
-          if (data.user) {
-            const { error: profileError } = await sbClient.from('profiles').upsert([{
-              id: data.user.id,
-              email,
-              full_name: name,
-              free_fire_name: ign,
-              free_fire_uid: uid,
-              phone: phone,
-              referred_by: validReferrerUid,
-              ref_claimed: false,
-              wallet_balance: 0,
-              is_banned: false,
-              is_admin: false
-            }]);
-
-            if (profileError) throw profileError;
-
-            Loader.hide();
-            Toast.show("Account registered and logged in successfully!", "success");
+          if (error) Toast.show(error.message, "error");
+          else {
+            Toast.show("Welcome back!", "success");
             await syncAuthAndProfile();
             Router.navigate('home');
           }
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Registration validation failed.", "error");
-        }
-      };
+        };
+      } else {
+        document.getElementById('signup-form').onsubmit = async (e) => {
+          e.preventDefault();
+          Loader.show("Validating details...");
+          const email = document.getElementById('reg-email').value.trim();
+          const password = document.getElementById('reg-pass').value;
+          const name = document.getElementById('reg-name').value.trim();
+          const ign = document.getElementById('reg-ign').value.trim();
+          const uid = document.getElementById('reg-uid').value.trim();
+          const phone = document.getElementById('reg-phone').value.trim();
+          const refInput = document.getElementById('reg-ref').value.trim();
+
+          try {
+            const { data: existingProfiles } = await sbClient
+              .from('profiles')
+              .select('free_fire_uid, email, phone')
+              .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
+
+            if (existingProfiles && existingProfiles.length > 0) {
+              Loader.hide();
+              const match = existingProfiles[0];
+              if (match.free_fire_uid === uid) {
+                Toast.show("Error: This Free Fire UID is already registered!", "error");
+              } else if (match.email === email) {
+                Toast.show("Error: This Email address is already registered!", "error");
+              } else if (match.phone === phone) {
+                Toast.show("Error: This WhatsApp number is already registered!", "error");
+              } else {
+                Toast.show("Error: Duplicate credentials found!", "error");
+              }
+              return;
+            }
+
+            let validReferrerUid = null;
+            if (refInput) {
+              if (refInput === uid) {
+                Loader.hide();
+                Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
+                return;
+              }
+              const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
+              if (!refCheck) {
+                Loader.hide();
+                Toast.show("Yeh referral code available nahi hai!", "error");
+                return;
+              }
+              validReferrerUid = refCheck.free_fire_uid;
+            }
+
+            Loader.show("Registering account...");
+            const { data, error } = await sbClient.auth.signUp({ email, password });
+            if (error) {
+              Loader.hide();
+              Toast.show(error.message, "error");
+              return;
+            }
+
+            if (data.user) {
+              const { error: profileError } = await sbClient.from('profiles').upsert([{
+                id: data.user.id,
+                email,
+                full_name: name,
+                free_fire_name: ign,
+                free_fire_uid: uid,
+                phone: phone,
+                referred_by: validReferrerUid,
+                ref_claimed: false,
+                wallet_balance: 0,
+                is_banned: false,
+                is_admin: false
+              }]);
+
+              if (profileError) throw profileError;
+
+              Loader.hide();
+              Toast.show("Account registered and logged in successfully!", "success");
+              await syncAuthAndProfile();
+              Router.navigate('home');
+            }
+          } catch (err) {
+            Loader.hide();
+            Toast.show(err.message || "Registration validation failed.", "error");
+          }
+        };
+      }
     }
 
     function renderForgotPassword() {
@@ -1932,15 +1923,6 @@
           Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
         }
       };
-    }
-
-    function toggleAuth(isLogin) {
-      const loginForm = document.getElementById('login-form');
-      const signupForm = document.getElementById('signup-form');
-      if (loginForm && signupForm) {
-        loginForm.classList.toggle('hidden', !isLogin);
-        signupForm.classList.toggle('hidden', isLogin);
-      }
     }
 
     function renderProfile() {
