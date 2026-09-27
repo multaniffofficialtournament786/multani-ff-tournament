@@ -208,7 +208,7 @@
         </div>
       </section>
 
-      <!-- WINNERS (4 POSITIONS AT ONCE) -->
+      <!-- WINNERS -->
       <section id="section-winners" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
@@ -497,11 +497,31 @@
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
           <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
         </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">1st Prize (PKR)</label>
-          <input type="number" id="edit-t-prize" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
+      </div>
+
+      <!-- EDIT PRIZE POOL BREAKDOWN (1st, 2nd, 3rd, 4th) -->
+      <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+        <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
+            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
+            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
+            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
+            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+          </div>
         </div>
       </div>
+
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
@@ -1293,7 +1313,12 @@
       document.getElementById('edit-t-mode').value = t.mode;
       document.getElementById('edit-t-map').value = t.map;
       document.getElementById('edit-t-fee').value = t.entry_fee;
-      document.getElementById('edit-t-prize').value = t.prize_pool;
+      
+      document.getElementById('edit-t-prize-1').value = t.prize_pool || '';
+      document.getElementById('edit-t-prize-2').value = t.prize_2 || '';
+      document.getElementById('edit-t-prize-3').value = t.prize_3 || '';
+      document.getElementById('edit-t-prize-4').value = t.prize_4 || '';
+
       document.getElementById('edit-t-file').value = '';
       
       if (t.match_date) {
@@ -1317,7 +1342,12 @@
       const mode = document.getElementById('edit-t-mode').value;
       const map = document.getElementById('edit-t-map').value;
       const entry_fee = parseFloat(document.getElementById('edit-t-fee').value);
-      const prize_pool = parseFloat(document.getElementById('edit-t-prize').value);
+      
+      const prize_1 = parseFloat(document.getElementById('edit-t-prize-1').value) || 0;
+      const prize_2 = parseFloat(document.getElementById('edit-t-prize-2').value) || 0;
+      const prize_3 = parseFloat(document.getElementById('edit-t-prize-3').value) || 0;
+      const prize_4 = parseFloat(document.getElementById('edit-t-prize-4').value) || 0;
+
       const match_date_val = document.getElementById('edit-t-date').value;
       const fileInput = document.getElementById('edit-t-file');
 
@@ -1326,7 +1356,10 @@
         mode, 
         map, 
         entry_fee, 
-        prize_pool,
+        prize_pool: prize_1,
+        prize_2,
+        prize_3,
+        prize_4,
         updated_at: new Date().toISOString()
       };
 
