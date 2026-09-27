@@ -208,7 +208,7 @@
         </div>
       </section>
 
-      <!-- WINNERS (COMPACT 2x2 GRID LAYOUT) -->
+      <!-- WINNERS (COMPACT 2x2 GRID WITH NATIVE DROPDOWNS) -->
       <section id="section-winners" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
@@ -217,49 +217,41 @@
             <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
 
-          <!-- 2x2 GRID STYLING -->
+          <!-- 2x2 GRID STYLING WITH DROPDOWNS -->
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <!-- 1ST PLACE -->
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
-              <div onclick="openMultiPlayerSelectModal(1)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-                <span id="win-p1-text">Choose player...</span>
-                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-              </div>
-              <input type="hidden" id="win-u1" />
+              <select id="win-u1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
               <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
             </div>
 
             <!-- 2ND PLACE -->
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
-              <div onclick="openMultiPlayerSelectModal(2)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-                <span id="win-p2-text">Choose player...</span>
-                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-              </div>
-              <input type="hidden" id="win-u2" />
+              <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
               <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
             </div>
 
             <!-- 3RD PLACE -->
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
-              <div onclick="openMultiPlayerSelectModal(3)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-                <span id="win-p3-text">Choose player...</span>
-                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-              </div>
-              <input type="hidden" id="win-u3" />
+              <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
               <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
             </div>
 
             <!-- 4TH PLACE -->
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
-              <div onclick="openMultiPlayerSelectModal(4)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
-                <span id="win-p4-text">Choose player...</span>
-                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-              </div>
-              <input type="hidden" id="win-u4" />
+              <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
               <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
             </div>
           </div>
@@ -425,24 +417,6 @@
       </div>
       <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
         <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: MULTI-POSITION PLAYER SELECTOR (AUTO CLOSE ON SELECT) -->
-  <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 id="modal-vip-title" class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-trophy text-yellow-400"></i> Select Winning Gamer
-        </h3>
-        <button onclick="closeVipPlayerSelectModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div>
-        <input type="text" id="vip-player-search" oninput="filterVipPlayerModal()" placeholder="Search player by name or UID..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
-      </div>
-      <div id="modal-vip-player-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
-        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
       </div>
     </div>
   </div>
@@ -653,7 +627,6 @@
     let loadedTournamentsList = [];
     let currentTournamentFilter = 'all';
     let globalAllPlayersCache = [];
-    let activeSelectingPosition = 1;
     let selectedTournamentDetails = null;
 
     function escapeHTML(str) {
@@ -1649,6 +1622,33 @@
       }
     }
 
+    async function populateWinnerDropdowns(tId) {
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `<option value="">Loading players...</option>`;
+      });
+
+      const { data, error } = await sbClient
+        .from('tournament_entries')
+        .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
+        .eq('tournament_id', tId);
+
+      const optionsHtml = ['<option value="">Choose player...</option>'];
+      if (!error && data && data.length > 0) {
+        data.forEach(e => {
+          const p = e.profiles;
+          if (p) {
+            optionsHtml.push(`<option value="${p.id}">${escapeHTML(p.free_fire_name)} (UID: ${escapeHTML(p.free_fire_uid)})</option>`);
+          }
+        });
+      }
+
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = optionsHtml.join('');
+      });
+    }
+
     async function onWinnerTournamentChange(tId) {
       if (!tId) return;
       selectedTournamentDetails = loadedTournamentsList.find(x => x.id === tId) || {};
@@ -1658,92 +1658,7 @@
       document.getElementById('win-amt3').value = selectedTournamentDetails.prize_3 || '';
       document.getElementById('win-amt4').value = selectedTournamentDetails.prize_4 || '';
 
-      document.getElementById('win-u1').value = '';
-      document.getElementById('win-p1-text').innerText = 'Choose player...';
-      document.getElementById('win-u2').value = '';
-      document.getElementById('win-p2-text').innerText = 'Choose player...';
-      document.getElementById('win-u3').value = '';
-      document.getElementById('win-p3-text').innerText = 'Choose player...';
-      document.getElementById('win-u4').value = '';
-      document.getElementById('win-p4-text').innerText = 'Choose player...';
-    }
-
-    async function openMultiPlayerSelectModal(pos) {
-      activeSelectingPosition = pos;
-      const modal = document.getElementById('modal-vip-player-select');
-      document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
-      modal.classList.remove('hidden');
-
-      const body = document.getElementById('modal-vip-player-body');
-      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading joined players...</p>`;
-
-      const tId = document.getElementById('win-tournament').value;
-      if (!tId) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">Please select a tournament first.</p>`;
-        return;
-      }
-
-      const { data, error } = await sbClient
-        .from('tournament_entries')
-        .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
-        .eq('tournament_id', tId);
-
-      if (error || !data || !data.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
-        return;
-      }
-
-      const players = data.map(e => e.profiles).filter(Boolean);
-      renderMultiPlayerModalList(players);
-    }
-
-    function closeVipPlayerSelectModal() {
-      document.getElementById('modal-vip-player-select').classList.add('hidden');
-    }
-
-    function renderMultiPlayerModalList(list) {
-      const body = document.getElementById('modal-vip-player-body');
-      if (!list || !list.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
-        return;
-      }
-
-      body.innerHTML = list.map(p => {
-        const pid = p.id || '';
-        const pname = escapeHTML(p.free_fire_name || 'Player');
-        const puid = escapeHTML(p.free_fire_uid || '--');
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        
-        return `
-          <div onclick="selectMultiWinningPlayer('${pid}', '${pname}', '${puid}', '${avatarUrl}')" style="cursor: pointer; position: relative; z-index: 9999;" class="flex items-center justify-between p-3 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl transition text-xs mb-2">
-            <div class="flex items-center gap-3 pointer-events-none">
-              <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
-              <div>
-                <h4 class="font-bold text-white text-sm">${pname}</h4>
-                <p class="text-cyan-400 font-mono text-xs">UID: ${puid}</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-circle-check text-gray-400 pointer-events-none text-base"></i>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function filterVipPlayerModal() {
-      const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
-      if (!q) return;
-    }
-
-    function selectMultiWinningPlayer(id, name, uid, avatarUrl) {
-      const pos = activeSelectingPosition;
-      document.getElementById(`win-u${pos}`).value = id;
-      document.getElementById(`win-p${pos}`).innerHTML = `
-        <div class="flex items-center gap-2">
-          <img src="${avatarUrl}" class="w-5 h-5 rounded-full object-cover border border-[#ff4624]" />
-          <span>🎯 ${name} (UID: ${uid})</span>
-        </div>
-      `;
-      closeVipPlayerSelectModal();
+      await populateWinnerDropdowns(tId);
     }
 
     async function submitAllWinnersDeclaration() {
