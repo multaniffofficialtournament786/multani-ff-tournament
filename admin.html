@@ -208,37 +208,61 @@
         </div>
       </section>
 
-      <!-- WINNERS -->
+      <!-- WINNERS (4 POSITIONS AT ONCE) -->
       <section id="section-winners" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winner</h2>
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
-            <select id="win-tournament" onchange="loadJoinedPlayersForTournament(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+            <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Position / Rank</label>
-            <select id="win-pos-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
-              <option value="1st Place (Booyah)">1st Place</option>
-              <option value="2nd Place">2nd Place</option>
-              <option value="3rd Place">3rd Place</option>
-              <option value="4th Place">4th Place</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Winning Gamer</label>
-            <div id="win-player-select-box" onclick="openVipPlayerSelectModal()" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white cursor-pointer flex items-center justify-between">
-              <span id="win-selected-player-text">Choose player...</span>
+
+          <!-- 1ST PLACE -->
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+            <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
+            <div onclick="openMultiPlayerSelectModal(1)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+              <span id="win-p1-text">Choose player...</span>
               <i class="fa-solid fa-chevron-down text-gray-400"></i>
             </div>
-            <input type="hidden" id="win-player" />
+            <input type="hidden" id="win-u1" />
+            <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize Amount" />
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prize Amount (PKR)</label>
-            <input type="number" id="win-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 1200" required />
+
+          <!-- 2ND PLACE -->
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+            <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
+            <div onclick="openMultiPlayerSelectModal(2)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+              <span id="win-p2-text">Choose player (Optional)...</span>
+              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            </div>
+            <input type="hidden" id="win-u2" />
+            <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize Amount" />
           </div>
-          <button onclick="submitWinnerDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Transfer Prize & Announce
+
+          <!-- 3RD PLACE -->
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+            <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
+            <div onclick="openMultiPlayerSelectModal(3)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+              <span id="win-p3-text">Choose player (Optional)...</span>
+              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            </div>
+            <input type="hidden" id="win-u3" />
+            <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize Amount" />
+          </div>
+
+          <!-- 4TH PLACE -->
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+            <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
+            <div onclick="openMultiPlayerSelectModal(4)" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white cursor-pointer flex items-center justify-between">
+              <span id="win-p4-text">Choose player (Optional)...</span>
+              <i class="fa-solid fa-chevron-down text-gray-400"></i>
+            </div>
+            <input type="hidden" id="win-u4" />
+            <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize Amount" />
+          </div>
+
+          <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            Announce All Winners & Complete Match
           </button>
         </div>
 
@@ -402,11 +426,11 @@
     </div>
   </div>
 
-  <!-- MODAL: VIP PLAYER SELECTOR FOR WINNERS -->
+  <!-- MODAL: MULTI-POSITION PLAYER SELECTOR -->
   <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+        <h3 id="modal-vip-title" class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
           <i class="fa-solid fa-trophy text-yellow-400"></i> Select Winning Gamer
         </h3>
         <button onclick="closeVipPlayerSelectModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -501,7 +525,7 @@
       </h3>
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
-        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. LONE WOLF #500" required />
+        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 4-PRIZE Battle Royal" required />
       </div>
 
       <div class="grid grid-cols-2 gap-2">
@@ -539,7 +563,7 @@
         </div>
       </div>
 
-      <!-- PRIZE POOL BREAKDOWN (1st, 2nd, 3rd, 4th Prizes) -->
+      <!-- PRIZE POOL BREAKDOWN -->
       <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
         <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
         <div class="grid grid-cols-2 gap-2">
@@ -548,15 +572,15 @@
             <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 1200" required />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize (Optional)</label>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
             <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize (Optional)</label>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
             <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize (Optional)</label>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
             <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
           </div>
         </div>
@@ -591,6 +615,8 @@
     let currentTournamentFilter = 'all';
     let globalAllPlayersCache = [];
     let globalWinnerSelectPlayersCache = [];
+    let activeSelectingPosition = 1;
+    let selectedTournamentDetails = null;
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -1215,9 +1241,9 @@
         const winTSelect = document.getElementById('win-tournament');
         if (winTSelect) {
           winTSelect.value = id;
-          loadJoinedPlayersForTournament(id);
+          onWinnerTournamentChange(id);
         }
-        alert("Please declare winner for this match to complete it.");
+        alert("Please declare winners for this match to complete it.");
         return;
       }
 
@@ -1562,45 +1588,55 @@
     }
 
     async function loadWinnerSelectOptions() {
-      const { data: tourneys } = await sbClient.from('tournaments').select('id, title').order('created_at', { ascending: false });
+      const { data: tourneys } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+      loadedTournamentsList = tourneys || [];
       const selectT = document.getElementById('win-tournament');
       selectT.innerHTML = (tourneys || []).map(t => `<option value="${t.id}">${escapeHTML(t.title)}</option>`).join('');
 
       if (tourneys && tourneys.length > 0) {
-        await loadJoinedPlayersForTournament(tourneys[0].id);
+        await onWinnerTournamentChange(tourneys[0].id);
       }
     }
 
-    async function loadJoinedPlayersForTournament(tId) {
+    async function onWinnerTournamentChange(tId) {
       if (!tId) return;
-      const { data, error } = await sbClient
+      selectedTournamentDetails = loadedTournamentsList.find(x => x.id === tId) || {};
+      
+      document.getElementById('win-amt1').value = selectedTournamentDetails.prize_pool || '';
+      document.getElementById('win-amt2').value = selectedTournamentDetails.prize_2 || '';
+      document.getElementById('win-amt3').value = selectedTournamentDetails.prize_3 || '';
+      document.getElementById('win-amt4').value = selectedTournamentDetails.prize_4 || '';
+
+      document.getElementById('win-u1').value = '';
+      document.getElementById('win-p1-text').innerText = 'Choose player...';
+      document.getElementById('win-u2').value = '';
+      document.getElementById('win-p2-text').innerText = 'Choose player (Optional)...';
+      document.getElementById('win-u3').value = '';
+      document.getElementById('win-p3-text').innerText = 'Choose player (Optional)...';
+      document.getElementById('win-u4').value = '';
+      document.getElementById('win-p4-text').innerText = 'Choose player (Optional)...';
+
+      const { data } = await sbClient
         .from('tournament_entries')
         .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
         .eq('tournament_id', tId);
 
       globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
-
-      if (globalWinnerSelectPlayersCache.length > 0) {
-        const firstP = globalWinnerSelectPlayersCache[0];
-        document.getElementById('win-player').value = firstP.id;
-        document.getElementById('win-selected-player-text').innerHTML = `🎯 ${escapeHTML(firstP.free_fire_name || 'Player')} (UID: ${escapeHTML(firstP.free_fire_uid || '--')})`;
-      } else {
-        document.getElementById('win-player').value = '';
-        document.getElementById('win-selected-player-text').innerText = `No players joined this match yet`;
-      }
     }
 
-    function openVipPlayerSelectModal() {
+    function openMultiPlayerSelectModal(pos) {
+      activeSelectingPosition = pos;
       const modal = document.getElementById('modal-vip-player-select');
+      document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
       modal.classList.remove('hidden');
-      renderVipPlayerModalList(globalWinnerSelectPlayersCache);
+      renderMultiPlayerModalList(globalWinnerSelectPlayersCache);
     }
 
     function closeVipPlayerSelectModal() {
       document.getElementById('modal-vip-player-select').classList.add('hidden');
     }
 
-    function renderVipPlayerModalList(list) {
+    function renderMultiPlayerModalList(list) {
       const body = document.getElementById('modal-vip-player-body');
       if (!list.length) {
         body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
@@ -1610,7 +1646,7 @@
       body.innerHTML = list.map(p => {
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         return `
-          <div onclick="selectVipWinningPlayer('${p.id}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}','${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
+          <div onclick="selectMultiWinningPlayer('${p.id}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}','${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
             <div class="flex items-center gap-3">
               <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
               <div>
@@ -1627,19 +1663,20 @@
     function filterVipPlayerModal() {
       const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
       if (!q) {
-        renderVipPlayerModalList(globalWinnerSelectPlayersCache);
+        renderMultiPlayerModalList(globalWinnerSelectPlayersCache);
         return;
       }
       const filtered = globalWinnerSelectPlayersCache.filter(p =>
         (p.free_fire_name && p.free_fire_name.toLowerCase().includes(q)) ||
         (p.free_fire_uid && p.free_fire_uid.toLowerCase().includes(q))
       );
-      renderVipPlayerModalList(filtered);
+      renderMultiPlayerModalList(filtered);
     }
 
-    function selectVipWinningPlayer(id, name, uid, avatarUrl) {
-      document.getElementById('win-player').value = id;
-      document.getElementById('win-selected-player-text').innerHTML = `
+    function selectMultiWinningPlayer(id, name, uid, avatarUrl) {
+      const pos = activeSelectingPosition;
+      document.getElementById(`win-u${pos}`).value = id;
+      document.getElementById(`win-p${pos}`).innerHTML = `
         <div class="flex items-center gap-2">
           <img src="${avatarUrl}" class="w-5 h-5 rounded-full object-cover border border-[#ff4624]" />
           <span>🎯 ${name} (UID: ${uid})</span>
@@ -1648,56 +1685,67 @@
       closeVipPlayerSelectModal();
     }
 
-    async function submitWinnerDeclaration() {
+    async function submitAllWinnersDeclaration() {
       const tournament_id = document.getElementById('win-tournament').value;
-      const user_id = document.getElementById('win-player').value;
-      const prize_amount = parseFloat(document.getElementById('win-amount').value);
-      const position = document.getElementById('win-pos-select').value;
-
-      if (!tournament_id || !user_id || isNaN(prize_amount) || !position) {
-        alert("Please choose tournament, player, position, and prize amount.");
+      if (!tournament_id) {
+        alert("Please select a tournament.");
         return;
       }
 
-      const { error: winErr } = await sbClient.from('winners').insert([{
-        tournament_id,
-        user_id,
-        prize_amount,
-        position
-      }]);
+      const winnersData = [
+        { pos: '1st Place (Booyah)', uid: document.getElementById('win-u1').value, amt: parseFloat(document.getElementById('win-amt1').value) },
+        { pos: '2nd Place', uid: document.getElementById('win-u2').value, amt: parseFloat(document.getElementById('win-amt2').value) },
+        { pos: '3rd Place', uid: document.getElementById('win-u3').value, amt: parseFloat(document.getElementById('win-amt3').value) },
+        { pos: '4th Place', uid: document.getElementById('win-u4').value, amt: parseFloat(document.getElementById('win-amt4').value) }
+      ];
 
-      if (winErr) {
-        alert("Error announcing winner: " + winErr.message);
+      const validWinners = winnersData.filter(w => w.uid && !isNaN(w.amt) && w.amt > 0);
+      if (!validWinners.length) {
+        alert("Please select at least 1st place winner and prize amount.");
         return;
+      }
+
+      for (const w of validWinners) {
+        const { error: winErr } = await sbClient.from('winners').insert([{
+          tournament_id,
+          user_id: w.uid,
+          prize_amount: w.amt,
+          position: w.pos
+        }]);
+
+        if (winErr) {
+          alert(`Error saving ${w.pos}: ` + winErr.message);
+          return;
+        }
+
+        const { data: prof } = await sbClient.from('profiles').select('wallet_balance, total_won').eq('id', w.uid).single();
+        if (prof) {
+          await sbClient.from('profiles').update({
+            wallet_balance: (prof.wallet_balance || 0) + w.amt,
+            total_won: (prof.total_won || 0) + w.amt
+          }).eq('id', w.uid);
+
+          await sbClient.from('wallet_transactions').insert([{
+            user_id: w.uid,
+            amount: w.amt,
+            transaction_type: 'prize',
+            status: 'approved',
+            description: `Tournament Prize Won (${w.pos})`
+          }]);
+
+          await sbClient.from('notifications').insert([{
+            user_id: w.uid,
+            title: "Tournament Won!",
+            message: `Congratulations! You won PKR ${w.amt} (${w.pos}). Prize credited to your wallet.`
+          }]);
+        }
       }
 
       await sbClient.from('tournaments').update({ status: 'completed' }).eq('id', tournament_id);
 
-      const { data: prof } = await sbClient.from('profiles').select('wallet_balance, total_won').eq('id', user_id).single();
-      if (prof) {
-        await sbClient.from('profiles').update({
-          wallet_balance: (prof.wallet_balance || 0) + prize_amount,
-          total_won: (prof.total_won || 0) + prize_amount
-        }).eq('id', user_id);
-
-        await sbClient.from('wallet_transactions').insert([{
-          user_id,
-          amount: prize_amount,
-          transaction_type: 'prize',
-          status: 'approved',
-          description: `Tournament Prize Won (${position})`
-        }]);
-
-        await sbClient.from('notifications').insert([{
-          user_id: user_id,
-          title: "Tournament Won!",
-          message: `Congratulations! You won PKR ${prize_amount} (${position}). Prize credited to your wallet.`
-        }]);
-      }
-
-      alert("Winner announced, match completed, and prize credited!");
-      document.getElementById('win-amount').value = '';
+      alert("All winners announced, match automatically completed, and prizes credited successfully!");
       loadDeclaredWinners();
+      loadTournaments();
     }
 
     async function loadDeclaredWinners() {
