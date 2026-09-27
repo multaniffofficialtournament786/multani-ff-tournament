@@ -1682,7 +1682,6 @@
       document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
       modal.classList.remove('hidden');
 
-      // Agar cache khali ho toh current selected tournament ki entries dobara fetch kar lo
       if (!globalWinnerSelectPlayersCache.length) {
         const tId = document.getElementById('win-tournament').value;
         if (tId) {
@@ -1709,14 +1708,18 @@
       }
 
       body.innerHTML = list.map(p => {
+        const pid = p.id;
+        const pname = escapeHTML(p.free_fire_name || 'Player');
+        const puid = escapeHTML(p.free_fire_uid || '--');
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        
         return `
-          <div onclick="selectMultiWinningPlayer('${p.id}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}','${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
+          <div onclick="selectMultiWinningPlayer('${pid}', '${pname}', '${puid}', '${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
             <div class="flex items-center gap-3">
               <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
               <div>
-                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')}</h4>
-                <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
+                <h4 class="font-bold text-white">${pname}</h4>
+                <p class="text-cyan-400 font-mono text-[11px]">UID: ${puid}</p>
               </div>
             </div>
             <i class="fa-solid fa-circle-check text-gray-400"></i>
