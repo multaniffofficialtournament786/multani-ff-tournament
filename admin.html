@@ -34,9 +34,19 @@
           const currentToken = await getToken(messaging, {
             vapidKey: 'BApFHrn7CrPBOt6Ik_gEOdUGQb2OLaPbqtY0MEuctwqjDWjquDFJUBQptUKkWuqQU6vNUxNfjL-FQimi7-JyRn8'
           });
-          if (currentToken) {
-            console.log("FCM Token:", currentToken);
-            alert("Notifications Enabled Successfully!");
+          if (currentToken && window.currentAdminUser) {
+            const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
+            const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
+            const tmpClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            await tmpClient.from('admin_fcm_tokens').upsert({
+              user_id: window.currentAdminUser.id,
+              fcm_token: currentToken
+            }, { onConflict: 'fcm_token' });
+
+            alert("Notifications Enabled & Saved Successfully!");
+          } else {
+            alert("Please login first to save notification token.");
           }
         } else {
           alert("Notification permission denied.");
@@ -45,6 +55,18 @@
         console.error("Notification permission error:", err);
       }
     };
+
+    onMessage(messaging, (payload) => {
+      console.log('Message received in foreground: ', payload);
+      if (payload.notification) {
+        if (Notification.permission === 'granted') {
+          new Notification(payload.notification.title, {
+            body: payload.notification.body,
+            icon: '/favicon.ico'
+          });
+        }
+      }
+    });
   </script>
 
   <style>
@@ -88,6 +110,7 @@
       font-family: 'Rajdhani', sans-serif;
       font-weight: bold;
       text-transform: uppercase;
+      position: relative;
     }
     .admin-nav-btn i {
       font-size: 18px;
@@ -481,9 +504,11 @@
     <div class="admin-center-plus" onclick="openCreateTournamentModal()">
       <i class="fa-solid fa-plus"></i>
     </div>
-    <button class="admin-nav-btn" onclick="selectTab('tournaments')">
-      <i class="fa-solid fa-trophy"></i>
-      <span>Matches</span>
+    <!-- Support Button replaced in place of Matches -->
+    <button class="admin-nav-btn" onclick="selectTab('support')">
+      <i class="fa-solid fa-headset"></i>
+      <span>Support</span>
+      <span id="nav-badge-support" class="absolute top-1 right-3 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
     </button>
     <button class="admin-nav-btn" onclick="selectTab('deposits')">
       <i class="fa-solid fa-money-bill-transfer"></i>
@@ -626,7 +651,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CREATE MATCH (Fixed Scrolling & Compact Spacing) -->
+  <!-- MODAL: CREATE MATCH -->
   <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-2.5 max-h-[82vh] overflow-y-auto sidebar-scroll shadow-2xl">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
@@ -722,6 +747,7 @@
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentAdmin = null;
+    window.currentAdminUser = null;
     let activeChatPlayerId = null;
     let chatInterval = null;
     let loadedTournamentsList = [];
@@ -799,6 +825,7 @@
         }
 
         currentAdmin = profile;
+        window.currentAdminUser = profile;
         authScreen.classList.add('hidden');
         document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
         if (profile.avatar_url) {
@@ -836,6 +863,7 @@
         }
 
         currentAdmin = prof;
+        window.currentAdminUser = prof;
         document.getElementById('admin-auth-screen').classList.add('hidden');
         document.getElementById('admin-user-name').innerText = prof.free_fire_name || prof.full_name || 'Master Admin';
         if (prof.avatar_url) {
@@ -853,6 +881,7 @@
     async function adminSignOut() {
       await sbClient.auth.signOut();
       currentAdmin = null;
+      window.currentAdminUser = null;
       document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
 
@@ -963,6 +992,12 @@
       if (quickSup) {
         quickSup.innerText = supCount;
         quickSup.classList.toggle('hidden', supCount === 0);
+      }
+
+      const navBadgeSup = document.getElementById('nav-badge-support');
+      if (navBadgeSup) {
+        navBadgeSup.innerText = supCount;
+        navBadgeSup.classList.toggle('hidden', supCount === 0);
       }
     }
 
