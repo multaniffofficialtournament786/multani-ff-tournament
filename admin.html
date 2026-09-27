@@ -1676,11 +1676,24 @@
       globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
     }
 
-    function openMultiPlayerSelectModal(pos) {
+    async function openMultiPlayerSelectModal(pos) {
       activeSelectingPosition = pos;
       const modal = document.getElementById('modal-vip-player-select');
       document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
       modal.classList.remove('hidden');
+
+      // Agar cache khali ho toh current selected tournament ki entries dobara fetch kar lo
+      if (!globalWinnerSelectPlayersCache.length) {
+        const tId = document.getElementById('win-tournament').value;
+        if (tId) {
+          const { data } = await sbClient
+            .from('tournament_entries')
+            .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+            .eq('tournament_id', tId);
+          globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
+        }
+      }
+
       renderMultiPlayerModalList(globalWinnerSelectPlayersCache);
     }
 
@@ -1690,7 +1703,7 @@
 
     function renderMultiPlayerModalList(list) {
       const body = document.getElementById('modal-vip-player-body');
-      if (!list.length) {
+      if (!list || !list.length) {
         body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
         return;
       }
@@ -1706,7 +1719,7 @@
                 <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(p.free_fire_uid || '--')}</p>
               </div>
             </div>
-            <i class="fa-solid fa-circle-check text-gray-600"></i>
+            <i class="fa-solid fa-circle-check text-gray-400"></i>
           </div>
         `;
       }).join('');
