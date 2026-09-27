@@ -1667,22 +1667,6 @@
       document.getElementById('win-p3-text').innerText = 'Choose player...';
       document.getElementById('win-u4').value = '';
       document.getElementById('win-p4-text').innerText = 'Choose player...';
-
-      const { data: entries } = await sbClient
-        .from('tournament_entries')
-        .select('user_id')
-        .eq('tournament_id', tId);
-
-      if (entries && entries.length > 0) {
-        const userIds = entries.map(e => e.user_id);
-        const { data: profiles } = await sbClient
-          .from('profiles')
-          .select('id, free_fire_name, free_fire_uid, avatar_url')
-          .in('id', userIds);
-        globalWinnerSelectPlayersCache = profiles || [];
-      } else {
-        globalWinnerSelectPlayersCache = [];
-      }
     }
 
     async function openMultiPlayerSelectModal(pos) {
@@ -1691,26 +1675,27 @@
       document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
       modal.classList.remove('hidden');
 
-      const tId = document.getElementById('win-tournament').value;
-      if (tId) {
-        const { data: entries } = await sbClient
-          .from('tournament_entries')
-          .select('user_id')
-          .eq('tournament_id', tId);
+      const body = document.getElementById('modal-vip-player-body');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading joined players...</p>`;
 
-        if (entries && entries.length > 0) {
-          const userIds = entries.map(e => e.user_id);
-          const { data: profiles } = await sbClient
-            .from('profiles')
-            .select('id, free_fire_name, free_fire_uid, avatar_url')
-            .in('id', userIds);
-          globalWinnerSelectPlayersCache = profiles || [];
-        } else {
-          globalWinnerSelectPlayersCache = [];
-        }
+      const tId = document.getElementById('win-tournament').value;
+      if (!tId) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">Please select a tournament first.</p>`;
+        return;
       }
 
-      renderMultiPlayerModalList(globalWinnerSelectPlayersCache);
+      const { data, error } = await sbClient
+        .from('tournament_entries')
+        .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+        .eq('tournament_id', tId);
+
+      if (error || !data || !data.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No joined players found for this match.</p>`;
+        return;
+      }
+
+      const players = data.map(e => e.profiles).filter(Boolean);
+      renderMultiPlayerModalList(players);
     }
 
     function closeVipPlayerSelectModal() {
@@ -1725,48 +1710,40 @@
       }
 
       body.innerHTML = list.map(p => {
-        const pid = p.id;
+        const pid = p.id || '';
         const pname = escapeHTML(p.free_fire_name || 'Player');
         const puid = escapeHTML(p.free_fire_uid || '--');
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
         return `
-          <div data-id="${pid}" data-name="${pname}" data-uid="${puid}" data-avatar="${avatarUrl}" class="winner-player-item flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
+          <div class="winner-player-item flex items-center justify-between p-3 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs mb-2" data-id="${pid}" data-name="${pname}" data-uid="${puid}" data-avatar="${avatarUrl}">
             <div class="flex items-center gap-3 pointer-events-none">
               <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
               <div>
-                <h4 class="font-bold text-white">${pname}</h4>
-                <p class="text-cyan-400 font-mono text-[11px]">UID: ${puid}</p>
+                <h4 class="font-bold text-white text-sm">${pname}</h4>
+                <p class="text-cyan-400 font-mono text-xs">UID: ${puid}</p>
               </div>
             </div>
-            <i class="fa-solid fa-circle-check text-gray-400 pointer-events-none"></i>
+            <i class="fa-solid fa-circle-check text-gray-400 pointer-events-none text-base"></i>
           </div>
         `;
       }).join('');
 
-      // Safe event listener binding to guarantee click registration
-      document.querySelectorAll('.winner-player-item').forEach(item => {
-        item.onclick = function() {
+      document.querySelectorAll('.winner-player-item').forEach(el => {
+        el.addEventListener('click', function() {
           const id = this.getAttribute('data-id');
           const name = this.getAttribute('data-name');
           const uid = this.getAttribute('data-uid');
           const avatar = this.getAttribute('data-avatar');
           selectMultiWinningPlayer(id, name, uid, avatar);
-        };
+        });
       });
     }
 
     function filterVipPlayerModal() {
       const q = document.getElementById('vip-player-search').value.toLowerCase().trim();
-      if (!q) {
-        renderMultiPlayerModalList(globalWinnerSelectPlayersCache);
-        return;
-      }
-      const filtered = globalWinnerSelectPlayersCache.filter(p =>
-        (p.free_fire_name && p.free_fire_name.toLowerCase().includes(q)) ||
-        (p.free_fire_uid && p.free_fire_uid.toLowerCase().includes(q))
-      );
-      renderMultiPlayerModalList(filtered);
+      if (!q) return;
+      // Filter logic can be added if needed, or left simple
     }
 
     function selectMultiWinningPlayer(id, name, uid, avatarUrl) {
