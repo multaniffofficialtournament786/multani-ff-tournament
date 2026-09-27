@@ -1668,12 +1668,21 @@
       document.getElementById('win-u4').value = '';
       document.getElementById('win-p4-text').innerText = 'Choose player...';
 
-      const { data } = await sbClient
+      const { data: entries } = await sbClient
         .from('tournament_entries')
-        .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+        .select('user_id')
         .eq('tournament_id', tId);
 
-      globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
+      if (entries && entries.length > 0) {
+        const userIds = entries.map(e => e.user_id);
+        const { data: profiles } = await sbClient
+          .from('profiles')
+          .select('id, free_fire_name, free_fire_uid, avatar_url')
+          .in('id', userIds);
+        globalWinnerSelectPlayersCache = profiles || [];
+      } else {
+        globalWinnerSelectPlayersCache = [];
+      }
     }
 
     async function openMultiPlayerSelectModal(pos) {
@@ -1685,11 +1694,19 @@
       if (!globalWinnerSelectPlayersCache.length) {
         const tId = document.getElementById('win-tournament').value;
         if (tId) {
-          const { data } = await sbClient
+          const { data: entries } = await sbClient
             .from('tournament_entries')
-            .select('user_id, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+            .select('user_id')
             .eq('tournament_id', tId);
-          globalWinnerSelectPlayersCache = (data || []).map(e => e.profiles).filter(Boolean);
+
+          if (entries && entries.length > 0) {
+            const userIds = entries.map(e => e.user_id);
+            const { data: profiles } = await sbClient
+              .from('profiles')
+              .select('id, free_fire_name, free_fire_uid, avatar_url')
+              .in('id', userIds);
+            globalWinnerSelectPlayersCache = profiles || [];
+          }
         }
       }
 
