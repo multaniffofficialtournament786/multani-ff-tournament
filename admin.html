@@ -113,7 +113,7 @@
     }
   </style>
 </head>
-<body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative pb-16 md:pb-0">
+<body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative pb-20 md:pb-0">
 
   <!-- AUTH OVERLAY -->
   <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
@@ -125,12 +125,12 @@
       </div>
 
       <form id="admin-login-form" class="space-y-3 pt-2" onsubmit="handleAdminLogin(event)">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Admin Email</label>
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Admin Email</label>
           <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
         </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Password</label>
           <div class="relative">
             <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
@@ -626,19 +626,24 @@
     </div>
   </div>
 
-  <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[92vh] overflow-y-auto">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-        <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
-      </h3>
+  <!-- MODAL: CREATE MATCH (Fixed Scrolling & Compact Spacing) -->
+  <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-2.5 max-h-[82vh] overflow-y-auto sidebar-scroll shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
+        </h3>
+        <button onclick="closeCreateTournamentModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
         <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 4-PRIZE Battle Royal" required />
       </div>
 
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Mode</label>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Mode</label>
           <select id="m-mode" onchange="handleAdminModeChange()" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
             <option value="Squad">Squad</option>
             <option value="Solo">Solo</option>
@@ -649,7 +654,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Map</label>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Map</label>
           <select id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
             <option value="Bermuda">Bermuda</option>
             <option value="Purgatory">Purgatory</option>
@@ -662,48 +667,49 @@
 
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
           <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Max Slots</label>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Max Slots</label>
           <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
         </div>
       </div>
 
-      <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-        <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
+      <!-- PRIZE POOL BREAKDOWN -->
+      <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-lg space-y-2">
+        <span class="text-[11px] font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
-            <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 1200" required />
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">1st Prize</label>
+            <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="e.g. 1200" required />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
-            <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">2nd Prize</label>
+            <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
-            <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">3rd Prize</label>
+            <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
-            <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="Optional" />
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">4th Prize</label>
+            <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
           </div>
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
-        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
+        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" />
       </div>
 
-      <div class="flex gap-2 pt-2">
+      <div class="flex gap-2 pt-2 sticky bottom-0 bg-[#0e1118] pb-1">
         <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
         <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
       </div>
