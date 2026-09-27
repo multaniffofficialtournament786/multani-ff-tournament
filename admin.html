@@ -1730,7 +1730,7 @@
 
       const { data, error } = await sbClient
         .from('winners')
-        .select('id, prize_amount, position, created_at, tournaments(title), profiles(free_fire_name, free_fire_uid, avatar_url)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error || !data || !data.length) {
@@ -1738,16 +1738,31 @@
         return;
       }
 
+      const userIds = [...new Set(data.map(w => w.user_id))];
+      const tournamentIds = [...new Set(data.map(w => w.tournament_id))];
+
+      const [profRes, tourneyRes] = await Promise.all([
+        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url').in('id', userIds),
+        sbClient.from('tournaments').select('id, title').in('id', tournamentIds)
+      ]);
+
+      const profMap = {};
+      (profRes.data || []).forEach(p => { profMap[p.id] = p; });
+
+      const tourneyMap = {};
+      (tourneyRes.data || []).forEach(t => { tourneyMap[t.id] = t; });
+
       container.innerHTML = data.map(w => {
-        const p = w.profiles || {};
-        const t = w.tournaments || {};
+        const p = profMap[w.user_id] || {};
+        const t = tourneyMap[w.tournament_id] || {};
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs mb-2">
             <div class="flex items-center gap-3">
               <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-yellow-400" />
               <div>
-                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')} <span class="text-yellow-400 font-mono">(${escapeHTML(w.position)})</span></h4>
+                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')} <span class="text-yellow-400 font-mono">(${escapeHTML(w.position || 'Winner')})</span></h4>
                 <p class="text-gray-400 text-[10px] truncate max-w-[185px]">Match: ${escapeHTML(t.title || '--')}</p>
                 <p class="text-emerald-400 font-bold font-gaming">Prize: PKR ${w.prize_amount}</p>
               </div>
