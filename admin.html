@@ -1691,22 +1691,22 @@
       document.getElementById('modal-vip-title').innerHTML = `<i class="fa-solid fa-trophy text-yellow-400"></i> Select Player for ${pos}${pos === 1 ? 'st' : (pos === 2 ? 'nd' : (pos === 3 ? 'rd' : 'th'))} Place`;
       modal.classList.remove('hidden');
 
-      if (!globalWinnerSelectPlayersCache.length) {
-        const tId = document.getElementById('win-tournament').value;
-        if (tId) {
-          const { data: entries } = await sbClient
-            .from('tournament_entries')
-            .select('user_id')
-            .eq('tournament_id', tId);
+      const tId = document.getElementById('win-tournament').value;
+      if (tId) {
+        const { data: entries } = await sbClient
+          .from('tournament_entries')
+          .select('user_id')
+          .eq('tournament_id', tId);
 
-          if (entries && entries.length > 0) {
-            const userIds = entries.map(e => e.user_id);
-            const { data: profiles } = await sbClient
-              .from('profiles')
-              .select('id, free_fire_name, free_fire_uid, avatar_url')
-              .in('id', userIds);
-            globalWinnerSelectPlayersCache = profiles || [];
-          }
+        if (entries && entries.length > 0) {
+          const userIds = entries.map(e => e.user_id);
+          const { data: profiles } = await sbClient
+            .from('profiles')
+            .select('id, free_fire_name, free_fire_uid, avatar_url')
+            .in('id', userIds);
+          globalWinnerSelectPlayersCache = profiles || [];
+        } else {
+          globalWinnerSelectPlayersCache = [];
         }
       }
 
@@ -1731,18 +1731,29 @@
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
         return `
-          <div onclick="selectMultiWinningPlayer('${pid}', '${pname}', '${puid}', '${avatarUrl}')" class="flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
-            <div class="flex items-center gap-3">
+          <div data-id="${pid}" data-name="${pname}" data-uid="${puid}" data-avatar="${avatarUrl}" class="winner-player-item flex items-center justify-between p-2.5 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs">
+            <div class="flex items-center gap-3 pointer-events-none">
               <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
               <div>
                 <h4 class="font-bold text-white">${pname}</h4>
                 <p class="text-cyan-400 font-mono text-[11px]">UID: ${puid}</p>
               </div>
             </div>
-            <i class="fa-solid fa-circle-check text-gray-400"></i>
+            <i class="fa-solid fa-circle-check text-gray-400 pointer-events-none"></i>
           </div>
         `;
       }).join('');
+
+      // Safe event listener binding to guarantee click registration
+      document.querySelectorAll('.winner-player-item').forEach(item => {
+        item.onclick = function() {
+          const id = this.getAttribute('data-id');
+          const name = this.getAttribute('data-name');
+          const uid = this.getAttribute('data-uid');
+          const avatar = this.getAttribute('data-avatar');
+          selectMultiWinningPlayer(id, name, uid, avatar);
+        };
+      });
     }
 
     function filterVipPlayerModal() {
