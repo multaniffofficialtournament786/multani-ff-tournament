@@ -430,7 +430,7 @@
   </div>
 
   <!-- MODAL: MULTI-POSITION PLAYER SELECTOR (AUTO CLOSE ON SELECT) -->
-  <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="modal-vip-player-select" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-lg space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
         <h3 id="modal-vip-title" class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
@@ -1715,7 +1715,7 @@
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
         return `
-          <div class="winner-player-item flex items-center justify-between p-3 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition text-xs mb-2" data-id="${pid}" data-name="${pname}" data-uid="${puid}" data-avatar="${avatarUrl}">
+          <div onclick="selectMultiWinningPlayer('${pid}', '${pname}', '${puid}', '${avatarUrl}')" style="cursor: pointer; position: relative; z-index: 9999;" class="flex items-center justify-between p-3 bg-[#151922] border border-[#262f40] hover:border-[#ff4624] rounded-xl transition text-xs mb-2">
             <div class="flex items-center gap-3 pointer-events-none">
               <img src="${avatarUrl}" class="w-9 h-9 rounded-full object-cover border border-[#ff4624]" />
               <div>
@@ -1727,16 +1727,6 @@
           </div>
         `;
       }).join('');
-
-      document.querySelectorAll('.winner-player-item').forEach(el => {
-        el.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          const name = this.getAttribute('data-name');
-          const uid = this.getAttribute('data-uid');
-          const avatar = this.getAttribute('data-avatar');
-          selectMultiWinningPlayer(id, name, uid, avatar);
-        });
-      });
     }
 
     function filterVipPlayerModal() {
