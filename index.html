@@ -284,6 +284,23 @@
     .arena-input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
     .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
     .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
+
+    /* ANIMATED DRAGON & LIGHTING VIP FRAMES */
+    @keyframes dragonGlowGold {
+      0%, 100% { box-shadow: 0 0 15px #ffbe00, 0 0 30px #ff5500, inset 0 0 10px #ffbe00; border-color: #ffbe00; }
+      50% { box-shadow: 0 0 25px #ffea75, 0 0 45px #ff7700, inset 0 0 18px #ffea75; border-color: #ffea75; }
+    }
+    @keyframes dragonGlowSilver {
+      0%, 100% { box-shadow: 0 0 15px #00f0ff, 0 0 30px #0055ff, inset 0 0 10px #00f0ff; border-color: #00f0ff; }
+      50% { box-shadow: 0 0 25px #80f8ff, 0 0 45px #0088ff, inset 0 0 18px #80f8ff; border-color: #80f8ff; }
+    }
+    @keyframes dragonGlowBronze {
+      0%, 100% { box-shadow: 0 0 15px #ff7700, 0 0 30px #aa2200, inset 0 0 10px #ff7700; border-color: #ff7700; }
+      50% { box-shadow: 0 0 25px #ffa14a, 0 0 45px #dd4400, inset 0 0 18px #ffa14a; border-color: #ffa14a; }
+    }
+    .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 2s infinite ease-in-out; }
+    .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
+    .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
   </style>
 </head>
 <body>
@@ -1048,17 +1065,12 @@
       if (!currentUser) { Router.navigate('login'); return; }
       Loader.show("Loading Diamond Shop...");
       
-      const [pkgRes, myReqRes, pubReqRes] = await Promise.all([
-        sbClient.from('diamond_packages').select('*').eq('is_active', true).order('diamond_count', { ascending: true }),
-        sbClient.from('diamond_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sbClient.from('diamond_requests').select('game_name, diamonds, updated_at, delivery_screenshot_url').eq('status', 'delivered').order('updated_at', { ascending: false }).limit(10)
+      const [pkgRes] = await Promise.all([
+        sbClient.from('diamond_packages').select('*').eq('is_active', true).order('diamond_count', { ascending: true })
       ]);
-      
       Loader.hide();
 
       const packages = pkgRes.data || [];
-      const myRequests = myReqRes.data || [];
-      const publicDeliveries = pubReqRes.data || [];
 
       const packagesGridHtml = packages.length ? packages.map(pkg => `
         <div style="background:var(--bg-card); border:1.5px solid #ff770044; border-radius:var(--radius); padding:14px; text-align:center; display:flex; flex-direction:column; justify-content:space-between;">
@@ -1072,45 +1084,102 @@
         </div>
       `).join('') : '<p style="color:var(--text-dim); text-align:center;">No diamond packages available.</p>';
 
-      const myHistoryHtml = myRequests.length ? myRequests.map(req => `
-        <div class="tx-item" style="border-left: 3px solid ${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">
-          <div class="tx-info">
-            <h4>${req.diamonds} Diamonds 💎</h4>
-            <span>UID: ${escapeHTML(req.free_fire_uid)} (${escapeHTML(req.game_name)})<br>${new Date(req.created_at).toLocaleString()}</span>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-family:var(--font-gaming); font-size:14px; color:var(--danger); font-weight:bold;">-${req.coins_deducted} Coins</div>
-            <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; background:${req.status === 'delivered' ? 'rgba(0,230,118,0.2)' : (req.status === 'rejected' ? 'rgba(255,23,68,0.2)' : 'rgba(255,190,0,0.2)')}; color:${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">${req.status}</span>
-          </div>
-        </div>
-      `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No diamond requests yet.</p>';
-
-      const publicHistoryHtml = publicDeliveries.length ? publicDeliveries.map(item => `
-        <div class="tx-item" style="border-left: 3px solid var(--success);">
-          <div class="tx-info">
-            <h4 style="color:var(--accent-cyan);">${escapeHTML(item.game_name)}</h4>
-            <span>Delivered +${item.diamonds} Diamonds 💎<br>${new Date(item.updated_at).toLocaleString()}</span>
-          </div>
-          <div>
-            ${item.delivery_screenshot_url ? `<a href="${item.delivery_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:10px; padding:4px 8px; color:var(--accent-cyan);">View Proof</a>` : '<span style="font-size:10px; color:var(--text-dim);">Delivered</span>'}
-          </div>
-        </div>
-      `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No public deliveries yet.</p>';
-
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
+          <!-- VIP IMPORTANT NOTICE -->
+          <div style="background:linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,70,36,0.1)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:14px; margin-bottom:16px; box-shadow:0 4px 15px rgba(255,190,0,0.2);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold); font-size:16px;"></i>
+              <span style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); text-transform:uppercase;">VIP Important Notice</span>
+            </div>
+            <p style="font-size:11px; color:#fff; line-height:1.5;">
+              Diamond purchase karne se pehle apni profile mein <strong>Free Fire UID aur Game Name (IGN)</strong> bilkul drust type check kar lein. Agar details ghalat hui aur diamonds kisi aur account mein chale gaye ya delivery mein masla hua, toh <strong>admin ki koi zimedari nahi hogi</strong>.
+            </p>
+          </div>
+
           <div class="section-title"><span><i class="fa-solid fa-gem text-gold"></i> Buy Free Fire Diamonds</span></div>
-          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:20px;">
             ${packagesGridHtml}
           </div>
 
-          <div class="section-title"><span>📜 My Diamond History</span></div>
-          <div style="margin-bottom:16px;">${myHistoryHtml}</div>
+          <!-- CATEGORY QUICK ACTION BUTTONS FOR DIAMOND HISTORY -->
+          <div class="section-title"><span>📜 Diamond History Center</span></div>
+          <div style="display:flex; gap:16px; justify-content:center; margin-top:10px;">
+            <div class="cat-item" onclick="openDiamondHistoryModal('my')">
+              <div class="cat-circle" style="background:linear-gradient(135deg, #1f293d, #0f131a); border-color:var(--accent-gold);"><i class="fa-solid fa-clock-rotate-left text-gold"></i></div>
+              <span class="cat-label">My History</span>
+            </div>
+            <div class="cat-item" onclick="openDiamondHistoryModal('public')">
+              <div class="cat-circle" style="background:linear-gradient(135deg, #1f293d, #0f131a); border-color:var(--accent-cyan);"><i class="fa-solid fa-globe text-accent"></i></div>
+              <span class="cat-label">Public Deliveries</span>
+            </div>
+          </div>
+        </div>
 
-          <div class="section-title"><span>🌍 Public Diamond Delivery History</span></div>
-          <div>${publicHistoryHtml}</div>
+        <!-- MODAL FOR DIAMOND HISTORY WITH BACK NAVIGATION -->
+        <div id="diamond-history-modal" class="hidden" style="position:absolute; inset:0; background:rgba(6,7,10,0.95); z-index:500; display:flex; flex-direction:column; padding:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:14px;">
+            <button onclick="closeDiamondHistoryModal()" class="btn btn-secondary btn-sm" style="width:auto; padding:6px 12px; font-size:12px;">
+              <i class="fa-solid fa-arrow-left"></i> BACK
+            </button>
+            <h3 id="diamond-history-modal-title" style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase;">History</h3>
+            <div style="width:50px;"></div>
+          </div>
+          <div id="diamond-history-modal-body" style="flex:1; overflow-y:auto; padding-bottom:20px;">
+            <p style="text-align:center; color:var(--text-dim); padding:20px;">Loading...</p>
+          </div>
         </div>
       `;
+    }
+
+    async function openDiamondHistoryModal(type) {
+      const modal = document.getElementById('diamond-history-modal');
+      const titleEl = document.getElementById('diamond-history-modal-title');
+      const bodyEl = document.getElementById('diamond-history-modal-body');
+      
+      modal.classList.remove('hidden');
+      bodyEl.innerHTML = `<p style="text-align:center; color:var(--text-dim); padding:20px;">Loading history...</p>`;
+
+      if (type === 'my') {
+        titleEl.innerText = "My Diamond History";
+        const { data } = await sbClient.from('diamond_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        const list = data || [];
+        
+        bodyEl.innerHTML = list.length ? list.map(req => `
+          <div class="tx-item" style="border-left: 3px solid ${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">
+            <div class="tx-info">
+              <h4>${req.diamonds} Diamonds 💎</h4>
+              <span>UID: ${escapeHTML(req.free_fire_uid)} (${escapeHTML(req.game_name)})<br>${new Date(req.created_at).toLocaleString()}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:var(--font-gaming); font-size:14px; color:var(--danger); font-weight:bold;">-${req.coins_deducted} Coins</div>
+              <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; background:${req.status === 'delivered' ? 'rgba(0,230,118,0.2)' : (req.status === 'rejected' ? 'rgba(255,23,68,0.2)' : 'rgba(255,190,0,0.2)')}; color:${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">${req.status}</span>
+            </div>
+          </div>
+        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:20px;">No diamond requests yet.</p>';
+
+      } else {
+        titleEl.innerText = "Public Deliveries";
+        const { data } = await sbClient.from('diamond_requests').select('game_name, diamonds, updated_at, delivery_screenshot_url').eq('status', 'delivered').order('updated_at', { ascending: false }).limit(20);
+        const list = data || [];
+
+        bodyEl.innerHTML = list.length ? list.map(item => `
+          <div class="tx-item" style="border-left: 3px solid var(--success);">
+            <div class="tx-info">
+              <h4 style="color:var(--accent-cyan);">${escapeHTML(item.game_name)}</h4>
+              <span>Delivered +${item.diamonds} Diamonds 💎<br>${new Date(item.updated_at).toLocaleString()}</span>
+            </div>
+            <div>
+              ${item.delivery_screenshot_url ? `<a href="${item.delivery_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:10px; padding:4px 8px; color:var(--accent-cyan);">View Proof</a>` : '<span style="font-size:10px; color:var(--text-dim);">Delivered</span>'}
+            </div>
+          </div>
+        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:20px;">No public deliveries yet.</p>';
+      }
+    }
+
+    function closeDiamondHistoryModal() {
+      const modal = document.getElementById('diamond-history-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     async function requestDiamondPurchase(packageId) {
@@ -1262,18 +1331,65 @@
         return;
       }
 
+      const top1 = profiles[0] || null;
+      const top2 = profiles[1] || null;
+      const top3 = profiles[2] || null;
+      const remaining = profiles.slice(3);
+
+      const defaultAvatar = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
       view.innerHTML = `
         <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Leaderboard</span></div>
-          ${profiles.map((l, idx) => {
+          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame Leaderboard</span></div>
+
+          <!-- PODIUM TOP 3 HIGHLIGHT SECTION -->
+          <div style="background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 10px; margin-bottom: 20px; display: flex; justify-content: space-around; align-items: flex-end; text-align: center;">
+            
+            <!-- 2ND PLACE -->
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(10px);">
+              <div style="position: relative; width: 56px; height: 56px; margin-bottom: 6px;">
+                <img src="${top2?.avatar_url || defaultAvatar}" class="vip-frame-2" style="width: 100%; height: 100%; object-fit: cover;" />
+                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #00f0ff; color: #000; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">#2</span>
+              </div>
+              <h4 style="font-size: 12px; font-weight: 700; color: #fff; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top2?.free_fire_name || 'N/A')}</h4>
+              <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top2?.total_won || 0}</span>
+            </div>
+
+            <!-- 1ST PLACE -->
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(-10px);">
+              <div style="position: relative; width: 72px; height: 72px; margin-bottom: 6px;">
+                <img src="${top1?.avatar_url || defaultAvatar}" class="vip-frame-1" style="width: 100%; height: 100%; object-fit: cover;" />
+                <span style="position: absolute; -top: 10px; left: 50%; transform: translateX(-50%); color: var(--accent-gold); font-size: 16px;"><i class="fa-solid fa-crown"></i></span>
+                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: #000; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 10px;">#1</span>
+              </div>
+              <h4 style="font-size: 13px; font-weight: 700; color: var(--accent-gold); width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top1?.free_fire_name || 'N/A')}</h4>
+              <span style="font-family: var(--font-gaming); font-size: 15px; font-weight: 800; color: var(--accent-gold);">PKR ${top1?.total_won || 0}</span>
+            </div>
+
+            <!-- 3RD PLACE -->
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(15px);">
+              <div style="position: relative; width: 50px; height: 50px; margin-bottom: 6px;">
+                <img src="${top3?.avatar_url || defaultAvatar}" class="vip-frame-3" style="width: 100%; height: 100%; object-fit: cover;" />
+                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #ff7700; color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">#3</span>
+              </div>
+              <h4 style="font-size: 12px; font-weight: 700; color: #fff; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top3?.free_fire_name || 'N/A')}</h4>
+              <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top3?.total_won || 0}</span>
+            </div>
+
+          </div>
+
+          <!-- REMAINING PLAYERS LIST -->
+          <div class="section-title"><span>Rankings #4 onwards</span></div>
+          ${remaining.map((l, index) => {
+            const rankNum = index + 4;
             const userTotalDeposit = depositMap[l.id] || 0;
-            const dpUrl = l.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+            const dpUrl = l.avatar_url || defaultAvatar;
             
             return `
               <div class="tx-item" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
                 <div style="display:flex; align-items:center; gap:12px;">
-                  <span style="font-family:var(--font-gaming); font-size:18px; font-weight:800; color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-cyan)'}; min-width:24px;">#${idx + 1}</span>
-                  <img src="${dpUrl}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary); object-fit:cover;" />
+                  <span style="font-family:var(--font-gaming); font-size:16px; font-weight:800; color:var(--text-muted); min-width:24px;">#${rankNum}</span>
+                  <img src="${dpUrl}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--border-color); object-fit:cover;" />
                   <div>
                     <h4 style="font-size:14px; font-weight:700;">${escapeHTML(l.free_fire_name || 'Player')}</h4>
                     <span style="font-size:11px; color:var(--accent-cyan);">UID: ${escapeHTML(l.free_fire_uid || '--')}</span>
