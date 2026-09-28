@@ -164,6 +164,7 @@
     .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
     .cat-circle:active { transform: scale(0.92); }
     .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .cat-item.active-action .cat-circle { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan); transform: scale(1.05); }
 
     #admin-float-widget { position: absolute; bottom: 120px; right: 18px; z-index: 300; touch-action: none; user-select: none; cursor: grab; display: flex; flex-direction: column-reverse; align-items: center; }
     #admin-float-widget:active { cursor: grabbing; }
@@ -287,8 +288,8 @@
 
     /* ANIMATED DRAGON & LIGHTING VIP FRAMES */
     @keyframes dragonGlowGold {
-      0%, 100% { box-shadow: 0 0 15px #ffbe00, 0 0 30px #ff5500, inset 0 0 10px #ffbe00; border-color: #ffbe00; }
-      50% { box-shadow: 0 0 25px #ffea75, 0 0 45px #ff7700, inset 0 0 18px #ffea75; border-color: #ffea75; }
+      0%, 100% { box-shadow: 0 0 20px #ffbe00, 0 0 40px #ff5500, inset 0 0 12px #ffbe00; border-color: #ffbe00; transform: scale(1); }
+      50% { box-shadow: 0 0 35px #ffea75, 0 0 60px #ff7700, inset 0 0 20px #ffea75; border-color: #ffea75; transform: scale(1.03); }
     }
     @keyframes dragonGlowSilver {
       0%, 100% { box-shadow: 0 0 15px #00f0ff, 0 0 30px #0055ff, inset 0 0 10px #00f0ff; border-color: #00f0ff; }
@@ -298,7 +299,7 @@
       0%, 100% { box-shadow: 0 0 15px #ff7700, 0 0 30px #aa2200, inset 0 0 10px #ff7700; border-color: #ff7700; }
       50% { box-shadow: 0 0 25px #ffa14a, 0 0 45px #dd4400, inset 0 0 18px #ffa14a; border-color: #ffa14a; }
     }
-    .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 2s infinite ease-in-out; }
+    .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 1.8s infinite ease-in-out; }
     .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
     .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
   </style>
@@ -707,7 +708,7 @@
             if (masterHeader) masterHeader.classList.add('hidden');
             if (subHeader) subHeader.classList.remove('hidden');
             const subTitle = document.getElementById('sub-header-title');
-            if (subTitle) subTitle.innerText = page.toUpperCase();
+            if (subTitle) subTitle.innerText = page.toUpperCase().replace('_', ' ');
           } else {
             if (masterHeader) masterHeader.classList.remove('hidden');
             if (subHeader) subHeader.classList.add('hidden');
@@ -725,6 +726,8 @@
         else if (page === 'wallet') renderWallet();
         else if (page === 'deposit') renderDeposit();
         else if (page === 'diamonds') renderDiamondsShop();
+        else if (page === 'diamond_history') renderDiamondHistoryPage('my');
+        else if (page === 'diamond_public_deliveries') renderDiamondHistoryPage('public');
         else if (page === 'invite') renderInvite();
         else if (page === 'login' || page === 'register') renderAuth(page);
         else if (page === 'profile') renderProfile();
@@ -1105,47 +1108,30 @@
           <!-- CATEGORY QUICK ACTION BUTTONS FOR DIAMOND HISTORY -->
           <div class="section-title"><span>📜 Diamond History Center</span></div>
           <div style="display:flex; gap:16px; justify-content:center; margin-top:10px;">
-            <div class="cat-item" onclick="openDiamondHistoryModal('my')">
+            <div id="action-btn-my" class="cat-item" onclick="Router.navigate('diamond_history')">
               <div class="cat-circle" style="background:linear-gradient(135deg, #1f293d, #0f131a); border-color:var(--accent-gold);"><i class="fa-solid fa-clock-rotate-left text-gold"></i></div>
               <span class="cat-label">My History</span>
             </div>
-            <div class="cat-item" onclick="openDiamondHistoryModal('public')">
+            <div id="action-btn-public" class="cat-item" onclick="Router.navigate('diamond_public_deliveries')">
               <div class="cat-circle" style="background:linear-gradient(135deg, #1f293d, #0f131a); border-color:var(--accent-cyan);"><i class="fa-solid fa-globe text-accent"></i></div>
               <span class="cat-label">Public Deliveries</span>
             </div>
           </div>
         </div>
-
-        <!-- MODAL FOR DIAMOND HISTORY WITH BACK NAVIGATION -->
-        <div id="diamond-history-modal" class="hidden" style="position:absolute; inset:0; background:rgba(6,7,10,0.95); z-index:500; display:flex; flex-direction:column; padding:16px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:14px;">
-            <button onclick="closeDiamondHistoryModal()" class="btn btn-secondary btn-sm" style="width:auto; padding:6px 12px; font-size:12px;">
-              <i class="fa-solid fa-arrow-left"></i> BACK
-            </button>
-            <h3 id="diamond-history-modal-title" style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase;">History</h3>
-            <div style="width:50px;"></div>
-          </div>
-          <div id="diamond-history-modal-body" style="flex:1; overflow-y:auto; padding-bottom:20px;">
-            <p style="text-align:center; color:var(--text-dim); padding:20px;">Loading...</p>
-          </div>
-        </div>
       `;
     }
 
-    async function openDiamondHistoryModal(type) {
-      const modal = document.getElementById('diamond-history-modal');
-      const titleEl = document.getElementById('diamond-history-modal-title');
-      const bodyEl = document.getElementById('diamond-history-modal-body');
-      
-      modal.classList.remove('hidden');
-      bodyEl.innerHTML = `<p style="text-align:center; color:var(--text-dim); padding:20px;">Loading history...</p>`;
+    async function renderDiamondHistoryPage(type) {
+      if (!currentUser) { Router.navigate('login'); return; }
+      Loader.show("Loading history...");
+
+      const titleText = type === 'my' ? "My Diamond History" : "Public Diamond Deliveries";
+      let contentHtml = '';
 
       if (type === 'my') {
-        titleEl.innerText = "My Diamond History";
         const { data } = await sbClient.from('diamond_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
         const list = data || [];
-        
-        bodyEl.innerHTML = list.length ? list.map(req => `
+        contentHtml = list.length ? list.map(req => `
           <div class="tx-item" style="border-left: 3px solid ${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">
             <div class="tx-info">
               <h4>${req.diamonds} Diamonds 💎</h4>
@@ -1156,14 +1142,11 @@
               <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; background:${req.status === 'delivered' ? 'rgba(0,230,118,0.2)' : (req.status === 'rejected' ? 'rgba(255,23,68,0.2)' : 'rgba(255,190,0,0.2)')}; color:${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">${req.status}</span>
             </div>
           </div>
-        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:20px;">No diamond requests yet.</p>';
-
+        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:30px;">No diamond requests yet.</p>';
       } else {
-        titleEl.innerText = "Public Deliveries";
-        const { data } = await sbClient.from('diamond_requests').select('game_name, diamonds, updated_at, delivery_screenshot_url').eq('status', 'delivered').order('updated_at', { ascending: false }).limit(20);
+        const { data } = await sbClient.from('diamond_requests').select('game_name, diamonds, updated_at, delivery_screenshot_url').eq('status', 'delivered').order('updated_at', { ascending: false }).limit(30);
         const list = data || [];
-
-        bodyEl.innerHTML = list.length ? list.map(item => `
+        contentHtml = list.length ? list.map(item => `
           <div class="tx-item" style="border-left: 3px solid var(--success);">
             <div class="tx-info">
               <h4 style="color:var(--accent-cyan);">${escapeHTML(item.game_name)}</h4>
@@ -1173,13 +1156,27 @@
               ${item.delivery_screenshot_url ? `<a href="${item.delivery_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:10px; padding:4px 8px; color:var(--accent-cyan);">View Proof</a>` : '<span style="font-size:10px; color:var(--text-dim);">Delivered</span>'}
             </div>
           </div>
-        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:20px;">No public deliveries yet.</p>';
+        `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:30px;">No public deliveries yet.</p>';
       }
-    }
 
-    function closeDiamondHistoryModal() {
-      const modal = document.getElementById('diamond-history-modal');
-      if (modal) modal.classList.add('hidden');
+      Loader.hide();
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-clock-rotate-left text-gold"></i> ${titleText}</span></div>
+          <div style="margin-top:10px;">${contentHtml}</div>
+        </div>
+      `;
+
+      // Highlight active button state
+      setTimeout(() => {
+        const myBtn = document.getElementById('action-btn-my');
+        const pubBtn = document.getElementById('action-btn-public');
+        if (myBtn && pubBtn) {
+          myBtn.classList.toggle('active-action', type === 'my');
+          pubBtn.classList.toggle('active-action', type === 'public');
+        }
+      }, 50);
     }
 
     async function requestDiamondPurchase(packageId) {
