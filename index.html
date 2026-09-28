@@ -371,6 +371,7 @@
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('diamonds')" class="drawer-link text-gold"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
         <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
@@ -706,6 +707,7 @@
         else if (page === 'tournament_detail') renderTournamentDetail(id);
         else if (page === 'wallet') renderWallet();
         else if (page === 'deposit') renderDeposit();
+        else if (page === 'diamonds') renderDiamondsShop();
         else if (page === 'invite') renderInvite();
         else if (page === 'login' || page === 'register') renderAuth(page);
         else if (page === 'profile') renderProfile();
@@ -975,6 +977,10 @@
               <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
               <span class="cat-label">Add Cash</span>
             </div>
+            <div class="cat-item" onclick="Router.navigate('diamonds')">
+              <div class="cat-circle"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
+              <span class="cat-label">Diamonds</span>
+            </div>
             <div class="cat-item" onclick="Router.navigate('winners')">
               <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Winners</span>
@@ -985,7 +991,7 @@
             </div>
             <div class="cat-item" onclick="Router.navigate('wallet')">
               <div class="cat-circle"><i class="fa-solid fa-receipt" style="color:#00e676;"></i></div>
-              <span class="cat-label">Payment Record</span>
+              <span class="cat-label">Record</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('leaderboard')">
               <div class="cat-circle"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i></div>
@@ -1036,6 +1042,103 @@
 
       currentTournamentFilter = 'all';
       renderTournamentsListUI();
+    }
+
+    async function renderDiamondsShop() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      Loader.show("Loading Diamond Shop...");
+      
+      const [pkgRes, myReqRes, pubReqRes] = await Promise.all([
+        sbClient.from('diamond_packages').select('*').eq('is_active', true).order('diamond_count', { ascending: true }),
+        sbClient.from('diamond_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sbClient.from('diamond_requests').select('game_name, diamonds, updated_at, delivery_screenshot_url').eq('status', 'delivered').order('updated_at', { ascending: false }).limit(10)
+      ]);
+      
+      Loader.hide();
+
+      const packages = pkgRes.data || [];
+      const myRequests = myReqRes.data || [];
+      const publicDeliveries = pubReqRes.data || [];
+
+      const packagesGridHtml = packages.length ? packages.map(pkg => `
+        <div style="background:var(--bg-card); border:1.5px solid #ff770044; border-radius:var(--radius); padding:14px; text-align:center; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="font-family:var(--font-gaming); font-size:24px; font-weight:800; color:var(--accent-gold); margin-bottom:4px;">${pkg.diamond_count} 💎</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Price: <strong style="color:#fff;">${pkg.coin_price} Coins</strong></div>
+          </div>
+          <button onclick="requestDiamondPurchase(${pkg.id})" class="btn btn-primary" style="padding:8px; font-size:12px; background:linear-gradient(135deg, #ff7700, #ff4624);">
+            BUY NOW
+          </button>
+        </div>
+      `).join('') : '<p style="color:var(--text-dim); text-align:center;">No diamond packages available.</p>';
+
+      const myHistoryHtml = myRequests.length ? myRequests.map(req => `
+        <div class="tx-item" style="border-left: 3px solid ${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">
+          <div class="tx-info">
+            <h4>${req.diamonds} Diamonds 💎</h4>
+            <span>UID: ${escapeHTML(req.free_fire_uid)} (${escapeHTML(req.game_name)})<br>${new Date(req.created_at).toLocaleString()}</span>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-gaming); font-size:14px; color:var(--danger); font-weight:bold;">-${req.coins_deducted} Coins</div>
+            <span style="font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; background:${req.status === 'delivered' ? 'rgba(0,230,118,0.2)' : (req.status === 'rejected' ? 'rgba(255,23,68,0.2)' : 'rgba(255,190,0,0.2)')}; color:${req.status === 'delivered' ? 'var(--success)' : (req.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')};">${req.status}</span>
+          </div>
+        </div>
+      `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No diamond requests yet.</p>';
+
+      const publicHistoryHtml = publicDeliveries.length ? publicDeliveries.map(item => `
+        <div class="tx-item" style="border-left: 3px solid var(--success);">
+          <div class="tx-info">
+            <h4 style="color:var(--accent-cyan);">${escapeHTML(item.game_name)}</h4>
+            <span>Delivered +${item.diamonds} Diamonds 💎<br>${new Date(item.updated_at).toLocaleString()}</span>
+          </div>
+          <div>
+            ${item.delivery_screenshot_url ? `<a href="${item.delivery_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:10px; padding:4px 8px; color:var(--accent-cyan);">View Proof</a>` : '<span style="font-size:10px; color:var(--text-dim);">Delivered</span>'}
+          </div>
+        </div>
+      `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No public deliveries yet.</p>';
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-gem text-gold"></i> Buy Free Fire Diamonds</span></div>
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
+            ${packagesGridHtml}
+          </div>
+
+          <div class="section-title"><span>📜 My Diamond History</span></div>
+          <div style="margin-bottom:16px;">${myHistoryHtml}</div>
+
+          <div class="section-title"><span>🌍 Public Diamond Delivery History</span></div>
+          <div>${publicHistoryHtml}</div>
+        </div>
+      `;
+    }
+
+    async function requestDiamondPurchase(packageId) {
+      if (!currentUser) return;
+      
+      if (!currentProfile || !currentProfile.free_fire_uid || !currentProfile.free_fire_name) {
+        Toast.show("Please update your Free Fire UID and Game Name in your profile before purchasing.", "error");
+        Router.navigate('profile');
+        return;
+      }
+
+      if (!confirm("Are you sure you want to purchase diamonds using your wallet coins?")) return;
+
+      Loader.show("Processing diamond request securely...");
+      const { data, error } = await sbClient.rpc('request_free_fire_diamonds', {
+        p_package_id: packageId
+      });
+      Loader.hide();
+
+      if (error) {
+        Toast.show(error.message, "error");
+      } else if (data && data.success) {
+        Toast.show(data.message, "success");
+        await syncAuthAndProfile();
+        renderDiamondsShop();
+      } else {
+        Toast.show(data.message || "Failed to process request.", "error");
+      }
     }
 
     async function renderInvite() {
