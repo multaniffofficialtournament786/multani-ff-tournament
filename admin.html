@@ -1041,24 +1041,28 @@
       if (!container) return;
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond requests...</p>`;
 
-      const { data, error } = await sbClient
-        .from('diamond_requests')
-        .select('*, profiles(free_fire_name, email, phone)')
-        .order('created_at', { ascending: false });
+      const [reqRes, profRes] = await Promise.all([
+        sbClient.from('diamond_requests').select('*').order('created_at', { ascending: false }),
+        sbClient.from('profiles').select('id, free_fire_name, email, phone')
+      ]);
 
-      if (error) {
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${error.message}</p>`;
+      if (reqRes.error) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${reqRes.error.message}</p>`;
         return;
       }
 
-      const requests = data || [];
+      const requests = reqRes.data || [];
+      const profiles = profRes.data || [];
+      const profMap = {};
+      profiles.forEach(p => { profMap[p.id] = p; });
+
       if (!requests.length) {
         container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found.</p>`;
         return;
       }
 
       container.innerHTML = requests.map(req => {
-        const p = req.profiles || {};
+        const p = profMap[req.user_id] || {};
         const statusColor = req.status === 'delivered' ? 'text-green-400' : (req.status === 'rejected' ? 'text-red-400' : (req.status === 'approved' ? 'text-cyan-400' : 'text-yellow-400'));
 
         return `
@@ -1066,7 +1070,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="font-bold text-sm text-white">#${req.id} • ${escapeHTML(req.game_name)}</h4>
-                <span class="text-cyan-400 font-mono text-xs">UID: ${escapeHTML(req.free_fire_uid)}</span>
+                <span class="text-cyan-400 font-mono text-xs">UID: ${escapeHTML(req.free_fire_uid)} (Gamer: ${escapeHTML(p.free_fire_name || 'N/A')})</span>
               </div>
               <span class="font-gaming font-bold text-orange-400 text-sm">${req.diamonds} 💎</span>
             </div>
@@ -1084,7 +1088,11 @@
 
             <div class="space-y-2">
               <input type="text" id="admin-note-${req.id}" value="${escapeHTML(req.admin_notes || '')}" placeholder="Admin notes (optional)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1.5 text-xs text-white outline-none" />
-              <input type="text" id="admin-screenshot-${req.id}" value="${escapeHTML(req.delivery_screenshot_url || '')}" placeholder="Delivery proof screenshot image URL (optional)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1.5 text-xs text-white outline-none" />
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Upload Delivery Proof Screenshot (Optional)</label>
+                <input type="file" id="admin-ss-file-${req.id}" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" />
+                ${req.delivery_screenshot_url ? `<a href="${req.delivery_screenshot_url}" target="_blank" class="text-xs text-cyan-400 underline mt-1 block">View Current Screenshot Proof</a>` : ''}
+              </div>
             </div>
 
             <div class="flex items-center gap-1.5 flex-wrap pt-1">
@@ -1099,7 +1107,19 @@
 
     async function updateDiamondReqStatus(requestId, newStatus) {
       const notes = document.getElementById(`admin-note-${requestId}`).value.trim();
-      const screenshotUrl = document.getElementById(`admin-screenshot-${requestId}`).value.trim();
+      const fileInput = document.getElementById(`admin-ss-file-${requestId}`);
+      
+      let screenshotUrl = null;
+
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const path = `diamond_proofs/${Date.now()}_${file.name}`;
+        const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+        if (!upErr) {
+          const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+          screenshotUrl = publicUrl;
+        }
+      }
 
       if (!confirm(`Are you sure you want to mark request #${requestId} as ${newStatus.toUpperCase()}?`)) return;
 
@@ -1107,7 +1127,7 @@
         p_request_id: requestId,
         p_new_status: newStatus,
         p_admin_notes: notes,
-        p_screenshot_url: screenshotUrl || null
+        p_screenshot_url: screenshotUrl
       });
 
       if (error) {
@@ -1339,7 +1359,7 @@
 
       title.innerText = `${userName} - Payment History`;
       modal.classList.remove('hidden');
-      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading player history...</p>`;
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading history...</p>`;
 
       const [txRes, depRes] = await Promise.all([
         sbClient.from('wallet_transactions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
