@@ -1167,16 +1167,6 @@
           <div style="margin-top:10px;">${contentHtml}</div>
         </div>
       `;
-
-      // Highlight active button state
-      setTimeout(() => {
-        const myBtn = document.getElementById('action-btn-my');
-        const pubBtn = document.getElementById('action-btn-public');
-        if (myBtn && pubBtn) {
-          myBtn.classList.toggle('active-action', type === 'my');
-          pubBtn.classList.toggle('active-action', type === 'public');
-        }
-      }, 50);
     }
 
     async function requestDiamondPurchase(packageId) {
