@@ -201,6 +201,10 @@
           <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
           <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
+        <button onclick="selectTab('diamond_requests')" id="nav-diamond_requests" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gem w-5 text-amber-400"></i> Diamond Requests
+          <span id="badge-diamond_requests" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
         <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-users w-5"></i> Gamers & Balance
         </button>
@@ -285,9 +289,13 @@
               <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
               <span id="quick-badge-deposits" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
+            <button onclick="selectTab('diamond_requests')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-gem text-amber-400 text-lg"></i>
+              <p class="text-[11px] font-bold mt-1 text-gray-200">Diamonds</p>
+              <span id="quick-badge-diamond_requests" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('tutorials')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-video text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Tutorials</p></button>
             <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
           </div>
         </div>
@@ -312,6 +320,16 @@
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
         <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
+        </div>
+      </section>
+
+      <!-- DIAMOND REQUESTS ADMIN SECTION -->
+      <section id="section-diamond_requests" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
+        </div>
+        <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading diamond requests...</p>
         </div>
       </section>
 
@@ -900,7 +918,7 @@
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'users', 'tutorials', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'diamond_requests', 'users', 'tutorials', 'support', 'banned', 'settings'];
 
     function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
@@ -930,13 +948,14 @@
         openSideBtn.classList.remove('hidden');
         loadDashboardStats();
       } else {
-        document.getElementById('panel-title').innerText = tabId.toUpperCase();
+        document.getElementById('panel-title').innerText = tabId.toUpperCase().replace('_', ' ');
         backBtn.classList.remove('hidden');
         openSideBtn.classList.add('hidden');
       }
 
       if (tabId === 'tournaments') loadTournaments();
       if (tabId === 'deposits') loadDeposits();
+      if (tabId === 'diamond_requests') loadAdminDiamondRequests();
       if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
       if (tabId === 'users') loadUsers();
       if (tabId === 'tutorials') loadTutorialsManager();
@@ -951,8 +970,15 @@
     });
 
     async function loadDashboardStats() {
-      const { data: allDeps } = await sbClient.from('deposit_requests').select('*');
-      const safeDeps = allDeps || [];
+      const [allDeps, allDiamonds, userCountRes, supportCountRes] = await Promise.all([
+        sbClient.from('deposit_requests').select('*'),
+        sbClient.from('diamond_requests').select('*'),
+        sbClient.from('profiles').select('*', { count: 'exact', head: true }),
+        sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false)
+      ]);
+
+      const safeDeps = allDeps.data || [];
+      const safeDiamonds = allDiamonds.data || [];
 
       const totalDeposits = safeDeps
         .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
@@ -976,12 +1002,21 @@
         quickDep.classList.toggle('hidden', pendingCount === 0);
       }
 
-      const { count: userCount } = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
-      document.getElementById('stat-total-players').innerText = userCount || 0;
+      const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
+      const badgeDiam = document.getElementById('badge-diamond_requests');
+      if (badgeDiam) {
+        badgeDiam.innerText = pendingDiamonds;
+        badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
+      }
+      const quickDiam = document.getElementById('quick-badge-diamond_requests');
+      if (quickDiam) {
+        quickDiam.innerText = pendingDiamonds;
+        quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
+      }
 
-      const { count: supportCount } = await sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false);
-      const supCount = supportCount || 0;
+      document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
 
+      const supCount = supportCountRes.count || 0;
       const badgeSup = document.getElementById('badge-support');
       if (badgeSup) {
         badgeSup.innerText = supCount;
@@ -998,6 +1033,91 @@
       if (navBadgeSup) {
         navBadgeSup.innerText = supCount;
         navBadgeSup.classList.toggle('hidden', supCount === 0);
+      }
+    }
+
+    async function loadAdminDiamondRequests() {
+      const container = document.getElementById('admin-diamond-requests-container');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond requests...</p>`;
+
+      const { data, error } = await sbClient
+        .from('diamond_requests')
+        .select('*, profiles(free_fire_name, email, phone)')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${error.message}</p>`;
+        return;
+      }
+
+      const requests = data || [];
+      if (!requests.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found.</p>`;
+        return;
+      }
+
+      container.innerHTML = requests.map(req => {
+        const p = req.profiles || {};
+        const statusColor = req.status === 'delivered' ? 'text-green-400' : (req.status === 'rejected' ? 'text-red-400' : (req.status === 'approved' ? 'text-cyan-400' : 'text-yellow-400'));
+
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-white">#${req.id} • ${escapeHTML(req.game_name)}</h4>
+                <span class="text-cyan-400 font-mono text-xs">UID: ${escapeHTML(req.free_fire_uid)}</span>
+              </div>
+              <span class="font-gaming font-bold text-orange-400 text-sm">${req.diamonds} 💎</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block">Coins Deducted</span>
+                <span class="text-red-400 font-bold">-${req.coins_deducted} Coins</span>
+              </div>
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block">Status</span>
+                <span class="uppercase font-bold ${statusColor}">${req.status}</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <input type="text" id="admin-note-${req.id}" value="${escapeHTML(req.admin_notes || '')}" placeholder="Admin notes (optional)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1.5 text-xs text-white outline-none" />
+              <input type="text" id="admin-screenshot-${req.id}" value="${escapeHTML(req.delivery_screenshot_url || '')}" placeholder="Delivery proof screenshot image URL (optional)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1.5 text-xs text-white outline-none" />
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-wrap pt-1">
+              <button onclick="updateDiamondReqStatus(${req.id}, 'approved')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Approve</button>
+              <button onclick="updateDiamondReqStatus(${req.id}, 'delivered')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Deliver</button>
+              <button onclick="updateDiamondReqStatus(${req.id}, 'rejected')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Reject & Refund</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateDiamondReqStatus(requestId, newStatus) {
+      const notes = document.getElementById(`admin-note-${requestId}`).value.trim();
+      const screenshotUrl = document.getElementById(`admin-screenshot-${requestId}`).value.trim();
+
+      if (!confirm(`Are you sure you want to mark request #${requestId} as ${newStatus.toUpperCase()}?`)) return;
+
+      const { data, error } = await sbClient.rpc('admin_update_diamond_request_status', {
+        p_request_id: requestId,
+        p_new_status: newStatus,
+        p_admin_notes: notes,
+        p_screenshot_url: screenshotUrl || null
+      });
+
+      if (error) {
+        alert("Error: " + error.message);
+      } else if (data && data.success) {
+        alert(data.message);
+        loadAdminDiamondRequests();
+        loadDashboardStats();
+      } else {
+        alert(data.message || "Failed to update status.");
       }
     }
 
