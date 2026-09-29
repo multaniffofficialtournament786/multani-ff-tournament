@@ -526,7 +526,6 @@
         const txt = document.getElementById('global-loader-text');
         if (txt) txt.innerText = text;
         if (el) el.classList.remove('hidden');
-        // SAFETY TIMEOUT: Force hide loader after 4 seconds to prevent infinite spinning
         if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
         window._loaderTimeout = setTimeout(() => {
           this.hide();
@@ -552,17 +551,6 @@
       const p = document.getElementById('community-popup-overlay');
       if (p) p.classList.add('hidden');
     }
-
-    async function updateHeartbeat() {
-      if (!currentUser) return;
-      try {
-        await sbClient.from('profiles').update({
-          last_seen: new Date().toISOString()
-        }).eq('id', currentUser.id);
-      } catch (err) {}
-    }
-
-    setInterval(updateHeartbeat, 45000);
 
     function startAnnouncementTicker() {
       setTimeout(() => {
@@ -636,7 +624,6 @@
           userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
           unreadNotifCount = notifRes.count || 0;
           unreadChatCount = chatRes.count || 0;
-          updateHeartbeat();
         } else {
           currentProfile = null;
           userJoinedTournamentIds.clear();
