@@ -328,6 +328,16 @@
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
         </div>
+
+        <!-- DIAMOND FILTER BUTTONS -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-2xl">
+          <button onclick="filterDiamondRequests('all')" id="diamond-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All</button>
+          <button onclick="filterDiamondRequests('pending')" id="diamond-filter-pending" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Pending</button>
+          <button onclick="filterDiamondRequests('approved')" id="diamond-filter-approved" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Approved</button>
+          <button onclick="filterDiamondRequests('delivered')" id="diamond-filter-delivered" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Delivered</button>
+          <button onclick="filterDiamondRequests('rejected')" id="diamond-filter-rejected" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Rejected</button>
+        </div>
+
         <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading diamond requests...</p>
         </div>
@@ -773,6 +783,9 @@
     let globalAllPlayersCache = [];
     let selectedTournamentDetails = null;
 
+    let loadedDiamondRequestsList = [];
+    let currentDiamondFilter = 'all';
+
     function escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -1051,17 +1064,45 @@
         return;
       }
 
-      const requests = reqRes.data || [];
-      const profiles = profRes.data || [];
-      const profMap = {};
-      profiles.forEach(p => { profMap[p.id] = p; });
+      loadedDiamondRequestsList = reqRes.data || [];
+      window.profilesMapCache = {};
+      (profRes.data || []).forEach(p => { window.profilesMapCache[p.id] = p; });
 
-      if (!requests.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found.</p>`;
+      renderDiamondRequestsList();
+    }
+
+    function filterDiamondRequests(status) {
+      currentDiamondFilter = status;
+      ['all', 'pending', 'approved', 'delivered', 'rejected'].forEach(s => {
+        const btn = document.getElementById(`diamond-filter-${s}`);
+        if (btn) {
+          if (s === status) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
+          }
+        }
+      });
+      renderDiamondRequestsList();
+    }
+
+    function renderDiamondRequestsList() {
+      const container = document.getElementById('admin-diamond-requests-container');
+      if (!container) return;
+
+      const filtered = loadedDiamondRequestsList.filter(req => {
+        if (currentDiamondFilter === 'all') return true;
+        return (req.status || '').toLowerCase() === currentDiamondFilter;
+      });
+
+      if (!filtered.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found for '${currentDiamondFilter}'.</p>`;
         return;
       }
 
-      container.innerHTML = requests.map(req => {
+      const profMap = window.profilesMapCache || {};
+
+      container.innerHTML = filtered.map(req => {
         const p = profMap[req.user_id] || {};
         const statusColor = req.status === 'delivered' ? 'text-green-400' : (req.status === 'rejected' ? 'text-red-400' : (req.status === 'approved' ? 'text-cyan-400' : 'text-yellow-400'));
 
@@ -1095,10 +1136,15 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-1.5 flex-wrap pt-1">
-              <button onclick="updateDiamondReqStatus(${req.id}, 'approved')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Approve</button>
-              <button onclick="updateDiamondReqStatus(${req.id}, 'delivered')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Deliver</button>
-              <button onclick="updateDiamondReqStatus(${req.id}, 'rejected')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Reject & Refund</button>
+            <div class="flex items-center justify-between flex-wrap pt-1 gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <button onclick="updateDiamondReqStatus(${req.id}, 'approved')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Approve</button>
+                <button onclick="updateDiamondReqStatus(${req.id}, 'delivered')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Deliver</button>
+                <button onclick="updateDiamondReqStatus(${req.id}, 'rejected')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1.5 rounded text-xs font-bold">Reject & Refund</button>
+              </div>
+              <div>
+                <button onclick="deleteDiamondRequest(${req.id})" class="bg-[#1f242d] hover:bg-red-700 text-red-400 hover:text-white px-2.5 py-1.5 rounded text-xs font-bold transition flex items-center gap-1"><i class="fa-solid fa-trash"></i> Delete</button>
+              </div>
             </div>
           </div>
         `;
@@ -1138,6 +1184,18 @@
         loadDashboardStats();
       } else {
         alert(data.message || "Failed to update status.");
+      }
+    }
+
+    async function deleteDiamondRequest(requestId) {
+      if (!confirm(`Are you sure you want to delete diamond request #${requestId} permanently?`)) return;
+      const { error } = await sbClient.from('diamond_requests').delete().eq('id', requestId);
+      if (error) {
+        alert("Failed to delete: " + error.message);
+      } else {
+        alert("Diamond request deleted successfully.");
+        loadAdminDiamondRequests();
+        loadDashboardStats();
       }
     }
 
