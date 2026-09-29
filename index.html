@@ -1023,8 +1023,16 @@
             </a>
           </div>
 
-          <!-- 3. CATEGORY CIRCLES / BUTTONS (ONLY DIAMONDS & WINNERS LEFT) -->
-          <div class="category-scroll-container" style="justify-content: center; gap: 24px;">
+          <!-- 3. CATEGORY CIRCLES / BUTTONS (RESTORED ALL 5 ORIGINAL BUTTONS) -->
+          <div class="category-scroll-container">
+            <div class="cat-item" onclick="openVipWdModal()">
+              <div class="cat-circle" style="border-color:var(--accent-cyan);"><i class="fa-solid fa-money-bill-transfer" style="color:var(--accent-cyan)"></i></div>
+              <span class="cat-label">Withdraw</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('deposit')">
+              <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
+              <span class="cat-label">Add Cash</span>
+            </div>
             <div class="cat-item" onclick="Router.navigate('diamonds')">
               <div class="cat-circle"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Diamonds</span>
@@ -1032,6 +1040,10 @@
             <div class="cat-item" onclick="Router.navigate('winners')">
               <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Winners</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
+              <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
+              <span class="cat-label">Wallet</span>
             </div>
           </div>
 
