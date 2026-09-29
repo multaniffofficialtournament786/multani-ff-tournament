@@ -526,8 +526,14 @@
         const txt = document.getElementById('global-loader-text');
         if (txt) txt.innerText = text;
         if (el) el.classList.remove('hidden');
+        // SAFETY TIMEOUT: Force hide loader after 4 seconds to prevent infinite spinning
+        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
+        window._loaderTimeout = setTimeout(() => {
+          this.hide();
+        }, 4000);
       },
       hide() {
+        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
         const el = document.getElementById('global-loader');
         if (el) el.classList.add('hidden');
       }
@@ -683,6 +689,7 @@
       history: [],
       async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
+        Loader.show("Loading page...");
         await syncAuthAndProfile();
 
         if (!currentUser && page !== 'login' && page !== 'register') {
@@ -721,23 +728,25 @@
           el.classList.toggle('active', el.getAttribute('data-page') === page);
         });
 
-        if (page === 'home') renderHome();
-        else if (page === 'tournaments') renderTournaments();
-        else if (page === 'tournament_detail') renderTournamentDetail(id);
-        else if (page === 'wallet') renderWallet();
-        else if (page === 'withdrawal') renderWithdrawal();
+        if (page === 'home') await renderHome();
+        else if (page === 'tournaments') await renderTournaments();
+        else if (page === 'tournament_detail') await renderTournamentDetail(id);
+        else if (page === 'wallet') await renderWallet();
+        else if (page === 'withdrawal') await renderWithdrawal();
         else if (page === 'deposit') renderDeposit();
-        else if (page === 'diamonds') renderDiamondsShop();
-        else if (page === 'diamond_history') renderDiamondHistoryPage('my');
-        else if (page === 'diamond_public_deliveries') renderDiamondHistoryPage('public');
-        else if (page === 'invite') renderInvite();
+        else if (page === 'diamonds') await renderDiamondsShop();
+        else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
+        else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
+        else if (page === 'invite') await renderInvite();
         else if (page === 'login' || page === 'register') renderAuth(page);
         else if (page === 'profile') renderProfile();
-        else if (page === 'winners') renderWinners();
-        else if (page === 'leaderboard') renderLeaderboard();
-        else if (page === 'notifications') renderNotifications();
+        else if (page === 'winners') await renderWinners();
+        else if (page === 'leaderboard') await renderLeaderboard();
+        else if (page === 'notifications') await renderNotifications();
         else if (page === 'rules') renderRules();
         else if (page === 'about') renderAbout();
+
+        Loader.hide();
       },
       async back() {
         if (this.history.length > 1) {
@@ -867,7 +876,6 @@
     }
 
     async function renderHome() {
-      Loader.show("Loading arena...");
       let siteTutorialsList = [];
       try {
         const [settingsRes, tourRes] = await Promise.all([
@@ -884,7 +892,6 @@
       } catch (e) {
         console.error("Home load error:", e);
       }
-      Loader.hide();
 
       const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "" };
       const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
@@ -1046,14 +1053,12 @@
     }
 
     async function renderTournaments() {
-      Loader.show("Loading arena matches...");
       try {
         const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
         activeTournaments = data || [];
       } catch (e) {
         console.error(e);
       }
-      Loader.hide();
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1068,14 +1073,14 @@
 
     async function renderDiamondsShop() {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading Diamond Shop...");
       
-      const [pkgRes] = await Promise.all([
-        sbClient.from('diamond_packages').select('*').eq('is_active', true).order('diamond_count', { ascending: true })
-      ]);
-      Loader.hide();
-
-      const packages = pkgRes.data || [];
+      let packages = [];
+      try {
+        const { data } = await sbClient.from('diamond_packages').select('*').eq('is_active', true).order('diamond_count', { ascending: true });
+        packages = data || [];
+      } catch (e) {
+        console.error(e);
+      }
 
       const packagesGridHtml = packages.length ? packages.map(pkg => `
         <div style="background:var(--bg-card); border:1.5px solid #ff770044; border-radius:var(--radius); padding:14px; text-align:center; display:flex; flex-direction:column; justify-content:space-between;">
@@ -1125,7 +1130,6 @@
 
     async function renderDiamondHistoryPage(type) {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading history...");
 
       const titleText = type === 'my' ? "My Diamond History" : "Public Diamond Deliveries";
       let contentHtml = '';
@@ -1160,8 +1164,6 @@
           </div>
         `).join('') : '<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:30px;">No public deliveries yet.</p>';
       }
-
-      Loader.hide();
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1314,17 +1316,18 @@
     }
 
     async function renderLeaderboard() {
-      Loader.show("Loading leaderboard...");
-      
-      const [profilesRes, depositsRes] = await Promise.all([
-        sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url, total_won').order('total_won', { ascending: false }).limit(20),
-        sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
-      ]);
-
-      Loader.hide();
-
-      const profiles = profilesRes.data || [];
-      const deposits = depositsRes.data || [];
+      let profiles = [];
+      let deposits = [];
+      try {
+        const [profilesRes, depositsRes] = await Promise.all([
+          sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url, total_won').order('total_won', { ascending: false }).limit(20),
+          sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
+        ]);
+        profiles = profilesRes.data || [];
+        deposits = depositsRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
 
       const depositMap = {};
       deposits.forEach(d => {
@@ -1414,24 +1417,30 @@
     }
 
     async function renderTournamentDetail(id) {
-      Loader.show("Fetching tournament...");
       await syncAuthAndProfile();
 
-      const [tRes, entriesRes, winRes] = await Promise.all([
-        sbClient.from('tournaments').select('*').eq('id', id).single(),
-        sbClient.from('tournament_entries').select('slot_number, user_id, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id),
-        sbClient.from('winners').select('position, prize_amount, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id)
-      ]);
-      Loader.hide();
+      let t = null;
+      let entries = [];
+      let winData = [];
+      try {
+        const [tRes, entriesRes, winRes] = await Promise.all([
+          sbClient.from('tournaments').select('*').eq('id', id).single(),
+          sbClient.from('tournament_entries').select('slot_number, user_id, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id),
+          sbClient.from('winners').select('position, prize_amount, profiles(free_fire_name, free_fire_uid)').eq('tournament_id', id)
+        ]);
+        t = tRes.data;
+        entries = entriesRes.data || [];
+        winData = winRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
 
-      const t = tRes.data;
       if (!t) {
         document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><p>Tournament not found.</p></div>`;
         return;
       }
 
       const isCompleted = (t.status || '').toLowerCase() === 'completed';
-      const entries = entriesRes.data || [];
       const occupiedSlots = {};
       let mySlotNumber = null;
 
@@ -1462,11 +1471,11 @@
       }
 
       let winnerInfoHTML = '';
-      if (isCompleted && winRes.data && winRes.data.length > 0) {
+      if (isCompleted && winData.length > 0) {
         winnerInfoHTML = `
           <div style="background:rgba(255,190,0,0.1); border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom:12px;">
             <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winners Declared</div>
-            ${winRes.data.map(w => `
+            ${winData.map(w => `
               <div style="font-size:13px; font-weight:bold; color:#fff; margin-top: 4px;">
                 ${escapeHTML(w.profiles?.free_fire_name || 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR ${w.prize_amount}]
               </div>
@@ -1622,11 +1631,15 @@
     }
 
     async function renderWinners() {
-      Loader.show("Loading winners...");
-      const { data: winnersData, error } = await sbClient.from('winners').select('*').order('created_at', { ascending: false });
+      let winnersData = [];
+      try {
+        const { data } = await sbClient.from('winners').select('*').order('created_at', { ascending: false });
+        winnersData = data || [];
+      } catch (e) {
+        console.error(e);
+      }
 
-      if (error || !winnersData || !winnersData.length) {
-        Loader.hide();
+      if (!winnersData.length) {
         document.getElementById('app-view').innerHTML = `
           <div class="view-container empty-state">
             <i class="fa-solid fa-medal text-gold"></i>
@@ -1650,8 +1663,6 @@
 
       const tourMap = {};
       (tourRes.data || []).forEach(t => { tourMap[t.id] = t; });
-
-      Loader.hide();
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1686,28 +1697,34 @@
 
     async function renderWallet() {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading payment records...");
       await syncAuthAndProfile();
       
-      const [txRes, depRes] = await Promise.all([
-        sbClient.from('wallet_transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sbClient.from('deposit_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
-      ]);
-      Loader.hide();
+      let deposits = [];
+      let transactions = [];
+      try {
+        const [txRes, depRes] = await Promise.all([
+          sbClient.from('wallet_transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+          sbClient.from('deposit_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+        ]);
+        transactions = txRes.data || [];
+        deposits = depRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
 
-      const deposits = (depRes.data || []).map(d => ({
+      const formattedDeposits = deposits.map(d => ({
         ...d,
         sortDate: new Date(d.created_at).getTime(),
         isDeposit: true
       }));
 
-      const transactions = (txRes.data || []).map(tx => ({
+      const formattedTxs = transactions.map(tx => ({
         ...tx,
         sortDate: new Date(tx.created_at).getTime(),
         isDeposit: false
       }));
 
-      const combinedHistory = [...deposits, ...transactions].sort((a, b) => b.sortDate - a.sortDate);
+      const combinedHistory = [...formattedDeposits, ...formattedTxs].sort((a, b) => b.sortDate - a.sortDate);
 
       const historyHtml = combinedHistory.length ? combinedHistory.map(item => {
         if (item.isDeposit) {
@@ -1761,12 +1778,8 @@
       `;
     }
 
-    // ==========================================
-    // PLAYER WITHDRAWAL & HISTORY MODULE
-    // ==========================================
     async function renderWithdrawal() {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading withdrawal portal...");
       await syncAuthAndProfile();
 
       let withdrawHistoryHtml = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:16px;">No withdrawal requests yet.</p>`;
@@ -1803,7 +1816,6 @@
       } catch (err) {
         console.error("Error loading withdrawals:", err);
       }
-      Loader.hide();
 
       const balance = currentProfile?.wallet_balance || 0;
 
@@ -2496,19 +2508,22 @@
 
     async function renderNotifications() {
       if (!currentUser) { Router.navigate('login'); return; }
-      Loader.show("Loading notifications...");
       
-      const [notifRes] = await Promise.all([
-        sbClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sbClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false)
-      ]);
+      let data = [];
+      try {
+        const [notifRes] = await Promise.all([
+          sbClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+          sbClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false)
+        ]);
+        data = notifRes.data || [];
+      } catch (e) {
+        console.error(e);
+      }
       
       unreadNotifCount = 0;
       updateNotificationBadges();
-      Loader.hide();
 
-      const data = notifRes.data;
-      if (!data || !data.length) {
+      if (!data.length) {
         document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
         return;
       }
