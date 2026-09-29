@@ -707,7 +707,11 @@
       async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
         Loader.show("Loading page...");
-        await syncAuthAndProfile();
+        try {
+          await syncAuthAndProfile();
+        } catch(err) {
+          console.error("Sync error:", err);
+        }
 
         if (!currentUser && page !== 'login' && page !== 'register') {
           page = 'login';
@@ -715,7 +719,9 @@
 
         if (pushHistory && (this.history.length === 0 || this.history[this.history.length - 1] !== page)) {
           this.history.push(page);
-          history.pushState({ page, id }, '', '#' + page);
+          try {
+            history.pushState({ page, id }, '', '#' + page);
+          } catch(e) {}
         }
 
         const isAuthView = (page === 'login' || page === 'register');
@@ -764,7 +770,7 @@
           else if (page === 'rules') renderRules();
           else if (page === 'about') renderAbout();
         } catch (err) {
-          console.error("Navigation error:", err);
+          console.error("View render error:", err);
         }
 
         Loader.hide();
@@ -1983,7 +1989,9 @@
       setupPullToRefresh();
       
       Loader.show("Checking session...");
-      await syncAuthAndProfile();
+      try {
+        await syncAuthAndProfile();
+      } catch(e) {}
       Loader.hide();
 
       if (currentUser) {
