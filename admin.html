@@ -1104,7 +1104,7 @@
     }
 
     // ==========================================
-    // ADMIN WITHDRAWAL MANAGEMENT FUNCTIONS
+    // ADMIN WITHDRAWAL MANAGEMENT FUNCTIONS (FIXED)
     // ==========================================
     async function loadAdminWithdrawals() {
       const container = document.getElementById('admin-withdrawal-requests-list');
@@ -1114,28 +1114,40 @@
       try {
         const { data: withdrawals, error: wErr } = await sbClient
           .from('withdrawals')
-          .select('*, profiles(free_fire_name, free_fire_uid, full_name, email)')
+          .select('*')
           .order('created_at', { ascending: false });
 
         if (wErr) throw wErr;
 
-        const { data: feesData, error: fErr } = await sbClient
-          .from('withdrawal_fee_earnings')
-          .select('*');
-
-        if (fErr) console.error("Error fetching fee earnings:", fErr);
-
-        const feeList = feesData || [];
-        let totalFeesEarned = feeList.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-
         const list = withdrawals || [];
+        
+        const userIds = [...new Set(list.map(w => w.user_id))];
+        let profilesMap = {};
+        if (userIds.length > 0) {
+          const { data: profs } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, full_name, email').in('id', userIds);
+          if (profs) {
+            profs.forEach(p => { profilesMap[p.id] = p; });
+          }
+        }
+
+        let totalFeesEarned = 0;
+        try {
+          const { data: feesData } = await sbClient.from('withdrawal_fee_earnings').select('amount');
+          if (feesData) {
+            totalFeesEarned = feesData.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+          }
+        } catch (e) {
+          console.log("Fee earnings optional notice:", e);
+        }
+
         let pendingCount = 0;
         let approvedCount = 0;
         let totalWithdrawalAmt = 0;
 
         list.forEach(w => {
-          if ((w.status || '').toLowerCase() === 'pending') pendingCount++;
-          if ((w.status || '').toLowerCase() === 'approved') {
+          const st = (w.status || '').toLowerCase();
+          if (st === 'pending') pendingCount++;
+          if (st === 'approved') {
             approvedCount++;
             totalWithdrawalAmt += Number(w.amount || 0);
           }
@@ -1158,7 +1170,7 @@
         }
 
         container.innerHTML = list.map(w => {
-          const p = w.profiles || {};
+          const p = profilesMap[w.user_id] || {};
           const playerName = p.free_fire_name || p.full_name || 'Player';
           const playerUid = p.free_fire_uid || '--';
           const statusVal = (w.status || 'pending').toLowerCase();
@@ -1218,7 +1230,7 @@
 
       } catch (err) {
         console.error("Load admin withdrawals error:", err);
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading withdrawal requests.</p>`;
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading withdrawal requests: ${escapeHTML(err.message)}</p>`;
       }
     }
 
