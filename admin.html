@@ -1194,8 +1194,8 @@
         alert("Failed to delete: " + error.message);
       } else {
         alert("Diamond request deleted successfully.");
-        loadAdminDiamondRequests();
-        loadDashboardStats();
+        await loadAdminDiamondRequests();
+        await loadDashboardStats();
       }
     }
 
