@@ -370,6 +370,25 @@
       </div>
     </div>
 
+    <!-- VIP WITHDRAWAL NOTE MODAL -->
+    <div id="vip-wd-modal" class="hidden" style="position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:800; display:flex; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0e1118; border:1.5px solid var(--accent-gold); border-radius:16px; padding:22px; width:100%; max-width:340px; text-align:right; direction:rtl; box-shadow:0 10px 30px rgba(0,0,0,0.9);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:12px;">
+          <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);"><i class="fa-solid fa-crown"></i> VIP WITHDRAWAL PROTOCOL</h3>
+          <button onclick="closeVipWdModal()" class="icon-btn" style="width:28px; height:28px; font-size:14px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="font-size:12px; color:#ddd; line-height:1.7; margin-bottom:16px; text-align:right;">
+          <p>👑 <strong>VIP WITHDRAWAL RULES:</strong></p>
+          <p>1. <strong>Minimum Limit:</strong> Kam az kam PKR 200 tak withdraw karein.</p>
+          <p>2. <strong>Processing Time:</strong> Request admin verification ke baad jald transfer hoti hai.</p>
+          <p>3. <strong>Fee:</strong> Har successful withdrawal par 2% service fee lagti hai.</p>
+          <p>4. <strong>Correct Details:</strong> Apna account title aur number bilkul theek enter karein.</p>
+          <p>5. <strong>Rejected Refund:</strong> Reject hone par balance safely refund ho jata hai.</p>
+        </div>
+        <button onclick="closeVipWdModal(); Router.navigate('withdrawal');" class="btn btn-primary" style="background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000;">PROCEED TO WITHDRAW</button>
+      </div>
+    </div>
+
     <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
     <aside id="side-drawer" class="side-drawer">
       <div class="drawer-header">
@@ -480,7 +499,7 @@
     <nav id="bottom-nav" class="bottom-nav hidden">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-      <div class="nav-item" data-page="withdrawal" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
+      <div class="nav-item" data-page="invite" onclick="Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i><span>Invite</span></div>
       <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
       <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
@@ -505,6 +524,7 @@
     let unreadNotifCount = 0;
     let unreadChatCount = 0;
     let currentTournamentFilter = 'all';
+    let walletHistoryFilter = 'all';
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
@@ -550,6 +570,16 @@
     function closeCommunityPopup() {
       const p = document.getElementById('community-popup-overlay');
       if (p) p.classList.add('hidden');
+    }
+
+    function openVipWdModal() {
+      const m = document.getElementById('vip-wd-modal');
+      if (m) m.classList.remove('hidden');
+    }
+
+    function closeVipWdModal() {
+      const m = document.getElementById('vip-wd-modal');
+      if (m) m.classList.add('hidden');
     }
 
     function startAnnouncementTicker() {
@@ -983,20 +1013,8 @@
             </a>
           </div>
 
-          <!-- 3. CATEGORY CIRCLES / BUTTONS -->
-          <div class="category-scroll-container">
-            <div class="cat-item" onclick="Router.navigate('tournaments')">
-              <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
-              <span class="cat-label">Matches</span>
-            </div>
-            <div class="cat-item" onclick="Router.navigate('withdrawal')">
-              <div class="cat-circle" style="border-color:var(--accent-cyan);"><i class="fa-solid fa-money-bill-transfer" style="color:var(--accent-cyan)"></i></div>
-              <span class="cat-label">Withdraw</span>
-            </div>
-            <div class="cat-item" onclick="Router.navigate('deposit')">
-              <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
-              <span class="cat-label">Add Cash</span>
-            </div>
+          <!-- 3. CATEGORY CIRCLES / BUTTONS (REMOVED 3, ONLY DIAMONDS & WINNERS LEFT) -->
+          <div class="category-scroll-container" style="justify-content: center; gap: 24px;">
             <div class="cat-item" onclick="Router.navigate('diamonds')">
               <div class="cat-circle"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Diamonds</span>
@@ -1004,14 +1022,6 @@
             <div class="cat-item" onclick="Router.navigate('winners')">
               <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Winners</span>
-            </div>
-            <div class="cat-item" onclick="Router.navigate('wallet')">
-              <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
-              <span class="cat-label">Wallet</span>
-            </div>
-            <div class="cat-item" onclick="Router.navigate('leaderboard')">
-              <div class="cat-circle"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i></div>
-              <span class="cat-label">Top List</span>
             </div>
           </div>
 
@@ -1713,7 +1723,18 @@
 
       const combinedHistory = [...formattedDeposits, ...formattedTxs].sort((a, b) => b.sortDate - a.sortDate);
 
-      const historyHtml = combinedHistory.length ? combinedHistory.map(item => {
+      const filteredHistory = combinedHistory.filter(item => {
+        if (walletHistoryFilter === 'deposit') {
+          return item.isDeposit;
+        } else if (walletHistoryFilter === 'reject') {
+          return item.isDeposit && (item.status === 'rejected');
+        } else if (walletHistoryFilter === 'pending') {
+          return item.isDeposit && (item.status === 'pending');
+        }
+        return true;
+      });
+
+      const historyHtml = filteredHistory.length ? filteredHistory.map(item => {
         if (item.isDeposit) {
           let badgeColor = 'background:#ff9800; color:#000;';
           if (item.status === 'approved') badgeColor = 'background:#00e676; color:#000;';
@@ -1746,7 +1767,7 @@
             </div>
           `;
         }
-      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:8px;">No transaction history found.</p>`;
+      }).join('') : `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No matching records found.</p>`;
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
@@ -1754,15 +1775,28 @@
             <span class="wallet-balance-title">Current Balance</span>
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
             <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" style="flex:1;" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
+              <button class="btn btn-primary" style="flex:1; background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000;" onclick="openVipWdModal()"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
               <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash</button>
             </div>
           </div>
 
-          <div class="section-title"><span>Transaction History (Newest First)</span></div>
-          <div>${historyHtml}</div>
+          <!-- FILTER TABS FOR WALLET HISTORY -->
+          <div class="section-title"><span>Transaction History</span></div>
+          <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; margin-bottom:12px;">
+            <button onclick="setWalletFilter('all')" id="w-filter-all" class="filter-tab-btn ${walletHistoryFilter==='all'?'active':''}">All & Pending</button>
+            <button onclick="setWalletFilter('deposit')" id="w-filter-deposit" class="filter-tab-btn ${walletHistoryFilter==='deposit'?'active':''}">Payment Deposit History</button>
+            <button onclick="setWalletFilter('reject')" id="w-filter-reject" class="filter-tab-btn ${walletHistoryFilter==='reject'?'active':''}">Rejected & Refund History</button>
+            <button onclick="setWalletFilter('pending')" id="w-filter-pending" class="filter-tab-btn ${walletHistoryFilter==='pending'?'active':''}">Pending Only</button>
+          </div>
+
+          <div id="wallet-history-container">${historyHtml}</div>
         </div>
       `;
+    }
+
+    function setWalletFilter(filterType) {
+      walletHistoryFilter = filterType;
+      renderWallet();
     }
 
     async function renderWithdrawal() {
@@ -1926,866 +1960,6 @@
         Toast.show(err.message || "Failed to submit withdrawal request.", "error");
       }
     }
-
-    function renderDeposit() {
-      if (!currentUser) { Router.navigate('login'); return; }
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card" style="margin-bottom:14px;">
-            <h4 id="dep-box-header" style="font-size:13px; text-transform:uppercase; color:var(--accent-gold); margin-bottom:6px;">Official Payment Details</h4>
-            <div id="dep-box-number" style="font-size:18px; font-weight:bold; color:var(--accent-cyan);">03186815926</div>
-            <div id="dep-box-title" style="font-size:12px; color:var(--text-muted); margin-top:2px;">Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)</div>
-          </div>
-
-          <!-- PAYMENT RULES EXPANDABLE DROPDOWN -->
-          <div class="rules-dropdown-container">
-            <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:14px;">💳</span>
-                <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">PAYMENT & DEPOSIT RULES</span>
-              </div>
-              <span class="rules-arrow">&#9660;</span>
-            </div>
-            <div class="rules-dropdown-content">
-              <p><strong>1. 💰 Minimum Deposit:</strong> Wallet mein deposit karne ke liye minimum amount app mein diye gaye payment method ke mutabiq hoga.</p>
-              <p><strong>2. 📸 Payment Screenshot لازمی:</strong> Payment complete karne ke baad transaction ka clear screenshot upload karna zaroori hai.</p>
-              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein.</p>
-              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
-                🔴 <strong>IMPORTANT WARNING:</strong><br>
-                Screenshot mein jitni payment hai, sirf utni hi amount enter karein.
-              </div>
-            </div>
-          </div>
-
-          <form id="dep-form">
-            <div class="form-group">
-              <label class="form-label">Deposit Amount (PKR)</label>
-              <input type="number" id="dp-amount" class="form-input" placeholder="e.g. 100" required min="10" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Select Payment Method</label>
-              <select id="dp-method" class="form-input" onchange="updatePaymentDetailsDisplay(this.value)" required>
-                <option value="Easypaisa">Easypaisa</option>
-                <option value="SadaPay">SadaPay</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Sender Account Name</label>
-              <input type="text" id="dp-sender" class="form-input" placeholder="Your account title name" required />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Your Gmail Address</label>
-              <input type="email" id="dp-gmail" class="form-input" value="${currentUser.email || ''}" placeholder="e.g. yourname@gmail.com" required />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Payment Screenshot</label>
-              <input type="file" id="dp-file" class="form-input" accept="image/*" required />
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="margin-top:8px;">SUBMIT DEPOSIT SLIP</button>
-          </form>
-        </div>
-      `;
-
-      document.getElementById('dep-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const file = document.getElementById('dp-file').files[0];
-        if (!file) return;
-
-        Loader.show("Uploading deposit slip...");
-        try {
-          const path = `${currentUser.id}/${Date.now()}_${file.name}`;
-          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
-          if (uploadError) throw uploadError;
-
-          const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
-
-          const { error: dbError } = await sbClient.from('deposit_requests').insert([{
-            user_id: currentUser.id,
-            amount: parseFloat(document.getElementById('dp-amount').value),
-            payment_method: document.getElementById('dp-method').value,
-            sender_name: document.getElementById('dp-sender').value,
-            transaction_id: document.getElementById('dp-gmail').value,
-            screenshot_url: publicUrl,
-            status: 'pending'
-          }]);
-
-          if (dbError) throw dbError;
-
-          Loader.hide();
-          Toast.show("Slip submitted! Check Payment Record for status.", "success");
-          Router.navigate('wallet');
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message, "error");
-        }
-      };
-    }
-
-    function toggleRulesDropdown(headerEl) {
-      const container = headerEl.closest('.rules-dropdown-container');
-      if (container) {
-        container.classList.toggle('open');
-      }
-    }
-
-    function updatePaymentDetailsDisplay(method) {
-      const numEl = document.getElementById('dep-box-number');
-      const titleEl = document.getElementById('dep-box-title');
-      if (method === 'SadaPay') {
-        numEl.innerText = "03281926729";
-        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (SadaPay)";
-      } else {
-        numEl.innerText = "03186815926";
-        titleEl.innerHTML = "Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)";
-      }
-    }
-
-    function renderAuth(mode = 'login') {
-      const isLogin = (mode === 'login');
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="arena-login-wrap">
-            <h2 class="arena-title">MULTANI FF ARENA</h2>
-            <p class="arena-subtitle">${isLogin ? 'Sign in to enter the arena.' : 'Create an account to join tournaments.'}</p>
-
-            ${isLogin ? `
-              <form id="login-form">
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-envelope"></i>
-                  <input type="email" id="log-email" class="arena-field" placeholder="you@example.com" required />
-                </div>
-
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-lock"></i>
-                  <input type="password" id="log-pass" class="arena-field" placeholder="••••••••" required />
-                  <i class="fa-solid fa-eye" style="cursor:pointer;" onclick="const p=document.getElementById('log-pass'); p.type=p.type==='password'?'text':'password';"></i>
-                </div>
-
-                <div style="text-align:right; margin-bottom:14px;">
-                  <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
-              </form>
-            ` : `
-              <form id="signup-form">
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-user"></i>
-                  <input type="text" id="reg-name" class="arena-field" placeholder="Full Name" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-gamepad"></i>
-                  <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MLT・HAMZA★)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-id-card"></i>
-                  <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-phone"></i>
-                  <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-envelope"></i>
-                  <input type="email" id="reg-email" class="arena-field" placeholder="you@example.com" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-lock"></i>
-                  <input type="password" id="reg-pass" class="arena-field" placeholder="Password (min 6 chars)" minlength="6" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-users"></i>
-                  <input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" />
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">REGISTER</button>
-              </form>
-            `}
-
-            <div style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:16px;">
-              ${isLogin ? `
-                Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>
-              ` : `
-                Already have an account? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>
-              `}
-            </div>
-          </div>
-        </div>
-      `;
-
-      if (isLogin) {
-        document.getElementById('login-form').onsubmit = async (e) => {
-          e.preventDefault();
-          Loader.show("Signing in...");
-          const { error } = await sbClient.auth.signInWithPassword({
-            email: document.getElementById('log-email').value,
-            password: document.getElementById('log-pass').value
-          });
-          Loader.hide();
-
-          if (error) Toast.show(error.message, "error");
-          else {
-            Toast.show("Welcome back!", "success");
-            await syncAuthAndProfile();
-            Router.navigate('home');
-          }
-        };
-      } else {
-        document.getElementById('signup-form').onsubmit = async (e) => {
-          e.preventDefault();
-          Loader.show("Validating details...");
-          const email = document.getElementById('reg-email').value.trim();
-          const password = document.getElementById('reg-pass').value;
-          const name = document.getElementById('reg-name').value.trim();
-          const ign = document.getElementById('reg-ign').value.trim();
-          const uid = document.getElementById('reg-uid').value.trim();
-          const phone = document.getElementById('reg-phone').value.trim();
-          const refInput = document.getElementById('reg-ref').value.trim();
-
-          try {
-            const { data: existingProfiles } = await sbClient
-              .from('profiles')
-              .select('free_fire_uid, email, phone')
-              .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
-
-            if (existingProfiles && existingProfiles.length > 0) {
-              Loader.hide();
-              const match = existingProfiles[0];
-              if (match.free_fire_uid === uid) {
-                Toast.show("Error: This Free Fire UID is already registered!", "error");
-              } else if (match.email === email) {
-                Toast.show("Error: This Email address is already registered!", "error");
-              } else if (match.phone === phone) {
-                Toast.show("Error: This WhatsApp number is already registered!", "error");
-              } else {
-                Toast.show("Error: Duplicate credentials found!", "error");
-              }
-              return;
-            }
-
-            let validReferrerUid = null;
-            if (refInput) {
-              if (refInput === uid) {
-                Loader.hide();
-                Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-                return;
-              }
-              const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
-              if (!refCheck) {
-                Loader.hide();
-                Toast.show("Yeh referral code available nahi hai!", "error");
-                return;
-              }
-              validReferrerUid = refCheck.free_fire_uid;
-            }
-
-            Loader.show("Registering account...");
-            const { data, error } = await sbClient.auth.signUp({ email, password });
-            if (error) {
-              Loader.hide();
-              Toast.show(error.message, "error");
-              return;
-            }
-
-            if (data.user) {
-              const { error: profileError } = await sbClient.from('profiles').upsert([{
-                id: data.user.id,
-                email,
-                full_name: name,
-                free_fire_name: ign,
-                free_fire_uid: uid,
-                phone: phone,
-                referred_by: validReferrerUid,
-                ref_claimed: false,
-                wallet_balance: 0,
-                is_banned: false,
-                is_admin: false
-              }]);
-
-              if (profileError) throw profileError;
-
-              Loader.hide();
-              Toast.show("Account registered and logged in successfully!", "success");
-              await syncAuthAndProfile();
-              Router.navigate('home');
-            }
-          } catch (err) {
-            Loader.hide();
-            Toast.show(err.message || "Registration validation failed.", "error");
-          }
-        };
-      }
-    }
-
-    function renderForgotPassword() {
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
-        <div class="view-container">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-            <button class="icon-btn" onclick="Router.navigate('login')" style="width:34px; height:34px;"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">RESET PASSWORD</h3>
-          </div>
-
-          <form id="forgot-email-form">
-            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Enter your registered Gmail address to receive the password reset OTP code.</p>
-              <div class="form-group">
-                <label class="form-label">Gmail Address</label>
-                <input type="email" id="fg-email" class="form-input" placeholder="e.g. yourname@gmail.com" required />
-              </div>
-              <button type="submit" class="btn btn-primary">SEND OTP TO GMAIL</button>
-            </div>
-          </form>
-
-          <form id="forgot-verify-form" class="hidden">
-            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
-              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
-              
-              <div class="form-group">
-                <label class="form-label">Enter OTP Code</label>
-                <input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP code" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 characters" minlength="8" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="8" required />
-              </div>
-
-              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
-            </div>
-          </form>
-        </div>
-      `;
-
-      document.getElementById('forgot-email-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('fg-email').value.trim();
-        if (!email) { Toast.show("Please enter your Gmail address.", "error"); return; }
-        Loader.show("Sending secure OTP to Gmail...");
-
-        try {
-          const { data, error } = await sbClient.functions.invoke("send-reset-otp", { body: { email: email } });
-          Loader.hide();
-          if (error) throw new Error(error.message || "Failed to send OTP.");
-          if (!data || data.success !== true) throw new Error(data?.message || data?.error || "Failed to send OTP.");
-
-          window.resetEmailTarget = email;
-          Toast.show("6-digit OTP sent to your Gmail!", "success");
-          document.getElementById('forgot-email-form').classList.add('hidden');
-          document.getElementById('forgot-verify-form').classList.remove('hidden');
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Unable to send OTP. Please try again.", "error");
-        }
-      };
-
-      document.getElementById('forgot-verify-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const token = document.getElementById('fg-otp').value.trim();
-        const newPassword = document.getElementById('fg-newpass').value;
-        const confPassword = document.getElementById('fg-confpass').value;
-
-        if (!/^\d{6}$/.test(token)) { Toast.show("Please enter the 6-digit OTP.", "error"); return; }
-        if (newPassword.length < 8) { Toast.show("Password must be at least 8 characters.", "error"); return; }
-        if (newPassword !== confPassword) { Toast.show("New password and confirm password do not match!", "error"); return; }
-        if (!window.resetEmailTarget) { Toast.show("Please request a new OTP first.", "error"); return; }
-
-        Loader.show("Verifying OTP & Updating password...");
-        try {
-          const { data, error } = await sbClient.functions.invoke("verify-reset-otp", { body: { email: window.resetEmailTarget, otp: token, new_password: newPassword } });
-          Loader.hide();
-          if (error) throw new Error(error.message || "OTP verification failed.");
-          if (!data || data.success !== true) throw new Error(data?.message || "Invalid or expired OTP.");
-
-          Toast.show("Password changed successfully! Please login.", "success");
-          window.resetEmailTarget = null;
-          Router.navigate("login");
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
-        }
-      };
-    }
-
-    function renderProfile() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      const p = currentProfile || {};
-      const avatarSrc = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-      const hasReferrer = !!p.referred_by;
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card" style="text-align:center; position:relative;">
-            <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
-              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
-              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #0e1118;">
-                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
-              </label>
-              <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
-            </div>
-            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${escapeHTML(p.free_fire_name || p.full_name || 'Soldier')}</h2>
-            <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
-          </div>
-
-          <div class="player-hero-card">
-            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-user-pen"></i> Edit Profile Details
-            </h3>
-
-            <form id="edit-profile-form">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" placeholder="Enter full name" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire In-Game Name (IGN)</label>
-                <input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" placeholder="e.g. MLT・HAMZA★" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire UID (Editable)</label>
-                <input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" placeholder="Enter Free Fire UID" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">WhatsApp Mobile #</label>
-                <input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" placeholder="e.g. 03001234567" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Email (Editable)</label>
-                <input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || currentUser.email)}" placeholder="yourname@gmail.com" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Referral Code (UID)</label>
-                <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
-                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (5 coins reward)</span>'}
-              </div>
-
-              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
-                <i class="fa-solid fa-check"></i> SAVE CHANGES
-              </button>
-            </form>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('edit-profile-form').onsubmit = saveUserProfile;
-    }
-
-    async function uploadAvatarPhoto(input) {
-      const file = input.files[0];
-      if (!file || !currentUser) return;
-
-      Loader.show("Uploading photo...");
-      try {
-        const fileExt = file.name.split('.').pop();
-        const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
-
-        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file, { upsert: true });
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
-
-        const { error: updateError } = await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-        if (updateError) throw updateError;
-
-        document.getElementById('profile-display-avatar').src = publicUrl;
-        Toast.show("Profile photo updated successfully!", "success");
-        await syncAuthAndProfile();
-      } catch (err) {
-        Toast.show(err.message || "Failed to upload photo.", "error");
-      } finally {
-        Loader.hide();
-      }
-    }
-
-    async function saveUserProfile(e) {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const fullName = document.getElementById('prof-fullname').value.trim();
-      const ign = document.getElementById('prof-ign').value.trim();
-      const newUid = document.getElementById('prof-uid').value.trim();
-      const newEmail = document.getElementById('prof-email').value.trim();
-      const phone = document.getElementById('prof-phone').value.trim();
-      const refInputEl = document.getElementById('prof-ref');
-      const newRef = refInputEl ? refInputEl.value.trim() : '';
-      const btn = document.getElementById('btn-save-profile');
-
-      if (btn) btn.disabled = true;
-      Loader.show("Validating and saving profile...");
-
-      try {
-        const { data: dupCheck } = await sbClient
-          .from('profiles')
-          .select('id, free_fire_uid, email')
-          .or(`free_fire_uid.eq.${newUid},email.eq.${newEmail}`);
-
-        if (dupCheck && dupCheck.length > 0) {
-          const conflict = dupCheck.find(x => x.id !== currentUser.id);
-          if (conflict) {
-            Loader.hide();
-            if (conflict.free_fire_uid === newUid) {
-              Toast.show("Error: This Free Fire UID is already used by another account!", "error");
-            } else {
-              Toast.show("Error: This Email is already used by another account!", "error");
-            }
-            if (btn) btn.disabled = false;
-            return;
-          }
-        }
-
-        let verifiedReferredBy = currentProfile?.referred_by || null;
-
-        if (!currentProfile?.referred_by && newRef) {
-          if (newRef === newUid) {
-            Loader.hide();
-            Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
-          const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', newRef).maybeSingle();
-          if (!refCheck) {
-            Loader.hide();
-            Toast.show("Yeh referral code available nahi hai!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
-          verifiedReferredBy = refCheck.free_fire_uid;
-        }
-
-        const { error } = await sbClient.from('profiles').upsert([{
-          id: currentUser.id,
-          email: newEmail,
-          full_name: fullName,
-          free_fire_name: ign,
-          free_fire_uid: newUid,
-          phone: phone,
-          referred_by: verifiedReferredBy,
-          updated_at: new Date().toISOString()
-        }], { onConflict: 'id' });
-
-        if (error) throw error;
-
-        Toast.show("Profile updated successfully!", "success");
-        await syncAuthAndProfile();
-        renderProfile();
-      } catch (err) {
-        Toast.show(err.message || "Failed to update profile.", "error");
-      } finally {
-        if (btn) btn.disabled = false;
-        Loader.hide();
-      }
-    }
-
-    async function renderNotifications() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      
-      let data = [];
-      try {
-        const [notifRes] = await Promise.all([
-          sbClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-          sbClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false)
-        ]);
-        data = notifRes.data || [];
-      } catch (e) {
-        console.error(e);
-      }
-      
-      unreadNotifCount = 0;
-      updateNotificationBadges();
-
-      if (!data.length) {
-        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
-        return;
-      }
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          ${data.map(n => `
-            <div class="tx-item" style="border-left: 3px solid var(--primary);">
-              <div class="tx-info">
-                <h4>${escapeHTML(n.title)}</h4>
-                <p style="font-size:12px; color:var(--text-muted);">${escapeHTML(n.message)}</p>
-                <span>${new Date(n.created_at).toLocaleString()}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function renderRules() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card">
-            <h3 style="color:var(--primary); font-family:var(--font-gaming); margin-bottom:6px;">Fair Play Mandatory</h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">No hacks, emulators, or teaming allowed. Violators will be banned permanently with forfeiture of wallet balance.</p>
-          </div>
-          <div class="player-hero-card" style="margin-top:10px;">
-            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:6px;">Permanent Slot Policy</h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">Once a slot is reserved, funds are locked and slot registration is non-refundable.</p>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderAbout() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container" style="text-align:center;">
-          <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and instant winner prizes.</p>
-        </div>
-      `;
-    }
-
-    const Drawer = {
-      open() {
-        document.getElementById('side-drawer').classList.add('open');
-        document.getElementById('drawer-overlay').classList.remove('hidden');
-      },
-      close() {
-        document.getElementById('side-drawer').classList.remove('open');
-        document.getElementById('drawer-overlay').classList.add('hidden');
-      }
-    };
-
-    function toggleSupportMenu(forceState) {
-      const menu = document.getElementById('support-popup-menu');
-      if (!menu) return;
-      const shouldShow = typeof forceState === 'boolean' ? forceState : !menu.classList.contains('show');
-      menu.classList.toggle('show', shouldShow);
-    }
-
-    const ChatModal = {
-      isOpen: false,
-      interval: null,
-      async open() {
-        if (!currentUser) {
-          Toast.show("Please sign in to chat with admin", "info");
-          Router.navigate('login');
-          return;
-        }
-        document.getElementById('chat-modal-overlay').classList.remove('hidden');
-        this.isOpen = true;
-        
-        await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', currentUser.id).eq('sender_role', 'admin').eq('is_read', false);
-
-        await this.loadMessages();
-        await syncAuthAndProfile();
-
-        this.interval = setInterval(() => this.loadMessages(), 3500);
-      },
-      close() {
-        document.getElementById('chat-modal-overlay').classList.add('hidden');
-        this.isOpen = false;
-        if (this.interval) clearInterval(this.interval);
-        syncAuthAndProfile();
-      },
-      async loadMessages() {
-        if (!currentUser) return;
-        const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
-
-        const container = document.getElementById('chat-modal-messages');
-        if (!data || data.length === 0) {
-          container.innerHTML = `
-            <div class="chat-row theirs">
-              <div class="chat-bubble theirs">
-                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-              </div>
-              <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = data.map(m => {
-          const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
-          const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-          return `
-            <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
-              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
-                ${escapeHTML(m.message)}
-              </div>
-              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
-                ${isMe ? 'You' : 'Admin Support'} • ${time}
-              </div>
-            </div>
-          `;
-        }).join('');
-        container.scrollTop = container.scrollHeight;
-      }
-    };
-
-    document.getElementById('chat-modal-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const input = document.getElementById('chat-modal-input');
-      const text = input.value.trim();
-      if (!text || !currentUser) return;
-      input.value = "";
-
-      const { error } = await sbClient.from('support_messages').insert([{
-        user_id: currentUser.id,
-        sender_id: currentUser.id,
-        sender_role: 'player',
-        message: text,
-        is_read: false
-      }]);
-
-      if (error) Toast.show(error.message, "error");
-      else ChatModal.loadMessages();
-    };
-
-    function setupPullToRefresh() {
-      const mainContent = document.querySelector('.main-content');
-      const indicator = document.getElementById('pull-refresh-indicator');
-      if (!mainContent || !indicator) return;
-
-      let startY = 0;
-      let pulling = false;
-
-      mainContent.addEventListener('touchstart', (e) => {
-        if (mainContent.scrollTop === 0) {
-          startY = e.touches[0].clientY;
-          pulling = true;
-        }
-      }, { passive: true });
-
-      mainContent.addEventListener('touchmove', (e) => {
-        if (!pulling) return;
-        const currentY = e.touches[0].clientY;
-        const diff = currentY - startY;
-
-        if (diff > 70) {
-          indicator.style.display = 'block';
-        }
-      }, { passive: true });
-
-      mainContent.addEventListener('touchend', async (e) => {
-        if (!pulling) return;
-        pulling = false;
-        const endY = e.changedTouches[0].clientY;
-        if (endY - startY > 90) {
-          indicator.innerText = "🔄 Refreshing data...";
-          await hardRefreshApp();
-        } else {
-          indicator.style.display = 'none';
-        }
-      });
-    }
-
-    async function hardRefreshApp() {
-      Loader.show("Refreshing app...");
-      await syncAuthAndProfile();
-      const currentPage = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
-      await Router.navigate(currentPage, null, false);
-      Loader.hide();
-      Toast.show("App refreshed successfully!", "success");
-      const indicator = document.getElementById('pull-refresh-indicator');
-      if (indicator) indicator.style.display = 'none';
-    }
-
-    function setupDraggableBot() {
-      const widget = document.getElementById('admin-float-widget');
-      const mainBtn = document.getElementById('float-main-btn');
-      let isDragging = false;
-      let startX, startY, origX, origY;
-      let hasMoved = false;
-
-      function onStart(e) {
-        isDragging = true;
-        hasMoved = false;
-        const touch = e.touches ? e.touches[0] : e;
-        startX = touch.clientX;
-        startY = touch.clientY;
-
-        const rect = widget.getBoundingClientRect();
-        origX = rect.left;
-        origY = rect.top;
-      }
-
-      function onMove(e) {
-        if (!isDragging) return;
-        const touch = e.touches ? e.touches[0] : e;
-        const dx = touch.clientX - startX;
-        const dy = touch.clientY - startY;
-
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
-
-        let newX = origX + dx;
-        let newY = origY + dy;
-
-        const container = document.getElementById('app-container');
-        const cRect = container.getBoundingClientRect();
-
-        newX = Math.max(cRect.left + 5, Math.min(newX, cRect.right - 65));
-        newY = Math.max(cRect.top + 50, Math.min(newY, cRect.bottom - 130));
-
-        widget.style.left = (newX - cRect.left) + 'px';
-        widget.style.top = (newY - cRect.top) + 'px';
-        widget.style.right = 'auto';
-        widget.style.bottom = 'auto';
-      }
-
-      function onEnd() { isDragging = false; }
-
-      widget.addEventListener('touchstart', onStart, { passive: true });
-      window.addEventListener('touchmove', onMove, { passive: true });
-      window.addEventListener('touchend', onEnd);
-      widget.addEventListener('mousedown', onStart);
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onEnd);
-
-      mainBtn.addEventListener('click', (e) => {
-        if (!hasMoved) {
-          toggleSupportMenu();
-        }
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('btn-hamburger').onclick = () => Drawer.open();
-
-      document.getElementById('btn-drawer-logout').onclick = async () => {
-        Drawer.close();
-        await sbClient.auth.signOut();
-        currentUser = null;
-        currentProfile = null;
-        userJoinedTournamentIds.clear();
-        updateDrawerUI();
-        Toast.show("Logged out successfully", "info");
-        Router.navigate('login');
-      };
-
-      setupDraggableBot();
-      setupPullToRefresh();
-      
-      Loader.show("Checking session...");
-      await syncAuthAndProfile();
-      Loader.hide();
-
-      if (currentUser) {
-        Router.navigate('home');
-      } else {
-        Router.navigate('login');
-      }
-    });
   </script>
 </body>
 </html>
