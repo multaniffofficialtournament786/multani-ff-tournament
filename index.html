@@ -388,6 +388,7 @@
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
+        <button onclick="Router.navigate('withdrawal')" class="drawer-link text-accent"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
         <button onclick="Router.navigate('diamonds')" class="drawer-link text-gold"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
         <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends</button>
@@ -479,7 +480,7 @@
     <nav id="bottom-nav" class="bottom-nav hidden">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-      <div class="nav-item" data-page="invite" onclick="Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i><span>Invite</span></div>
+      <div class="nav-item" data-page="withdrawal" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
       <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
       <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
@@ -724,6 +725,7 @@
         else if (page === 'tournaments') renderTournaments();
         else if (page === 'tournament_detail') renderTournamentDetail(id);
         else if (page === 'wallet') renderWallet();
+        else if (page === 'withdrawal') renderWithdrawal();
         else if (page === 'deposit') renderDeposit();
         else if (page === 'diamonds') renderDiamondsShop();
         else if (page === 'diamond_history') renderDiamondHistoryPage('my');
@@ -993,6 +995,10 @@
               <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
               <span class="cat-label">Matches</span>
             </div>
+            <div class="cat-item" onclick="Router.navigate('withdrawal')">
+              <div class="cat-circle" style="border-color:var(--accent-cyan);"><i class="fa-solid fa-money-bill-transfer" style="color:var(--accent-cyan)"></i></div>
+              <span class="cat-label">Withdraw</span>
+            </div>
             <div class="cat-item" onclick="Router.navigate('deposit')">
               <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
               <span class="cat-label">Add Cash</span>
@@ -1008,10 +1014,6 @@
             <div class="cat-item" onclick="Router.navigate('wallet')">
               <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
               <span class="cat-label">Wallet</span>
-            </div>
-            <div class="cat-item" onclick="Router.navigate('wallet')">
-              <div class="cat-circle"><i class="fa-solid fa-receipt" style="color:#00e676;"></i></div>
-              <span class="cat-label">Record</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('leaderboard')">
               <div class="cat-circle"><i class="fa-solid fa-ranking-star" style="color:#ff0055"></i></div>
@@ -1747,13 +1749,183 @@
           <div class="wallet-hero">
             <span class="wallet-balance-title">Current Balance</span>
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
-            <button class="btn btn-primary" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash / Deposit</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" style="flex:1;" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
+              <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash</button>
+            </div>
           </div>
 
           <div class="section-title"><span>Transaction History (Newest First)</span></div>
           <div>${historyHtml}</div>
         </div>
       `;
+    }
+
+    // ==========================================
+    // PLAYER WITHDRAWAL & HISTORY MODULE
+    // ==========================================
+    async function renderWithdrawal() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      Loader.show("Loading withdrawal portal...");
+      await syncAuthAndProfile();
+
+      let withdrawHistoryHtml = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:16px;">No withdrawal requests yet.</p>`;
+      try {
+        const { data: wList, error: wErr } = await sbClient.from('withdrawals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        if (!wErr && wList && wList.length > 0) {
+          withdrawHistoryHtml = wList.map(w => {
+            const accNum = w.account_number || '';
+            const maskedAcc = accNum.length > 4 ? '*'.repeat(accNum.length - 4) + accNum.slice(-4) : accNum;
+            
+            let statusBadgeStyle = 'background:rgba(255,190,0,0.2); color:var(--accent-gold);';
+            if (w.status === 'approved') statusBadgeStyle = 'background:rgba(0,230,118,0.2); color:var(--success);';
+            if (w.status === 'rejected') statusBadgeStyle = 'background:rgba(255,23,68,0.2); color:var(--danger);';
+
+            return `
+              <div class="tx-item" style="border-left: 3px solid ${w.status === 'approved' ? 'var(--success)' : (w.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)')}; margin-bottom:10px;">
+                <div class="tx-info">
+                  <h4 style="color:#fff;">${escapeHTML(w.payment_method)} • PKR ${w.amount}</h4>
+                  <span>
+                    Fee (2%): PKR ${w.fee || (w.amount * 0.02)} | <strong>Net: PKR ${w.net_amount || (w.amount * 0.98)}</strong><br>
+                    Account: ${escapeHTML(maskedAcc)} (${escapeHTML(w.account_name || 'N/A')})<br>
+                    Date: ${new Date(w.created_at).toLocaleString()}
+                    ${w.admin_note ? `<br><strong style="color:var(--accent-cyan);">Admin Note:</strong> ${escapeHTML(w.admin_note)}` : ''}
+                  </span>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <span style="font-size:10px; padding:3px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${statusBadgeStyle}">${escapeHTML(w.status)}</span>
+                  ${w.payment_screenshot_url ? `<br><a href="${w.payment_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:9px; padding:3px 6px; margin-top:6px; color:var(--accent-cyan); display:inline-block;">View Proof</a>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error("Error loading withdrawals:", err);
+      }
+      Loader.hide();
+
+      const balance = currentProfile?.wallet_balance || 0;
+
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="wallet-hero" style="margin-bottom:14px;">
+            <span class="wallet-balance-title">Available Wallet Balance</span>
+            <div class="wallet-amount" style="font-size:32px; margin-bottom:0;">PKR ${balance}</div>
+          </div>
+
+          <div class="player-hero-card" style="padding:16px; margin-bottom:16px;">
+            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:12px;">
+              <i class="fa-solid fa-money-bill-transfer"></i> Request Withdrawal / Cashout
+            </h3>
+
+            <form id="withdrawal-form">
+              <div class="form-group">
+                <label class="form-label">Withdrawal Amount (Min PKR 200)</label>
+                <input type="number" id="wd-amount" class="form-input" placeholder="e.g. 1000" min="200" required oninput="calculateWithdrawalNet()" />
+              </div>
+
+              <div style="background:#0a0e16; border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:14px; font-size:12px; display:flex; justify-content:space-between;">
+                <span>Withdrawal Fee (2%): <strong id="wd-fee-display" style="color:var(--danger);">PKR 0</strong></span>
+                <span>Net You Receive: <strong id="wd-net-display" style="color:var(--success);">PKR 0</strong></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Payment Method</label>
+                <select id="wd-method" class="form-input" required>
+                  <option value="JazzCash">JazzCash</option>
+                  <option value="EasyPaisa">EasyPaisa</option>
+                  <option value="SadaPay">SadaPay</option>
+                  <option value="NayaPay">NayaPay</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Account Holder Name</label>
+                <input type="text" id="wd-acc-name" class="form-input" placeholder="Enter account title" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Account Number / Mobile Number</label>
+                <input type="text" id="wd-acc-num" class="form-input" placeholder="e.g. 03001234567" required />
+              </div>
+
+              <button type="submit" id="btn-submit-withdrawal" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">
+                SUBMIT WITHDRAWAL REQUEST
+              </button>
+            </form>
+          </div>
+
+          <div class="section-title"><span>📜 Withdrawal History</span></div>
+          <div>${withdrawHistoryHtml}</div>
+        </div>
+      `;
+
+      document.getElementById('withdrawal-form').onsubmit = submitWithdrawalRequest;
+    }
+
+    function calculateWithdrawalNet() {
+      const amtVal = parseFloat(document.getElementById('wd-amount').value) || 0;
+      const fee = amtVal * 0.02;
+      const net = amtVal - fee;
+      document.getElementById('wd-fee-display').innerText = `PKR ${fee.toFixed(2)}`;
+      document.getElementById('wd-net-display').innerText = `PKR ${net.toFixed(2)}`;
+    }
+
+    async function submitWithdrawalRequest(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const amount = parseFloat(document.getElementById('wd-amount').value);
+      const method = document.getElementById('wd-method').value;
+      const accNum = document.getElementById('wd-acc-num').value.trim();
+      const accName = document.getElementById('wd-acc-name').value.trim();
+
+      if (isNaN(amount) || amount < 200) {
+        Toast.show("Minimum withdrawal amount is PKR 200.", "error");
+        return;
+      }
+
+      const currentBalance = currentProfile?.wallet_balance || 0;
+      if (amount > currentBalance) {
+        Toast.show("Requested amount exceeds your available wallet balance!", "error");
+        return;
+      }
+
+      if (!accName || !accNum) {
+        Toast.show("Please fill in account holder name and number.", "error");
+        return;
+      }
+
+      const fee = amount * 0.02;
+      const net = amount - fee;
+
+      const confirmMsg = `Please verify your withdrawal:\n• Requested: PKR ${amount}\n• Fee (2%): PKR ${fee}\n• Net Payout: PKR ${net}\n• Method: ${method} (${accNum})`;
+      if (!confirm(confirmMsg)) return;
+
+      const submitBtn = document.getElementById('btn-submit-withdrawal');
+      if (submitBtn) submitBtn.disabled = true;
+      Loader.show("Submitting withdrawal request securely...");
+
+      try {
+        const { data, error } = await sbClient.rpc('request_withdrawal', {
+          p_amount: amount,
+          p_method: method,
+          p_acc_num: accNum,
+          p_acc_name: accName
+        });
+
+        if (error) throw error;
+
+        Loader.hide();
+        Toast.show("Withdrawal request submitted successfully!", "success");
+        await syncAuthAndProfile();
+        renderWithdrawal();
+      } catch (err) {
+        Loader.hide();
+        if (submitBtn) submitBtn.disabled = false;
+        Toast.show(err.message || "Failed to submit withdrawal request.", "error");
+      }
     }
 
     function renderDeposit() {
