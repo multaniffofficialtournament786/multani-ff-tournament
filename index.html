@@ -1474,7 +1474,7 @@
             <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winners Declared</div>
             ${winData.map(w => `
               <div style="font-size:13px; font-weight:bold; color:#fff; margin-top: 4px;">
-                ${escapeHTML(w.profiles?.free_fire_name || 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR ${w.prize_amount}]
+                ${escapeHTML(w.profiles?.free_fire_name \vert{}\vert{} 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR${w.prize_amount}]
               </div>
             `).join('')}
           </div>
@@ -1775,8 +1775,8 @@
             <span class="wallet-balance-title">Current Balance</span>
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
             <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" style="flex:1; background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000;" onclick="openVipWdModal()"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
               <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash</button>
+              <button class="btn btn-primary" style="flex:1; background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000;" onclick="openVipWdModal()"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
             </div>
           </div>
 
@@ -1960,6 +1960,34 @@
         Toast.show(err.message || "Failed to submit withdrawal request.", "error");
       }
     }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('btn-hamburger').onclick = () => Drawer.open();
+
+      document.getElementById('btn-drawer-logout').onclick = async () => {
+        Drawer.close();
+        await sbClient.auth.signOut();
+        currentUser = null;
+        currentProfile = null;
+        userJoinedTournamentIds.clear();
+        updateDrawerUI();
+        Toast.show("Logged out successfully", "info");
+        Router.navigate('login');
+      };
+
+      setupDraggableBot();
+      setupPullToRefresh();
+      
+      Loader.show("Checking session...");
+      await syncAuthAndProfile();
+      Loader.hide();
+
+      if (currentUser) {
+        Router.navigate('home');
+      } else {
+        Router.navigate('login');
+      }
+    });
   </script>
 </body>
 </html>
