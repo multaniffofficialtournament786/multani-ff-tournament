@@ -201,6 +201,10 @@
           <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
           <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
+        <button onclick="selectTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-money-bill-transfer w-5 text-amber-400"></i> Withdrawal Requests
+          <span id="badge-withdrawals" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
         <button onclick="selectTab('diamond_requests')" id="nav-diamond_requests" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-gem w-5 text-amber-400"></i> Diamond Requests
           <span id="badge-diamond_requests" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
@@ -289,6 +293,11 @@
               <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
               <span id="quick-badge-deposits" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
+            <button onclick="selectTab('withdrawals')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-money-bill-transfer text-amber-400 text-lg"></i>
+              <p class="text-[11px] font-bold mt-1 text-gray-200">Withdraw</p>
+              <span id="quick-badge-withdrawals" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
             <button onclick="selectTab('diamond_requests')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
               <i class="fa-solid fa-gem text-amber-400 text-lg"></i>
               <p class="text-[11px] font-bold mt-1 text-gray-200">Diamonds</p>
@@ -296,7 +305,6 @@
             </button>
             <button onclick="selectTab('winners')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Winners</p></button>
             <button onclick="selectTab('users')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-wallet text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Wallets</p></button>
-            <button onclick="selectTab('settings')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Notice</p></button>
           </div>
         </div>
       </section>
@@ -320,6 +328,37 @@
         <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
         <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
+        </div>
+      </section>
+
+      <!-- WITHDRAWAL REQUESTS ADMIN SECTION -->
+      <section id="section-withdrawals" class="space-y-4 hidden w-full">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;" class="w-full max-w-full md:max-w-2xl">
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Pending Withdrawals</span>
+            <div id="admin-stat-pending" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #ffbe00; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Approved Withdrawals</span>
+            <div id="admin-stat-approved" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #00e676; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Withdrawal Amount</span>
+            <div id="admin-stat-total-amt" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #00f0ff; margin-top: 4px;">PKR 0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Fees Earned</span>
+            <div id="admin-stat-fees" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #ffbe00; margin-top: 4px;">PKR 0</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Withdrawal Requests</h3>
+          <button onclick="loadAdminWithdrawals()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading withdrawal requests...</p>
         </div>
       </section>
 
@@ -931,7 +970,7 @@
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'diamond_requests', 'users', 'tutorials', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'tutorials', 'support', 'banned', 'settings'];
 
     function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
@@ -968,6 +1007,7 @@
 
       if (tabId === 'tournaments') loadTournaments();
       if (tabId === 'deposits') loadDeposits();
+      if (tabId === 'withdrawals') loadAdminWithdrawals();
       if (tabId === 'diamond_requests') loadAdminDiamondRequests();
       if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
       if (tabId === 'users') loadUsers();
@@ -983,14 +1023,16 @@
     });
 
     async function loadDashboardStats() {
-      const [allDeps, allDiamonds, userCountRes, supportCountRes] = await Promise.all([
+      const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes] = await Promise.all([
         sbClient.from('deposit_requests').select('*'),
+        sbClient.from('withdrawals').select('*'),
         sbClient.from('diamond_requests').select('*'),
         sbClient.from('profiles').select('*', { count: 'exact', head: true }),
         sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false)
       ]);
 
       const safeDeps = allDeps.data || [];
+      const safeWds = allWds.data || [];
       const safeDiamonds = allDiamonds.data || [];
 
       const totalDeposits = safeDeps
@@ -1013,6 +1055,18 @@
       if (quickDep) {
         quickDep.innerText = pendingCount;
         quickDep.classList.toggle('hidden', pendingCount === 0);
+      }
+
+      const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+      const badgeWd = document.getElementById('badge-withdrawals');
+      if (badgeWd) {
+        badgeWd.innerText = pendingWdCount;
+        badgeWd.classList.toggle('hidden', pendingWdCount === 0);
+      }
+      const quickWd = document.getElementById('quick-badge-withdrawals');
+      if (quickWd) {
+        quickWd.innerText = pendingWdCount;
+        quickWd.classList.toggle('hidden', pendingWdCount === 0);
       }
 
       const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
@@ -1046,6 +1100,179 @@
       if (navBadgeSup) {
         navBadgeSup.innerText = supCount;
         navBadgeSup.classList.toggle('hidden', supCount === 0);
+      }
+    }
+
+    // ==========================================
+    // ADMIN WITHDRAWAL MANAGEMENT FUNCTIONS
+    // ==========================================
+    async function loadAdminWithdrawals() {
+      const container = document.getElementById('admin-withdrawal-requests-list');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading withdrawal requests...</p>`;
+
+      try {
+        const { data: withdrawals, error: wErr } = await sbClient
+          .from('withdrawals')
+          .select('*, profiles(free_fire_name, free_fire_uid, full_name, email)')
+          .order('created_at', { ascending: false });
+
+        if (wErr) throw wErr;
+
+        const { data: feesData, error: fErr } = await sbClient
+          .from('withdrawal_fee_earnings')
+          .select('*');
+
+        if (fErr) console.error("Error fetching fee earnings:", fErr);
+
+        const feeList = feesData || [];
+        let totalFeesEarned = feeList.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+        const list = withdrawals || [];
+        let pendingCount = 0;
+        let approvedCount = 0;
+        let totalWithdrawalAmt = 0;
+
+        list.forEach(w => {
+          if ((w.status || '').toLowerCase() === 'pending') pendingCount++;
+          if ((w.status || '').toLowerCase() === 'approved') {
+            approvedCount++;
+            totalWithdrawalAmt += Number(w.amount || 0);
+          }
+        });
+
+        document.getElementById('admin-stat-pending').innerText = pendingCount;
+        document.getElementById('admin-stat-approved').innerText = approvedCount;
+        document.getElementById('admin-stat-total-amt').innerText = `PKR ${totalWithdrawalAmt}`;
+        document.getElementById('admin-stat-fees').innerText = `PKR ${totalFeesEarned}`;
+
+        const badgeWd = document.getElementById('badge-withdrawals');
+        if (badgeWd) {
+          badgeWd.innerText = pendingCount;
+          badgeWd.classList.toggle('hidden', pendingCount === 0);
+        }
+
+        if (!list.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No withdrawal requests found.</p>`;
+          return;
+        }
+
+        container.innerHTML = list.map(w => {
+          const p = w.profiles || {};
+          const playerName = p.free_fire_name || p.full_name || 'Player';
+          const playerUid = p.free_fire_uid || '--';
+          const statusVal = (w.status || 'pending').toLowerCase();
+          const isPending = statusVal === 'pending';
+
+          let badgeStyle = 'background:rgba(255,190,0,0.2); color:#ffbe00;';
+          if (statusVal === 'approved') badgeStyle = 'background:rgba(0,230,118,0.2); color:#00e676;';
+          if (statusVal === 'rejected') badgeStyle = 'background:rgba(255,23,68,0.2); color:#ff1744;';
+
+          return `
+            <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(playerName)} <span class="text-cyan-400 font-mono text-xs">(UID: ${escapeHTML(playerUid)})</span></h4>
+                  <span class="text-gray-400 text-[11px]">Method: <strong class="text-yellow-400">${escapeHTML(w.payment_method)}</strong> • Date: ${new Date(w.created_at).toLocaleString()}</span>
+                </div>
+                <span class="text-[10px] px-2.5 py-1 rounded font-bold uppercase ${badgeStyle}">${escapeHTML(w.status)}</span>
+              </div>
+
+              <div class="bg-[#0e1118] p-2.5 rounded-lg text-xs grid grid-cols-2 gap-2">
+                <div>Requested: <strong class="text-white">PKR ${w.amount}</strong></div>
+                <div>Fee (2%): <strong class="text-red-400">PKR ${w.fee || (w.amount * 0.02)}</strong></div>
+                <div>Net Payout: <strong class="text-emerald-400">PKR ${w.net_amount || (w.amount * 0.98)}</strong></div>
+                <div>Account Title: <strong class="text-white">${escapeHTML(w.account_name || 'N/A')}</strong></div>
+                <div class="col-span-2">Account Number: <strong class="text-cyan-400 font-mono text-sm">${escapeHTML(w.account_number)}</strong></div>
+              </div>
+
+              ${w.payment_screenshot_url ? `
+                <div>
+                  <a href="${w.payment_screenshot_url}" target="_blank" class="text-xs text-cyan-400 underline font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-image"></i> View Payment Proof Screenshot
+                  </a>
+                </div>
+              ` : ''}
+
+              ${isPending ? `
+                <div class="border-t border-[#262f40] pt-3 mt-2 space-y-2.5">
+                  <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Upload Payment Screenshot Proof</label>
+                    <input type="file" id="admin-screenshot-${w.id}" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" accept="image/*" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Admin Note / Reason</label>
+                    <input type="text" id="admin-note-${w.id}" value="${escapeHTML(w.admin_note || '')}" placeholder="e.g. Paid via Easypaisa" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+                  </div>
+                  <div class="flex gap-2 pt-1">
+                    <button onclick="reviewWithdrawalRequest('${w.id}', 'approve')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded text-xs font-bold uppercase"><i class="fa-solid fa-check"></i> APPROVE</button>
+                    <button onclick="reviewWithdrawalRequest('${w.id}', 'reject')" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded text-xs font-bold uppercase"><i class="fa-solid fa-xmark"></i> REJECT</button>
+                  </div>
+                </div>
+              ` : `
+                ${w.admin_note ? `<div class="text-[11px] text-gray-400 mt-1"><strong class="text-cyan-400">Admin Note:</strong> ${escapeHTML(w.admin_note)}</div>` : ''}
+              `}
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error("Load admin withdrawals error:", err);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading withdrawal requests.</p>`;
+      }
+    }
+
+    async function reviewWithdrawalRequest(withdrawalId, action) {
+      if (!confirm(`Are you sure you want to ${action.toUpperCase()} this withdrawal request?`)) return;
+
+      try {
+        let screenshotUrl = null;
+        const fileInput = document.getElementById(`admin-screenshot-${withdrawalId}`);
+        const noteInput = document.getElementById(`admin-note-${withdrawalId}`);
+        const adminNote = noteInput ? noteInput.value.trim() : '';
+
+        if (action === 'approve') {
+          if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            alert("Please upload a payment screenshot proof before approving!");
+            return;
+          }
+
+          const file = fileInput.files[0];
+          const filePath = `withdrawals/${withdrawalId}_${Date.now()}_${file.name}`;
+
+          const { error: uploadErr } = await sbClient.storage
+            .from('WITHDRAWAL-PAYMENT-SCREENSHOTS')
+            .upload(filePath, file, { upsert: true });
+
+          if (uploadErr) {
+            throw new Error("Failed to upload screenshot to 'WITHDRAWAL-PAYMENT-SCREENSHOTS' storage bucket. Ensure the bucket exists in Supabase.");
+          }
+
+          const { data: pubData } = sbClient.storage
+            .from('WITHDRAWAL-PAYMENT-SCREENSHOTS')
+            .getPublicUrl(filePath);
+
+          screenshotUrl = pubData.publicUrl;
+
+          await sbClient.from('withdrawals').update({
+            payment_screenshot_url: screenshotUrl
+          }).eq('id', withdrawalId);
+        }
+
+        const { data, error } = await sbClient.rpc('admin_review_withdrawal', {
+          p_withdrawal_id: withdrawalId,
+          p_action: action,
+          p_admin_note: adminNote || (action === 'approve' ? 'Approved & paid successfully.' : 'Rejected.')
+        });
+
+        if (error) throw error;
+
+        alert(`Withdrawal request ${action}d successfully!`);
+        loadAdminWithdrawals();
+        loadDashboardStats();
+
+      } catch (err) {
+        alert(err.message || "Failed to process review.");
       }
     }
 
