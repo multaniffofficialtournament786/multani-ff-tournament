@@ -745,23 +745,27 @@
           el.classList.toggle('active', el.getAttribute('data-page') === page);
         });
 
-        if (page === 'home') await renderHome();
-        else if (page === 'tournaments') await renderTournaments();
-        else if (page === 'tournament_detail') await renderTournamentDetail(id);
-        else if (page === 'wallet') await renderWallet();
-        else if (page === 'withdrawal') await renderWithdrawal();
-        else if (page === 'deposit') renderDeposit();
-        else if (page === 'diamonds') await renderDiamondsShop();
-        else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
-        else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
-        else if (page === 'invite') await renderInvite();
-        else if (page === 'login' || page === 'register') renderAuth(page);
-        else if (page === 'profile') renderProfile();
-        else if (page === 'winners') await renderWinners();
-        else if (page === 'leaderboard') await renderLeaderboard();
-        else if (page === 'notifications') await renderNotifications();
-        else if (page === 'rules') renderRules();
-        else if (page === 'about') renderAbout();
+        try {
+          if (page === 'home') await renderHome();
+          else if (page === 'tournaments') await renderTournaments();
+          else if (page === 'tournament_detail') await renderTournamentDetail(id);
+          else if (page === 'wallet') await renderWallet();
+          else if (page === 'withdrawal') await renderWithdrawal();
+          else if (page === 'deposit') renderDeposit();
+          else if (page === 'diamonds') await renderDiamondsShop();
+          else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
+          else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
+          else if (page === 'invite') await renderInvite();
+          else if (page === 'login' || page === 'register') renderAuth(page);
+          else if (page === 'profile') renderProfile();
+          else if (page === 'winners') await renderWinners();
+          else if (page === 'leaderboard') await renderLeaderboard();
+          else if (page === 'notifications') await renderNotifications();
+          else if (page === 'rules') renderRules();
+          else if (page === 'about') renderAbout();
+        } catch (err) {
+          console.error("Navigation error:", err);
+        }
 
         Loader.hide();
       },
