@@ -385,13 +385,14 @@
 
       <nav class="drawer-nav">
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
+        <button onclick="Router.navigate('spin')" class="drawer-link text-gold"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
         <button onclick="Router.navigate('withdrawal')" class="drawer-link text-accent"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
         <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
         <button onclick="Router.navigate('diamonds')" class="drawer-link text-gold"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
-        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends</button>
+        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</button>
         <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
           <span><i class="fa-solid fa-bell"></i> Notifications</span>
@@ -717,6 +718,7 @@
         });
 
         if (page === 'home') await renderHome();
+        else if (page === 'spin') await renderDailySpin();
         else if (page === 'tournaments') await renderTournaments();
         else if (page === 'tournament_detail') await renderTournamentDetail(id);
         else if (page === 'wallet') await renderWallet();
@@ -755,6 +757,94 @@
         Router.navigate(prev, null, false);
       }
     });
+
+    // DAILY SPIN WHEEL RENDER & TRIGGER FUNCTIONS
+    async function renderDailySpin() {
+      if (!currentUser) { Router.navigate('login'); return; }
+      
+      let slots = [];
+      try {
+        const { data } = await sbClient.from('daily_spin_rewards').select('*').order('slot_number', { ascending: true });
+        slots = data || [];
+      } catch (e) {
+        console.error(e);
+      }
+
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
+        <div class="view-container" style="text-align:center;">
+          <div style="margin-bottom:12px;">
+            <span style="font-family:var(--font-gaming); font-size:11px; letter-spacing:3px; color:var(--primary); font-weight:700;">MULTANI FF OFFICIAL TOURNAMENT</span>
+            <h2 style="font-family:var(--font-gaming); font-size:26px; font-weight:800; color:#ffaa00; text-transform:uppercase; text-shadow:0 2px 6px rgba(0,0,0,0.8);">DAILY SPIN</h2>
+            <p style="font-size:11px; font-weight:700; color:#ffffff; text-transform:uppercase; letter-spacing:1px;">SPIN & WIN FREE COINS</p>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:10px; margin-bottom:14px; text-align:left; font-size:11px; color:var(--text-muted);">
+            <div style="color:var(--accent-gold); font-weight:bold; margin-bottom:4px;">🎯 DAILY REWARD INFORMATION:</div>
+            <div>• <strong>8 COINS</strong> — ONLY 2 PLAYERS PER DAY</div>
+            <div>• <strong>5 COINS</strong> — ONLY 2–3 PLAYERS PER DAY</div>
+            <div>• <strong>1 FREE SPIN DAILY</strong></div>
+            <div>• <strong>NEXT SPIN: 12:00 AM — PAKISTAN TIME</strong></div>
+          </div>
+
+          <div style="position:relative; width:280px; height:280px; margin:0 auto 16px auto; display:flex; align-items:center; justify-content:center;">
+            <div id="spin-pointer" style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:24px solid var(--accent-cyan); z-index:50; filter:drop-shadow(0 0 6px var(--accent-cyan));"></div>
+            
+            <div id="wheel-element" style="width:100%; height:100%; border-radius:50%; border:4px solid var(--accent-gold); position:relative; overflow:hidden; box-shadow:0 0 30px rgba(255,190,0,0.4), inset 0 0 20px rgba(0,0,0,0.8); transition: transform 4s cubic-bezier(0.15, 0.95, 0.15, 1); background:#111;">
+              ${slots.map((s, idx) => {
+                const angle = idx * 45;
+                return `<div style="position:absolute; width:50%; height:50%; top:50%; left:50%; transform-origin:0 0; transform:rotate(${angle}deg) skewY(-45deg); background:${idx % 2 === 0 ? 'rgba(255,70,36,0.3)' : 'rgba(0,240,255,0.2)'}; border:1px solid rgba(255,255,255,0.1);"></div>`;
+              }).join('')}
+            </div>
+
+            <button onclick="triggerDailySpin()" id="wheel-center-btn" style="position:absolute; width:64px; height:64px; border-radius:50%; background:radial-gradient(circle, #ffbe00, #ff7700); border:3px solid #fff; color:#000; font-family:var(--font-gaming); font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 0 15px rgba(255,190,0,0.8); z-index:40;">
+              SPIN
+            </button>
+          </div>
+
+          <button onclick="triggerDailySpin()" id="btn-spin-now" class="btn btn-primary" style="background:linear-gradient(135deg, #ff7700, #ff4624); padding:14px; font-size:16px; box-shadow:0 4px 20px var(--primary-glow);">
+            SPIN NOW
+          </button>
+        </div>
+      `;
+    }
+
+    async function triggerDailySpin() {
+      const btn = document.getElementById('wheel-center-btn');
+      const btnNow = document.getElementById('btn-spin-now');
+      if (btn) btn.disabled = true;
+      if (btnNow) btnNow.disabled = true;
+
+      Loader.show("Processing spin securely...");
+      const { data, error } = await sbClient.rpc('spin_daily_reward');
+      Loader.hide();
+
+      if (error) {
+        Toast.show(error.message, "error");
+        if (btn) btn.disabled = false;
+        if (btnNow) btnNow.disabled = false;
+        return;
+      }
+
+      if (!data.success) {
+        Toast.show(data.message, "info");
+        if (btn) btn.disabled = false;
+        if (btnNow) btnNow.disabled = false;
+        return;
+      }
+
+      const slotNum = data.slot_number || 1;
+      const degreesPerSlot = 360 / 8;
+      const targetDegree = 3600 + (slotNum - 1) * degreesPerSlot + (degreesPerSlot / 2);
+      
+      const wheel = document.getElementById('wheel-element');
+      if (wheel) wheel.style.transform = `rotate(${targetDegree}deg)`;
+
+      setTimeout(() => {
+        Toast.show(data.message, "success");
+        syncAuthAndProfile();
+      }, 4200);
+    }
 
     function filterTournaments(status) {
       currentTournamentFilter = status;
@@ -986,6 +1076,10 @@
 
           <!-- 3. CATEGORY CIRCLES / BUTTONS -->
           <div class="category-scroll-container">
+            <div class="cat-item" onclick="Router.navigate('spin')">
+              <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-dharmachakra" style="color:var(--accent-gold)"></i></div>
+              <span class="cat-label">Daily Spin</span>
+            </div>
             <div class="cat-item" onclick="Router.navigate('tournaments')">
               <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
               <span class="cat-label">Matches</span>
@@ -1212,33 +1306,78 @@
       let totalRegisters = 0;
       let validReferrals = 0;
       let totalIncome = 0;
+      let rewardsList = [];
+      let myClaims = new Set();
 
       if (currentUser && currentProfile && currentProfile.free_fire_uid) {
-        const { data: refUsers } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, created_at, ref_claimed').eq('referred_by', currentProfile.free_fire_uid).order('ref_claimed', { ascending: true }).order('created_at', { ascending: false });
-        
-        if (refUsers && refUsers.length > 0) {
-          totalRegisters = refUsers.length;
-          validReferrals = refUsers.filter(u => u.ref_claimed).length;
-          totalIncome = validReferrals * 5; 
-          
-          invitedListHTML = refUsers.map(u => {
-            const isClaimed = u.ref_claimed;
-            return `
-              <div class="tx-item" style="${!isClaimed ? 'border-left: 3px solid var(--accent-gold);' : ''}">
-                <div class="tx-info">
-                  <h4>${escapeHTML(u.free_fire_name || 'Gamer')}</h4>
-                  <span>UID: ${escapeHTML(u.free_fire_uid || '--')} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+        try {
+          const [refUsersRes, rewRes, claimRes] = await Promise.all([
+            sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, created_at, ref_claimed').eq('referred_by', currentProfile.free_fire_uid).order('ref_claimed', { ascending: true }).order('created_at', { ascending: false }),
+            sbClient.from('referral_rewards').select('*').eq('is_active', true).order('referrals_required', { ascending: true }),
+            sbClient.from('user_referral_claims').select('reward_id').eq('user_id', currentUser.id)
+          ]);
+
+          const refUsers = refUsersRes.data || [];
+          rewardsList = rewRes.data || [];
+          myClaims = new Set((claimRes.data || []).map(c => c.reward_id));
+
+          if (refUsers.length > 0) {
+            totalRegisters = refUsers.length;
+            validReferrals = refUsers.filter(u => u.ref_claimed).length;
+            totalIncome = validReferrals * 5; 
+            
+            invitedListHTML = refUsers.map(u => {
+              const isClaimed = u.ref_claimed;
+              return `
+                <div class="tx-item" style="${!isClaimed ? 'border-left: 3px solid var(--accent-gold);' : ''}">
+                  <div class="tx-info">
+                    <h4>${escapeHTML(u.free_fire_name || 'Gamer')}</h4>
+                    <span>UID: ${escapeHTML(u.free_fire_uid || '--')} • Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div>
+                    ${isClaimed ? 
+                      `<span style="font-size:11px; color:var(--success); font-weight:bold;"><i class="fa-solid fa-check"></i> Claimed (+5)</span>` : 
+                      `<button onclick="claimReferralBonus('${u.id}', 5)" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; padding:6px 12px; font-size:11px; font-weight:bold;">CLAIM +5</button>`
+                    }
+                  </div>
                 </div>
-                <div>
-                  ${isClaimed ? 
-                    `<span style="font-size:11px; color:var(--success); font-weight:bold;"><i class="fa-solid fa-check"></i> Claimed (+5)</span>` : 
-                    `<button onclick="claimReferralBonus('${u.id}', 5)" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; padding:6px 12px; font-size:11px; font-weight:bold;">CLAIM +5</button>`
-                  }
-                </div>
-              </div>
-            `;
-          }).join('');
+              `;
+            }).join('');
+          }
+        } catch (e) {
+          console.error(e);
         }
+      }
+
+      let milestonesHtml = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No milestone rewards configured.</p>`;
+      if (rewardsList.length > 0) {
+        milestonesHtml = rewardsList.map(rew => {
+          const isClaimed = myClaims.has(rew.id);
+          const isUnlocked = validReferrals >= rew.referrals_required;
+          const progressPercent = Math.min(100, Math.floor((validReferrals / rew.referrals_required) * 100));
+
+          let btnHtml = `<button class="btn btn-secondary btn-sm" style="background:#262f40; color:#888; cursor:default;" disabled>Locked (${validReferrals}/${rew.referrals_required})</button>`;
+          if (isClaimed) {
+            btnHtml = `<button class="btn btn-secondary btn-sm" style="background:rgba(0,230,118,0.2); color:var(--success); border-color:rgba(0,230,118,0.4);" disabled><i class="fa-solid fa-check"></i> Claimed</button>`;
+          } else if (isUnlocked) {
+            btnHtml = `<button onclick="claimReferralMilestone(${rew.id})" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; font-weight:bold;">CLAIM</button>`;
+          }
+
+          return `
+            <div class="tx-item" style="display:flex; flex-direction:column; align-items:stretch; gap:8px; margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <h4 style="color:#fff; font-size:14px;">${escapeHTML(rew.reward_name)}</h4>
+                  <span style="font-size:11px; color:var(--accent-cyan);">Required: <strong>${rew.referrals_required}</strong> Referrals</span>
+                </div>
+                <div>${btnHtml}</div>
+              </div>
+              <div style="width:100%; background:#131722; height:5px; border-radius:3px; overflow:hidden;">
+                <div style="width:${progressPercent}%; background:var(--accent-gold); height:100%;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
 
       document.getElementById('app-view').innerHTML = `
@@ -1277,6 +1416,12 @@
             ${invitedListHTML}
           </div>
 
+          <!-- REFERRAL MILESTONE REWARDS SECTION EMBEDDED AT THE BOTTOM OF INVITE PAGE -->
+          <div class="section-title"><span><i class="fa-solid fa-gift text-gold"></i> Referral Milestone Rewards</span></div>
+          <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
+            ${milestonesHtml}
+          </div>
+
           <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
             <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
             <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Invite Reward</h3>
@@ -1300,6 +1445,28 @@
       } catch (err) {
         Loader.hide();
         Toast.show(err.message || "Failed to claim bonus.", "error");
+      }
+    }
+
+    async function claimReferralMilestone(rewardId) {
+      if (!currentUser) return;
+      Loader.show("Claiming referral reward securely...");
+      
+      try {
+        const { error: claimErr } = await sbClient.from('user_referral_claims').insert([{
+          user_id: currentUser.id,
+          reward_id: rewardId
+        }]);
+
+        if (claimErr) throw claimErr;
+
+        Loader.hide();
+        Toast.show("Milestone reward claimed successfully!", "success");
+        await syncAuthAndProfile();
+        renderInvite();
+      } catch (err) {
+        Loader.hide();
+        Toast.show(err.message || "Failed to claim reward. You might have already claimed it.", "error");
       }
     }
 
