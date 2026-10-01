@@ -133,7 +133,7 @@
     .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
     .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
 
-    .filter-tab-btn { padding: 8px 14px; border-radius: 8px; font-family: var(--font-gaming); font-size: 12px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); }
+    .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); text-align: center; }
     .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px var(--primary-glow); }
 
     @keyframes ledGlow {
@@ -612,8 +612,6 @@
     }
 
     async function syncAuthAndProfile() {
-      if (window._isSyncingAuth) return;
-      window._isSyncingAuth = true;
       try {
         const { data: { user } } = await sbClient.auth.getUser();
         currentUser = user;
@@ -638,8 +636,6 @@
         updateNotificationBadges();
       } catch (e) {
         console.error("Auth sync error:", e);
-      } finally {
-        window._isSyncingAuth = false;
       }
     }
 
@@ -682,7 +678,9 @@
       history: [],
       async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
-        
+        Loader.show("Loading...");
+        await syncAuthAndProfile();
+
         if (!currentUser && page !== 'login' && page !== 'register') {
           page = 'login';
         }
@@ -928,22 +926,48 @@
 
       const slotNum = data.slot_number || 1;
       const degreesPerSlot = 360 / 8;
-      const targetDegree = 3600 + (slotNum - 1) * degreesPerSlot + (degreesPerSlot / 2);
+      const slotIndex = slotNum - 1;
+
+      // Exact angle calculation for 4-second smooth spin & pointer alignment
+      const segmentCenterAngle = (slotIndex * degreesPerSlot) + 22.5;
+      const svgOffset = -22.5;
+      const normalizedTarget = ((270 - segmentCenterAngle - svgOffset) % 360 + 360) % 360;
+      
+      const currentRot = window._currentWheelRotation || 0;
+      const fullSpans = 360 * 5;
+      const extra = (normalizedTarget - (currentRot % 360) + 360) % 360;
+      const targetDegree = currentRot + fullSpans + extra;
+      window._currentWheelRotation = targetDegree;
       
       const wheel = document.getElementById('wheel-element');
       if (wheel) {
-        wheel.style.transition = 'none';
-        wheel.style.transform = 'rotate(0deg)';
-        void wheel.offsetWidth; // Force reflow
-        wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0.95, 0.15, 1)';
-        wheel.style.transform = `rotate(${targetDegree}deg)`;
-      }
+        try {
+          const animation = wheel.animate([
+            { transform: `rotate(${currentRot}deg)` },
+            { transform: `rotate(${targetDegree}deg)` }
+          ], {
+            duration: 4000,
+            easing: 'cubic-bezier(0.15, 0.95, 0.15, 1)',
+            fill: 'forwards'
+          });
 
-      setTimeout(() => {
+          animation.onfinish = async () => {
+            wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
+            Toast.show(data.message, "success");
+            await syncAuthAndProfile();
+            renderDailySpin();
+          };
+        } catch (e) {
+          wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
+          Toast.show(data.message, "success");
+          await syncAuthAndProfile();
+          renderDailySpin();
+        }
+      } else {
         Toast.show(data.message, "success");
-        syncAuthAndProfile();
+        await syncAuthAndProfile();
         renderDailySpin();
-      }, 4200);
+      }
     }
 
     function filterTournaments(status) {
@@ -1193,11 +1217,11 @@
               <span class="cat-label">Add Cash</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('diamonds')">
-              <div class="cat-circle"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
+              <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Diamonds</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('winners')">
-              <div class="cat-circle"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
+              <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-medal" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Winners</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('wallet')">
@@ -2024,19 +2048,39 @@
             </div>
           </div>
 
-          <!-- WALLET FILTER BUTTONS (ADDED PER REQUEST) -->
-          <div class="section-title"><span>Transaction History Filter</span></div>
-          <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-3" style="scrollbar-width:none;">
-            <button onclick="filterWalletHistory('all')" id="w-filter-all" class="filter-tab-btn active">All / Pending</button>
-            <button onclick="filterWalletHistory('deposit')" id="w-filter-deposit" class="filter-tab-btn">Payment Deposit</button>
-            <button onclick="filterWalletHistory('rejected')" id="w-filter-rejected" class="filter-tab-btn">Rejected & Refund</button>
+          <!-- TRANSACTION HISTORY FILTER & COLLAPSIBLE TOGGLE (UPDATED LAYOUT) -->
+          <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Transaction History Filter</span>
+            <button onclick="toggleTransactionHistory()" id="tx-toggle-btn" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 8px; width:auto;">
+              <span>Show History</span> <i id="tx-toggle-arrow" class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+          
+          <div style="display:flex; gap:6px; margin-bottom:14px; width:100%;">
+            <button onclick="filterWalletHistory('all')" id="w-filter-all" class="filter-tab-btn active" style="flex:1; padding:8px 4px;">All / Pending</button>
+            <button onclick="filterWalletHistory('deposit')" id="w-filter-deposit" class="filter-tab-btn" style="flex:1; padding:8px 4px;">Payment Deposit</button>
+            <button onclick="filterWalletHistory('rejected')" id="w-filter-rejected" class="filter-tab-btn" style="flex:1; padding:8px 4px;">Rejected & Refund</button>
           </div>
 
-          <div id="wallet-history-container"></div>
+          <div id="wallet-history-wrapper" class="hidden" style="margin-top:10px;">
+            <div id="wallet-history-container"></div>
+          </div>
         </div>
       `;
 
       filterWalletHistory('all');
+    }
+
+    function toggleTransactionHistory() {
+      const wrapper = document.getElementById('wallet-history-wrapper');
+      const arrow = document.getElementById('tx-toggle-arrow');
+      const btnText = document.getElementById('tx-toggle-btn').querySelector('span');
+      if (wrapper && arrow && btnText) {
+        const isHidden = wrapper.classList.contains('hidden');
+        wrapper.classList.toggle('hidden', !isHidden);
+        arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        btnText.innerText = isHidden ? 'Hide History' : 'Show History';
+      }
     }
 
     function filterWalletHistory(filterType) {
@@ -2056,7 +2100,7 @@
         } else if (filterType === 'rejected') {
           return item.statusLower === 'rejected' || (item.description && item.description.toLowerCase().includes('refund'));
         } else {
-          return true; // 'all' shows all including pending
+          return true;
         }
       });
 
