@@ -531,7 +531,7 @@
         if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
         window._loaderTimeout = setTimeout(() => {
           this.hide();
-        }, 4000);
+        }, 3000);
       },
       hide() {
         if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
@@ -612,6 +612,8 @@
     }
 
     async function syncAuthAndProfile() {
+      if (window._isSyncingAuth) return;
+      window._isSyncingAuth = true;
       try {
         const { data: { user } } = await sbClient.auth.getUser();
         currentUser = user;
@@ -636,6 +638,8 @@
         updateNotificationBadges();
       } catch (e) {
         console.error("Auth sync error:", e);
+      } finally {
+        window._isSyncingAuth = false;
       }
     }
 
@@ -678,9 +682,7 @@
       history: [],
       async navigate(page, id = null, pushHistory = true) {
         Drawer.close();
-        Loader.show("Loading page...");
-        await syncAuthAndProfile();
-
+        
         if (!currentUser && page !== 'login' && page !== 'register') {
           page = 'login';
         }
@@ -758,7 +760,7 @@
       }
     });
 
-    // DAILY SPIN WHEEL WITH PRE-SPIN STATE AND LIVE COUNTDOWN TIMER
+    // DAILY SPIN WHEEL WITH FORCE REFLOW SMOOTH ANIMATION
     async function renderDailySpin() {
       if (!currentUser) { Router.navigate('login'); return; }
       
@@ -805,7 +807,7 @@
         if (matchedSlot) {
           const slotNum = matchedSlot.slot_number || 1;
           const degreesPerSlot = 360 / 8;
-          initialRotation = 3600 + (slotNum - 1) * degreesPerSlot + (degreesPerSlot / 2);
+          initialRotation = (slotNum - 1) * degreesPerSlot + (degreesPerSlot / 2);
         }
       }
 
@@ -929,7 +931,13 @@
       const targetDegree = 3600 + (slotNum - 1) * degreesPerSlot + (degreesPerSlot / 2);
       
       const wheel = document.getElementById('wheel-element');
-      if (wheel) wheel.style.transform = `rotate(${targetDegree}deg)`;
+      if (wheel) {
+        wheel.style.transition = 'none';
+        wheel.style.transform = 'rotate(0deg)';
+        void wheel.offsetWidth; // Force reflow
+        wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0.95, 0.15, 1)';
+        wheel.style.transform = `rotate(${targetDegree}deg)`;
+      }
 
       setTimeout(() => {
         Toast.show(data.message, "success");
