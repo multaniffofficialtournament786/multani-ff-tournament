@@ -908,18 +908,32 @@
       if (btnNow) btnNow.disabled = true;
 
       Loader.show("Processing spin securely...");
-      const { data, error } = await sbClient.rpc('spin_daily_reward');
+      
+      let res;
+      try {
+        res = await sbClient.rpc('spin_daily_reward');
+      } catch (err) {
+        Loader.hide();
+        Toast.show("Connection error during spin.", "error");
+        if (btn) btn.disabled = false;
+        if (btnNow) btnNow.disabled = false;
+        return;
+      }
+      
       Loader.hide();
 
+      const data = res.data;
+      const error = res.error;
+
       if (error) {
-        Toast.show(error.message, "error");
+        Toast.show(error.message || "Spin error occurred.", "error");
         if (btn) btn.disabled = false;
         if (btnNow) btnNow.disabled = false;
         return;
       }
 
-      if (!data.success) {
-        Toast.show(data.message, "info");
+      if (!data || !data.success) {
+        Toast.show(data?.message || "You have already spun today!", "info");
         renderDailySpin();
         return;
       }
@@ -928,43 +942,36 @@
       const degreesPerSlot = 360 / 8;
       const slotIndex = slotNum - 1;
 
-      // Exact angle calculation for 4-second smooth spin & pointer alignment
+      // Exact angle calculation for smooth spin & pointer alignment
       const segmentCenterAngle = (slotIndex * degreesPerSlot) + 22.5;
       const svgOffset = -22.5;
       const normalizedTarget = ((270 - segmentCenterAngle - svgOffset) % 360 + 360) % 360;
       
       const currentRot = window._currentWheelRotation || 0;
-      const fullSpans = 360 * 5;
+      const fullSpans = 360 * 5; // 5 full rotations
       const extra = (normalizedTarget - (currentRot % 360) + 360) % 360;
       const targetDegree = currentRot + fullSpans + extra;
       window._currentWheelRotation = targetDegree;
       
       const wheel = document.getElementById('wheel-element');
-      if (wheel) {
-        try {
-          const animation = wheel.animate([
-            { transform: `rotate(${currentRot}deg)` },
-            { transform: `rotate(${targetDegree}deg)` }
-          ], {
-            duration: 4000,
-            easing: 'cubic-bezier(0.15, 0.95, 0.15, 1)',
-            fill: 'forwards'
-          });
+      const successMessage = data.message || "Reward claimed successfully!";
 
-          animation.onfinish = async () => {
-            wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
-            Toast.show(data.message, "success");
-            await syncAuthAndProfile();
-            renderDailySpin();
-          };
-        } catch (e) {
-          wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
-          Toast.show(data.message, "success");
+      if (wheel) {
+        // Reliable CSS transition approach for smooth mobile rotation
+        wheel.style.transition = 'none';
+        wheel.style.transform = `rotate(${currentRot}deg)`;
+        void wheel.offsetWidth; // Force DOM reflow
+        
+        wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0.95, 0.15, 1)';
+        wheel.style.transform = `rotate(${targetDegree}deg)`;
+
+        setTimeout(async () => {
+          Toast.show(successMessage, "success");
           await syncAuthAndProfile();
           renderDailySpin();
-        }
+        }, 4200);
       } else {
-        Toast.show(data.message, "success");
+        Toast.show(successMessage, "success");
         await syncAuthAndProfile();
         renderDailySpin();
       }
@@ -2048,7 +2055,7 @@
             </div>
           </div>
 
-          <!-- TRANSACTION HISTORY FILTER & COLLAPSIBLE TOGGLE (UPDATED LAYOUT) -->
+          <!-- TRANSACTION HISTORY FILTER & COLLAPSIBLE TOGGLE (EXACTLY AS REQUESTED) -->
           <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
             <span>Transaction History Filter</span>
             <button onclick="toggleTransactionHistory()" id="tx-toggle-btn" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 8px; width:auto;">
