@@ -809,13 +809,15 @@
         }
       }
 
+      const rewardWonText = userHistory ? `You won: ${userHistory.reward_name}` : 'SPIN & WIN FREE COINS';
+
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container" style="text-align:center;">
           <div style="margin-bottom:8px;">
             <span style="font-family:var(--font-gaming); font-size:11px; letter-spacing:3px; color:var(--primary); font-weight:700;">MULTANI FF OFFICIAL TOURNAMENT</span>
             <h2 style="font-family:var(--font-gaming); font-size:24px; font-weight:800; color:#ffaa00; text-transform:uppercase; text-shadow:0 2px 6px rgba(0,0,0,0.8); margin-top:2px;">DAILY SPIN</h2>
-            <p style="font-size:10px; font-weight:700; color:#ffffff; text-transform:uppercase; letter-spacing:1px;">SPIN & WIN FREE COINS</p>
+            <p style="font-size:11px; font-weight:700; color:#00e676; text-transform:uppercase; letter-spacing:1px;" id="won-reward-subtitle">${rewardWonText}</p>
           </div>
 
           <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:10px; text-align:left; font-size:11px; color:var(--text-muted);">
@@ -861,8 +863,8 @@
             </button>
           </div>
 
-          <button ${userHistory ? 'disabled' : 'onclick="triggerDailySpin()"'} id="btn-spin-now" class="btn btn-primary" style="background:${userHistory ? '#262f40' : 'linear-gradient(135deg, #ff7700, #ff4624)'}; color:${userHistory ? '#888' : '#fff'}; padding:12px; font-size:15px; box-shadow:${userHistory ? 'none' : '0 4px 20px var(--primary-glow)'}; cursor:${userHistory ? 'default' : 'pointer'};">
-            ${userHistory ? 'SPIN COMPLETED FOR TODAY' : 'SPIN NOW'}
+          <button ${userHistory ? 'disabled' : 'onclick="triggerDailySpin()"'} id="btn-spin-now" class="btn btn-primary" style="background:${userHistory ? '#262f40' : 'linear-gradient(135deg, #ff7700, #ff4624)'}; color:${userHistory ? '#00e676' : '#fff'}; padding:12px; font-size:14px; box-shadow:${userHistory ? 'none' : '0 4px 20px var(--primary-glow)'}; cursor:${userHistory ? 'default' : 'pointer'};">
+            ${userHistory ? '✓ ' + escapeHTML(userHistory.reward_name) + ' CLAIMED TODAY' : 'SPIN NOW'}
           </button>
         </div>
       `;
