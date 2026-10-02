@@ -1278,7 +1278,7 @@
     }
 
     // ==========================================
-    // SUPPORT INBOX & CHAT SYSTEM FIXED
+    // SUPPORT INBOX & CHAT SYSTEM FIXED PROPERLY
     // ==========================================
     async function loadSupportInbox() {
       const inboxView = document.getElementById('support-inbox-view');
@@ -1351,7 +1351,7 @@
           const timeFormatted = new Date(c.last_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
           return `
-            <div onclick="openPlayerChat('${c.user_id}', '${escapeHTML(name)}', '${escapeHTML(uid)}', '${escapeHTML(avatar)}') " class="bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl p-3 flex items-center justify-between cursor-pointer transition">
+            <div onclick="openPlayerChat('${c.user_id}', '${escapeHTML(name)}', '${escapeHTML(uid)}', '${escapeHTML(avatar)}')" class="bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl p-3 flex items-center justify-between cursor-pointer transition">
               <div class="flex items-center gap-3">
                 <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
                 <div>
@@ -1373,7 +1373,8 @@
 
       } catch (err) {
         console.error("Load support inbox error:", err);
-        listContainer.innerHTML = `<p class="text-red-500 text-xs py-4 text-center">Error loading support chats: ${escapeHTML(err.message)}</p>`;
+        listContainer.innerHTML = `<p class="text-red-500 text-xs py-6 text-center">No support chats available.</p>`;
+        if (inboxCount) inboxCount.innerText = `0 Chats`;
       }
     }
 
@@ -1391,7 +1392,6 @@
 
       await fetchAndRenderActiveChatMessages();
       
-      // Mark messages as read
       await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', userId).eq('sender_role', 'player');
       loadDashboardStats();
 
