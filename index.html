@@ -2400,11 +2400,21 @@
         Loader.show("Uploading deposit slip...");
 
         try {
-          const path = `${currentUser.id}/${Date.now()}_${file.name}`;
-          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
-          if (uploadError) throw uploadError;
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+          
+          const { error: uploadError } = await sbClient.storage
+            .from('deposit-screenshots')
+            .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-          const { data: publicUrlData } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+          if (uploadError) {
+            throw new Error("Storage Upload Failed: " + uploadError.message);
+          }
+
+          const { data: publicUrlData } = sbClient.storage
+            .from('deposit-screenshots')
+            .getPublicUrl(fileName);
+
           const publicUrl = publicUrlData?.publicUrl || '';
 
           const { error: dbError } = await sbClient.from('deposit_requests').insert([{
@@ -2417,13 +2427,15 @@
             status: 'pending'
           }]);
 
-          if (dbError) throw dbError;
+          if (dbError) {
+            throw new Error("Database Insert Failed: " + dbError.message);
+          }
 
           Toast.show("Slip submitted successfully! Check Wallet for status.", "success");
           Router.navigate('wallet');
         } catch (err) {
           console.error("Deposit submission error:", err);
-          Toast.show(err.message || "Failed to submit deposit. Please try again.", "error");
+          Toast.show(err.message || "Failed to submit deposit. Check your internet connection.", "error");
         } finally {
           Loader.hide();
           if (submitBtn) submitBtn.disabled = false;
