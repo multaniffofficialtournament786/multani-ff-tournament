@@ -2231,21 +2231,35 @@
       if (!container) return;
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond requests...</p>`;
 
-      const [reqRes, profRes] = await Promise.all([
-        sbClient.from('diamond_requests').select('*').order('created_at', { ascending: false }),
-        sbClient.from('profiles').select('id, free_fire_name, email, phone')
-      ]);
+      try {
+        const { data: reqs, error: reqErr } = await sbClient
+          .from('diamond_requests')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (reqRes.error) {
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${reqRes.error.message}</p>`;
-        return;
+        if (reqErr) throw reqErr;
+
+        loadedDiamondRequestsList = reqs || [];
+        
+        const userIds = [...new Set(loadedDiamondRequestsList.map(r => r.user_id))];
+        window.profilesMapCache = {};
+        
+        if (userIds.length > 0) {
+          const { data: profs } = await sbClient
+            .from('profiles')
+            .select('id, free_fire_name, free_fire_uid, email, phone')
+            .in('id', userIds);
+            
+          if (profs) {
+            profs.forEach(p => { window.profilesMapCache[p.id] = p; });
+          }
+        }
+
+        renderDiamondRequestsList();
+      } catch (err) {
+        console.error("Load diamond requests error:", err);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading diamond requests: ${escapeHTML(err.message)}</p>`;
       }
-
-      loadedDiamondRequestsList = reqRes.data || [];
-      window.profilesMapCache = {};
-      (profRes.data || []).forEach(p => { window.profilesMapCache[p.id] = p; });
-
-      renderDiamondRequestsList();
     }
 
     function filterDiamondRequests(status) {
