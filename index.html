@@ -942,13 +942,12 @@
       const degreesPerSlot = 360 / 8;
       const slotIndex = slotNum - 1;
 
-      // Exact angle calculation for smooth spin & pointer alignment
       const segmentCenterAngle = (slotIndex * degreesPerSlot) + 22.5;
       const svgOffset = -22.5;
       const normalizedTarget = ((270 - segmentCenterAngle - svgOffset) % 360 + 360) % 360;
       
       const currentRot = window._currentWheelRotation || 0;
-      const fullSpans = 360 * 5; // 5 full rotations
+      const fullSpans = 360 * 5;
       const extra = (normalizedTarget - (currentRot % 360) + 360) % 360;
       const targetDegree = currentRot + fullSpans + extra;
       window._currentWheelRotation = targetDegree;
@@ -957,10 +956,9 @@
       const successMessage = data.message || "Reward claimed successfully!";
 
       if (wheel) {
-        // Reliable CSS transition approach for smooth mobile rotation
         wheel.style.transition = 'none';
         wheel.style.transform = `rotate(${currentRot}deg)`;
-        void wheel.offsetWidth; // Force DOM reflow
+        void wheel.offsetWidth;
         
         wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0.95, 0.15, 1)';
         wheel.style.transform = `rotate(${targetDegree}deg)`;
@@ -1091,9 +1089,12 @@
           sbClient.from('site_settings').select('*'),
           sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
         ]);
-        if (settingsRes.data) {
-          settingsRes.data.forEach(item => { siteSettings[item.setting_key] = item.setting_value; });
+        
+        if (settingsRes.data && settingsRes.data.length > 0) {
+          const sRow = settingsRes.data[0];
+          siteSettings.announcement_ticker = sRow.ticker_text || "";
         }
+
         activeTournaments = tourRes.data || [];
 
         const { data: tutData } = await sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false });
