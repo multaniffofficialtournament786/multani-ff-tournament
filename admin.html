@@ -1298,6 +1298,137 @@
     }
 
     // ==========================================
+    // WINNERS DECLARATION TAB & TOURNAMENT SELECT FIXED
+    // ==========================================
+    async function loadWinnerSelectOptions() {
+      const winTournamentSelect = document.getElementById('win-tournament');
+      if (!winTournamentSelect) return;
+
+      winTournamentSelect.innerHTML = `<option value="">Loading tournaments...</option>`;
+
+      const { data, error } = await sbClient
+        .from('tournaments')
+        .select('id, title, status')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || !data.length) {
+        winTournamentSelect.innerHTML = `<option value="">No tournaments found</option>`;
+        return;
+      }
+
+      winTournamentSelect.innerHTML = `<option value="">Choose tournament...</option>` + data.map(t => `
+        <option value="${t.id}">${escapeHTML(t.title)} (${t.status || 'upcoming'})</option>
+      `).join('');
+    }
+
+    async function onWinnerTournamentChange(tournamentId) {
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.innerHTML = `<option value="">Choose player...</option>`;
+      });
+
+      if (!tournamentId) return;
+
+      const { data, error } = await sbClient
+        .from('tournament_entries')
+        .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
+        .eq('tournament_id', tournamentId);
+
+      if (error || !data || !data.length) return;
+
+      const playerOptions = `<option value="">Choose player...</option>` + data.map(e => {
+        const p = e.profiles || {};
+        return `<option value="${p.id}">${escapeHTML(p.free_fire_name || 'Gamer')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</option>`;
+      }).join('');
+
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.innerHTML = playerOptions;
+      });
+    }
+
+    async function submitAllWinnersDeclaration() {
+      const tournamentId = document.getElementById('win-tournament').value;
+      if (!tournamentId) {
+        alert("Please select a tournament first.");
+        return;
+      }
+
+      const u1 = document.getElementById('win-u1').value;
+      const amt1 = parseFloat(document.getElementById('win-amt1').value) || 0;
+
+      if (!u1 || amt1 <= 0) {
+        alert("1st Place Winner and 1st Prize amount are mandatory.");
+        return;
+      }
+
+      const u2 = document.getElementById('win-u2').value;
+      const amt2 = parseFloat(document.getElementById('win-amt2').value) || 0;
+
+      const u3 = document.getElementById('win-u3').value;
+      const amt3 = parseFloat(document.getElementById('win-amt3').value) || 0;
+
+      const u4 = document.getElementById('win-u4').value;
+      const amt4 = parseFloat(document.getElementById('win-amt4').value) || 0;
+
+      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;
+
+      try {
+        const { error: winErr } = await sbClient.from('tournament_winners').insert([
+          { tournament_id: tournamentId, user_id: u1, position: 1, prize_amount: amt1 },
+          ...(u2 ? [{ tournament_id: tournamentId, user_id: u2, position: 2, prize_amount: amt2 }] : []),
+          ...(u3 ? [{ tournament_id: tournamentId, user_id: u3, position: 3, prize_amount: amt3 }] : []),
+          ...(u4 ? [{ tournament_id: tournamentId, user_id: u4, position: 4, prize_amount: amt4 }] : [])
+        ]);
+
+        if (winErr) throw winErr;
+
+        await sbClient.from('tournaments').update({
+          status: 'completed',
+          updated_at: new Date().toISOString()
+        }).eq('id', tournamentId);
+
+        alert("Winners announced and match completed successfully!");
+        loadDeclaredWinners();
+      } catch (err) {
+        alert("Error declaring winners: " + err.message);
+      }
+    }
+
+    async function loadDeclaredWinners() {
+      const container = document.getElementById('admin-declared-winners-list');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading declared winners...</p>`;
+
+      const { data, error } = await sbClient
+        .from('tournament_winners')
+        .select('id, position, prize_amount, created_at, tournaments(title), profiles(free_fire_name, free_fire_uid)')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || !data.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No declared winners found.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(w => {
+        const t = w.tournaments || {};
+        const p = w.profiles || {};
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
+            <div>
+              <h4 class="font-bold text-white text-sm">${escapeHTML(t.title || 'Tournament')}</h4>
+              <p class="text-yellow-400 font-bold mt-0.5">Position #${w.position} • Winner: ${escapeHTML(p.free_fire_name || 'Gamer')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</p>
+              <span class="text-emerald-400 text-[11px]">Prize: PKR ${w.prize_amount}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-gray-400 text-[10px] font-mono">${new Date(w.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
     // USERS / GAMERS MANAGEMENT TAB FIXED & BALANCE EDIT
     // ==========================================
     async function loadUsers() {
@@ -1313,8 +1444,6 @@
           .limit(100);
 
         if (error) throw error;
-
-        console.log("PROFILES DATA DEBUG:", data); // Check browser console F12 to see exact column names
 
         globalAllPlayersCache = data || [];
         renderUsersList(globalAllPlayersCache);
@@ -1355,7 +1484,6 @@
         const userEmail = u.email || 'No email added';
         const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         
-        // Checking all possible balance column names in profiles table
         const userBalance = Number(
           u.balance !== undefined && u.balance !== null ? u.balance :
           (u.wallet_balance !== undefined && u.wallet_balance !== null ? u.wallet_balance :
