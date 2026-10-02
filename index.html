@@ -1409,12 +1409,12 @@
         try {
           const ntfyTopic = 'stuntff_notifications';
           const ntfyMessage = `💎 *NEW DIAMOND BUY REQUEST* 💎\n` +
-                              `👤 Username: ${data.username}\n` +
-                              `🆔 Free Fire UID: ${data.uid}\n` +
-                              `🎮 Game Name: ${data.ign}\n` +
+                              `👤 Username: ${data.username || currentProfile.free_fire_name}\n` +
+                              `🆔 Free Fire UID: ${data.uid || currentProfile.free_fire_uid}\n` +
+                              `🎮 Game Name: ${data.ign || currentProfile.free_fire_name}\n` +
                               `💎 Diamonds: ${data.diamonds}\n` +
                               `🪙 Coins Used: ${data.coins}\n` +
-                              `🔢 Request ID: #${data.request_id}`;
+                              `🔢 Request ID: #${data.request_id || 'N/A'}`;
 
           await fetch(`https://ntfy.sh/${ntfyTopic}`, {
             method: 'POST',
