@@ -1204,77 +1204,81 @@
     });
 
     async function loadDashboardStats() {
-      const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes] = await Promise.all([
-        sbClient.from('deposit_requests').select('*'),
-        sbClient.from('withdrawals').select('*'),
-        sbClient.from('diamond_requests').select('*'),
-        sbClient.from('profiles').select('*', { count: 'exact', head: true }),
-        sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false)
-      ]);
+      try {
+        const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes] = await Promise.all([
+          sbClient.from('deposit_requests').select('*'),
+          sbClient.from('withdrawals').select('*'),
+          sbClient.from('diamond_requests').select('*'),
+          sbClient.from('profiles').select('*', { count: 'exact', head: true }),
+          sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false)
+        ]);
 
-      const safeDeps = allDeps.data || [];
-      const safeWds = allWds.data || [];
-      const safeDiamonds = allDiamonds.data || [];
+        const safeDeps = allDeps.data || [];
+        const safeWds = allWds.data || [];
+        const safeDiamonds = allDiamonds.data || [];
 
-      const totalDeposits = safeDeps
-        .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
-        .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
-      document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
+        const totalDeposits = safeDeps
+          .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
+          .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
+        document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
 
-      const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
-      const pendingCount = pendingList.length;
-      
-      document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
-      
-      const badgeDep = document.getElementById('badge-deposits');
-      if (badgeDep) {
-        badgeDep.innerText = pendingCount;
-        badgeDep.classList.toggle('hidden', pendingCount === 0);
-      }
+        const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
+        const pendingCount = pendingList.length;
+        
+        document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
+        
+        const badgeDep = document.getElementById('badge-deposits');
+        if (badgeDep) {
+          badgeDep.innerText = pendingCount;
+          badgeDep.classList.toggle('hidden', pendingCount === 0);
+        }
 
-      const quickDep = document.getElementById('quick-badge-deposits');
-      if (quickDep) {
-        quickDep.innerText = pendingCount;
-        quickDep.classList.toggle('hidden', pendingCount === 0);
-      }
+        const quickDep = document.getElementById('quick-badge-deposits');
+        if (quickDep) {
+          quickDep.innerText = pendingCount;
+          quickDep.classList.toggle('hidden', pendingCount === 0);
+        }
 
-      const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
-      const badgeWd = document.getElementById('badge-withdrawals');
-      if (badgeWd) {
-        badgeWd.innerText = pendingWdCount;
-        badgeWd.classList.toggle('hidden', pendingWdCount === 0);
-      }
-      const quickWd = document.getElementById('quick-badge-withdrawals');
-      if (quickWd) {
-        quickWd.innerText = pendingWdCount;
-        quickWd.classList.toggle('hidden', pendingWdCount === 0);
-      }
+        const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+        const badgeWd = document.getElementById('badge-withdrawals');
+        if (badgeWd) {
+          badgeWd.innerText = pendingWdCount;
+          badgeWd.classList.toggle('hidden', pendingWdCount === 0);
+        }
+        const quickWd = document.getElementById('quick-badge-withdrawals');
+        if (quickWd) {
+          quickWd.innerText = pendingWdCount;
+          quickWd.classList.toggle('hidden', pendingWdCount === 0);
+        }
 
-      const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
-      const badgeDiam = document.getElementById('badge-diamond_requests');
-      if (badgeDiam) {
-        badgeDiam.innerText = pendingDiamonds;
-        badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
-      }
-      const quickDiam = document.getElementById('quick-badge-diamond_requests');
-      if (quickDiam) {
-        quickDiam.innerText = pendingDiamonds;
-        quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
-      }
+        const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
+        const badgeDiam = document.getElementById('badge-diamond_requests');
+        if (badgeDiam) {
+          badgeDiam.innerText = pendingDiamonds;
+          badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
+        }
+        const quickDiam = document.getElementById('quick-badge-diamond_requests');
+        if (quickDiam) {
+          quickDiam.innerText = pendingDiamonds;
+          quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
+        }
 
-      document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
+        document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
 
-      const supCount = supportCountRes.count || 0;
-      const badgeSup = document.getElementById('badge-support');
-      if (badgeSup) {
-        badgeSup.innerText = supCount;
-        badgeSup.classList.toggle('hidden', supCount === 0);
-      }
+        const supCount = supportCountRes.count || 0;
+        const badgeSup = document.getElementById('badge-support');
+        if (badgeSup) {
+          badgeSup.innerText = supCount;
+          badgeSup.classList.toggle('hidden', supCount === 0);
+        }
 
-      const navBadgeSup = document.getElementById('nav-badge-support');
-      if (navBadgeSup) {
-        navBadgeSup.innerText = supCount;
-        navBadgeSup.classList.toggle('hidden', supCount === 0);
+        const navBadgeSup = document.getElementById('nav-badge-support');
+        if (navBadgeSup) {
+          navBadgeSup.innerText = supCount;
+          navBadgeSup.classList.toggle('hidden', supCount === 0);
+        }
+      } catch (e) {
+        console.error("Dashboard stats error:", e);
       }
     }
 
@@ -2704,6 +2708,167 @@
 
     function closeAllPlayersModal() {
       document.getElementById('modal-all-players').classList.add('hidden');
+    }
+
+    // ==========================================
+    // GAMERS & WALLET CONTROL FIX
+    // ==========================================
+    async function loadUsers() {
+      const container = document.getElementById('users-cards-container');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>`;
+
+      try {
+        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        globalUsersCache = data || [];
+        renderUsersList(globalUsersCache);
+      } catch (err) {
+        console.error("Load users error:", err);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading gamers: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    // ==========================================
+    // BANNED PLAYERS FIX
+    // ==========================================
+    async function loadBannedUsers() {
+      const container = document.getElementById('banned-cards-container');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">Loading banned players...</p>`;
+
+      try {
+        const { data, error } = await sbClient.from('profiles').select('*').eq('is_banned', true);
+        if (error) throw error;
+        
+        if (!data || !data.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players currently banned.</p>`;
+          return;
+        }
+
+        container.innerHTML = data.map(b => {
+          const avatarUrl = b.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+          return `
+            <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2.5">
+                <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-white">${escapeHTML(b.free_fire_name || b.full_name)}</h4>
+                  <p class="text-red-400 font-mono text-[11px]">UID: ${escapeHTML(b.free_fire_uid || '--')}</p>
+                </div>
+              </div>
+              <button onclick="toggleBanUser('${b.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase">UNBAN</button>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error("Load banned users error:", err);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading banned players: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    // ==========================================
+    // SUPPORT MESSAGES / INBOX FIX
+    // ==========================================
+    async function loadSupportInbox() {
+      const inboxList = document.getElementById('support-inbox-list');
+      if (!inboxList) return;
+      inboxList.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
+
+      try {
+        const { data: msgs, error } = await sbClient
+          .from('support_messages')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!msgs || !msgs.length) {
+          inboxList.innerHTML = `<p class="text-gray-500 text-xs py-6 text-center">No inquiries yet.</p>`;
+          document.getElementById('inbox-count').innerText = "0 Chats";
+          return;
+        }
+
+        const threadMap = {};
+        msgs.forEach(m => {
+          const uId = m.user_id || m.sender_id;
+          if (!threadMap[uId]) {
+            threadMap[uId] = {
+              userId: uId,
+              lastMsg: m.message,
+              lastTime: m.created_at,
+              unreadCount: 0
+            };
+          }
+          if (m.sender_role === 'player' && !m.is_read) {
+            threadMap[uId].unreadCount++;
+          }
+        });
+
+        const userIds = Object.keys(threadMap);
+        document.getElementById('inbox-count').innerText = `${userIds.length} Players`;
+
+        const { data: profiles } = await sbClient
+          .from('profiles')
+          .select('id, free_fire_name, free_fire_uid, avatar_url')
+          .in('id', userIds);
+
+        const profMap = {};
+        (profiles || []).forEach(p => { profMap[p.id] = p; });
+
+        inboxList.innerHTML = userIds.map(uid => {
+          const item = threadMap[uid];
+          const p = profMap[uid] || {};
+          const name = p.free_fire_name || 'Gamer';
+          const ign = p.free_fire_uid || '--';
+          const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+          const time = new Date(item.lastTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(ign)}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-xs text-white">${escapeHTML(name)}</h4>
+                  <p class="text-[10px] text-gray-400 truncate max-w-[170px]">${escapeHTML(item.lastMsg)}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] text-gray-500">${time}</span>
+                <div class="mt-1">
+                  ${item.unreadCount > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${item.unreadCount}</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error("Load support inbox error:", err);
+        inboxList.innerHTML = `<p class="text-red-500 text-xs py-4 text-center">Error loading support chats: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    // ==========================================
+    // ANNOUNCEMENT TICKER SAVE FIX
+    // ==========================================
+    async function saveSiteSettings() {
+      const tickerText = document.getElementById('set-ticker-text').value.trim();
+      const tickerEnabled = document.getElementById('set-ticker-enabled').checked ? 'true' : 'false';
+
+      try {
+        const updates = [
+          { setting_key: 'announcement_ticker', setting_value: tickerText },
+          { setting_key: 'announcement_enabled', setting_value: tickerEnabled }
+        ];
+
+        for (const item of updates) {
+          const { error } = await sbClient.from('site_settings').upsert(item, { onConflict: 'setting_key' });
+          if (error) throw error;
+        }
+        alert("Announcement ticker saved successfully!");
+      } catch (err) {
+        alert("Failed to save announcement: " + err.message);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
