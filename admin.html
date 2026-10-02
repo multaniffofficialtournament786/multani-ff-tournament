@@ -273,43 +273,64 @@
     <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
       <!-- DASHBOARD OVERVIEW -->
       <section id="section-overview" class="space-y-4">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
-            <h3 id="stat-total-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ffbe00] mt-0.5">PKR 0</h3>
+        <!-- TOP DEPOSIT & PENDING SLIPS CARDS (SMALLER & SIDE-BY-SIDE WITH REFRESH) -->
+        <div class="grid grid-cols-2 gap-2.5 w-full max-w-full md:max-w-2xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
+            <h3 id="stat-total-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ffbe00] mt-1">PKR 0</h3>
           </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl cursor-pointer relative" onclick="selectTab('deposits')">
-            <span class="text-[10px] uppercase font-bold text-gray-400">Pending Slips</span>
-            <h3 id="stat-pending-deposits" class="text-lg md:text-xl font-bold font-gaming text-[#ff4624] mt-0.5">0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl col-span-2 md:col-span-1 flex items-center justify-between">
-            <div>
-              <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
-              <h3 id="stat-total-players" class="text-lg md:text-xl font-bold font-gaming text-white mt-0.5">0</h3>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl cursor-pointer relative flex flex-col justify-between" onclick="selectTab('deposits')">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] uppercase font-bold text-gray-400">Pending Slips</span>
+              <button onclick="event.stopPropagation(); loadDashboardStats(); loadDeposits(); alert('Refreshed!');" class="text-cyan-400 hover:text-cyan-300 text-xs p-1" title="Refresh Stats"><i class="fa-solid fa-rotate"></i></button>
             </div>
-            <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-2 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
-              <i class="fa-solid fa-list-ul"></i> LIST
-            </button>
+            <h3 id="stat-pending-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ff4624] mt-1">0</h3>
           </div>
         </div>
 
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl">
+        <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl w-full max-w-full md:max-w-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
+            <h3 id="stat-total-players" class="text-lg font-bold font-gaming text-white mt-0.5">0</h3>
+          </div>
+          <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+            <i class="fa-solid fa-list-ul"></i> LIST
+          </button>
+        </div>
+
+        <!-- QUICK ACTIONS WITH ALL SIDEBAR FEATURES ADDED -->
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
-          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <button onclick="selectTab('tournaments')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Matches</p></button>
-            <button onclick="selectTab('referral_rewards_mgmt')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition"><i class="fa-solid fa-gift text-amber-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Referrals</p></button>
-            <button onclick="selectTab('daily_spin_mgmt')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-dharmachakra text-cyan-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Daily Spin</p></button>
-            <button onclick="selectTab('daily_spin_history')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-clock-rotate-left text-purple-400 text-lg"></i><p class="text-[11px] font-bold mt-1 text-gray-200">Spin Logs</p></button>
-            <button onclick="selectTab('deposits')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
-              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i>
-              <p class="text-[11px] font-bold mt-1 text-gray-200">Deposits</p>
-              <span id="quick-badge-deposits" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <button onclick="selectTab('tournaments')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Matches</p></button>
+            <button onclick="selectTab('winners')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Winners</p></button>
+            <button onclick="selectTab('referral_rewards_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition"><i class="fa-solid fa-gift text-amber-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Referrals</p></button>
+            <button onclick="selectTab('daily_spin_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-dharmachakra text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Daily Spin</p></button>
+            <button onclick="selectTab('daily_spin_history')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-clock-rotate-left text-purple-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Spin Logs</p></button>
+            <button onclick="selectTab('deposits')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Deposits</p>
+              <span id="quick-badge-deposits" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
-            <button onclick="selectTab('withdrawals')" class="p-3 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
-              <i class="fa-solid fa-money-bill-transfer text-amber-400 text-lg"></i>
-              <p class="text-[11px] font-bold mt-1 text-gray-200">Withdraw</p>
-              <span id="quick-badge-withdrawals" class="absolute top-2 right-2 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            <button onclick="selectTab('withdrawals')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-money-bill-transfer text-amber-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Withdraw</p>
+              <span id="quick-badge-withdrawals" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
             </button>
+            <button onclick="selectTab('diamond_requests')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-gem text-amber-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Diamonds</p>
+              <span id="quick-badge-diamond_requests" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('users')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-blue-400 transition"><i class="fa-solid fa-users text-blue-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Gamers</p></button>
+            <button onclick="selectTab('support')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-green-400 transition relative">
+              <i class="fa-solid fa-headset text-green-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Support</p>
+              <span id="nav-badge-support" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('tutorials')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-video text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Tutorials</p></button>
+            <button onclick="selectTab('banned')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-500 transition"><i class="fa-solid fa-ban text-red-500 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Banned</p></button>
+            <button onclick="selectTab('settings')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Ticker</p></button>
           </div>
         </div>
       </section>
@@ -441,6 +462,7 @@
       <section id="section-diamond_requests" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
+          <button onclick="loadAdminDiamondRequests()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
 
         <!-- DIAMOND FILTER BUTTONS -->
@@ -635,9 +657,9 @@
 
   <!-- FIXED BOTTOM NAVIGATION BAR -->
   <div class="admin-bottom-nav">
-    <button class="admin-nav-btn" onclick="hardRefreshPage()">
-      <i class="fa-solid fa-rotate"></i>
-      <span>Refresh</span>
+    <button class="admin-nav-btn" onclick="selectTab('overview')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
     </button>
     <button class="admin-nav-btn" onclick="openAllPlayersModal()">
       <i class="fa-solid fa-users"></i>
@@ -646,7 +668,7 @@
     <div class="admin-center-plus" onclick="openCreateTournamentModal()">
       <i class="fa-solid fa-plus"></i>
     </div>
-    <!-- Support Button replaced in place of Matches -->
+    <!-- Support Button -->
     <button class="admin-nav-btn" onclick="selectTab('support')">
       <i class="fa-solid fa-headset"></i>
       <span>Support</span>
