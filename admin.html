@@ -1151,6 +1151,7 @@
 
     function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
+      closeAllPlayersModal();
 
       if (pushHistory && history.state?.tab !== tabId) {
         history.pushState({ tab: tabId }, '', '#' + tabId);
@@ -2534,15 +2535,17 @@
       modal.classList.remove('hidden');
       body.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading players list...</p>`;
 
-      const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+      try {
+        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
 
-      if (error || !data || !data.length) {
-        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No players found.</p>`;
-        return;
+        if (error) throw error;
+
+        globalAllPlayersCache = data || [];
+        renderAllPlayersList(globalAllPlayersCache);
+      } catch (err) {
+        console.error("Open players modal error:", err);
+        body.innerHTML = `<p class="text-red-500 text-xs text-center py-6">Error loading players: ${escapeHTML(err.message)}</p>`;
       }
-
-      globalAllPlayersCache = data;
-      renderAllPlayersList(globalAllPlayersCache);
     }
 
     function renderAllPlayersList(list) {
