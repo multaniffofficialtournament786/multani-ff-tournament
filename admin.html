@@ -1270,11 +1270,195 @@
         badgeSup.classList.toggle('hidden', supCount === 0);
       }
 
-      const navBadgeSup = document.getElementById('nav-badge-support');
-      if (navBadgeSup) {
-        navBadgeSup.innerText = supCount;
-        navBadgeSup.classList.toggle('hidden', supCount === 0);
+      const navBadgeSup = document.querySelectorAll('#nav-badge-support');
+      navBadgeSup.forEach(el => {
+        el.innerText = supCount;
+        el.classList.toggle('hidden', supCount === 0);
+      });
+    }
+
+    // ==========================================
+    // SUPPORT INBOX & CHAT SYSTEM FIXED
+    // ==========================================
+    async function loadSupportInbox() {
+      const inboxView = document.getElementById('support-inbox-view');
+      const chatView = document.getElementById('support-chat-view');
+      if (inboxView) inboxView.classList.remove('hidden');
+      if (chatView) chatView.classList.add('hidden');
+      if (chatInterval) clearInterval(chatInterval);
+
+      const listContainer = document.getElementById('support-inbox-list');
+      const inboxCount = document.getElementById('inbox-count');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
+
+      try {
+        const { data: messages, error } = await sbClient
+          .from('support_messages')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const allMsgs = messages || [];
+        const userMap = {};
+
+        allMsgs.forEach(m => {
+          if (!m.user_id) return;
+          if (!userMap[m.user_id]) {
+            userMap[m.user_id] = {
+              user_id: m.user_id,
+              last_message: m.message,
+              last_time: m.created_at,
+              unread_count: 0
+            };
+          }
+          if (m.sender_role === 'player' && !m.is_read) {
+            userMap[m.user_id].unread_count++;
+          }
+        });
+
+        const userIds = Object.keys(userMap);
+        if (userIds.length === 0) {
+          listContainer.innerHTML = `<p class="text-gray-500 text-xs py-6 text-center">No support chats available.</p>`;
+          if (inboxCount) inboxCount.innerText = `0 Chats`;
+          return;
+        }
+
+        const { data: profiles } = await sbClient
+          .from('profiles')
+          .select('id, free_fire_name, free_fire_uid, full_name, avatar_url')
+          .in('id', userIds);
+
+        const profileMap = {};
+        if (profiles) {
+          profiles.forEach(p => { profileMap[p.id] = p; });
+        }
+
+        const chatsArray = userIds.map(uid => ({
+          ...userMap[uid],
+          profile: profileMap[uid] || { free_fire_name: 'Gamer', free_fire_uid: '--', avatar_url: '' }
+        })).sort((a, b) => new Date(b.last_time) - new Date(a.last_time));
+
+        if (inboxCount) inboxCount.innerText = `${chatsArray.length} Chats`;
+
+        listContainer.innerHTML = chatsArray.map(c => {
+          const p = c.profile;
+          const avatar = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+          const name = p.free_fire_name || p.full_name || 'Player';
+          const uid = p.free_fire_uid || '--';
+          const timeFormatted = new Date(c.last_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <div onclick="openPlayerChat('${c.user_id}', '${escapeHTML(name)}', '${escapeHTML(uid)}', '${escapeHTML(avatar)}') " class="bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl p-3 flex items-center justify-between cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
+                <div>
+                  <h4 class="font-bold text-sm text-white flex items-center gap-2">
+                    ${escapeHTML(name)}
+                    ${c.unread_count > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">${c.unread_count} new</span>` : ''}
+                  </h4>
+                  <p class="text-xs text-gray-400 truncate max-w-[200px]">${escapeHTML(c.last_message)}</p>
+                  <span class="text-[10px] text-cyan-400 font-mono">UID: ${escapeHTML(uid)}</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-gray-500 font-mono">${timeFormatted}</span>
+                <i class="fa-solid fa-chevron-right text-gray-500 text-xs mt-1 block"></i>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error("Load support inbox error:", err);
+        listContainer.innerHTML = `<p class="text-red-500 text-xs py-4 text-center">Error loading support chats: ${escapeHTML(err.message)}</p>`;
       }
+    }
+
+    async function openPlayerChat(userId, name, uid, avatar) {
+      activeChatPlayerId = userId;
+      const inboxView = document.getElementById('support-inbox-view');
+      const chatView = document.getElementById('support-chat-view');
+
+      if (inboxView) inboxView.classList.add('hidden');
+      if (chatView) chatView.classList.remove('hidden');
+
+      document.getElementById('active-chat-username').innerText = name;
+      document.getElementById('active-chat-uid').innerText = `UID: ${uid}`;
+      if (avatar) document.getElementById('active-chat-avatar').src = avatar;
+
+      await fetchAndRenderActiveChatMessages();
+      
+      // Mark messages as read
+      await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', userId).eq('sender_role', 'player');
+      loadDashboardStats();
+
+      if (chatInterval) clearInterval(chatInterval);
+      chatInterval = setInterval(fetchAndRenderActiveChatMessages, 4000);
+    }
+
+    async function fetchAndRenderActiveChatMessages() {
+      if (!activeChatPlayerId) return;
+      const container = document.getElementById('active-chat-messages');
+      if (!container) return;
+
+      const { data, error } = await sbClient
+        .from('support_messages')
+        .select('*')
+        .eq('user_id', activeChatPlayerId)
+        .order('created_at', { ascending: true });
+
+      if (error || !data) return;
+
+      container.innerHTML = data.map(m => {
+        const isAdmin = m.sender_role === 'admin';
+        const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
+            <div class="max-w-[80%] rounded-xl px-3 py-2 text-xs ${isAdmin ? 'bg-[#ff4624] text-white rounded-br-none' : 'bg-[#06070a] border border-[#262f40] text-gray-200 rounded-bl-none'}">
+              <p>${escapeHTML(m.message)}</p>
+            </div>
+            <span class="text-[9px] text-gray-500 mt-1 font-mono">${timeStr}</span>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function closePlayerChat() {
+      if (chatInterval) clearInterval(chatInterval);
+      activeChatPlayerId = null;
+      loadSupportInbox();
+    }
+
+    const replyForm = document.getElementById('admin-reply-form');
+    if (replyForm) {
+      replyForm.onsubmit = async (e) => {
+        e.preventDefault();
+        if (!activeChatPlayerId) return;
+        const input = document.getElementById('admin-reply-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+
+        const { error } = await sbClient.from('support_messages').insert([{
+          user_id: activeChatPlayerId,
+          sender_role: 'admin',
+          message: text,
+          is_read: true
+        }]);
+
+        if (error) {
+          alert("Failed to send message: " + error.message);
+        } else {
+          fetchAndRenderActiveChatMessages();
+        }
+      };
     }
 
     // ==========================================
@@ -1394,7 +1578,6 @@
         const slots = slotsRes.data || [];
         const history = historyRes.data || [];
 
-        // Calculate today's stats in Pakistan Time
         const todayStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" });
         const todayDateOnly = new Date(todayStr).toDateString();
 
