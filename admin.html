@@ -1284,7 +1284,7 @@
     }
 
     // ==========================================
-    // USERS & WALLET CONTROL
+    // USERS & WALLET CONTROL (GAMERS)
     // ==========================================
     async function loadUsers() {
       const container = document.getElementById('users-cards-container');
@@ -1457,7 +1457,7 @@
     }
 
     // ==========================================
-    // SUPPORT MESSAGES
+    // SUPPORT MESSAGES & INBOX
     // ==========================================
     async function loadSupportInbox() {
       const inboxList = document.getElementById('support-inbox-list');
@@ -1508,16 +1508,17 @@
         inboxList.innerHTML = userIds.map(uid => {
           const item = threadMap[uid];
           const p = profMap[uid] || {};
-          const name = p.free_fire_name || 'Gamer';
+          const name = escapeHTML(p.free_fire_name || p.full_name || 'Gamer');
+          const ign = escapeHTML(p.free_fire_uid || '--');
           const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
           const time = new Date(item.lastTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
           return `
-            <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(p.free_fire_uid || '--')}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
+            <div onclick="openPlayerChat('${uid}', '${name}', '${ign}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
               <div class="flex items-center gap-3">
                 <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
                 <div>
-                  <h4 class="font-bold text-xs text-white">${escapeHTML(name)}</h4>
+                  <h4 class="font-bold text-xs text-white">${name}</h4>
                   <p class="text-[10px] text-gray-400 truncate max-w-[170px]">${escapeHTML(item.lastMsg)}</p>
                 </div>
               </div>
@@ -1687,7 +1688,8 @@
         const p = profMap[req.user_id] || {};
         const statusVal = (req.status || 'pending').toLowerCase().trim();
         const statusColor = statusVal === 'delivered' ? 'text-green-400' : (statusVal === 'rejected' ? 'text-red-400' : (statusVal === 'approved' ? 'text-cyan-400' : 'text-yellow-400'));
-        const requestDateFormatted = req.created_at ? new Date(req.created_at).toLocaleString() : 'Unknown Time';
+        
+        const requestDateFormatted = req.created_at ? new Date(req.created_at).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown Time';
 
         const isPending = statusVal === 'pending';
         const isApproved = statusVal === 'approved';
@@ -1838,7 +1840,7 @@
     }
 
     // ==========================================
-    // TUTORIALS & TOURNAMENTS (STANDARD STUBS)
+    // TUTORIALS & TOURNAMENTS STUBS
     // ==========================================
     async function loadTournaments() {
       const container = document.getElementById('tournaments-cards-container');
