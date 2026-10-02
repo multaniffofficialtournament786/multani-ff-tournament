@@ -1314,6 +1314,8 @@
 
         if (error) throw error;
 
+        console.log("PROFILES DATA DEBUG:", data); // Check browser console F12 to see exact column names
+
         globalAllPlayersCache = data || [];
         renderUsersList(globalAllPlayersCache);
       } catch (err) {
@@ -1352,7 +1354,14 @@
         const waNumber = u.phone || '';
         const userEmail = u.email || 'No email added';
         const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        const userBalance = Number(u.balance !== undefined ? u.balance : (u.wallet_balance !== undefined ? u.wallet_balance : (u.amount !== undefined ? u.amount : 0)));
+        
+        // Checking all possible balance column names in profiles table
+        const userBalance = Number(
+          u.balance !== undefined && u.balance !== null ? u.balance :
+          (u.wallet_balance !== undefined && u.wallet_balance !== null ? u.wallet_balance :
+          (u.wallet !== undefined && u.wallet !== null ? u.wallet :
+          (u.amount !== undefined && u.amount !== null ? u.amount : 0)))
+        );
         
         const lastSeenTime = u.last_seen || u.updated_at || u.created_at;
         const diffMinutes = lastSeenTime ? (now - new Date(lastSeenTime)) / (1000 * 60) : 999;
