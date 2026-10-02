@@ -263,7 +263,6 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Notification Enable Button -->
         <button onclick="requestAdminNotificationPermission()" class="bg-[#151922] border border-[#ff4624] text-[#ff4624] hover:bg-[#ff4624] hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
           <i class="fa-solid fa-bell"></i> <span class="hidden sm:inline">NOTIFICATIONS</span>
         </button>
@@ -273,7 +272,6 @@
     <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
       <!-- DASHBOARD OVERVIEW -->
       <section id="section-overview" class="space-y-4">
-        <!-- TOP DEPOSIT & PENDING SLIPS CARDS -->
         <div class="grid grid-cols-2 gap-2.5 w-full max-w-full md:max-w-2xl">
           <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
             <span class="text-[9px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
@@ -335,26 +333,23 @@
         </div>
       </section>
 
-      <!-- REFERRAL REWARDS MANAGEMENT ADMIN SECTION -->
+      <!-- REFERRAL REWARDS MANAGEMENT -->
       <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Referral Rewards Management</h3>
           <button onclick="openAddReferralRewardModal()" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming uppercase"><i class="fa-solid fa-plus"></i> Add New Reward</button>
         </div>
-
         <div id="admin-referral-rewards-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading referral rewards...</p>
         </div>
       </section>
 
-      <!-- DAILY SPIN MANAGEMENT ADMIN SECTION -->
+      <!-- DAILY SPIN MANAGEMENT -->
       <section id="section-daily_spin_mgmt" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin 8 Slots & Today's Stats</h3>
           <button onclick="loadAdminDailySpinMgmt()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
-
-        <!-- DAILY SPIN STATS MONITORING CARD -->
         <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-2xl space-y-3">
           <h4 class="font-gaming text-xs font-bold text-yellow-400 uppercase"><i class="fa-solid fa-chart-line mr-1"></i> Today's Daily Spin Analytics</h4>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -384,13 +379,12 @@
             </div>
           </div>
         </div>
-
         <div id="admin-daily-spin-slots-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading daily spin slots...</p>
         </div>
       </section>
 
-      <!-- DAILY SPIN HISTORY ADMIN SECTION -->
+      <!-- DAILY SPIN HISTORY -->
       <section id="section-daily_spin_history" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl gap-2 flex-wrap">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin History</h3>
@@ -399,7 +393,6 @@
             <button onclick="loadAdminSpinHistory()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i></button>
           </div>
         </div>
-
         <div id="admin-spin-history-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading spin history...</p>
         </div>
@@ -413,7 +406,6 @@
           <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
           <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
         </div>
-
         <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
@@ -427,7 +419,7 @@
         </div>
       </section>
 
-      <!-- WITHDRAWAL REQUESTS ADMIN SECTION -->
+      <!-- WITHDRAWAL REQUESTS -->
       <section id="section-withdrawals" class="space-y-4 hidden w-full">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;" class="w-full max-w-full md:max-w-2xl">
           <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
@@ -447,25 +439,21 @@
             <div id="admin-stat-fees" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #ffbe00; margin-top: 4px;">PKR 0</div>
           </div>
         </div>
-
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Withdrawal Requests</h3>
           <button onclick="loadAdminWithdrawals()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
-
         <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading withdrawal requests...</p>
         </div>
       </section>
 
-      <!-- DIAMOND REQUESTS ADMIN SECTION -->
+      <!-- DIAMOND REQUESTS -->
       <section id="section-diamond_requests" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
           <button onclick="loadAdminDiamondRequests()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
-
-        <!-- DIAMOND FILTER BUTTONS -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-2xl">
           <button onclick="filterDiamondRequests('all')" id="diamond-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All</button>
           <button onclick="filterDiamondRequests('pending')" id="diamond-filter-pending" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Pending</button>
@@ -473,7 +461,6 @@
           <button onclick="filterDiamondRequests('delivered')" id="diamond-filter-delivered" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Delivered</button>
           <button onclick="filterDiamondRequests('rejected')" id="diamond-filter-rejected" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Rejected</button>
         </div>
-
         <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading diamond requests...</p>
         </div>
@@ -487,7 +474,6 @@
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
             <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
           </div>
-
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
@@ -496,7 +482,6 @@
               </select>
               <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
             </div>
-
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
               <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
@@ -504,7 +489,6 @@
               </select>
               <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
             </div>
-
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
               <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
@@ -512,7 +496,6 @@
               </select>
               <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
             </div>
-
             <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
               <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
               <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
@@ -521,12 +504,10 @@
               <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
             </div>
           </div>
-
           <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
             Announce All Winners & Complete Match
           </button>
         </div>
-
         <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
           <div id="admin-declared-winners-list" class="space-y-3">
@@ -558,36 +539,29 @@
             <input type="text" id="tut-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. HOW TO DEPOSIT COINS" required />
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link (Auto-detects YouTube, TikTok, FB, etc.)</label>
-            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/... or https://tiktok.com/..." required />
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 1 Text (Subtitle / Top Text)</label>
-            <input type="text" id="tut-line1" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. COMPLETE STEP-BY-STEP WEBSITE GUIDE" />
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link</label>
+            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/..." required />
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 2 Text (Description / Detail Text)</label>
-            <input type="text" id="tut-line2" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Tap below to watch complete step-by-step guidance." />
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 1 Text</label>
+            <input type="text" id="tut-line1" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Subtitle" />
           </div>
-
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card / Banner Photo</label>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 2 Text</label>
+            <input type="text" id="tut-line2" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Description" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Banner Photo</label>
             <input type="file" id="tut-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
           </div>
           <div class="flex gap-2 pt-2">
             <button onclick="resetTutorialForm()" id="btn-cancel-tut" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
-            <button onclick="saveTutorialCard()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-              SAVE TUTORIAL / AD CARD
-            </button>
+            <button onclick="saveTutorialCard()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">SAVE TUTORIAL / AD</button>
           </div>
         </div>
-
         <div class="space-y-3 w-full max-w-full md:max-w-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Carousel Cards</h3>
-          <div id="admin-tutorials-list" class="space-y-3">
-            <p class="text-gray-500 text-xs text-center py-4">Loading cards...</p>
-          </div>
+          <div id="admin-tutorials-list" class="space-y-3"><p class="text-gray-500 text-xs text-center py-4">Loading cards...</p></div>
         </div>
       </section>
 
@@ -617,9 +591,7 @@
             </div>
             <div class="w-8"></div>
           </div>
-
           <div id="active-chat-messages" class="flex-1 overflow-y-auto p-2 space-y-2.5 my-2 sidebar-scroll"></div>
-
           <form id="admin-reply-form" class="flex gap-2 pt-2 border-t border-[#262f40]">
             <input type="text" id="admin-reply-input" placeholder="Type message to player..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-[#ff4624]" autocomplete="off" required />
             <button type="submit" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-4 py-2 rounded-lg font-bold text-xs font-gaming uppercase">SEND</button>
@@ -647,9 +619,7 @@
             <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
             <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on gamer homepage</label>
           </div>
-          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Save Announcement
-          </button>
+          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">Save Announcement</button>
         </div>
       </section>
     </div>
@@ -668,7 +638,6 @@
     <div class="admin-center-plus" onclick="openCreateTournamentModal()">
       <i class="fa-solid fa-plus"></i>
     </div>
-    <!-- Support Button -->
     <button class="admin-nav-btn" onclick="selectTab('support')">
       <i class="fa-solid fa-headset"></i>
       <span>Support</span>
@@ -855,29 +824,15 @@
           <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
         </div>
       </div>
-
       <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
         <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup</span>
         <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
-            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
-            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
-            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
-            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
+          <div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label><input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" /></div>
+          <div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label><input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" /></div>
+          <div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label><input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" /></div>
+          <div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label><input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" /></div>
         </div>
       </div>
-
       <div>
         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
@@ -902,12 +857,10 @@
         </h3>
         <button onclick="closeCreateTournamentModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <div>
         <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
         <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 4-PRIZE Battle Royal" required />
       </div>
-
       <div class="grid grid-cols-2 gap-2">
         <div>
           <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Mode</label>
@@ -931,51 +884,27 @@
           </select>
         </div>
       </div>
-
       <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Max Slots</label>
-          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
-        </div>
+        <div><label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label><input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required /></div>
+        <div><label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Max Slots</label><input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required /></div>
       </div>
-
-      <!-- PRIZE POOL BREAKDOWN -->
       <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-lg space-y-2">
         <span class="text-[11px] font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
         <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">1st Prize</label>
-            <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="e.g. 1200" required />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">2nd Prize</label>
-            <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">3rd Prize</label>
-            <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">4th Prize</label>
-            <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
+          <div><label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">1st Prize</label><input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="e.g. 1200" required /></div>
+          <div><label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">2nd Prize</label><input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" /></div>
+          <div><label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">3rd Prize</label><input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" /></div>
+          <div><label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">4th Prize</label><input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" /></div>
         </div>
       </div>
-
       <div>
         <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
         <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
       </div>
-
       <div>
         <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
         <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" />
       </div>
-
       <div class="flex gap-2 pt-2 sticky bottom-0 bg-[#0e1118] pb-1">
         <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
         <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
@@ -996,10 +925,8 @@
     let currentTournamentFilter = 'all';
     let globalAllPlayersCache = [];
     let selectedTournamentDetails = null;
-
     let loadedDiamondRequestsList = [];
     let currentDiamondFilter = 'all';
-
     let globalSpinHistoryCache = [];
     let globalUsersCache = [];
 
@@ -1021,7 +948,6 @@
       const diffMin = Math.floor(diffSec / 60);
       const diffHours = Math.floor(diffMin / 60);
       const diffDays = Math.floor(diffHours / 24);
-
       const timeFormatted = past.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       if (diffMin < 3) return `Active just now`;
@@ -1284,7 +1210,7 @@
     }
 
     // ==========================================
-    // USERS & WALLET CONTROL (GAMERS)
+    // USERS & WALLET CONTROL (GAMERS) - FULLY FIXED
     // ==========================================
     async function loadUsers() {
       const container = document.getElementById('users-cards-container');
@@ -1457,7 +1383,7 @@
     }
 
     // ==========================================
-    // SUPPORT MESSAGES & INBOX
+    // SUPPORT MESSAGES & INBOX - FULLY FIXED CLICK
     // ==========================================
     async function loadSupportInbox() {
       const inboxList = document.getElementById('support-inbox-list');
@@ -1515,14 +1441,14 @@
 
           return `
             <div onclick="openPlayerChat('${uid}', '${name}', '${ign}', '${avatarUrl}')" class="p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl flex items-center justify-between cursor-pointer transition">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 pointer-events-none">
                 <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
                 <div>
                   <h4 class="font-bold text-xs text-white">${name}</h4>
                   <p class="text-[10px] text-gray-400 truncate max-w-[170px]">${escapeHTML(item.lastMsg)}</p>
                 </div>
               </div>
-              <div class="text-right">
+              <div class="text-right pointer-events-none">
                 <span class="text-[9px] text-gray-500">${time}</span>
                 <div class="mt-1">
                   ${item.unreadCount > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${item.unreadCount}</span>` : ''}
@@ -1688,8 +1614,7 @@
         const p = profMap[req.user_id] || {};
         const statusVal = (req.status || 'pending').toLowerCase().trim();
         const statusColor = statusVal === 'delivered' ? 'text-green-400' : (statusVal === 'rejected' ? 'text-red-400' : (statusVal === 'approved' ? 'text-cyan-400' : 'text-yellow-400'));
-        
-        const requestDateFormatted = req.created_at ? new Date(req.created_at).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown Time';
+        const requestDateFormatted = req.created_at ? new Date(req.created_at).toLocaleString() : 'Unknown Time';
 
         const isPending = statusVal === 'pending';
         const isApproved = statusVal === 'approved';
@@ -1840,7 +1765,7 @@
     }
 
     // ==========================================
-    // TUTORIALS & TOURNAMENTS STUBS
+    // ADDITIONAL STUBS
     // ==========================================
     async function loadTournaments() {
       const container = document.getElementById('tournaments-cards-container');
