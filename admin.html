@@ -650,7 +650,7 @@
       if (diffMin < 3) return `Active just now`;
       if (diffHours < 24) return `${diffHours} hours ago (${timeFormatted})`;
       if (diffDays === 1) return `1 day ago ${timeFormatted}`;
-      return `${diffDays} days ago${timeFormatted}`;
+      return `${diffDays} days ago ${timeFormatted}`;
     }
 
     function hardRefreshPage() { window.location.reload(true); }
@@ -714,7 +714,7 @@
       await sbClient.auth.signOut();
       currentAdmin = null;
       window.currentAdminUser = null;
-      document.getElementById('admin-auth-screen').classList.remove('hidden');
+      document.getElementById('admin-auth-screen').classList.add('hidden');
     }
 
     function toggleSidebar(forceState = null) {
@@ -754,8 +754,8 @@
         loadDashboardStats();
       } else {
         document.getElementById('panel-title').innerText = tabId.toUpperCase().replace(/_/g, ' ');
-        backBtn.classList.remove('hidden');
-        openSideBtn.classList.add('hidden');
+        backBtn.classList.add('hidden');
+        openSideBtn.classList.remove('hidden');
       }
 
       if (tabId === 'tournaments') loadTournaments();
@@ -960,15 +960,18 @@
       } catch(e) { console.log(e); }
     }
 
-    document.getElementById('admin-reply-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const input = document.getElementById('admin-reply-input');
-      const text = input.value.trim();
-      if (!text || !activeChatPlayerId) return;
-      input.value = '';
-      await sbClient.from('support_messages').insert([{ user_id: activeChatPlayerId, sender_id: currentAdmin.id, sender_role: 'admin', message: text, is_read: true }]);
-      renderActiveChatMessages();
-    });
+    const replyForm = document.getElementById('admin-reply-form');
+    if (replyForm) {
+      replyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('admin-reply-input');
+        const text = input.value.trim();
+        if (!text || !activeChatPlayerId) return;
+        input.value = '';
+        await sbClient.from('support_messages').insert([{ user_id: activeChatPlayerId, sender_id: currentAdmin.id, sender_role: 'admin', message: text, is_read: true }]);
+        renderActiveChatMessages();
+      });
+    }
 
     async function loadAdminDiamondRequests() {
       const container = document.getElementById('admin-diamond-requests-container');
@@ -992,7 +995,7 @@
       if (!filtered.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found.</p>`; return; }
       container.innerHTML = filtered.map(req => `
         <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-2 text-xs">
-          <div class="flex justify-between font-bold text-white"><span>#${req.id} -${escapeHTML(req.game_name)}</span><span class="text-orange-400">${req.diamonds} 💎</span></div>
+          <div class="flex justify-between font-bold text-white"><span>#${req.id} - ${escapeHTML(req.game_name)}</span><span class="text-orange-400">${req.diamonds} 💎</span></div>
           <p class="text-cyan-400 font-mono">UID: ${escapeHTML(req.free_fire_uid)}</p>
           <p class="text-gray-400">Status: <strong class="uppercase text-yellow-400">${req.status}</strong></p>
         </div>
@@ -1060,7 +1063,7 @@
 
     function renderAllPlayersList(list) {
       const body = document.getElementById('modal-all-players-body');
-      if (!list.length) { body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players found.</p>'; return; }
+      if (!list.length) { body.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No players found.</p>`; return; }
       body.innerHTML = list.map(u => `
         <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 text-xs flex justify-between items-center">
           <div><h4 class="font-bold text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4><span class="text-cyan-400 font-mono text-[10px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</span></div>
