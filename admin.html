@@ -1298,14 +1298,15 @@
     }
 
     // ==========================================
-    // ANNOUNCEMENT TICKER SETTINGS (FIXED)
+    // ANNOUNCEMENT TICKER SETTINGS (FIXED UPSERT)
     // ==========================================
     async function loadSettings() {
       try {
         const { data, error } = await sbClient
           .from('site_settings')
           .select('*')
-          .single();
+          .limit(1)
+          .maybeSingle();
 
         if (data) {
           document.getElementById('set-ticker-text').value = data.ticker_text || '';
@@ -1321,16 +1322,16 @@
       const tickerEnabled = document.getElementById('set-ticker-enabled').checked;
 
       try {
-        // Try updating existing row or inserting if not exists
-        const { data: existing } = await sbClient.from('site_settings').select('id').limit(1);
+        // First check if a settings record already exists
+        const { data: existing } = await sbClient.from('site_settings').select('id').limit(1).maybeSingle();
 
         let error;
-        if (existing && existing.length > 0) {
+        if (existing && existing.id) {
           const res = await sbClient.from('site_settings').update({
             ticker_text: tickerText,
             ticker_enabled: tickerEnabled,
             updated_at: new Date().toISOString()
-          }).eq('id', existing[0].id);
+          }).eq('id', existing.id);
           error = res.error;
         } else {
           const res = await sbClient.from('site_settings').insert([{
@@ -1343,7 +1344,7 @@
         if (error) throw error;
         alert("Announcement ticker saved successfully!");
       } catch (err) {
-        alert("Failed to save announcement: " + err.message);
+        alert("Failed to save announcement: " + (err.message || err));
       }
     }
 
