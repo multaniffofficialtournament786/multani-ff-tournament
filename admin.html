@@ -1306,13 +1306,19 @@
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading gamers...</p>`;
 
       try {
-        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+        const { data, error } = await sbClient
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
         if (error) throw error;
 
         globalAllPlayersCache = data || [];
         renderUsersList(globalAllPlayersCache);
       } catch (err) {
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading users: ${escapeHTML(err.message)}</p>`;
+        console.error("Load users error:", err);
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading users: ${escapeHTML(err.message || 'Network or Database error')}</p>`;
       }
     }
 
