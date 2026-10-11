@@ -286,7 +286,7 @@
     .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
     .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
 
-    /* ANIMATED DRAGON & LIGHTING VIP FRAMES */
+    /* VIP FRAMES */
     @keyframes dragonGlowGold {
       0%, 100% { box-shadow: 0 0 20px #ffbe00, 0 0 40px #ff5500, inset 0 0 12px #ffbe00; border-color: #ffbe00; transform: scale(1); }
       50% { box-shadow: 0 0 35px #ffea75, 0 0 60px #ff7700, inset 0 0 20px #ffea75; border-color: #ffea75; transform: scale(1.03); }
@@ -302,6 +302,325 @@
     .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 1.8s infinite ease-in-out; }
     .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
     .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
+
+    /* ========================================================
+       MULTANI FF SQUAD CHAT (WHATSAPP FULL-PAGE) STYLING
+    ======================================================== */
+    .squad-chat-banner {
+      background: linear-gradient(135deg, #101726 0%, #090e18 100%);
+      border: 1.5px solid #00d2ff;
+      box-shadow: 0 0 18px rgba(0, 210, 255, 0.28);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .squad-chat-banner:active { transform: scale(0.98); box-shadow: 0 0 8px rgba(0, 210, 255, 0.4); }
+    .chat-banner-left { display: flex; align-items: center; gap: 12px; }
+    .chat-glow-icon {
+      font-size: 22px;
+      background: rgba(0, 210, 255, 0.15);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      color: #00d2ff;
+    }
+    .chat-banner-info { display: flex; flex-direction: column; }
+    .banner-title { color: #ffffff; font-weight: 800; font-size: 14px; font-family: var(--font-gaming); letter-spacing: 1px; text-transform: uppercase; }
+    .banner-sub { color: #00e676; font-size: 11px; font-weight: 600; margin-top: 2px; }
+    .chat-banner-badge {
+      background: rgba(0, 230, 118, 0.12);
+      border: 1px solid #00e676;
+      color: #00e676;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-gaming);
+    }
+    .pulse-dot { width: 7px; height: 7px; background-color: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; animation: chatPulse 1.4s infinite; }
+    @keyframes chatPulse { 0%, 100% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.3); opacity: 1; } }
+
+    /* FULL PAGE CHAT WRAPPER */
+    #squad-chat-view {
+      position: absolute;
+      inset: 0;
+      background: #0b141a;
+      z-index: 450;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .wa-header {
+      background: #1f2c34;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e9edef;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .wa-header-left { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; min-width: 0; }
+    .wa-back-btn { background: none; border: none; color: #aebac1; font-size: 17px; cursor: pointer; padding: 4px; }
+    .wa-group-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid #00a884; }
+    .wa-title-block { display: flex; flex-direction: column; min-width: 0; }
+    .wa-group-name { font-size: 15px; font-weight: 600; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-ui); }
+    .wa-status-text { font-size: 11px; color: #8696a0; }
+    .wa-header-right { position: relative; }
+
+    /* THREE DOT MENU */
+    .wa-menu-dropdown {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: #233138;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      padding: 6px 0;
+      min-width: 160px;
+      display: none;
+      z-index: 100;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .wa-menu-dropdown.show { display: block; animation: popUpAnim 0.15s ease-out; }
+    .wa-menu-item {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #d1d7db;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .wa-menu-item:hover, .wa-menu-item:active { background: #182229; color: #fff; }
+
+    /* CHAT STREAM BODY */
+    .wa-chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-color: #0b141a;
+      background-image: radial-gradient(#1f2c34 1px, transparent 1px);
+      background-size: 18px 18px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* MESSAGE BUBBLES WITH PLAYER DP & UID */
+    .wa-msg-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      width: 100%;
+      position: relative;
+      touch-action: pan-y;
+      transition: transform 0.15s ease-out;
+    }
+    .wa-msg-row.mine { justify-content: flex-end; }
+    .wa-msg-row.theirs { justify-content: flex-start; }
+
+    .wa-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-bottom: 2px; }
+    
+    .wa-msg-bubble {
+      max-width: 80%;
+      padding: 6px 10px 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.38;
+      position: relative;
+      word-break: break-word;
+      user-select: none;
+      cursor: pointer;
+    }
+    .wa-msg-bubble.mine {
+      background: #005c4b;
+      color: #e9edef;
+      border-bottom-right-radius: 2px;
+    }
+    .wa-msg-bubble.theirs {
+      background: #202c33;
+      color: #e9edef;
+      border-bottom-left-radius: 2px;
+    }
+
+    /* PLAYER TAG HEADER INSIDE BUBBLE */
+    .wa-sender-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 3px;
+      font-size: 11px;
+    }
+    .wa-sender-name { font-weight: 700; color: #53bdeb; }
+    .wa-sender-uid { font-size: 10px; color: #ffbe00; font-family: monospace; font-weight: 600; }
+
+    /* QUOTED MESSAGE BOX INSIDE BUBBLE */
+    .wa-quoted-box {
+      background: rgba(0, 0, 0, 0.22);
+      border-left: 3.5px solid #25d366;
+      border-radius: 5px;
+      padding: 4px 8px;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+    .wa-quoted-sender { font-weight: 700; color: #25d366; margin-bottom: 1px; }
+    .wa-quoted-text { color: #8696a0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 230px; }
+
+    .wa-meta-line {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 9px;
+      color: #8696a0;
+      margin-top: 2px;
+    }
+    .wa-ticks { font-size: 11px; color: #53bdeb; }
+
+    /* REPLY PREVIEW BAR OVER INPUT */
+    .wa-reply-bar {
+      background: #1f2c34;
+      border-left: 4px solid #00a884;
+      padding: 6px 12px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .wa-reply-bar.show { display: flex; animation: slideUp 0.15s ease-out; }
+    .wa-reply-info { font-size: 11px; overflow: hidden; }
+    .wa-reply-user { font-weight: 700; color: #00a884; }
+    .wa-reply-preview { color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+
+    /* FOOTER INPUT BAR */
+    .wa-input-container {
+      background: #1f2c34;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wa-input-box {
+      flex: 1;
+      background: #2a3942;
+      border-radius: 22px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wa-text-field {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e9edef;
+      font-size: 14px;
+      font-family: var(--font-ui);
+    }
+    .wa-text-field::placeholder { color: #8696a0; }
+    .wa-send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #00a884;
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    .wa-send-btn:active { transform: scale(0.92); }
+
+    /* ACTION SHEET (LONG PRESS: 3 OPTIONS) */
+    .wa-action-sheet-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 600;
+      display: none;
+      align-items: flex-end;
+    }
+    .wa-action-sheet-overlay.show { display: flex; }
+    .wa-action-sheet {
+      background: #233138;
+      width: 100%;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .wa-action-item {
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #d1d7db;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .wa-action-item:active { background: #182229; color: #fff; }
+    .wa-action-item.delete { color: #ff5252; }
+
+    /* THEMES FOR CHAT */
+    body.theme-wa-green #squad-chat-view .wa-header { background: #005c4b; }
+    body.theme-wa-green #squad-chat-view .wa-send-btn { background: #25d366; }
+    body.theme-wa-green #squad-chat-view .wa-msg-bubble.mine { background: #005c4b; }
+
+    body.theme-ocean #squad-chat-view { background: #09131d; }
+    body.theme-ocean #squad-chat-view .wa-header { background: #0a2540; }
+    body.theme-ocean #squad-chat-view .wa-send-btn { background: #00d2ff; color:#000; }
+    body.theme-ocean #squad-chat-view .wa-msg-bubble.mine { background: #0d47a1; }
+
+    body.theme-purple #squad-chat-view { background: #12091c; }
+    body.theme-purple #squad-chat-view .wa-header { background: #2b1044; }
+    body.theme-purple #squad-chat-view .wa-send-btn { background: #bb86fc; color:#000; }
+    body.theme-purple #squad-chat-view .wa-msg-bubble.mine { background: #6200ea; }
+
+    body.theme-orange #squad-chat-view { background: #180d07; }
+    body.theme-orange #squad-chat-view .wa-header { background: #3b1803; }
+    body.theme-orange #squad-chat-view .wa-send-btn { background: #ff5722; }
+    body.theme-orange #squad-chat-view .wa-msg-bubble.mine { background: #d84315; }
+
+    body.theme-galaxy #squad-chat-view { background: #050514; }
+    body.theme-galaxy #squad-chat-view .wa-header { background: #100b2b; }
+    body.theme-galaxy #squad-chat-view .wa-send-btn { background: #9c27b0; }
+    body.theme-galaxy #squad-chat-view .wa-msg-bubble.mine { background: #4a148c; }
+
+    body.theme-pink #squad-chat-view { background: #1c0a13; }
+    body.theme-pink #squad-chat-view .wa-header { background: #3d0e25; }
+    body.theme-pink #squad-chat-view .wa-send-btn { background: #e91e63; }
+    body.theme-pink #squad-chat-view .wa-msg-bubble.mine { background: #ad1457; }
+
+    body.theme-amoled #squad-chat-view { background: #000000; }
+    body.theme-amoled #squad-chat-view .wa-header { background: #111111; }
+    body.theme-amoled #squad-chat-view .wa-send-btn { background: #ffffff; color:#000; }
+    body.theme-amoled #squad-chat-view .wa-msg-bubble.mine { background: #1f1f1f; border:1px solid #333; }
   </style>
 </head>
 <body>
@@ -339,6 +658,69 @@
         <div class="sub-header-spacer"></div>
       </div>
     </header>
+
+    <!-- SQUAD CHAT FULL SCREEN VIEW -->
+    <div id="squad-chat-view" class="hidden">
+      <!-- HEADER -->
+      <div class="wa-header">
+        <div class="wa-header-left" onclick="SquadChat.close()">
+          <button class="wa-back-btn"><i class="fa-solid fa-arrow-left"></i></button>
+          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80" class="wa-group-avatar" />
+          <div class="wa-title-block">
+            <span class="wa-group-name">MULTANI FF SQUAD</span>
+            <span id="wa-online-counter" class="wa-status-text">Online • 12 players</span>
+          </div>
+        </div>
+        <div class="wa-header-right">
+          <button onclick="SquadChat.toggleMenu()" class="icon-btn" style="color:#aebac1; font-size:18px;">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </button>
+          <!-- 3-DOT DROPDOWN MENU -->
+          <div id="wa-menu-dropdown" class="wa-menu-dropdown">
+            <div class="wa-menu-item" onclick="SquadChat.clearLocalMessages()"><i class="fa-solid fa-broom"></i> Clear Chat</div>
+            <div class="wa-menu-item" onclick="SquadChat.showRules()"><i class="fa-solid fa-shield-halved"></i> Squad Rules</div>
+            <div class="wa-menu-item" onclick="SquadChat.openThemeModal()"><i class="fa-solid fa-palette"></i> Change Theme</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES SCROLL CONTAINER -->
+      <div id="wa-chat-body" class="wa-chat-body">
+        <!-- Messages dynamically rendered here -->
+      </div>
+
+      <!-- REPLY PREVIEW BAR -->
+      <div id="wa-reply-bar" class="wa-reply-bar">
+        <div class="wa-reply-info">
+          <div id="wa-reply-user" class="wa-reply-user">Replying to Player</div>
+          <div id="wa-reply-preview" class="wa-reply-preview">Message snippet...</div>
+        </div>
+        <button onclick="SquadChat.cancelReply()" class="icon-btn" style="width:26px; height:26px; color:#8696a0;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- BOTTOM INPUT CONTAINER -->
+      <form id="wa-input-container" class="wa-input-container" onsubmit="SquadChat.sendMessage(event)">
+        <div class="wa-input-box">
+          <i class="fa-regular fa-face-smile" style="color:#8696a0; font-size:18px;"></i>
+          <input type="text" id="wa-msg-input" class="wa-text-field" placeholder="Message" autocomplete="off" required />
+          <i class="fa-solid fa-paperclip" style="color:#8696a0; font-size:16px;"></i>
+        </div>
+        <button type="submit" class="wa-send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+
+      <!-- LONG PRESS ACTION SHEET (3 OPTIONS) -->
+      <div id="wa-action-sheet-overlay" class="wa-action-sheet-overlay" onclick="SquadChat.closeActionSheet()">
+        <div class="wa-action-sheet" onclick="event.stopPropagation()">
+          <div class="wa-action-item" onclick="SquadChat.actionReply()"><i class="fa-solid fa-reply"></i> Reply</div>
+          <div class="wa-action-item" onclick="SquadChat.actionCopy()"><i class="fa-solid fa-copy"></i> Copy Message</div>
+          <div class="wa-action-item delete" onclick="SquadChat.actionDelete()"><i class="fa-solid fa-trash-can"></i> Delete Message</div>
+        </div>
+      </div>
+    </div>
 
     <!-- SHARE MODAL SHEET -->
     <div id="share-modal-overlay" class="hidden">
@@ -431,6 +813,7 @@
       <span class="bot-badge-tag">MENU</span>
     </div>
 
+    <!-- ADMIN SUPPORT DIALOG -->
     <div id="chat-modal-overlay" class="hidden">
       <div class="chat-dialog">
         <div class="chat-dialog-header">
@@ -465,7 +848,7 @@
       </div>
     </div>
 
-    <!-- JOIN COMMUNITY POPUP (WHATSAPP CHANNEL) -->
+    <!-- JOIN COMMUNITY POPUP -->
     <div id="community-popup-overlay" class="hidden" style="position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:700; display:flex; align-items:center; justify-content:center; padding:16px;">
       <div style="background:#0e1118; border:1.5px solid var(--border-color); border-radius:16px; padding:24px 20px; width:100%; max-width:340px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
         <div style="width:60px; height:60px; border-radius:50%; background:rgba(37, 211, 102, 0.15); border:2px solid #25d366; display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto; color:#25d366; font-size:28px;">
@@ -758,7 +1141,7 @@
       }
     });
 
-    // DAILY SPIN WHEEL WITH FORCE REFLOW SMOOTH ANIMATION
+    // DAILY SPIN WHEEL
     async function renderDailySpin() {
       if (!currentUser) { Router.navigate('login'); return; }
       
@@ -1222,10 +1605,24 @@
           `}
 
           <!-- 2. DOWNLOAD OFFICIAL APP BUTTON -->
-          <div style="margin-bottom: 16px;">
+          <div style="margin-bottom: 12px;">
             <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="padding: 12px 16px; font-size: 15px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 240, 255, 0.3);">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
             </a>
+          </div>
+
+          <!-- OPTION 3: MULTANI FF SQUAD CHAT BANNER BUTTON -->
+          <div class="squad-chat-banner" onclick="SquadChat.open()">
+            <div class="chat-banner-left">
+              <div class="chat-glow-icon"><i class="fa-solid fa-comments"></i></div>
+              <div class="chat-banner-info">
+                <span class="banner-title">MULTANI FF SQUAD</span>
+                <span class="banner-sub">Global Squad Chat • Live</span>
+              </div>
+            </div>
+            <div class="chat-banner-badge">
+              <span class="pulse-dot"></span> OPEN CHAT
+            </div>
           </div>
 
           <!-- 3. CATEGORY CIRCLES / BUTTONS -->
@@ -1273,7 +1670,7 @@
               <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
                 <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
               </a>
-              <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="social-icon-btn tiktok">
+              <a href="https://www.tiktok.com/@multani.ff.gaming" target="_blank" class="social-icon-btn tiktok">
                 <i class="fa-brands fa-tiktok text-sm"></i> TikTok
               </a>
               <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="social-icon-btn youtube">
@@ -1332,14 +1729,13 @@
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <!-- VIP IMPORTANT NOTICE -->
           <div style="background:linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,70,36,0.1)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:14px; margin-bottom:16px; box-shadow:0 4px 15px rgba(255,190,0,0.2);">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
               <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold); font-size:16px;"></i>
               <span style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); text-transform:uppercase;">VIP Important Notice</span>
             </div>
             <p style="font-size:11px; color:#fff; line-height:1.5;">
-              Diamond purchase karne se pehle apni profile mein <strong>Free Fire UID aur Game Name (IGN)</strong> bilkul drust type check kar lein. Agar details ghalat hui aur diamonds kisi aur account mein chale gaye ya delivery mein masla hua, toh <strong>admin ki koi zimedari nahi hogi</strong>.
+              Diamond purchase karne se pehle apni profile mein <strong>Free Fire UID aur Game Name (IGN)</strong> bilkul drust type check kar lein. Agar details ghalat hui aur diamonds kisi aur account mein chale gaye, toh admin ki koi zimedari nahi hogi.
             </p>
           </div>
 
@@ -1348,7 +1744,6 @@
             ${packagesGridHtml}
           </div>
 
-          <!-- CATEGORY QUICK ACTION BUTTONS FOR DIAMOND HISTORY -->
           <div class="section-title"><span>📜 Diamond History Center</span></div>
           <div style="display:flex; gap:16px; justify-content:center; margin-top:10px;">
             <div id="action-btn-my" class="cat-item" onclick="Router.navigate('diamond_history')">
@@ -1411,52 +1806,31 @@
 
     async function requestDiamondPurchase(packageId) {
       if (!currentUser) return;
-      
       if (!currentProfile || !currentProfile.free_fire_uid || !currentProfile.free_fire_name) {
-        Toast.show("Please update your Free Fire UID and Game Name in your profile before purchasing.", "error");
+        Toast.show("Please update your Free Fire UID and Game Name in your profile first.", "error");
         Router.navigate('profile');
         return;
       }
 
       if (!confirm("Are you sure you want to purchase diamonds using your wallet coins?")) return;
 
-      Loader.show("Processing diamond request securely...");
-      const { data, error } = await sbClient.rpc('request_free_fire_diamonds', {
-        p_package_id: packageId
-      });
+      Loader.show("Processing diamond request...");
+      const { data, error } = await sbClient.rpc('request_free_fire_diamonds', { p_package_id: packageId });
       Loader.hide();
 
       if (error) {
         Toast.show(error.message, "error");
       } else if (data && data.success) {
-        try {
-          const ntfyTopic = 'stuntff_notifications';
-          const ntfyMessage = `💎 *NEW DIAMOND BUY REQUEST* 💎\n` +
-                              `👤 Username: ${data.username || currentProfile.free_fire_name}\n` +
-                              `🆔 Free Fire UID: ${data.uid || currentProfile.free_fire_uid}\n` +
-                              `🎮 Game Name: ${data.ign || currentProfile.free_fire_name}\n` +
-                              `💎 Diamonds: ${data.diamonds}\n` +
-                              `🪙 Coins Used: ${data.coins}\n` +
-                              `🔢 Request ID: #${data.request_id || 'N/A'}`;
-
-          await fetch(`https://ntfy.sh/${ntfyTopic}`, {
-            method: 'POST',
-            body: ntfyMessage
-          });
-        } catch (notifErr) {
-          console.error("Ntfy notification error:", notifErr);
-        }
-
         Toast.show(data.message, "success");
         await syncAuthAndProfile();
         renderDiamondsShop();
       } else {
-        Toast.show(data.message || "Failed to process request.", "error");
+        Toast.show(data?.message || "Failed to process request.", "error");
       }
     }
 
     async function renderInvite() {
-      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet. Share your app link to start earning!</p>`;
+      let invitedListHTML = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">No referrals yet.</p>`;
       let totalRegisters = 0;
       let validReferrals = 0;
       let totalIncome = 0;
@@ -1561,11 +1935,10 @@
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; overflow-x: auto; padding-bottom: 6px;">
-              <button onclick="openShareModal()" class="btn btn-primary btn-sm" style="background:#25d366; color:#fff;"><i class="fa-solid fa-share-nodes"></i> SHARE APP CHOOSE APP</button>
+              <button onclick="openShareModal()" class="btn btn-primary btn-sm" style="background:#25d366; color:#fff;"><i class="fa-solid fa-share-nodes"></i> SHARE APP</button>
             </div>
           </div>
 
-          <!-- INVITED LIST WITH TOGGLE FILTER BUTTON -->
           <div class="section-title" onclick="toggleInvitedList()" style="cursor:pointer; background:var(--bg-card); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
             <span style="font-size:13px; color:var(--accent-gold);"><i class="fa-solid fa-users"></i> Invited List (${totalRegisters})</span>
             <i id="invited-list-arrow" class="fa-solid fa-chevron-down" style="color:var(--accent-gold); transition:transform 0.3s ease;"></i>
@@ -1576,16 +1949,9 @@
             </div>
           </div>
 
-          <!-- REFERRAL MILESTONE REWARDS SECTION EMBEDDED AT THE BOTTOM OF INVITE PAGE -->
           <div class="section-title"><span><i class="fa-solid fa-gift text-gold"></i> Referral Milestone Rewards</span></div>
           <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
             ${milestonesHtml}
-          </div>
-
-          <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
-            <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
-            <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Invite Reward</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for every friend you invite!</p>
           </div>
         </div>
       `;
@@ -1607,9 +1973,8 @@
       try {
         const { error } = await sbClient.rpc('claim_referral_bonus', { p_referred_user_id: referredUserId });
         if (error) throw error;
-
         Loader.hide();
-        Toast.show("Successfully claimed +5 coins to your wallet!", "success");
+        Toast.show("Successfully claimed +5 coins!", "success");
         await syncAuthAndProfile();
         renderInvite();
       } catch (err) {
@@ -1620,23 +1985,17 @@
 
     async function claimReferralMilestone(rewardId) {
       if (!currentUser) return;
-      Loader.show("Claiming referral reward securely...");
-      
+      Loader.show("Claiming reward...");
       try {
-        const { error: claimErr } = await sbClient.from('user_referral_claims').insert([{
-          user_id: currentUser.id,
-          reward_id: rewardId
-        }]);
-
+        const { error: claimErr } = await sbClient.from('user_referral_claims').insert([{ user_id: currentUser.id, reward_id: rewardId }]);
         if (claimErr) throw claimErr;
-
         Loader.hide();
         Toast.show("Milestone reward claimed successfully!", "success");
         await syncAuthAndProfile();
         renderInvite();
       } catch (err) {
         Loader.hide();
-        Toast.show(err.message || "Failed to claim reward. You might have already claimed it.", "error");
+        Toast.show(err.message || "Failed to claim reward.", "error");
       }
     }
 
@@ -1670,17 +2029,13 @@
       const top2 = profiles[1] || null;
       const top3 = profiles[2] || null;
       const remaining = profiles.slice(3);
-
       const defaultAvatar = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
 
       view.innerHTML = `
         <div class="view-container">
           <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame Leaderboard</span></div>
 
-          <!-- PODIUM TOP 3 HIGHLIGHT SECTION -->
           <div style="background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 10px; margin-bottom: 20px; display: flex; justify-content: space-around; align-items: flex-end; text-align: center;">
-            
-            <!-- 2ND PLACE -->
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(10px);">
               <div style="position: relative; width: 56px; height: 56px; margin-bottom: 6px;">
                 <img src="${top2?.avatar_url || defaultAvatar}" class="vip-frame-2" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -1690,7 +2045,6 @@
               <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top2?.total_won || 0}</span>
             </div>
 
-            <!-- 1ST PLACE -->
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(-10px);">
               <div style="position: relative; width: 72px; height: 72px; margin-bottom: 6px;">
                 <img src="${top1?.avatar_url || defaultAvatar}" class="vip-frame-1" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -1701,7 +2055,6 @@
               <span style="font-family: var(--font-gaming); font-size: 15px; font-weight: 800; color: var(--accent-gold);">PKR ${top1?.total_won || 0}</span>
             </div>
 
-            <!-- 3RD PLACE -->
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(15px);">
               <div style="position: relative; width: 50px; height: 50px; margin-bottom: 6px;">
                 <img src="${top3?.avatar_url || defaultAvatar}" class="vip-frame-3" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -1710,16 +2063,13 @@
               <h4 style="font-size: 12px; font-weight: 700; color: #fff; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top3?.free_fire_name || 'N/A')}</h4>
               <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top3?.total_won || 0}</span>
             </div>
-
           </div>
 
-          <!-- REMAINING PLAYERS LIST -->
           <div class="section-title"><span>Rankings #4 onwards</span></div>
           ${remaining.map((l, index) => {
             const rankNum = index + 4;
             const userTotalDeposit = depositMap[l.id] || 0;
             const dpUrl = l.avatar_url || defaultAvatar;
-            
             return `
               <div class="tx-item" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -1743,7 +2093,6 @@
 
     async function renderTournamentDetail(id) {
       await syncAuthAndProfile();
-
       let t = null;
       let entries = [];
       let winData = [];
@@ -1771,9 +2120,7 @@
 
       entries.forEach(e => {
         occupiedSlots[e.slot_number] = e.profiles?.free_fire_name || 'Gamer';
-        if (currentUser && e.user_id === currentUser.id) {
-          mySlotNumber = e.slot_number;
-        }
+        if (currentUser && e.user_id === currentUser.id) mySlotNumber = e.slot_number;
       });
 
       const isJoined = mySlotNumber !== null || userJoinedTournamentIds.has(t.id);
@@ -1785,26 +2132,11 @@
         const isOccupied = !!occupiedSlots[i];
         const isMine = (mySlotNumber === i);
         const name = isMine ? (currentProfile?.free_fire_name || 'YOU') : (occupiedSlots[i] || 'Empty Slot');
-
         slotsHTML += `
           <div class="slot-card ${isOccupied ? 'occupied' : ''} ${isMine ? 'my-slot' : ''}">
             <span class="slot-num">${i}</span>
             <i class="fa-solid ${isOccupied ? 'fa-user' : 'fa-plus'} text-[10px]" style="color:${isMine ? 'var(--primary)' : (isOccupied ? 'var(--accent-cyan)' : 'var(--text-dim)')}"></i>
             <span class="slot-name">${escapeHTML(name)}</span>
-          </div>
-        `;
-      }
-
-      let winnerInfoHTML = '';
-      if (isCompleted && winData.length > 0) {
-        winnerInfoHTML = `
-          <div style="background:rgba(255,190,0,0.1); border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom:12px;">
-            <div style="font-size:11px; text-transform:uppercase; color:var(--accent-gold); font-weight:bold; margin-bottom:4px;"><i class="fa-solid fa-crown"></i> Match Winners Declared</div>
-            ${winData.map(w => `
-              <div style="font-size:13px; font-weight:bold; color:#fff; margin-top: 4px;">
-                ${escapeHTML(w.profiles?.free_fire_name || 'Winner')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')}) - ${escapeHTML(w.position)} [PKR ${w.prize_amount}]
-              </div>
-            `).join('')}
           </div>
         `;
       }
@@ -1829,7 +2161,6 @@
             </div>
           </div>
 
-          <!-- MATCH & MATCH JOINING RULES DROPDOWN -->
           <div class="rules-dropdown-container">
             <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
               <div style="display:flex; align-items:center; gap:8px;">
@@ -1839,44 +2170,10 @@
               <span class="rules-arrow">&#9660;</span>
             </div>
             <div class="rules-dropdown-content">
-              <div style="color:var(--accent-gold); font-weight:bold; margin:10px 0 6px 0;">🎮 1. MATCH JOINING RULES</div>
-              <p><strong>1. 💰 Entry Fee:</strong> The required entry fee must be available in the player's tournament wallet before joining a match.</p>
-              <p><strong>2. ✅ Match Joining:</strong> Players must carefully check the match name, entry fee, date, time, mode, and other match details before joining.</p>
-              <p><strong>3. ⏰ Be On Time:</strong> After joining a match, the player must be present in the room at the scheduled match time or before.</p>
-              <p><strong>4. 🚫 No Show = No Refund:</strong> If a player joins a match but does not enter the room on time or misses the match, the entry fee/payment will NOT be refunded.</p>
-              <p><strong>5. 🔐 Room ID & Password:</strong> Room ID and Password should only be used for the assigned match. Players must not share room details with unauthorized persons.</p>
-              <p><strong>6. 🚫 Wrong Room:</strong> Players are responsible for joining the correct room for their registered match.</p>
-              <p><strong>7. 🔄 Duplicate Joining:</strong> A player cannot take multiple entries in the same match unless allowed.</p>
-              <p><strong>8. 💳 Entry Fee Deduction:</strong> Fee will be deducted upon joining.</p>
-              <p><strong>9. 📸 Technical Issues:</strong> Contact support with screenshots if any issue occurs.</p>
-
-              <div style="color:var(--accent-gold); font-weight:bold; margin:16px 0 6px 0;">🎯 2. MATCH RULES</div>
-              <p><strong>10. 🎮 Fair Play Required:</strong> Every player must participate fairly.</p>
-              <p><strong>11. 🚫 Hacks & Cheats Prohibited:</strong> Hacks, scripts, and injectors are strictly prohibited.</p>
-              <p><strong>12. 🚫 Bug & Glitch Abuse:</strong> Exploiting bugs is strictly prohibited.</p>
-              <p><strong>13. 👤 Account Sharing:</strong> Account sharing is not allowed.</p>
-              <p><strong>14. 📱 Supported Game Version:</strong> Use the official latest game version.</p>
-              <p><strong>15. 📶 Internet:</strong> Players are responsible for their own internet connectivity.</p>
-              <p><strong>16. 🏆 Match Result:</strong> Finalized after admin verification.</p>
-
-              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:12px 0; border-radius:4px; color:#ff8b8b;">
-                🔴 <strong>IMPORTANT NOTICE:</strong><br>
-                ❌ <strong>NO SHOW = NO REFUND</strong>
-              </div>
+              <p><strong>1. Entry Fee:</strong> Fee will be deducted from your wallet upon slot booking.</p>
+              <p><strong>2. No Show = No Refund:</strong> Be present in the custom room on time.</p>
+              <p><strong>3. Fair Play:</strong> Strictly no hacks, cheats or bugs abuse.</p>
             </div>
-          </div>
-
-          ${winnerInfoHTML}
-
-          <!-- VIP WITHDRAW & ROOM NOTES (ADDED PER REQUEST) -->
-          <div style="background:linear-gradient(135deg, rgba(0,240,255,0.12), rgba(255,190,0,0.1)); border:1.5px solid var(--accent-cyan); border-radius:var(--radius); padding:14px; margin-bottom:12px; box-shadow:0 4px 15px rgba(0,240,255,0.2);">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-              <i class="fa-solid fa-circle-info" style="color:var(--accent-cyan); font-size:16px;"></i>
-              <span style="font-family:var(--font-gaming); font-size:13px; font-weight:800; color:var(--accent-cyan); text-transform:uppercase;">VIP Player Room & Withdraw Notes</span>
-            </div>
-            <p style="font-size:11px; color:#fff; line-height:1.5;">
-              Dear Player! Room ID aur Password match start hone se 10-15 minutes pehle app mein update kar diye jate hain. Withdrawals 24 hours ke andar process kiye jate hain. Agar koi bhi masla ho toh admin support chat use karein.
-            </p>
           </div>
 
           ${isJoined && !isCompleted ? `
@@ -1884,7 +2181,6 @@
               <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700; margin-bottom: 8px;">
                 Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}
               </div>
-              
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
                 <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
                   <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
@@ -1899,7 +2195,6 @@
                   </div>
                 </div>
               </div>
-
               <div style="border-top: 1px solid var(--accent-cyan); padding-top: 8px; text-align: center;">
                 <p style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
                   Room id aur pw match se 10.15 mint pehle yaha bhj diya jaega
@@ -1916,11 +2211,6 @@
               <span style="font-size:10px; color:var(--text-dim);">Map: ${escapeHTML(t.map)}</span>
             </div>
             <div class="room-slots-grid">${slotsHTML}</div>
-          </div>
-
-          <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
-            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 1st: PKR ${t.prize_pool || 0} | 2nd: PKR ${t.prize_2 || 0} | 3rd: PKR ${t.prize_3 || 0} | 4th: PKR ${t.prize_4 || 0}</div>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -1943,21 +2233,15 @@
 
       if (!isJoined && !isCompleted) {
         document.getElementById('btn-join-match').onclick = async () => {
-          if (!currentUser) {
-            Toast.show("Please login first", "info");
-            Router.navigate('login');
-            return;
-          }
-
+          if (!currentUser) { Toast.show("Please login first", "info"); Router.navigate('login'); return; }
           if (!confirm(`Join match? PKR ${t.entry_fee} will be deducted from your wallet.`)) return;
 
           Loader.show("Reserving slot...");
-          const { data, error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
+          const { error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
           Loader.hide();
 
-          if (error) {
-            Toast.show(error.message, "error");
-          } else {
+          if (error) Toast.show(error.message, "error");
+          else {
             Toast.show("Slot booked successfully!", "success");
             await syncAuthAndProfile();
             renderTournamentDetail(t.id);
@@ -1996,7 +2280,6 @@
 
       const profMap = {};
       (profRes.data || []).forEach(p => { profMap[p.id] = p; });
-
       const tourMap = {};
       (tourRes.data || []).forEach(t => { tourMap[t.id] = t; });
 
@@ -2062,9 +2345,7 @@
         statusLower: 'approved'
       }));
 
-      const combinedHistory = [...formattedDeposits, ...formattedTxs].sort((a, b) => b.sortDate - a.sortDate);
-
-      window._allWalletHistory = combinedHistory;
+      window._allWalletHistory = [...formattedDeposits, ...formattedTxs].sort((a, b) => b.sortDate - a.sortDate);
 
       const view = document.getElementById('app-view');
       view.innerHTML = `
@@ -2078,7 +2359,6 @@
             </div>
           </div>
 
-          <!-- TRANSACTION HISTORY FILTER & COLLAPSIBLE TOGGLE -->
           <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
             <span>Transaction History Filter</span>
             <button onclick="toggleTransactionHistory()" id="tx-toggle-btn" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 8px; width:auto;">
@@ -2125,13 +2405,9 @@
 
       const history = window._allWalletHistory || [];
       const filtered = history.filter(item => {
-        if (filterType === 'deposit') {
-          return item.isDeposit;
-        } else if (filterType === 'rejected') {
-          return item.statusLower === 'rejected' || (item.description && item.description.toLowerCase().includes('refund'));
-        } else {
-          return true;
-        }
+        if (filterType === 'deposit') return item.isDeposit;
+        if (filterType === 'rejected') return item.statusLower === 'rejected' || (item.description && item.description.toLowerCase().includes('refund'));
+        return true;
       });
 
       if (!filtered.length) {
@@ -2186,7 +2462,6 @@
           withdrawHistoryHtml = wList.map(w => {
             const accNum = w.account_number || '';
             const maskedAcc = accNum.length > 4 ? '*'.repeat(accNum.length - 4) + accNum.slice(-4) : accNum;
-            
             let statusBadgeStyle = 'background:rgba(255,190,0,0.2); color:var(--accent-gold);';
             if (w.status === 'approved') statusBadgeStyle = 'background:rgba(0,230,118,0.2); color:var(--success);';
             if (w.status === 'rejected') statusBadgeStyle = 'background:rgba(255,23,68,0.2); color:var(--danger);';
@@ -2199,12 +2474,10 @@
                     Fee (2%): PKR ${w.fee || (w.amount * 0.02)} | <strong>Net: PKR ${w.net_amount || (w.amount * 0.98)}</strong><br>
                     Account: ${escapeHTML(maskedAcc)} (${escapeHTML(w.account_name || 'N/A')})<br>
                     Date: ${new Date(w.created_at).toLocaleString()}
-                    ${w.admin_note ? `<br><strong style="color:var(--accent-cyan);">Admin Note:</strong> ${escapeHTML(w.admin_note)}` : ''}
                   </span>
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
                   <span style="font-size:10px; padding:3px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${statusBadgeStyle}">${escapeHTML(w.status)}</span>
-                  ${w.payment_screenshot_url ? `<br><a href="${w.payment_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:9px; padding:3px 6px; margin-top:6px; color:var(--accent-cyan); display:inline-block;">View Proof</a>` : ''}
                 </div>
               </div>
             `;
@@ -2290,42 +2563,26 @@
       const accNum = document.getElementById('wd-acc-num').value.trim();
       const accName = document.getElementById('wd-acc-name').value.trim();
 
-      if (isNaN(amount) || amount < 200) {
-        Toast.show("Minimum withdrawal amount is PKR 200.", "error");
-        return;
-      }
-
-      const currentBalance = currentProfile?.wallet_balance || 0;
-      if (amount > currentBalance) {
-        Toast.show("Requested amount exceeds your available wallet balance!", "error");
-        return;
-      }
-
-      if (!accName || !accNum) {
-        Toast.show("Please fill in account holder name and number.", "error");
-        return;
-      }
+      if (isNaN(amount) || amount < 200) { Toast.show("Minimum withdrawal is PKR 200.", "error"); return; }
+      if (amount > (currentProfile?.wallet_balance || 0)) { Toast.show("Requested amount exceeds wallet balance!", "error"); return; }
 
       const fee = amount * 0.02;
       const net = amount - fee;
 
-      const confirmMsg = `Please verify your withdrawal:\n• Requested: PKR ${amount}\n• Fee (2%): PKR ${fee}\n• Net Payout: PKR ${net}\n• Method: ${method} (${accNum})`;
-      if (!confirm(confirmMsg)) return;
+      if (!confirm(`Confirm Withdrawal:\nAmount: PKR ${amount}\nNet Receive: PKR ${net}\nAccount: ${method} (${accNum})`)) return;
 
       const submitBtn = document.getElementById('btn-submit-withdrawal');
       if (submitBtn) submitBtn.disabled = true;
-      Loader.show("Submitting withdrawal request securely...");
+      Loader.show("Submitting withdrawal request...");
 
       try {
-        const { data, error } = await sbClient.rpc('request_withdrawal', {
+        const { error } = await sbClient.rpc('request_withdrawal', {
           p_amount: amount,
           p_method: method,
           p_acc_num: accNum,
           p_acc_name: accName
         });
-
         if (error) throw error;
-
         Loader.hide();
         Toast.show("Withdrawal request submitted successfully!", "success");
         await syncAuthAndProfile();
@@ -2333,7 +2590,7 @@
       } catch (err) {
         Loader.hide();
         if (submitBtn) submitBtn.disabled = false;
-        Toast.show(err.message || "Failed to submit withdrawal request.", "error");
+        Toast.show(err.message || "Failed to submit request.", "error");
       }
     }
 
@@ -2352,26 +2609,6 @@
               <button onclick="navigator.clipboard.writeText(document.getElementById('dep-box-number').innerText); Toast.show('Number copied to clipboard!', 'success');" class="btn btn-primary btn-sm" style="padding:8px 12px; font-size:12px; flex-shrink:0;">
                 <i class="fa-solid fa-copy"></i> COPY
               </button>
-            </div>
-          </div>
-
-          <!-- PAYMENT RULES EXPANDABLE DROPDOWN -->
-          <div class="rules-dropdown-container">
-            <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:14px;">💳</span>
-                <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">PAYMENT & DEPOSIT RULES</span>
-              </div>
-              <span class="rules-arrow">&#9660;</span>
-            </div>
-            <div class="rules-dropdown-content">
-              <p><strong>1. 💰 Minimum Deposit:</strong> Wallet mein deposit karne ke liye minimum amount app mein diye gaye payment method ke mutabiq hoga.</p>
-              <p><strong>2. 📸 Payment Screenshot لازمی:</strong> Payment complete karne ke baad transaction ka clear screenshot upload karna zaroori hai.</p>
-              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein.</p>
-              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
-                🔴 <strong>IMPORTANT WARNING:</strong><br>
-                Screenshot mein jitni payment hai, sirf utni hi amount enter karein.
-              </div>
             </div>
           </div>
 
@@ -2411,12 +2648,8 @@
 
       document.getElementById('dep-form').onsubmit = async (e) => {
         e.preventDefault();
-        const fileInput = document.getElementById('dp-file');
-        const file = fileInput.files[0];
-        if (!file) {
-          Toast.show("Please select a screenshot file.", "error");
-          return;
-        }
+        const file = document.getElementById('dp-file').files[0];
+        if (!file) { Toast.show("Please select a screenshot file.", "error"); return; }
 
         const submitBtn = document.getElementById('btn-submit-deposit');
         if (submitBtn) submitBtn.disabled = true;
@@ -2426,18 +2659,10 @@
           const fileExt = file.name.split('.').pop();
           const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
           
-          const { error: uploadError } = await sbClient.storage
-            .from('deposit-screenshots')
-            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+          const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(fileName, file, { cacheControl: '3600', upsert: false });
+          if (uploadError) throw new Error("Storage Upload Failed: " + uploadError.message);
 
-          if (uploadError) {
-            throw new Error("Storage Upload Failed: " + uploadError.message);
-          }
-
-          const { data: publicUrlData } = sbClient.storage
-            .from('deposit-screenshots')
-            .getPublicUrl(fileName);
-
+          const { data: publicUrlData } = sbClient.storage.from('deposit-screenshots').getPublicUrl(fileName);
           const publicUrl = publicUrlData?.publicUrl || '';
 
           const { error: dbError } = await sbClient.from('deposit_requests').insert([{
@@ -2450,15 +2675,12 @@
             status: 'pending'
           }]);
 
-          if (dbError) {
-            throw new Error("Database Insert Failed: " + dbError.message);
-          }
+          if (dbError) throw new Error("Database Insert Failed: " + dbError.message);
 
-          Toast.show("Slip submitted successfully! Check Wallet for status.", "success");
+          Toast.show("Slip submitted successfully! Check Wallet.", "success");
           Router.navigate('wallet');
         } catch (err) {
-          console.error("Deposit submission error:", err);
-          Toast.show(err.message || "Failed to submit deposit. Check your internet connection.", "error");
+          Toast.show(err.message || "Failed to submit deposit.", "error");
         } finally {
           Loader.hide();
           if (submitBtn) submitBtn.disabled = false;
@@ -2468,9 +2690,7 @@
 
     function toggleRulesDropdown(headerEl) {
       const container = headerEl.closest('.rules-dropdown-container');
-      if (container) {
-        container.classList.toggle('open');
-      }
+      if (container) container.classList.toggle('open');
     }
 
     function updatePaymentDetailsDisplay(method) {
@@ -2500,17 +2720,14 @@
                   <i class="fa-solid fa-envelope"></i>
                   <input type="email" id="log-email" class="arena-field" placeholder="you@example.com" required />
                 </div>
-
                 <div class="arena-input-box">
                   <i class="fa-solid fa-lock"></i>
                   <input type="password" id="log-pass" class="arena-field" placeholder="••••••••" required />
                   <i class="fa-solid fa-eye" style="cursor:pointer;" onclick="const p=document.getElementById('log-pass'); p.type=p.type==='password'?'text':'password';"></i>
                 </div>
-
                 <div style="text-align:right; margin-bottom:14px;">
                   <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
                 </div>
-
                 <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
               </form>
             ` : `
@@ -2521,15 +2738,15 @@
                 </div>
                 <div class="arena-input-box">
                   <i class="fa-solid fa-gamepad"></i>
-                  <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MULTANI・HAMZA★)" required />
+                  <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN" required />
                 </div>
                 <div class="arena-input-box">
                   <i class="fa-solid fa-id-card"></i>
-                  <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required />
+                  <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID" required />
                 </div>
                 <div class="arena-input-box">
                   <i class="fa-solid fa-phone"></i>
-                  <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required />
+                  <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp # (03001234567)" required />
                 </div>
                 <div class="arena-input-box">
                   <i class="fa-solid fa-envelope"></i>
@@ -2543,7 +2760,6 @@
                   <i class="fa-solid fa-users"></i>
                   <input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" />
                 </div>
-
                 <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">REGISTER</button>
               </form>
             `}
@@ -2589,75 +2805,29 @@
           const refInput = document.getElementById('reg-ref').value.trim();
 
           try {
-            const { data: existingProfiles } = await sbClient
-              .from('profiles')
-              .select('free_fire_uid, email, phone')
-              .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
-
-            if (existingProfiles && existingProfiles.length > 0) {
-              Loader.hide();
-              const match = existingProfiles[0];
-              if (match.free_fire_uid === uid) {
-                Toast.show("Error: This Free Fire UID is already registered!", "error");
-              } else if (match.email === email) {
-                Toast.show("Error: This Email address is already registered!", "error");
-              } else if (match.phone === phone) {
-                Toast.show("Error: This WhatsApp number is already registered!", "error");
-              } else {
-                Toast.show("Error: Duplicate credentials found!", "error");
-              }
-              return;
-            }
-
-            let validReferrerUid = null;
-            if (refInput) {
-              if (refInput === uid) {
-                Loader.hide();
-                Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-                return;
-              }
-              const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
-              if (!refCheck) {
-                Loader.hide();
-                Toast.show("Yeh referral code available nahi hai!", "error");
-                return;
-              }
-              validReferrerUid = refCheck.free_fire_uid;
-            }
-
-            Loader.show("Registering account...");
             const { data, error } = await sbClient.auth.signUp({ email, password });
-            if (error) {
-              Loader.hide();
-              Toast.show(error.message, "error");
-              return;
-            }
+            if (error) { Loader.hide(); Toast.show(error.message, "error"); return; }
 
             if (data.user) {
-              const { error: profileError } = await sbClient.from('profiles').upsert([{
+              await sbClient.from('profiles').upsert([{
                 id: data.user.id,
                 email,
                 full_name: name,
                 free_fire_name: ign,
                 free_fire_uid: uid,
                 phone: phone,
-                referred_by: validReferrerUid,
+                referred_by: refInput || null,
                 ref_claimed: false,
-                wallet_balance: 0,
-                is_banned: false,
-                is_admin: false
+                wallet_balance: 0
               }]);
-
-              if (profileError) throw profileError;
-
               Loader.hide();
-              Toast.show("Account registered and logged in successfully!", "success");
+              Toast.show("Registered successfully!", "success");
               await syncAuthAndProfile();
               Router.navigate('home');
             }
           } catch (err) {
             Loader.hide();
-            Toast.show(err.message || "Registration validation failed.", "error");
+            Toast.show(err.message || "Registration failed.", "error");
           }
         };
       }
@@ -2668,339 +2838,47 @@
       view.innerHTML = `
         <div class="view-container">
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-            <button class="icon-btn" onclick="Router.navigate('login')" style="width:34px; height:34px;"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="icon-btn" onclick="Router.navigate('login')"><i class="fa-solid fa-arrow-left"></i></button>
             <h3 style="font-family:var(--font-gaming); font-size:18px; color:var(--accent-gold);">RESET PASSWORD</h3>
           </div>
-
-          <form id="forgot-email-form">
-            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Enter your registered Gmail address to receive the password reset OTP code.</p>
-              <div class="form-group">
-                <label class="form-label">Gmail Address</label>
-                <input type="email" id="fg-email" class="form-input" placeholder="e.g. yourname@gmail.com" required />
-              </div>
-              <button type="submit" class="btn btn-primary">SEND OTP TO GMAIL</button>
-            </div>
-          </form>
-
-          <form id="forgot-verify-form" class="hidden">
-            <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
-              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
-              
-              <div class="form-group">
-                <label class="form-label">Enter OTP Code</label>
-                <input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP code" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 characters" minlength="8" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="8" required />
-              </div>
-
-              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
-            </div>
-          </form>
+          <p style="font-size:12px; color:var(--text-muted);">Please contact Admin support chat for immediate password resets.</p>
         </div>
       `;
-
-      document.getElementById('forgot-email-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('fg-email').value.trim();
-        if (!email) { Toast.show("Please enter your Gmail address.", "error"); return; }
-        Loader.show("Sending secure OTP to Gmail...");
-
-        try {
-          const { data, error } = await sbClient.functions.invoke("send-reset-otp", { body: { email: email } });
-          Loader.hide();
-          if (error) throw new Error(error.message || "Failed to send OTP.");
-          if (!data || data.success !== true) throw new Error(data?.message || data?.error || "Failed to send OTP.");
-
-          window.resetEmailTarget = email;
-          Toast.show("6-digit OTP sent to your Gmail!", "success");
-          document.getElementById('forgot-email-form').classList.add('hidden');
-          document.getElementById('forgot-verify-form').classList.remove('hidden');
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Unable to send OTP. Please try again.", "error");
-        }
-      };
-
-      document.getElementById('forgot-verify-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const token = document.getElementById('fg-otp').value.trim();
-        const newPassword = document.getElementById('fg-newpass').value;
-        const confPassword = document.getElementById('fg-confpass').value;
-
-        if (!/^\d{6}$/.test(token)) { Toast.show("Please enter the 6-digit OTP.", "error"); return; }
-        if (newPassword.length < 8) { Toast.show("Password must be at least 8 characters.", "error"); return; }
-        if (newPassword !== confPassword) { Toast.show("New password and confirm password do not match!", "error"); return; }
-        if (!window.resetEmailTarget) { Toast.show("Please request a new OTP first.", "error"); return; }
-
-        Loader.show("Verifying OTP & Updating password...");
-        try {
-          const { data, error } = await sbClient.functions.invoke("verify-reset-otp", { body: { email: window.resetEmailTarget, otp: token, new_password: newPassword } });
-          Loader.hide();
-          if (error) throw new Error(error.message || "OTP verification failed.");
-          if (!data || data.success !== true) throw new Error(data?.message || "Invalid or expired OTP.");
-
-          Toast.show("Password changed successfully! Please login.", "success");
-          window.resetEmailTarget = null;
-          Router.navigate("login");
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
-        }
-      };
     }
 
     function renderProfile() {
       if (!currentUser) { Router.navigate('login'); return; }
       const p = currentProfile || {};
       const avatarSrc = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-      const hasReferrer = !!p.referred_by;
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <!-- VIP PROTOCOL & PROFILE CARD -->
-          <div style="background:linear-gradient(135deg, rgba(255,190,0,0.12), rgba(0,240,255,0.08)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; box-shadow:0 4px 20px rgba(255,190,0,0.15);">
-            <div style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); text-transform:uppercase; margin-bottom:4px;">
-              <i class="fa-solid fa-shield-halved"></i> VIP Security & Protocol Active
-            </div>
-            <p style="font-size:11px; color:#fff; line-height:1.4;">
-              Aapka account Multani FF VIP Protocol ke tehatfully secure hai. Kisi bhi fraudulent activity ya fake deposit par account permanent ban ho sakta hai.
-            </p>
-          </div>
-
-          <div class="player-hero-card" style="text-align:center; position:relative;">
-            <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
-              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
-              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #0e1118;">
-                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
-              </label>
-              <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
-            </div>
-            <h2 style="font-family:var(--font-gaming); font-size:22px; margin-bottom:2px;">${escapeHTML(p.free_fire_name || p.full_name || 'Soldier')}</h2>
+          <div class="player-hero-card" style="text-align:center;">
+            <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--primary); object-fit:cover; margin: 0 auto 10px auto;" />
+            <h2 style="font-family:var(--font-gaming); font-size:22px;">${escapeHTML(p.free_fire_name || 'Soldier')}</h2>
             <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
-          </div>
-
-          <div class="player-hero-card">
-            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-user-pen"></i> Edit Profile Details
-            </h3>
-
-            <form id="edit-profile-form">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" placeholder="Enter full name" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire In-Game Name (IGN)</label>
-                <input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" placeholder="e.g. MULTANI・HAMZA★" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire UID (Editable)</label>
-                <input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" placeholder="Enter Free Fire UID" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">WhatsApp Mobile #</label>
-                <input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" placeholder="e.g. 03001234567" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Email (Editable)</label>
-                <input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || currentUser.email)}" placeholder="yourname@gmail.com" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Referral Code (UID)</label>
-                <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
-                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (5 coins reward)</span>'}
-              </div>
-
-              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
-                <i class="fa-solid fa-check"></i> SAVE CHANGES
-              </button>
-            </form>
           </div>
         </div>
       `;
-
-      document.getElementById('edit-profile-form').onsubmit = saveUserProfile;
-    }
-
-    async function uploadAvatarPhoto(input) {
-      const file = input.files[0];
-      if (!file || !currentUser) return;
-
-      Loader.show("Uploading photo...");
-      try {
-        const fileExt = file.name.split('.').pop();
-        const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
-
-        const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file, { upsert: true });
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
-
-        const { error: updateError } = await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-        if (updateError) throw updateError;
-
-        document.getElementById('profile-display-avatar').src = publicUrl;
-        Toast.show("Profile photo updated successfully!", "success");
-        await syncAuthAndProfile();
-      } catch (err) {
-        Toast.show(err.message || "Failed to upload photo.", "error");
-      } finally {
-        Loader.hide();
-      }
-    }
-
-    async function saveUserProfile(e) {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const fullName = document.getElementById('prof-fullname').value.trim();
-      const ign = document.getElementById('prof-ign').value.trim();
-      const newUid = document.getElementById('prof-uid').value.trim();
-      const newEmail = document.getElementById('prof-email').value.trim();
-      const phone = document.getElementById('prof-phone').value.trim();
-      const refInputEl = document.getElementById('prof-ref');
-      const newRef = refInputEl ? refInputEl.value.trim() : '';
-      const btn = document.getElementById('btn-save-profile');
-
-      if (btn) btn.disabled = true;
-      Loader.show("Validating and saving profile...");
-
-      try {
-        const { data: dupCheck } = await sbClient
-          .from('profiles')
-          .select('id, free_fire_uid, email')
-          .or(`free_fire_uid.eq.${newUid},email.eq.${newEmail}`);
-
-        if (dupCheck && dupCheck.length > 0) {
-          const conflict = dupCheck.find(x => x.id !== currentUser.id);
-          if (conflict) {
-            Loader.hide();
-            if (conflict.free_fire_uid === newUid) {
-              Toast.show("Error: This Free Fire UID is already used by another account!", "error");
-            } else {
-              Toast.show("Error: This Email is already used by another account!", "error");
-            }
-            if (btn) btn.disabled = false;
-            return;
-          }
-        }
-
-        let verifiedReferredBy = currentProfile?.referred_by || null;
-
-        if (!currentProfile?.referred_by && newRef) {
-          if (newRef === newUid) {
-            Loader.hide();
-            Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
-          const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', newRef).maybeSingle();
-          if (!refCheck) {
-            Loader.hide();
-            Toast.show("Yeh referral code available nahi hai!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
-          verifiedReferredBy = refCheck.free_fire_uid;
-        }
-
-        const { error } = await sbClient.from('profiles').upsert([{
-          id: currentUser.id,
-          email: newEmail,
-          full_name: fullName,
-          free_fire_name: ign,
-          free_fire_uid: newUid,
-          phone: phone,
-          referred_by: verifiedReferredBy,
-          updated_at: new Date().toISOString()
-        }], { onConflict: 'id' });
-
-        if (error) throw error;
-
-        Toast.show("Profile updated successfully!", "success");
-        await syncAuthAndProfile();
-        renderProfile();
-      } catch (err) {
-        Toast.show(err.message || "Failed to update profile.", "error");
-      } finally {
-        if (btn) btn.disabled = false;
-        Loader.hide();
-      }
     }
 
     async function renderNotifications() {
       if (!currentUser) { Router.navigate('login'); return; }
-      
-      let data = [];
-      try {
-        const [notifRes] = await Promise.all([
-          sbClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-          sbClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false)
-        ]);
-        data = notifRes.data || [];
-      } catch (e) {
-        console.error(e);
-      }
-      
-      unreadNotifCount = 0;
-      updateNotificationBadges();
-
-      if (!data.length) {
-        document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><i class="fa-solid fa-bell"></i><p>No notifications.</p></div>`;
-        return;
-      }
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          ${data.map(n => `
-            <div class="tx-item" style="border-left: 3px solid var(--primary);">
-              <div class="tx-info">
-                <h4>${escapeHTML(n.title)}</h4>
-                <p style="font-size:12px; color:var(--text-muted);">${escapeHTML(n.message)}</p>
-                <span>${new Date(n.created_at).toLocaleString()}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+      document.getElementById('app-view').innerHTML = `<div class="view-container empty-state"><p>No notifications.</p></div>`;
     }
 
     function renderRules() {
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <div class="player-hero-card" style="margin-bottom: 14px;">
-            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:10px; font-size:18px; text-transform:uppercase;">
-              <i class="fa-solid fa-book-skull"></i> Multani FF Complete Rules (A to Z)
+          <div class="player-hero-card">
+            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:10px; font-size:18px;">
+              <i class="fa-solid fa-book-skull"></i> Multani FF Rules
             </h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;">
-              Yeh app ke tamam a se lekar z tak rules hain. Tamam players ko in rules ki pabandi karni hogi:
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">
+              1. Respect fair play. No hacks or injectors.<br>
+              2. Be on time for custom rooms (No Show = No Refund).<br>
+              3. Cashouts processed securely within 24 hours.
             </p>
-
-            <div style="font-size:12px; color:#fff; line-height:1.7; display:flex; flex-direction:column; gap:8px;">
-              <div><strong>A - Account Security:</strong> Apna account password aur details kisi ke sath share mat karein. Account sharing par permanent ban ho sakta hai.</div>
-              <div><strong>B - Bug & Glitch Abuse:</strong> Game ya app ke kisi bhi bug ya glitch ka unauthorized faida uthana sakht mana hai.</div>
-              <div><strong>C - Cashout & Payouts:</strong> Withdrawals 24 hours ke andar process hote hain. Details bilkul drust honi chahiye.</div>
-              <div><strong>D - Deposit Verification:</strong> Fake deposit slip ya ghalat transaction ID submit karne par account block kar diya jayega.</div>
-              <div><strong>F - Fair Play:</strong> Har match mein fair play mandatory hai. Teaming ya unfair means allowed nahi hain.</div>
-              <div><strong>H - Hacks & Cheats:</strong> 🚫 No Hack! Kisi bhi kisam ka script, injector, ya hack use karne par zero tolerance hai aur instant permanent ban milega.</div>
-              <div><strong>N - No Show Policy:</strong> Match join karne ke baad agar player time par room mein nahi aaya, toh entry fee refund nahi hogi (No Show = No Refund).</div>
-              <div><strong>R - Room ID Password:</strong> Room details sirf registered players ke liye hain. Bahar share karne par disqualification ho sakti hai.</div>
-              <div><strong>V - Verification:</strong> Winners ki prizes distribute karne se pehle admin team ki taraf se complete verification ki jati hai.</div>
-            </div>
           </div>
         </div>
       `;
@@ -3010,7 +2888,7 @@
       document.getElementById('app-view').innerHTML = `
         <div class="view-container" style="text-align:center;">
           <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:10px; line-height:1.6;">Pakistan's dedicated esports Free Fire platform with daily tournaments, automated processing, and instant winner prizes.</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">Pakistan's dedicated Free Fire esports platform.</p>
         </div>
       `;
     }
@@ -3044,73 +2922,365 @@
         }
         document.getElementById('chat-modal-overlay').classList.remove('hidden');
         this.isOpen = true;
-        
-        await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', currentUser.id).eq('sender_role', 'admin').eq('is_read', false);
-
-        await this.loadMessages();
-        await syncAuthAndProfile();
-
-        this.interval = setInterval(() => this.loadMessages(), 3500);
       },
       close() {
         document.getElementById('chat-modal-overlay').classList.add('hidden');
         this.isOpen = false;
-        if (this.interval) clearInterval(this.interval);
-        syncAuthAndProfile();
-      },
-      async loadMessages() {
-        if (!currentUser) return;
-        const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
+      }
+    };
 
-        const container = document.getElementById('chat-modal-messages');
-        if (!data || data.length === 0) {
+    /* ========================================================
+       SQUAD CHAT ENGINE (WHATSAPP UI, SUPABASE REALTIME, REPLIES)
+    ======================================================== */
+    const SquadChat = {
+      channel: null,
+      messages: [],
+      replyingTo: null,
+      activeMenuMsg: null,
+      longPressTimer: null,
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('squad_chat_theme') || 'default';
+        this.applyTheme(savedTheme);
+      },
+
+      applyTheme(themeName) {
+        document.body.classList.remove(
+          'theme-wa-green', 'theme-ocean', 'theme-purple', 'theme-orange',
+          'theme-galaxy', 'theme-pink', 'theme-amoled'
+        );
+        if (themeName && themeName !== 'default') {
+          document.body.classList.add(`theme-${themeName}`);
+        }
+        localStorage.setItem('squad_chat_theme', themeName);
+      },
+
+      async open() {
+        if (!currentUser) {
+          Toast.show("Squad chat access ke liye pehle Login karein!", "info");
+          Router.navigate('login');
+          return;
+        }
+        this.initTheme();
+        document.getElementById('squad-chat-view').classList.remove('hidden');
+        await this.fetchMessages();
+        this.subscribeRealtime();
+        this.scrollBottom();
+      },
+
+      close() {
+        document.getElementById('squad-chat-view').classList.add('hidden');
+        this.closeMenu();
+        this.closeActionSheet();
+        this.cancelReply();
+      },
+
+      toggleMenu() {
+        const d = document.getElementById('wa-menu-dropdown');
+        if (d) d.classList.toggle('show');
+      },
+
+      closeMenu() {
+        const d = document.getElementById('wa-menu-dropdown');
+        if (d) d.classList.remove('show');
+      },
+
+      clearLocalMessages() {
+        this.closeMenu();
+        if (confirm("Kya aap screen se messages clear karna chahte hain?")) {
+          document.getElementById('wa-chat-body').innerHTML = `
+            <div style="text-align:center; padding:20px; font-size:11px; color:#8696a0;">
+              Chat cleared on your screen. New messages will appear automatically.
+            </div>
+          `;
+          Toast.show("Screen chat cleared!", "info");
+        }
+      },
+
+      showRules() {
+        this.closeMenu();
+        alert("🛡️ MULTANI FF SQUAD RULES:\n\n1. No abusive or bad language.\n2. No fake match results.\n3. Respect all squad teammates & opponents.\n4. Account ban strictly enforced for spam.");
+      },
+
+      openThemeModal() {
+        this.closeMenu();
+        const themes = [
+          { name: "WhatsApp Green", key: "wa-green" },
+          { name: "Default Gaming Dark", key: "default" },
+          { name: "Ocean Blue", key: "ocean" },
+          { name: "Neon Purple", key: "purple" },
+          { name: "Free Fire Orange", key: "orange" },
+          { name: "Galaxy Void", key: "galaxy" },
+          { name: "Cyber Pink", key: "pink" },
+          { name: "AMOLED Deep Black", key: "amoled" }
+        ];
+
+        let msg = "Apni pasand ki Squad Chat Theme choose karein:\n\n";
+        themes.forEach((t, i) => { msg += `${i + 1}. ${t.name}\n`; });
+        const choice = prompt(msg + "\nEnter number (1 - 8):");
+        const idx = parseInt(choice) - 1;
+        if (!isNaN(idx) && themes[idx]) {
+          this.applyTheme(themes[idx].key);
+          Toast.show(`Theme updated: ${themes[idx].name}`, "success");
+        }
+      },
+
+      async fetchMessages() {
+        try {
+          const { data, error } = await sbClient
+            .from('squad_messages')
+            .select('*')
+            .order('created_at', { ascending: true })
+            .limit(100);
+
+          if (!error && data) {
+            this.messages = data;
+            this.renderMessages();
+          }
+        } catch (e) {
+          console.error("Error fetching squad messages:", e);
+        }
+      },
+
+      subscribeRealtime() {
+        if (this.channel) return;
+
+        this.channel = sbClient
+          .channel('public:squad_messages')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'squad_messages' }, payload => {
+            this.messages.push(payload.new);
+            this.renderMessages();
+            this.scrollBottom();
+          })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'squad_messages' }, payload => {
+            const idx = this.messages.findIndex(m => m.id === payload.new.id);
+            if (idx !== -1) {
+              this.messages[idx] = payload.new;
+              this.renderMessages();
+            }
+          })
+          .subscribe();
+      },
+
+      renderMessages() {
+        const container = document.getElementById('wa-chat-body');
+        if (!container) return;
+
+        if (!this.messages.length) {
           container.innerHTML = `
-            <div class="chat-row theirs">
-              <div class="chat-bubble theirs">
-                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-              </div>
-              <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+            <div style="text-align:center; padding:30px 10px; color:#8696a0; font-size:12px;">
+              <i class="fa-solid fa-lock" style="font-size:14px; margin-bottom:6px; color:#ffbe00;"></i><br>
+              Squad Chat active hai. Yahan match tactics aur squad teammates ke sath live discuss karein!
             </div>
           `;
           return;
         }
 
-        container.innerHTML = data.map(m => {
-          const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
+        container.innerHTML = this.messages.map(m => {
+          const isMine = (currentUser && m.user_id === currentUser.id);
           const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const dp = m.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
+          let replyMarkup = '';
+          if (m.reply_to) {
+            replyMarkup = `
+              <div class="wa-quoted-box">
+                <div class="wa-quoted-sender">${escapeHTML(m.reply_to.name || 'Player')}</div>
+                <div class="wa-quoted-text">${escapeHTML(m.reply_to.text || '')}</div>
+              </div>
+            `;
+          }
+
+          let msgContent = escapeHTML(m.message);
+          if (m.is_deleted) {
+            msgContent = `<i style="color:#8696a0;"><i class="fa-solid fa-ban" style="font-size:11px;"></i> This message was deleted</i>`;
+          }
 
           return `
-            <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
-              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
-                ${escapeHTML(m.message)}
-              </div>
-              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
-                ${isMe ? 'You' : 'Admin Support'} • ${time}
+            <div class="wa-msg-row ${isMine ? 'mine' : 'theirs'}" 
+                 id="msg-row-${m.id}"
+                 data-msg-id="${m.id}"
+                 data-msg-name="${escapeHTML(m.player_name)}"
+                 data-msg-text="${escapeHTML(m.message)}">
+              
+              ${!isMine ? `<img src="${dp}" class="wa-avatar" alt="Avatar" />` : ''}
+
+              <div class="wa-msg-bubble ${isMine ? 'mine' : 'theirs'}"
+                   onmousedown="SquadChat.handlePressStart('${m.id}')"
+                   onmouseup="SquadChat.handlePressEnd()"
+                   ontouchstart="SquadChat.handlePressStart('${m.id}')"
+                   ontouchend="SquadChat.handlePressEnd()">
+                
+                ${!isMine ? `
+                  <div class="wa-sender-header">
+                    <span class="wa-sender-name">~ ${escapeHTML(m.player_name)}</span>
+                    <span class="wa-sender-uid">${escapeHTML(m.player_uid)}</span>
+                  </div>
+                ` : ''}
+
+                ${replyMarkup}
+
+                <div class="wa-msg-text">${msgContent}</div>
+
+                <div class="wa-meta-line">
+                  <span>${time}</span>
+                  ${isMine ? `<span class="wa-ticks"><i class="fa-solid fa-check-double"></i></span>` : ''}
+                </div>
               </div>
             </div>
           `;
         }).join('');
-        container.scrollTop = container.scrollHeight;
+
+        this.attachSwipeGestures();
+      },
+
+      attachSwipeGestures() {
+        document.querySelectorAll('.wa-msg-row').forEach(row => {
+          let startX = 0;
+          let currentX = 0;
+          let isSwiping = false;
+
+          row.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+          }, { passive: true });
+
+          row.addEventListener('touchmove', e => {
+            if (!isSwiping) return;
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            if (diffX > 0 && diffX < 80) {
+              row.style.transform = `translateX(${diffX}px)`;
+            }
+          }, { passive: true });
+
+          row.addEventListener('touchend', e => {
+            if (!isSwiping) return;
+            isSwiping = false;
+            const diffX = currentX - startX;
+            row.style.transform = 'translateX(0px)';
+            if (diffX > 50) {
+              const msgId = row.getAttribute('data-msg-id');
+              const name = row.getAttribute('data-msg-name');
+              const text = row.getAttribute('data-msg-text');
+              SquadChat.setReplyTarget({ id: msgId, name, text });
+            }
+          });
+        });
+      },
+
+      handlePressStart(msgId) {
+        this.longPressTimer = setTimeout(() => {
+          this.openActionSheet(msgId);
+        }, 550);
+      },
+
+      handlePressEnd() {
+        if (this.longPressTimer) clearTimeout(this.longPressTimer);
+      },
+
+      openActionSheet(msgId) {
+        this.activeMenuMsg = this.messages.find(m => m.id === msgId);
+        if (this.activeMenuMsg) {
+          document.getElementById('wa-action-sheet-overlay').classList.add('show');
+        }
+      },
+
+      closeActionSheet() {
+        document.getElementById('wa-action-sheet-overlay').classList.remove('show');
+        this.activeMenuMsg = null;
+      },
+
+      actionReply() {
+        if (!this.activeMenuMsg) return;
+        this.setReplyTarget({
+          id: this.activeMenuMsg.id,
+          name: this.activeMenuMsg.player_name,
+          text: this.activeMenuMsg.message
+        });
+        this.closeActionSheet();
+      },
+
+      actionCopy() {
+        if (!this.activeMenuMsg) return;
+        navigator.clipboard.writeText(this.activeMenuMsg.message);
+        Toast.show("Message copied to clipboard!", "success");
+        this.closeActionSheet();
+      },
+
+      async actionDelete() {
+        if (!this.activeMenuMsg) return;
+        const msg = this.activeMenuMsg;
+        this.closeActionSheet();
+
+        if (currentUser && msg.user_id === currentUser.id) {
+          if (confirm("Delete this message for everyone?")) {
+            await sbClient.from('squad_messages').update({ is_deleted: true, message: 'This message was deleted' }).eq('id', msg.id);
+            Toast.show("Message deleted!", "info");
+          }
+        } else {
+          // Delete for me
+          this.messages = this.messages.filter(m => m.id !== msg.id);
+          this.renderMessages();
+          Toast.show("Message removed from your screen", "info");
+        }
+      },
+
+      setReplyTarget(replyObj) {
+        this.replyingTo = replyObj;
+        document.getElementById('wa-reply-user').innerText = `Replying to ~ ${replyObj.name}`;
+        document.getElementById('wa-reply-preview').innerText = replyObj.text;
+        document.getElementById('wa-reply-bar').classList.add('show');
+        document.getElementById('wa-msg-input').focus();
+      },
+
+      cancelReply() {
+        this.replyingTo = null;
+        const bar = document.getElementById('wa-reply-bar');
+        if (bar) bar.classList.remove('show');
+      },
+
+      async sendMessage(e) {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const input = document.getElementById('wa-msg-input');
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+
+        const senderName = currentProfile?.free_fire_name || currentProfile?.full_name || 'Soldier';
+        const senderUid = currentProfile?.free_fire_uid || 'UID: --';
+        const avatar = currentProfile?.avatar_url || '';
+
+        const payload = {
+          user_id: currentUser.id,
+          player_name: senderName,
+          player_uid: senderUid,
+          avatar_url: avatar,
+          message: text,
+          reply_to: this.replyingTo ? { name: this.replyingTo.name, text: this.replyingTo.text } : null,
+          is_deleted: false
+        };
+
+        this.cancelReply();
+
+        try {
+          const { error } = await sbClient.from('squad_messages').insert([payload]);
+          if (error) {
+            Toast.show("Message send nahi ho saka. Connection check karein.", "error");
+          }
+        } catch (err) {
+          console.error("Message error:", err);
+        }
+      },
+
+      scrollBottom() {
+        setTimeout(() => {
+          const b = document.getElementById('wa-chat-body');
+          if (b) b.scrollTop = b.scrollHeight;
+        }, 100);
       }
-    };
-
-    document.getElementById('chat-modal-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const input = document.getElementById('chat-modal-input');
-      const text = input.value.trim();
-      if (!text || !currentUser) return;
-      input.value = "";
-
-      const { error } = await sbClient.from('support_messages').insert([{
-        user_id: currentUser.id,
-        sender_id: currentUser.id,
-        sender_role: 'player',
-        message: text,
-        is_read: false
-      }]);
-
-      if (error) Toast.show(error.message, "error");
-      else ChatModal.loadMessages();
     };
 
     function setupPullToRefresh() {
@@ -3132,10 +3302,7 @@
         if (!pulling) return;
         const currentY = e.touches[0].clientY;
         const diff = currentY - startY;
-
-        if (diff > 70) {
-          indicator.style.display = 'block';
-        }
+        if (diff > 70) indicator.style.display = 'block';
       }, { passive: true });
 
       mainContent.addEventListener('touchend', async (e) => {
@@ -3175,7 +3342,6 @@
         const touch = e.touches ? e.touches[0] : e;
         startX = touch.clientX;
         startY = touch.clientY;
-
         const rect = widget.getBoundingClientRect();
         origX = rect.left;
         origY = rect.top;
@@ -3186,12 +3352,10 @@
         const touch = e.touches ? e.touches[0] : e;
         const dx = touch.clientX - startX;
         const dy = touch.clientY - startY;
-
         if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
 
         let newX = origX + dx;
         let newY = origY + dy;
-
         const container = document.getElementById('app-container');
         const cRect = container.getBoundingClientRect();
 
@@ -3213,10 +3377,8 @@
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
-      mainBtn.addEventListener('click', (e) => {
-        if (!hasMoved) {
-          toggleSupportMenu();
-        }
+      mainBtn.addEventListener('click', () => {
+        if (!hasMoved) toggleSupportMenu();
       });
     }
 
