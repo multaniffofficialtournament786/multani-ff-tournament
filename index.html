@@ -7,10 +7,9 @@
   <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
   <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
 
-  <!-- ADVANCED SEO META TAGS -->
   <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
-  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
-  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire, Multani FF official website, Free Fire daily esports tournament Pakistan, Multani FF gaming zone" />
+  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant withdrawals." />
+  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire" />
   <meta name="author" content="Muhammad Nadeem" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0a0a0f" />
@@ -118,7 +117,6 @@
       overflow: hidden;
     }
     .screenshot-card > * { position: relative; z-index: 2; }
-
     .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
     .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
@@ -127,7 +125,6 @@
 
     .rules-dropdown-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 14px; overflow: hidden; }
     .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; transition: var(--transition); }
-    .rules-dropdown-header:hover { background: #222736; }
     .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
     .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
     .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
@@ -159,7 +156,6 @@
 
     .category-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 14px; scrollbar-width: none; }
     .category-scroll-container::-webkit-scrollbar { display: none; }
-    
     .cat-item { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; cursor: pointer; gap: 6px; }
     .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
     .cat-circle:active { transform: scale(0.92); }
@@ -174,8 +170,58 @@
     @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .support-action-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ffbe00, #ff9800); border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); cursor: pointer; text-decoration: none; transition: var(--transition); }
 
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    
+    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
+    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
+    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
+    .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+    .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
+    .stat-val.gold { color: var(--accent-gold); }
+    .stat-val.green { color: var(--success); }
+
+    .tournaments-stack-as8 { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); position: relative; }
+    .t-card-thumb-large { width: 100%; height: 160px; position: relative; background: #000; cursor: pointer; }
+    .t-card-thumb-large img { width: 100%; height: 100%; object-fit: cover; }
+    .t-card-info-large { padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #11151e; }
+    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; }
+    .t-card-meta-large { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+
+    .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
+    .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
+    .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
+    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; overflow: hidden; word-break: break-word; }
+    .tx-info { flex: 1; min-width: 0; padding-right: 8px; }
+    .tx-info h4 { font-size: 14px; font-weight: 600; }
+    .tx-info span { font-size: 11px; color: var(--text-dim); display: block; }
+    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; flex-shrink: 0; }
+    .tx-positive { color: var(--success); }
+    .tx-negative { color: var(--danger); }
+
+    .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 700; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+    .toast-msg.toast-success { border-color: var(--success); }
+    .toast-msg.toast-error { border-color: var(--danger); }
+    .toast-msg.toast-info { border-color: var(--accent-cyan); }
+
+    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
+    .hidden { display: none !important; }
+
     /* ========================================================
-       MULTANI FF SQUAD CHAT (WHATSAPP FULL-PAGE) STYLING
+       MULTANI FF SQUAD CHAT (PERFECT FULL CONTAINER DISPLAY)
     ======================================================== */
     .squad-chat-banner {
       background: linear-gradient(135deg, #101726 0%, #090e18 100%);
@@ -223,44 +269,50 @@
     .pulse-dot { width: 7px; height: 7px; background-color: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; animation: chatPulse 1.4s infinite; }
     @keyframes chatPulse { 0%, 100% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.3); opacity: 1; } }
 
-    /* FULL PAGE CHAT WRAPPER */
+    /* FULL-PAGE CHAT WRAPPER (CORRECTED WIDTH & HEIGHT) */
     #squad-chat-view {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       background: #0b141a;
-      z-index: 450;
+      z-index: 550;
       display: flex;
       flex-direction: column;
       animation: fadeIn 0.2s ease-out;
     }
+    #squad-chat-view.hidden { display: none !important; }
+
     .wa-header {
       background: #1f2c34;
-      padding: 8px 12px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       color: #e9edef;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
       z-index: 10;
+      flex-shrink: 0;
     }
-    .wa-header-left { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; min-width: 0; }
-    .wa-back-btn { background: none; border: none; color: #aebac1; font-size: 17px; cursor: pointer; padding: 4px; }
+    .wa-header-left { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0; }
+    .wa-back-btn { background: none; border: none; color: #aebac1; font-size: 18px; cursor: pointer; padding: 4px; }
     .wa-group-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid #00a884; }
     .wa-title-block { display: flex; flex-direction: column; min-width: 0; }
-    .wa-group-name { font-size: 15px; font-weight: 600; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-ui); }
+    .wa-group-name { font-size: 15px; font-weight: 700; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-gaming); letter-spacing: 0.5px; }
     .wa-status-text { font-size: 11px; color: #00e676; display: flex; align-items: center; gap: 5px; }
-    .wa-header-right { position: relative; }
 
-    /* THREE DOT MENU */
     .wa-menu-dropdown {
       position: absolute;
-      top: 40px;
-      right: 0;
+      top: 45px;
+      right: 8px;
       background: #233138;
       border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       padding: 6px 0;
-      min-width: 160px;
+      min-width: 165px;
       display: none;
       z-index: 100;
       border: 1px solid rgba(255,255,255,0.08);
@@ -274,25 +326,22 @@
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      transition: background 0.15s;
     }
     .wa-menu-item:hover, .wa-menu-item:active { background: #182229; color: #fff; }
 
-    /* CHAT STREAM BODY */
     .wa-chat-body {
       flex: 1;
       overflow-y: auto;
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       background-color: #0b141a;
       background-image: radial-gradient(#1f2c34 1px, transparent 1px);
       background-size: 18px 18px;
       -webkit-overflow-scrolling: touch;
     }
 
-    /* MESSAGE BUBBLES */
     .wa-msg-row {
       display: flex;
       gap: 8px;
@@ -306,10 +355,9 @@
     .wa-msg-row.theirs { justify-content: flex-start; }
 
     .wa-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-bottom: 2px; }
-    
     .wa-msg-bubble {
-      max-width: 80%;
-      padding: 6px 10px;
+      max-width: 82%;
+      padding: 7px 11px;
       border-radius: 8px;
       font-size: 13px;
       line-height: 1.38;
@@ -347,19 +395,19 @@
       justify-content: space-between;
       align-items: center;
       border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
     }
     .wa-reply-bar.show { display: flex; animation: slideUp 0.15s ease-out; }
     .wa-reply-info { font-size: 11px; overflow: hidden; }
     .wa-reply-user { font-weight: 700; color: #00a884; }
     .wa-reply-preview { color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
 
-    .wa-input-container { background: #1f2c34; padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
+    .wa-input-container { background: #1f2c34; padding: 8px 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .wa-input-box { flex: 1; background: #2a3942; border-radius: 22px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; }
     .wa-text-field { width: 100%; background: transparent; border: none; outline: none; color: #e9edef; font-size: 14px; font-family: var(--font-ui); }
     .wa-text-field::placeholder { color: #8696a0; }
     .wa-send-btn { width: 42px; height: 42px; border-radius: 50%; background: #00a884; border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); flex-shrink: 0; }
 
-    /* LONG PRESS ACTION SHEET */
     .wa-action-sheet-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.65); z-index: 600; display: none; align-items: flex-end; }
     .wa-action-sheet-overlay.show { display: flex; }
     .wa-action-sheet { background: #233138; width: 100%; border-top-left-radius: 18px; border-top-right-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; animation: slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -367,7 +415,6 @@
     .wa-action-item:active { background: #182229; color: #fff; }
     .wa-action-item.delete { color: #ff5252; }
 
-    /* VISUAL THEME SELECTOR MODAL */
     .theme-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 650; display: none; align-items: center; justify-content: center; padding: 16px; }
     .theme-modal-overlay.show { display: flex; }
     .theme-modal-card { background: #1a2228; border: 1px solid #2d3b45; border-radius: 16px; width: 100%; max-width: 340px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
@@ -377,7 +424,7 @@
     .theme-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); }
     .theme-label { font-size: 11px; font-weight: 700; color: #e9edef; font-family: var(--font-gaming); letter-spacing: 0.5px; }
 
-    /* SQUAD THEMES VARIATIONS */
+    /* SQUAD THEME VARIATIONS */
     body.theme-wa-green #squad-chat-view .wa-header { background: #005c4b; }
     body.theme-wa-green #squad-chat-view .wa-send-btn { background: #25d366; }
     body.theme-wa-green #squad-chat-view .wa-msg-bubble.mine { background: #005c4b; }
@@ -438,7 +485,6 @@
           </button>
           <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
             <i class="fa-solid fa-bell"></i>
-            <span id="header-notif-badge" class="hidden" style="position:absolute; top:6px; right:6px; width:9px; height:9px; background:var(--primary); border-radius:50%; border:1px solid #0e1118;"></span>
           </button>
           <button id="btn-header-profile" class="icon-btn avatar-btn" onclick="Router.navigate('profile')">
             <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
@@ -456,7 +502,7 @@
       </div>
     </header>
 
-    <!-- SQUAD CHAT FULL SCREEN VIEW -->
+    <!-- SQUAD CHAT FULL SCREEN VIEW (BAND RAHI GI START MEIN) -->
     <div id="squad-chat-view" class="hidden">
       <div class="wa-header">
         <div class="wa-header-left" onclick="SquadChat.close()">
@@ -513,7 +559,7 @@
         </div>
       </div>
 
-      <!-- VISUAL THEME SELECTOR MODAL -->
+      <!-- VISUAL THEME MODAL -->
       <div id="wa-theme-modal" class="theme-modal-overlay" onclick="SquadChat.closeThemeModal()">
         <div class="theme-modal-card" onclick="event.stopPropagation()">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2d3b45; padding-bottom:8px;">
@@ -525,23 +571,21 @@
       </div>
     </div>
 
-    <!-- MAIN CONTENT VIEW -->
+    <!-- MAIN APP VIEW -->
     <main id="app-view" class="main-content">
       <div id="pull-refresh-indicator">🔄 Pull down to refresh...</div>
     </main>
 
-    <!-- FLOATING MENU BUTTON -->
+    <!-- FLOATING BOT MENU -->
     <div id="admin-float-widget">
       <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
         <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
-        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
       </div>
       <div id="support-popup-menu" class="support-popup-menu">
         <a href="https://www.instagram.com/multani.ff.gaming" target="_blank" class="support-action-btn"><i class="fa-brands fa-instagram"></i></a>
         <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn"><i class="fa-brands fa-youtube"></i></a>
         <a href="https://www.tiktok.com/@multani.ff.gaming" target="_blank" class="support-action-btn"><i class="fa-brands fa-tiktok"></i></a>
         <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn"><i class="fa-brands fa-whatsapp"></i></a>
-        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn"><i class="fa-solid fa-headset"></i></div>
       </div>
       <span class="bot-badge-tag">MENU</span>
     </div>
@@ -594,9 +638,7 @@
 
     let currentUser = null;
     let currentProfile = null;
-    let siteSettings = {};
     let activeTournaments = [];
-    let userJoinedTournamentIds = new Set();
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
     const Toast = {
@@ -665,8 +707,7 @@
     }
 
     const Router = {
-      history: [],
-      async navigate(page, id = null) {
+      async navigate(page) {
         Drawer.close();
         Loader.show("Loading...");
         await syncAuthAndProfile();
@@ -784,7 +825,7 @@
     }
 
     /* ========================================================
-       SQUAD CHAT ENGINE: REAL ONLINE COUNT & VISUAL THEMES
+       SQUAD CHAT ENGINE: PURE WHATSAPP REALTIME & THEMING
     ======================================================== */
     const SquadChat = {
       channel: null,
@@ -819,7 +860,7 @@
           document.body.classList.add(`theme-${themeName}`);
         }
         localStorage.setItem('squad_chat_theme', themeName);
-        if (showToast) Toast.show(`Theme applied: ${themeName.toUpperCase()}`, "success");
+        if (showToast) Toast.show(`Theme: ${themeName.toUpperCase()}`, "success");
         this.closeThemeModal();
       },
 
@@ -881,7 +922,7 @@
 
       clearLocalMessages() {
         this.closeMenu();
-        if (confirm("Clear chat on your screen?")) {
+        if (confirm("Clear messages on your screen?")) {
           document.getElementById('wa-chat-body').innerHTML = `
             <div style="text-align:center; padding:20px; font-size:11px; color:#8696a0;">
               Chat cleared locally on this device.
@@ -896,12 +937,11 @@
         alert("🛡️ MULTANI FF SQUAD RULES:\n\n1. No abusive language.\n2. Respect squad members.\n3. Fair play tournament talk only.");
       },
 
-      // REAL SUPABASE ONLINE PRESENCE TRACKER
       trackRealOnlinePresence() {
         if (this.presenceChannel) return;
 
         this.presenceChannel = sbClient.channel('squad_presence', {
-          config: { presence: { key: currentUser?.id || 'guest_' + Math.random() } }
+          config: { presence: { key: currentUser?.id || 'usr_' + Math.random() } }
         });
 
         this.presenceChannel
@@ -969,7 +1009,7 @@
           container.innerHTML = `
             <div style="text-align:center; padding:30px 10px; color:#8696a0; font-size:12px;">
               <i class="fa-solid fa-lock" style="font-size:14px; margin-bottom:6px; color:#ffbe00;"></i><br>
-              Squad Chat active hai. Messages real-time sync hote hain.
+              Squad Chat active hai. Messages real-time Supabase se deliver hote hain.
             </div>
           `;
           return;
@@ -1189,18 +1229,18 @@
       }
     };
 
-    function toggleSupportMenu(forceState) {
+    function toggleSupportMenu() {
       const menu = document.getElementById('support-popup-menu');
-      if (!menu) return;
-      menu.classList.toggle('show');
+      if (menu) menu.classList.toggle('show');
     }
 
-    const ChatModal = {
-      open() { Toast.show("Support Desk loaded", "info"); },
-      close() {}
-    };
-
     window.addEventListener('DOMContentLoaded', async () => {
+      // Ensure squad chat is completely closed on initial launch
+      const chatView = document.getElementById('squad-chat-view');
+      if (chatView) chatView.classList.add('hidden');
+
+      SquadChat.initTheme();
+
       document.getElementById('btn-hamburger').onclick = () => Drawer.open();
       document.getElementById('float-main-btn').onclick = () => toggleSupportMenu();
 
