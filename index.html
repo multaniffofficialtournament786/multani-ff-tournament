@@ -63,7 +63,6 @@
     .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
     .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); position: relative; }
-    .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
     .header-actions { display: flex; align-items: center; gap: 6px; }
     .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
     .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
@@ -97,7 +96,7 @@
       margin-bottom: 14px;
       position: relative;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      background-color: transparent !important;
+      background-color: #121620 !important;
       background-size: cover !important;
       background-position: center !important;
       overflow: hidden;
@@ -106,8 +105,8 @@
     .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
     .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
-    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
-    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-shadow: 0 1px 5px rgba(0,0,0,0.98); }
+    .screenshot-title { font-family: var(--font-gaming); font-size: 20px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
+    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
 
     .led-signboard { background: #020305; border: 3px solid transparent; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; position: relative; box-shadow: 0 0 18px rgba(0, 240, 255, 0.35); background-image: radial-gradient(circle, #151c28 1px, transparent 1px); background-size: 6px 6px; }
     .led-signboard i { color: #ffbe00; font-size: 16px; filter: drop-shadow(0 0 6px #ffbe00); }
@@ -164,6 +163,7 @@
     .spinner-flame { width: 44px; height: 44px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 14px; color: var(--text-muted); }
+    .hidden { display: none !important; }
 
     /* MULTANI FF SQUAD CHAT FULL SCREEN UI */
     .squad-chat-banner {
@@ -246,7 +246,7 @@
     .theme-pick-btn { border-radius: 10px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; border: 2px solid transparent; }
     .theme-dot { width: 22px; height: 22px; border-radius: 50%; }
 
-    /* THEME OVERRIDES */
+    /* THEMES */
     body.theme-wa-green #squad-chat-view .wa-header { background: #005c4b; }
     body.theme-ocean #squad-chat-view .wa-header { background: #0a2540; }
     body.theme-purple #squad-chat-view .wa-header { background: #2b1044; }
@@ -269,6 +269,11 @@
             <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
           </button>
         </div>
+      </div>
+      <div id="sub-header-bar" class="header-bar hidden">
+        <button class="icon-btn" onclick="Router.navigate('home')"><i class="fa-solid fa-arrow-left"></i></button>
+        <h1 id="sub-header-title" class="sub-header-title">Page</h1>
+        <div class="sub-header-spacer"></div>
       </div>
     </header>
 
@@ -324,7 +329,7 @@
         </div>
       </div>
 
-      <!-- INPUT BAR (NO PAPERCLIP) -->
+      <!-- INPUT BAR WITHOUT PAPERCLIP -->
       <form id="wa-input-container" class="wa-input-container" onsubmit="SquadChat.sendMessage(event)">
         <div class="wa-input-box">
           <i class="fa-regular fa-face-smile" onclick="SquadChat.toggleStickers()" style="color:#00e676; font-size:20px; cursor:pointer;"></i>
@@ -374,17 +379,17 @@
 
       <nav class="drawer-nav">
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
-        <button onclick="Toast.show('Matches', 'info')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
-        <button onclick="Toast.show('Wallet', 'info')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</button>
+        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
+        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet</button>
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
     </aside>
 
     <nav id="bottom-nav" class="bottom-nav">
       <div class="nav-item active" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
-      <div class="nav-item" onclick="Toast.show('Matches Section', 'info')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-      <div class="nav-item" onclick="Toast.show('Withdraw Section', 'info')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
-      <div class="nav-item" onclick="Toast.show('Wallet Section', 'info')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+      <div class="nav-item" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
+      <div class="nav-item" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
+      <div class="nav-item" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
   </div>
 
@@ -401,6 +406,7 @@
 
     let currentUser = null;
     let currentProfile = null;
+    let activeTournaments = [];
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
     const Toast = {
@@ -458,16 +464,37 @@
     const Router = {
       async navigate(page) {
         Drawer.close();
-        if (page === 'home') renderHome();
+        const masterHeader = document.getElementById('master-header-bar');
+        const subHeader = document.getElementById('sub-header-bar');
+        const subTitle = document.getElementById('sub-header-title');
+
+        if (page === 'home') {
+          if (masterHeader) masterHeader.classList.remove('hidden');
+          if (subHeader) subHeader.classList.add('hidden');
+          renderHome();
+        } else {
+          if (masterHeader) masterHeader.classList.add('hidden');
+          if (subHeader) subHeader.classList.remove('hidden');
+          if (subTitle) subTitle.innerText = page.toUpperCase();
+
+          if (page === 'tournaments') renderTournaments();
+          else if (page === 'wallet') renderWallet();
+          else if (page === 'withdrawal') renderWithdrawal();
+          else if (page === 'deposit') renderDeposit();
+          else if (page === 'spin') renderDailySpin();
+          else if (page === 'diamonds') renderDiamonds();
+          else if (page === 'profile') renderProfile();
+        }
       }
     };
 
     function renderHome() {
       const p = currentProfile || { free_fire_name: "Soldier", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "No WhatsApp" };
-      const tickerText = "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • LIVE SQUAD CHAT ACTIVE!";
+      const tickerText = "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
+          <!-- LED SIGNBOARD -->
           <div class="led-signboard">
             <i class="fa-solid fa-bolt"></i>
             <div class="ticker-viewport">
@@ -475,6 +502,7 @@
             </div>
           </div>
 
+          <!-- PLAYER HERO CARD -->
           <div class="player-hero-card">
             <div class="hero-profile-row">
               <div style="display:flex; align-items:center; gap:12px;">
@@ -493,12 +521,14 @@
             </div>
           </div>
 
+          <!-- DOWNLOAD OFFICIAL APP BUTTON -->
           <div style="margin-bottom:12px;">
             <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="padding:12px 16px; font-size:15px; background:linear-gradient(135deg, #00f0ff, #0077ff); color:#000; font-weight:800; text-decoration:none;">
               <i class="fa-solid fa-cloud-arrow-down" style="font-size:18px;"></i> DOWNLOAD OFFICIAL APP
             </a>
           </div>
 
+          <!-- MULTANI FF SQUAD CHAT BANNER BUTTON -->
           <div class="squad-chat-banner" onclick="SquadChat.open()">
             <div class="chat-banner-left">
               <div class="chat-glow-icon"><i class="fa-solid fa-comments"></i></div>
@@ -512,29 +542,49 @@
             </div>
           </div>
 
+          <!-- QUICK CATEGORY CIRCLES -->
           <div class="category-scroll-container">
-            <div class="cat-item" onclick="Toast.show('Matches Section', 'info')">
+            <div class="cat-item" onclick="Router.navigate('tournaments')">
               <div class="cat-circle"><i class="fa-solid fa-trophy"></i></div>
               <span class="cat-label">Matches</span>
             </div>
-            <div class="cat-item" onclick="Toast.show('Withdraw Section', 'info')">
+            <div class="cat-item" onclick="Router.navigate('withdrawal')">
               <div class="cat-circle" style="border-color:var(--accent-cyan);"><i class="fa-solid fa-money-bill-transfer" style="color:var(--accent-cyan)"></i></div>
               <span class="cat-label">Withdraw</span>
             </div>
-            <div class="cat-item" onclick="Toast.show('Add Cash', 'info')">
+            <div class="cat-item" onclick="Router.navigate('deposit')">
               <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
               <span class="cat-label">Add Cash</span>
             </div>
-            <div class="cat-item" onclick="Toast.show('Daily Spin', 'info')">
+            <div class="cat-item" onclick="Router.navigate('spin')">
               <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-dharmachakra" style="color:var(--accent-gold)"></i></div>
               <span class="cat-label">Daily Spin</span>
             </div>
-            <div class="cat-item" onclick="Toast.show('Wallet', 'info')">
+            <div class="cat-item" onclick="Router.navigate('diamonds')">
+              <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-gem" style="color:var(--accent-gold)"></i></div>
+              <span class="cat-label">Diamonds</span>
+            </div>
+            <div class="cat-item" onclick="Router.navigate('wallet')">
               <div class="cat-circle"><i class="fa-solid fa-wallet" style="color:var(--primary)"></i></div>
               <span class="cat-label">Wallet</span>
             </div>
           </div>
 
+          <!-- TUTORIAL SCREENSHOT VIDEO GUIDES -->
+          <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; margin-bottom:14px;">
+            <div class="screenshot-card" style="min-width:300px; flex:1; margin-bottom:0;">
+              <div class="screenshot-card-header">
+                <div class="screenshot-card-logo"><i class="fa-brands fa-youtube"></i></div>
+                <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
+              </div>
+              <div class="screenshot-title">HOW TO PLAY & WIN CASH</div>
+              <div class="screenshot-subtitle">COMPLETE STEP-BY-STEP WEBSITE GUIDE</div>
+              <p style="font-size:11px; color:#fff; font-weight:700; margin-bottom:12px;">Watch how to deposit, join custom rooms, and withdraw.</p>
+              <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="btn btn-primary" style="padding:10px; font-size:13px;"><i class="fa-solid fa-play"></i> WATCH TUTORIAL</a>
+            </div>
+          </div>
+
+          <!-- SOCIAL FOOTER -->
           <div class="social-footer">
             <p>Connect With Us</p>
             <div class="social-icons-row">
@@ -547,10 +597,135 @@
       `;
     }
 
-    /* SQUAD CHAT LOGIC */
+    /* TOURNAMENTS PAGE */
+    async function renderTournaments() {
+      const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+      const list = data || [];
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-trophy" style="color:var(--accent-gold);"></i> Available Tournaments</span></div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            ${list.map(t => `
+              <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:14px;">
+                <h3 style="font-family:var(--font-gaming); font-size:18px; color:#fff;">${escapeHTML(t.title)}</h3>
+                <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:12px; color:var(--text-muted);">
+                  <span>Map: <strong>${escapeHTML(t.map || 'Bermuda')}</strong></span>
+                  <span>Entry: <strong style="color:var(--accent-gold);">PKR ${t.entry_fee}</strong></span>
+                  <span>Prize: <strong style="color:var(--success);">PKR ${t.prize_pool}</strong></span>
+                </div>
+                <button class="btn btn-primary btn-sm" style="width:100%;" onclick="Toast.show('Slot booked', 'success')">JOIN MATCH</button>
+              </div>
+            `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:20px;">No matches scheduled.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    /* WALLET PAGE */
+    function renderWallet() {
+      const balance = currentProfile?.wallet_balance || 0;
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="wallet-hero">
+            <span class="wallet-balance-title">Current Balance</span>
+            <div class="wallet-amount">PKR ${balance}</div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" style="flex:1;" onclick="Router.navigate('withdrawal')">Withdraw</button>
+              <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')">Add Cash</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* WITHDRAWAL PAGE */
+    function renderWithdrawal() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card">
+            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); margin-bottom:12px;">REQUEST CASHOUT (MIN 200 PKR)</h3>
+            <form onsubmit="event.preventDefault(); Toast.show('Withdrawal request submitted!', 'success'); Router.navigate('home');">
+              <div class="form-group"><label class="form-label">Amount (PKR)</label><input type="number" min="200" class="form-input" placeholder="e.g. 500" required /></div>
+              <div class="form-group"><label class="form-label">Method</label><select class="form-input"><option>JazzCash</option><option>Easypaisa</option><option>SadaPay</option></select></div>
+              <div class="form-group"><label class="form-label">Account Title</label><input type="text" class="form-input" placeholder="Full Name" required /></div>
+              <div class="form-group"><label class="form-label">Account Number</label><input type="text" class="form-input" placeholder="03XXXXXXXXX" required /></div>
+              <button type="submit" class="btn btn-primary">SUBMIT WITHDRAW</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    /* DEPOSIT PAGE */
+    function renderDeposit() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="margin-bottom:14px;">
+            <div style="font-size:12px; color:var(--accent-gold); font-weight:bold;">OFFICIAL PAYMENT DETAILS</div>
+            <div style="font-size:18px; color:var(--accent-cyan); font-weight:bold; margin-top:4px;">03186815926</div>
+            <div style="font-size:11px; color:#fff;">Title: <strong>MUHAMMAD NADEEM</strong> (Easypaisa)</div>
+          </div>
+          <form onsubmit="event.preventDefault(); Toast.show('Slip submitted! Admin will verify soon.', 'success'); Router.navigate('home');">
+            <div class="form-group"><label class="form-label">Amount Sent (PKR)</label><input type="number" min="50" class="form-input" required /></div>
+            <div class="form-group"><label class="form-label">Sender Name</label><input type="text" class="form-input" required /></div>
+            <button type="submit" class="btn btn-primary">SUBMIT SLIP</button>
+          </form>
+        </div>
+      `;
+    }
+
+    /* DAILY SPIN PAGE */
+    function renderDailySpin() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container" style="text-align:center;">
+          <h2 style="font-family:var(--font-gaming); color:#ffaa00; font-size:24px; margin-bottom:8px;">DAILY SPIN WHEEL</h2>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px;">Spin daily to win free coins!</p>
+          <div style="width:200px; height:200px; border-radius:50%; border:4px solid var(--accent-gold); margin:0 auto 20px auto; display:flex; align-items:center; justify-content:center; background:#151922; box-shadow:0 0 20px rgba(255,190,0,0.3);">
+            <i class="fa-solid fa-dharmachakra" style="font-size:80px; color:var(--accent-gold);"></i>
+          </div>
+          <button class="btn btn-primary" onclick="Toast.show('You won 2 Coins!', 'success')">SPIN NOW</button>
+        </div>
+      `;
+    }
+
+    /* DIAMONDS PAGE */
+    function renderDiamonds() {
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="section-title"><span><i class="fa-solid fa-gem" style="color:var(--accent-gold);"></i> Buy Free Fire Diamonds</span></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div style="background:var(--bg-card); padding:14px; border-radius:10px; text-align:center; border:1px solid #ff770033;">
+              <div style="font-size:22px; font-weight:800; color:var(--accent-gold);">100 💎</div>
+              <div style="font-size:11px; color:#fff; margin:6px 0;">Price: 100 Coins</div>
+              <button class="btn btn-primary btn-sm" style="width:100%;" onclick="Toast.show('Diamonds request submitted', 'success')">BUY</button>
+            </div>
+            <div style="background:var(--bg-card); padding:14px; border-radius:10px; text-align:center; border:1px solid #ff770033;">
+              <div style="font-size:22px; font-weight:800; color:var(--accent-gold);">310 💎</div>
+              <div style="font-size:11px; color:#fff; margin:6px 0;">Price: 300 Coins</div>
+              <button class="btn btn-primary btn-sm" style="width:100%;" onclick="Toast.show('Diamonds request submitted', 'success')">BUY</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* PROFILE PAGE */
+    function renderProfile() {
+      const p = currentProfile || {};
+      document.getElementById('app-view').innerHTML = `
+        <div class="view-container">
+          <div class="player-hero-card" style="text-align:center;">
+            <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--primary); margin:0 auto 10px auto;" />
+            <h2 style="font-family:var(--font-gaming); font-size:22px;">${escapeHTML(p.free_fire_name || 'Soldier')}</h2>
+            <span class="uid-tag">UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    /* SQUAD CHAT ENGINE */
     const SquadChat = {
       messages: [],
-      replyingTo: null,
       availableThemes: [
         { id: "default", name: "Dark", color: "#0e1118", border: "#262f40" },
         { id: "wa-green", name: "Green", color: "#005c4b", border: "#25d366" },
@@ -680,7 +855,6 @@
       },
 
       cancelReply() {
-        this.replyingTo = null;
         document.getElementById('wa-reply-bar').classList.remove('show');
       },
 
@@ -696,8 +870,8 @@
       async postPayload(content, type = 'text') {
         const payload = {
           user_id: currentUser ? currentUser.id : null,
-          player_name: currentProfile?.free_fire_name || 'Soldier',
-          player_uid: currentProfile?.free_fire_uid || 'UID: --',
+          player_name: currentProfile?.free_fire_name || currentProfile?.full_name || 'Soldier',
+          player_uid: currentProfile?.free_fire_uid || '--',
           avatar_url: currentProfile?.avatar_url || '',
           message: content,
           msg_type: type
@@ -705,7 +879,8 @@
 
         const { error } = await sbClient.from('squad_messages').insert([payload]);
         if (error) {
-          Toast.show("Message send failed. Check database permissions.", "error");
+          console.error("Chat insert error:", error);
+          Toast.show(error.message || "Message send failed.", "error");
         }
       }
     };
@@ -732,7 +907,6 @@
         location.reload();
       };
 
-      // App bina kisi blocking loader ke direct open hogi:
       renderHome();
       await syncAuthAndProfile();
       renderHome();
