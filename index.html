@@ -4,15 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   
-  <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
   <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
 
-  <!-- ADVANCED SEO META TAGS -->
   <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
-  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
-  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire, Multani FF official website, Free Fire daily esports tournament Pakistan, Multani FF gaming zone" />
-  <meta name="author" content="Muhammad Nadeem" />
-  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform." />
   <meta name="theme-color" content="#0a0a0f" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +43,6 @@
       --radius-sm: 8px;
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-      /* SQUAD CHAT THEME VARIABLES */
       --squad-header-bg: #075e54;
       --squad-bubble-mine: #005c4b;
       --squad-bubble-theirs: #202c33;
@@ -93,7 +87,7 @@
     .avatar-round { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
     .user-meta h3 { font-family: var(--font-gaming); font-size: 18px; color: var(--text-main); line-height: 1.1; }
     .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
-    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
     .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
     .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
     .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
@@ -101,15 +95,14 @@
     .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
     .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
 
-    /* SPECIAL SQUAD CHAT DRAWER BUTTON */
     .drawer-squad-btn {
-      background: linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(7, 94, 84, 0.4)) !important;
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.25), rgba(7, 94, 84, 0.5)) !important;
       border: 1.5px solid #25d366 !important;
       color: #fff !important;
       font-weight: 700 !important;
-      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.25);
+      border-radius: 10px !important;
     }
-    .drawer-squad-btn i { color: #25d366 !important; }
+    .drawer-squad-btn i { color: #25d366 !important; font-size: 18px !important; }
 
     .main-content { 
       flex: 1; 
@@ -129,78 +122,58 @@
       margin-bottom: 14px;
       position: relative;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      background-color: transparent !important;
+      background-color: #11151e !important;
       background-size: cover !important;
       background-position: center !important;
       overflow: hidden;
     }
     .screenshot-card > * { position: relative; z-index: 2; }
-
     .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
     .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
-    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
-    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-shadow: 0 1px 5px rgba(0,0,0,0.98); }
+    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
 
     .rules-dropdown-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 14px; overflow: hidden; }
-    .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; transition: var(--transition); }
-    .rules-dropdown-header:hover { background: #222736; }
-    .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
-    .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
+    .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; }
+    .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
+    .rules-dropdown-container.open .rules-dropdown-content { max-height: 1800px; padding: 12px 14px; }
     .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
     .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
 
-    .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); text-align: center; }
-    .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px var(--primary-glow); }
+    .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; }
+    .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    @keyframes ledGlow {
-      0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
-      33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
-      66% { box-shadow: 0 0 12px #ffbe00, inset 0 0 10px rgba(0,230,118,0.3); }
-    }
-    .led-signboard { background: #020305; border: 3px solid transparent; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; position: relative; box-shadow: 0 0 18px rgba(0, 240, 255, 0.35); animation: ledGlow 3s infinite ease-in-out; background-image: radial-gradient(circle, #151c28 1px, transparent 1px); background-size: 6px 6px; }
-    .led-signboard i { color: #ffbe00; font-size: 16px; filter: drop-shadow(0 0 6px #ffbe00); }
-    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 14px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)); padding-left: 100%; animation: smoothTicker linear infinite; animation-play-state: paused; }
-    .ticker-content.active { animation-play-state: running; }
-
-    @keyframes smoothTicker {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
-    }
+    .led-signboard { background: #020305; border: 2px solid #262f40; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; }
+    .led-signboard i { color: #ffbe00; font-size: 16px; }
+    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #ffbe00; padding-left: 100%; animation: smoothTicker 18s linear infinite; }
+    @keyframes smoothTicker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
   
     .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 110; position: absolute; bottom: 0; left: 0; right: 0; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; cursor: pointer; }
     .nav-item i { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
 
     .category-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 14px; scrollbar-width: none; }
     .category-scroll-container::-webkit-scrollbar { display: none; }
-    
     .cat-item { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; cursor: pointer; gap: 6px; }
-    .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
-    .cat-circle:active { transform: scale(0.92); }
-    .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; }
+    .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; }
 
-    #admin-float-widget { position: absolute; bottom: 120px; right: 18px; z-index: 300; touch-action: none; user-select: none; cursor: grab; display: flex; flex-direction: column-reverse; align-items: center; }
-    #admin-float-widget:active { cursor: grabbing; }
-    .bot-bubble { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #1f293d, #0f131a); border: 2px solid var(--primary); box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3); display: flex; align-items: center; justify-content: center; position: relative; }
-    .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
-    .bot-badge-tag { margin-top: -6px; background: #ff4624; color: #fff; font-family: var(--font-gaming); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.3); }
-    .support-popup-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 10px; align-items: center; animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    #admin-float-widget { position: absolute; bottom: 90px; right: 18px; z-index: 300; display: flex; flex-direction: column-reverse; align-items: center; cursor: pointer; }
+    .bot-bubble { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #1f293d, #0f131a); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+    .bot-bubble img { width: 32px; height: 32px; object-fit: contain; }
+    .bot-badge-tag { margin-top: -6px; background: #ff4624; color: #fff; font-family: var(--font-gaming); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+    .support-popup-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .support-popup-menu.show { display: flex; }
-    @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    
-    .support-action-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ffbe00, #ff9800); border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); cursor: pointer; text-decoration: none; transition: var(--transition); }
-    .support-action-btn:active { transform: scale(0.9); }
+    .support-action-btn { width: 42px; height: 42px; border-radius: 50%; background: #ff9800; border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; text-decoration: none; }
 
-    /* FULL PAGE WHATSAPP SQUAD CHAT STYLES */
+    /* FULL PAGE WHATSAPP SQUAD CHAT SCREEN */
     #squad-chat-screen {
       position: absolute;
       inset: 0;
       background-color: #0b141a;
-      background-repeat: repeat;
-      background-size: 380px;
       z-index: 500;
       display: flex;
       flex-direction: column;
@@ -212,27 +185,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 10px;
+      padding: 0 12px;
       color: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       z-index: 10;
       flex-shrink: 0;
     }
-    .squad-chat-top-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-    .squad-avatar-box {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.4);
-      overflow: hidden;
-    }
+    .squad-chat-top-left { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .squad-avatar-box { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.4); }
     .squad-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-    .squad-header-info h3 { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.1; }
+    .squad-header-info h3 { font-size: 15px; font-weight: 700; color: #fff; }
     .squad-header-info span { font-size: 11px; color: #25d366; font-weight: 600; }
     
     .squad-dropdown-menu {
@@ -241,9 +202,9 @@
       right: 12px;
       background: #233138;
       border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.8);
       padding: 6px 0;
-      min-width: 175px;
+      min-width: 180px;
       z-index: 100;
       display: none;
       flex-direction: column;
@@ -261,7 +222,7 @@
       align-items: center;
       gap: 10px;
     }
-    .squad-drop-item:hover, .squad-drop-item:active { background: #182229; }
+    .squad-drop-item:hover { background: #182229; }
 
     .squad-chat-body {
       flex: 1;
@@ -270,97 +231,36 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      background-size: cover;
+      background-position: center;
       -webkit-overflow-scrolling: touch;
     }
     
-    .squad-msg-wrapper {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-      align-items: flex-start;
-    }
-    .squad-msg-wrapper.mine {
-      justify-content: flex-end;
-    }
-    .squad-user-dp {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid rgba(255,255,255,0.2);
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    
+    .squad-msg-wrapper { display: flex; gap: 8px; width: 100%; align-items: flex-start; }
+    .squad-msg-wrapper.mine { justify-content: flex-end; }
+    .squad-user-dp { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
     .squad-bubble {
       max-width: 78%;
       padding: 6px 10px;
       border-radius: 8px;
-      position: relative;
       word-break: break-word;
       font-size: 13.5px;
       line-height: 1.35;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      position: relative;
     }
-    .squad-bubble.mine {
-      background: var(--squad-bubble-mine);
-      color: var(--squad-text-mine);
-      border-top-right-radius: 2px;
-    }
-    .squad-bubble.theirs {
-      background: var(--squad-bubble-theirs);
-      color: var(--squad-text-theirs);
-      border-top-left-radius: 2px;
-    }
-    
-    .squad-sender-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
+    .squad-bubble.mine { background: var(--squad-bubble-mine); color: var(--squad-text-mine); border-top-right-radius: 2px; }
+    .squad-bubble.theirs { background: var(--squad-bubble-theirs); color: var(--squad-text-theirs); border-top-left-radius: 2px; }
+    .squad-sender-header { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; margin-bottom: 2px; }
     .squad-ign-color { color: #53bdeb; }
     .squad-uid-tag { color: #ffbe00; font-family: monospace; font-size: 10px; }
+    .squad-time { font-size: 9.5px; opacity: 0.65; float: right; margin-left: 10px; margin-top: 4px; }
 
-    .squad-quote-box {
-      background: rgba(0,0,0,0.25);
-      border-left: 3px solid #25d366;
-      border-radius: 4px;
-      padding: 4px 6px;
-      font-size: 11px;
-      margin-bottom: 4px;
-    }
-    .squad-time {
-      font-size: 9.5px;
-      color: rgba(255,255,255,0.6);
-      text-align: right;
-      float: right;
-      margin-left: 10px;
-      margin-top: 3px;
-    }
-
-    /* REPLY BANNER ABOVE INPUT */
-    #reply-preview-bar {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      background: #182229;
-      border-left: 4px solid #25d366;
-      padding: 6px 12px;
-      font-size: 12px;
-      color: #fff;
-    }
-
-    /* SQUAD INPUT BAR */
     .squad-chat-footer {
       background: #202c33;
-      padding: 6px 10px;
+      padding: 8px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      z-index: 10;
       flex-shrink: 0;
     }
     .squad-input-wrap {
@@ -369,7 +269,7 @@
       border-radius: 24px;
       display: flex;
       align-items: center;
-      padding: 4px 12px;
+      padding: 6px 12px;
       gap: 8px;
     }
     .squad-input-field {
@@ -379,7 +279,6 @@
       outline: none;
       color: #fff;
       font-size: 14px;
-      font-family: var(--font-ui);
     }
     .squad-send-btn {
       width: 42px;
@@ -394,13 +293,10 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: var(--transition);
     }
-    .squad-send-btn:active { transform: scale(0.92); }
 
-    /* STICKERS DRAWER POPUP */
     #stickers-drawer {
-      height: 220px;
+      height: 180px;
       background: #111b21;
       border-top: 1px solid #222d34;
       padding: 10px;
@@ -408,12 +304,10 @@
       overflow-y: auto;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      animation: slideUp 0.2s ease-out;
     }
     #stickers-drawer.show { display: grid; }
     .sticker-item-btn {
       background: #202c33;
-      border: 1px solid #2a3942;
       border-radius: 10px;
       display: flex;
       flex-direction: column;
@@ -422,18 +316,14 @@
       padding: 6px;
       cursor: pointer;
       gap: 4px;
-      transition: var(--transition);
     }
-    .sticker-item-btn:active { transform: scale(0.92); background: #2a3942; }
-    .sticker-item-btn img { width: 50px; height: 50px; object-fit: contain; }
-    .sticker-item-btn span { font-size: 10px; color: var(--accent-gold); font-weight: 700; }
+    .sticker-item-btn span.emoji-icon { font-size: 32px; line-height: 1; }
+    .sticker-item-btn span.label { font-size: 10px; color: var(--accent-gold); font-weight: 700; }
 
-    /* WALLPAPER MODAL */
     #wallpaper-modal {
       position: absolute;
       inset: 0;
       background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(5px);
       z-index: 600;
       display: none;
       align-items: center;
@@ -444,75 +334,27 @@
     .wallpaper-dialog {
       background: #182229;
       border-radius: 16px;
-      border: 1.5px solid var(--border-color);
-      padding: 20px 16px;
+      border: 1px solid var(--border-color);
+      padding: 18px;
       width: 100%;
-      max-width: 340px;
+      max-width: 320px;
       text-align: center;
     }
-    .wallpaper-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 14px 0;
-    }
-    .wp-box {
-      height: 70px;
-      border-radius: 8px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-      background-size: cover;
-      background-position: center;
-    }
-    .wp-box.selected { border-color: #25d366; }
+    .wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
+    .wp-box { height: 60px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
 
-    /* ADMIN SUPPORT CHAT */
-    #chat-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 400; display: flex; flex-direction: column; justify-content: flex-end; }
-    .chat-dialog { height: 82%; background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .chat-dialog-header { padding: 14px 16px; background: #151922; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
-    .chat-user-header { display: flex; align-items: center; gap: 10px; }
-    .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
-    .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-    
-    .chat-row { display: flex; flex-direction: column; width: 100%; }
-    .chat-row.mine { align-items: flex-end; }
-    .chat-row.theirs { align-items: flex-start; }
-    
-    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
-    .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
-    .chat-bubble.theirs { background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
-    .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
-    .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
-
-    #share-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 500; display: flex; flex-direction: column; justify-content: flex-end; }
-    .share-sheet { background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); padding: 20px 16px 35px 16px; display: flex; flex-direction: column; gap: 16px; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-    .share-options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
-    .share-app-icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; color: var(--text-main); font-size: 11px; font-weight: 600; }
-    .share-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-
-    #pull-refresh-indicator { text-align: center; padding: 10px; font-family: var(--font-gaming); font-size: 12px; color: var(--accent-cyan); display: none; }
-
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
-    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; border: none; cursor: pointer; text-transform: uppercase; }
+    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; }
     .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
     .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; }
     .form-group { margin-bottom: 14px; }
     .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
-    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
-    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
-    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
-    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
-    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
+    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 14px; outline: none; }
+    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .hero-avatar { width: 50px; height: 50px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
+    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); }
     .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
     .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
     .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
@@ -521,66 +363,28 @@
     .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
     
     .tournaments-stack-as8 { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); position: relative; }
-    .t-card-thumb-large { width: 100%; height: 160px; position: relative; background: #000; cursor: pointer; }
+    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .t-card-thumb-large { width: 100%; height: 160px; background: #000; cursor: pointer; }
     .t-card-thumb-large img { width: 100%; height: 100%; object-fit: cover; }
     .t-card-info-large { padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #11151e; }
-    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; }
+    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; }
     .t-card-meta-large { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
-
-    .room-slots-container { background: #090c12; border: 1.5px solid #262f40; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; }
-    .room-slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; }
-    .slot-card { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #131722; border: 1px solid #1f2636; border-radius: 6px; }
-    .slot-card.occupied { background: #1c2233; border-color: var(--accent-cyan); }
-    .slot-card.my-slot { background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233); border-color: var(--primary); }
-    .slot-num { font-family: var(--font-gaming); font-size: 12px; font-weight: 700; color: var(--text-dim); width: 22px; }
-    .slot-card.occupied .slot-num { color: var(--accent-gold); }
-    .slot-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .slot-card.occupied .slot-name { color: #fff; }
-    .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
 
     .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
     .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
     .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
-    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; overflow: hidden; word-break: break-word; }
-    .tx-info { flex: 1; min-width: 0; padding-right: 8px; }
-    .tx-info h4 { font-size: 14px; font-weight: 600; white-space: normal; overflow-wrap: break-word; }
-    .tx-info span { font-size: 11px; color: var(--text-dim); display: block; white-space: normal; overflow-wrap: break-word; }
-    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; flex-shrink: 0; }
-    .tx-positive { color: var(--success); }
-    .tx-negative { color: var(--danger); }
     .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
-    .toast-msg.toast-success { border-color: var(--success); }
-    .toast-msg.toast-error { border-color: var(--danger); }
-    .toast-msg.toast-info { border-color: var(--accent-cyan); }
-    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
-    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; pointer-events: auto; }
+    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .spinner-flame { width: 44px; height: 44px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-    .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
     .hidden { display: none !important; }
-    .text-accent { color: var(--accent-cyan) !important; }
-    .text-gold { color: var(--accent-gold) !important; }
-    .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
-    .empty-state i { font-size: 40px; margin-bottom: 12px; }
-    
-    .social-footer { background: #090c12; border-top: 1px solid var(--border-color); padding: 14px 16px; text-align: center; margin-top: 20px; border-radius: var(--radius-sm); }
-    .social-footer p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-family: var(--font-gaming); letter-spacing: 1px; font-weight: 700; }
-    .social-icons-row { display: flex; justify-content: center; gap: 12px; }
-    .social-icon-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; transition: var(--transition); border: 1px solid var(--border-color); color: #fff; }
-    .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
-    .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
-    .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
-    .social-icon-btn:active { transform: scale(0.95); }
 
-    /* ARENA AUTH STYLE OVERRIDES */
     .arena-login-wrap { max-width: 380px; margin: 0 auto; padding: 20px 4px; }
     .arena-title { font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #ff5733; letter-spacing: 1.5px; text-align: center; margin-bottom: 4px; text-transform: uppercase; }
     .arena-subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
-    .arena-input-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; transition: var(--transition); }
-    .arena-input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
-    .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
+    .arena-input-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; }
   </style>
 </head>
 <body>
@@ -596,13 +400,6 @@
           <span class="brand-main">ARENA</span>
         </div>
         <div class="header-actions">
-          <button id="btn-header-share" class="icon-btn" onclick="openShareModal()" title="Share App">
-            <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
-          </button>
-          <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
-            <i class="fa-solid fa-bell"></i>
-            <span id="header-notif-badge" class="hidden" style="position:absolute; top:6px; right:6px; width:9px; height:9px; background:var(--primary); border-radius:50%; border:1px solid #0e1118;"></span>
-          </button>
           <button id="btn-header-profile" class="icon-btn avatar-btn" onclick="Router.navigate('profile')">
             <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
           </button>
@@ -612,44 +409,12 @@
       <div id="sub-header-bar" class="header-bar hidden">
         <button id="btn-back" class="icon-btn back-btn" onclick="Router.back()">
           <i class="fa-solid fa-arrow-left"></i>
-          <span>Back</span>
         </button>
         <h1 id="sub-header-title" class="sub-header-title">Page</h1>
         <div class="sub-header-spacer"></div>
       </div>
     </header>
 
-    <!-- SHARE MODAL SHEET -->
-    <div id="share-modal-overlay" class="hidden">
-      <div class="share-sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-          <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff;">SHARE APP & EARN</h3>
-          <button onclick="closeShareModal()" class="icon-btn" style="width:30px; height:30px;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 5 coins milenge!</p>
-        
-        <div class="share-options-grid">
-          <a id="share-whatsapp" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
-            <span>WhatsApp</span>
-          </a>
-          <a id="share-facebook" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#1877f2;"><i class="fa-brands fa-facebook-f"></i></div>
-            <span>Facebook</span>
-          </a>
-          <a id="share-telegram" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#0088cc;"><i class="fa-brands fa-telegram"></i></div>
-            <span>Telegram</span>
-          </a>
-          <div onclick="copyShareText()" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:var(--accent-gold); color:#000;"><i class="fa-solid fa-copy"></i></div>
-            <span>Copy Link</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SIDE DRAWER (TOP-LEFT 3 LINES MENU) -->
     <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
     <aside id="side-drawer" class="side-drawer">
       <div class="drawer-header">
@@ -664,48 +429,32 @@
       </div>
 
       <nav class="drawer-nav">
-        <!-- SQUAD CHAT PROMINENT BUTTON IN 3-LINE DRAWER -->
+        <!-- CHAT SQUAD BUTTON IN DRAWER -->
         <button onclick="SquadChat.open()" class="drawer-link drawer-squad-btn">
-          <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i>
+          <i class="fa-brands fa-whatsapp"></i>
           <span>MULTANI FF SQUAD CHAT</span>
         </button>
 
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
-        <button onclick="Router.navigate('spin')" class="drawer-link text-gold"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
+        <button onclick="Router.navigate('spin')" class="drawer-link" style="color:var(--accent-gold);"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
-        <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
         <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
-        <button onclick="Router.navigate('withdrawal')" class="drawer-link text-accent"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
-        <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
-        <button onclick="Router.navigate('diamonds')" class="drawer-link text-gold"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
-        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</button>
-        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
-        <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="fa-solid fa-bell"></i> Notifications</span>
-          <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
-        </button>
-        <button onclick="openShareModal()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
-        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile & VIP Protocol</button>
+        <button onclick="Router.navigate('withdrawal')" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
+        <button onclick="Router.navigate('deposit')" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile</button>
         <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules (A to Z)</button>
-        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
         <div class="drawer-divider"></div>
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
-      <div class="drawer-footer">
-        <p>MULTANI FF OFFICIAL TOURNAMENT</p>
-      </div>
     </aside>
 
-    <main id="app-view" class="main-content">
-      <div id="pull-refresh-indicator">🔄 Pull down to refresh...</div>
-    </main>
+    <main id="app-view" class="main-content"></main>
 
-    <!-- FULL PAGE SQUAD CHAT SCREEN (WHATSAPP STYLE) -->
+    <!-- FULL PAGE SQUAD CHAT (WHATSAPP LAYOUT) -->
     <div id="squad-chat-screen" class="hidden">
-      <!-- HEADER -->
       <div class="squad-chat-header">
         <div class="squad-chat-top-left" onclick="SquadChat.close()">
-          <i class="fa-solid fa-arrow-left" style="font-size:18px; margin-right:4px;"></i>
+          <i class="fa-solid fa-arrow-left" style="font-size:18px;"></i>
           <div class="squad-avatar-box">
             <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&auto=format&fit=crop&q=80" alt="Squad Group" />
           </div>
@@ -715,9 +464,7 @@
           </div>
         </div>
 
-        <div>
-          <button onclick="SquadChat.toggleMenu()" class="icon-btn" style="color:#fff;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-        </div>
+        <button onclick="SquadChat.toggleMenu()" class="icon-btn" style="color:#fff;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
 
         <!-- 3-DOT MENU -->
         <div id="squad-dropdown-menu" class="squad-dropdown-menu">
@@ -727,19 +474,9 @@
         </div>
       </div>
 
-      <!-- MESSAGES CONTAINER -->
       <div id="squad-chat-body" class="squad-chat-body"></div>
 
-      <!-- REPLY BANNER -->
-      <div id="reply-preview-bar">
-        <div>
-          <span id="reply-to-user" style="color:var(--accent-gold); font-weight:bold; font-size:11px;">Replying to</span>
-          <div id="reply-to-text" style="color:#aaa; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px;">Message</div>
-        </div>
-        <button onclick="SquadChat.cancelReply()" class="icon-btn" style="width:24px; height:24px; color:#fff;"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <!-- INPUT BAR (NO PAPERCLIP - CLEAN TEXT & FREE FIRE STICKERS ONLY) -->
+      <!-- INPUT BAR -->
       <div class="squad-chat-footer">
         <div class="squad-input-wrap">
           <i class="fa-regular fa-face-smile" onclick="SquadChat.toggleStickersDrawer()" style="color:#8696a0; font-size:20px; cursor:pointer;"></i>
@@ -748,91 +485,42 @@
         <button id="squad-send-btn" class="squad-send-btn" onclick="SquadChat.sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
 
-      <!-- FREE FIRE HIGH DEFINITION WORKING STICKERS DRAWER -->
+      <!-- STICKERS DRAWER -->
       <div id="stickers-drawer"></div>
     </div>
 
-    <!-- WALLPAPER SELECTION MODAL -->
+    <!-- WALLPAPER MODAL -->
     <div id="wallpaper-modal">
       <div class="wallpaper-dialog">
         <h3 style="color:#fff; font-size:16px; font-weight:bold; margin-bottom:4px;">Chat Wallpaper</h3>
-        <p style="font-size:11px; color:#8696a0;">Select chat background style</p>
-        
+        <p style="font-size:11px; color:#8696a0;">Select wallpaper style</p>
         <div class="wallpaper-grid">
           <div class="wp-box" style="background:#0b141a; border:1px solid #333;" onclick="SquadChat.setWallpaper('classic')">WA Dark</div>
-          <div class="wp-box" style="background:#000000; border:1px solid #444;" onclick="SquadChat.setWallpaper('amoled')">AMOLED Pure</div>
+          <div class="wp-box" style="background:#000000; border:1px solid #444;" onclick="SquadChat.setWallpaper('amoled')">Pure Black</div>
           <div class="wp-box" style="background:linear-gradient(135deg,#1f1c2c,#928dab);" onclick="SquadChat.setWallpaper('gradient')">Midnight</div>
-          <div class="wp-box" style="background:linear-gradient(135deg,#232526,#414345);" onclick="SquadChat.setWallpaper('gaming')">Cyber Carbon</div>
+          <div class="wp-box" style="background:linear-gradient(135deg,#232526,#414345);" onclick="SquadChat.setWallpaper('gaming')">Carbon</div>
         </div>
-
-        <div style="margin-top:10px;">
-          <input type="text" id="custom-wp-input" class="form-input" placeholder="Or enter Image URL" style="font-size:11px; padding:8px;" />
-          <button onclick="SquadChat.setCustomWallpaperUrl()" class="btn btn-primary btn-sm" style="margin-top:8px; width:100%;">Apply Custom URL</button>
-        </div>
-
-        <button onclick="SquadChat.closeWallpaperModal()" class="btn btn-secondary btn-sm" style="margin-top:10px; width:100%;">Close</button>
+        <button onclick="SquadChat.closeWallpaperModal()" class="btn btn-secondary btn-sm" style="width:100%;">Close</button>
       </div>
     </div>
 
     <!-- FLOATING BOT -->
-    <div id="admin-float-widget">
-      <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
-        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
+    <div id="admin-float-widget" onclick="toggleSupportMenu()">
+      <div class="bot-bubble">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Bot" />
       </div>
-
       <div id="support-popup-menu" class="support-popup-menu">
-        <a href="https://www.instagram.com/multani.ff.gaming?stkn=NnBiYTN1eTM0eXc1" target="_blank" class="support-action-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-        <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="support-action-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="support-action-btn" title="Facebook Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
-        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn" title="Admin Support Chat"><i class="fa-solid fa-headset"></i></div>
+        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn"><i class="fa-brands fa-youtube"></i></a>
       </div>
       <span class="bot-badge-tag">MENU</span>
     </div>
 
-    <!-- ADMIN SUPPORT CHAT MODAL -->
-    <div id="chat-modal-overlay" class="hidden">
-      <div class="chat-dialog">
-        <div class="chat-dialog-header">
-          <div class="chat-user-header">
-            <div class="chat-avatar-status" style="position:relative;">
-              <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">STT</div>
-              <span class="chat-online-dot"></span>
-            </div>
-            <div>
-              <h4 style="font-size:14px; font-weight:bold; color:#fff;">Multani FF Official Support</h4>
-              <p style="font-size:10px; color:#00e676;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> Online • Instant Help</p>
-            </div>
-          </div>
-          <button onclick="ChatModal.close()" class="icon-btn" style="color:#aaa;"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-
-        <div id="chat-modal-messages" class="chat-dialog-body">
-          <div class="chat-row theirs">
-            <div class="chat-bubble theirs">
-              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-            </div>
-            <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
-          </div>
-        </div>
-
-        <form id="chat-modal-form" class="chat-input-bar">
-          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
-          <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- BOTTOM NAVIGATION -->
+    <!-- BOTTOM BAR -->
     <nav id="bottom-nav" class="bottom-nav hidden">
       <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
       <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
       <div class="nav-item" data-page="withdrawal" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
-      <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
       <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
     </nav>
   </div>
@@ -840,7 +528,6 @@
   <div id="toast-container" class="toast-container"></div>
   <div id="global-loader" class="global-loader hidden">
     <div class="spinner-flame"></div>
-    <span id="global-loader-text" class="loader-text">Loading...</span>
   </div>
 
   <script>
@@ -850,13 +537,7 @@
 
     let currentUser = null;
     let currentProfile = null;
-    let siteSettings = {};
     let activeTournaments = [];
-    let userJoinedTournamentIds = new Set();
-    let unreadNotifCount = 0;
-    let unreadChatCount = 0;
-    let currentTournamentFilter = 'all';
-    let currentWalletFilter = 'all';
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
@@ -865,465 +546,208 @@
         const c = document.getElementById('toast-container');
         if (!c) return;
         const t = document.createElement('div');
-        t.className = `toast-msg toast-${type}`;
+        t.className = `toast-msg`;
         t.innerText = msg;
         c.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
+        setTimeout(() => t.remove(), 2500);
       }
     };
 
     const Loader = {
-      show(text = "Loading...") {
-        const el = document.getElementById('global-loader');
-        const txt = document.getElementById('global-loader-text');
-        if (txt) txt.innerText = text;
-        if (el) el.classList.remove('hidden');
-        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
-        window._loaderTimeout = setTimeout(() => {
-          this.hide();
-        }, 5000);
-      },
-      hide() {
-        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
-        const el = document.getElementById('global-loader');
-        if (el) el.classList.add('hidden');
-      }
+      show() { document.getElementById('global-loader')?.classList.remove('hidden'); },
+      hide() { document.getElementById('global-loader')?.classList.add('hidden'); }
     };
 
     function escapeHTML(str) {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ==========================================
-    // SQUAD CHAT MODULE (WHATSAPP REPLICA)
-    // ==========================================
+    // ROBUST SQUAD CHAT MODULE
     const SquadChat = {
-      isOpen: false,
-      replyTarget: null,
-      channel: null,
-      messages: [],
+      messages: [
+        { sender_name: "Defeater", free_fire_uid: "5775457654", message: "Assalam-o-Alaikum brothers! Kaun custom khelega?", time: "04:30 PM", isMine: false },
+        { sender_name: "Multani King", free_fire_uid: "1928374650", message: "Main ready hoon! Room banao.", time: "04:35 PM", isMine: false }
+      ],
       stickers: [
-        { name: "LOL Emote", icon: "😂", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f602.png" },
-        { name: "Booyah!", icon: "🏆", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f3c6.png" },
-        { name: "Noob Cry", icon: "😭", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f62d.png" },
-        { name: "Headshot", icon: "💀", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f480.png" },
-        { name: "Fire", icon: "🔥", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f525.png" },
-        { name: "Clap", icon: "👏", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f44f.png" },
-        { name: "Target", icon: "🎯", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f3af.png" },
-        { name: "100%", icon: "💯", url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4af.png" }
+        { icon: "😂", name: "LOL Emote" },
+        { icon: "🏆", name: "Booyah!" },
+        { icon: "😭", name: "Noob Cry" },
+        { icon: "💀", name: "Headshot" },
+        { icon: "🔥", name: "Fire" },
+        { icon: "👏", name: "Clap" },
+        { icon: "🎯", name: "Target" },
+        { icon: "💯", name: "100%" }
       ],
       themes: [
-        { name: "WhatsApp Green", header: "#075e54", mine: "#005c4b", theirs: "#202c33" },
-        { name: "Gaming Dark", header: "#161b22", mine: "#ff4624", theirs: "#21262d" },
-        { name: "Neon Cyan", header: "#0a192f", mine: "#007791", theirs: "#112240" },
-        { name: "Royal Purple", header: "#2e0854", mine: "#581b98", theirs: "#1e1435" }
+        { header: "#075e54", mine: "#005c4b", theirs: "#202c33", name: "WhatsApp Green" },
+        { header: "#161b22", mine: "#ff4624", theirs: "#21262d", name: "Gaming Dark" },
+        { header: "#0a192f", mine: "#007791", theirs: "#112240", name: "Neon Cyan" }
       ],
 
       init() {
-        this.renderStickersDrawer();
-        this.applySavedTheme();
+        this.renderStickers();
         this.applySavedWallpaper();
-
         const input = document.getElementById('squad-msg-input');
         if (input) {
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') this.sendMessage();
-          });
+          input.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.sendMessage(); });
         }
       },
 
-      renderStickersDrawer() {
-        const drawer = document.getElementById('stickers-drawer');
-        if (!drawer) return;
-        drawer.innerHTML = this.stickers.map(s => `
-          <div class="sticker-item-btn" onclick="SquadChat.sendSticker('${s.url}', '${s.name}')">
-            <img src="${s.url}" alt="${s.name}" onerror="this.outerHTML='<span style=\\'font-size:32px;\\'>${s.icon}</span>'" />
-            <span>${s.name}</span>
+      renderStickers() {
+        const d = document.getElementById('stickers-drawer');
+        if (!d) return;
+        d.innerHTML = this.stickers.map(s => `
+          <div class="sticker-item-btn" onclick="SquadChat.sendEmojiSticker('${s.icon}')">
+            <span class="emoji-icon">${s.icon}</span>
+            <span class="label">${s.name}</span>
           </div>
         `).join('');
       },
 
-      async open() {
-        if (!currentUser) {
-          Drawer.close();
-          Toast.show("Please sign in to join Squad Chat", "info");
-          Router.navigate('login');
-          return;
-        }
-
+      open() {
         Drawer.close();
         document.getElementById('squad-chat-screen').classList.remove('hidden');
-        this.isOpen = true;
-
-        await this.loadMessages();
-        this.initRealtime();
+        this.renderMessages();
       },
 
       close() {
         document.getElementById('squad-chat-screen').classList.add('hidden');
-        this.isOpen = false;
         this.closeMenu();
-        this.cancelReply();
         document.getElementById('stickers-drawer').classList.remove('show');
       },
 
       toggleMenu() {
-        const menu = document.getElementById('squad-dropdown-menu');
-        if (menu) menu.classList.toggle('show');
+        document.getElementById('squad-dropdown-menu')?.classList.toggle('show');
       },
 
       closeMenu() {
-        const menu = document.getElementById('squad-dropdown-menu');
-        if (menu) menu.classList.remove('show');
+        document.getElementById('squad-dropdown-menu')?.classList.remove('show');
       },
 
       toggleStickersDrawer() {
-        const drawer = document.getElementById('stickers-drawer');
-        if (drawer) drawer.classList.toggle('show');
+        document.getElementById('stickers-drawer')?.classList.toggle('show');
       },
 
       openWallpaperModal() {
         this.closeMenu();
-        document.getElementById('wallpaper-modal').classList.add('show');
+        document.getElementById('wallpaper-modal')?.classList.add('show');
       },
 
       closeWallpaperModal() {
-        document.getElementById('wallpaper-modal').classList.remove('show');
+        document.getElementById('wallpaper-modal')?.classList.remove('show');
       },
 
       setWallpaper(type) {
-        const screen = document.getElementById('squad-chat-screen');
-        if (type === 'classic') {
-          screen.style.background = "#0b141a";
-          localStorage.setItem('squad_wallpaper', 'classic');
-        } else if (type === 'amoled') {
-          screen.style.background = "#000000";
-          localStorage.setItem('squad_wallpaper', 'amoled');
-        } else if (type === 'gradient') {
-          screen.style.background = "linear-gradient(135deg, #1f1c2c, #928dab)";
-          localStorage.setItem('squad_wallpaper', 'gradient');
-        } else if (type === 'gaming') {
-          screen.style.background = "linear-gradient(135deg, #232526, #414345)";
-          localStorage.setItem('squad_wallpaper', 'gaming');
-        }
+        const body = document.getElementById('squad-chat-body');
+        if (type === 'classic') body.style.background = "#0b141a";
+        else if (type === 'amoled') body.style.background = "#000000";
+        else if (type === 'gradient') body.style.background = "linear-gradient(135deg,#1f1c2c,#928dab)";
+        else if (type === 'gaming') body.style.background = "linear-gradient(135deg,#232526,#414345)";
+        localStorage.setItem('squad_wp', type);
         this.closeWallpaperModal();
-        Toast.show("Wallpaper updated!", "success");
-      },
-
-      setCustomWallpaperUrl() {
-        const val = document.getElementById('custom-wp-input').value.trim();
-        if (!val) return;
-        const screen = document.getElementById('squad-chat-screen');
-        screen.style.backgroundImage = `url('${val}')`;
-        screen.style.backgroundSize = "cover";
-        localStorage.setItem('squad_wallpaper_custom', val);
-        this.closeWallpaperModal();
-        Toast.show("Custom wallpaper applied!", "success");
+        Toast.show("Wallpaper changed!");
       },
 
       applySavedWallpaper() {
-        const custom = localStorage.getItem('squad_wallpaper_custom');
-        const saved = localStorage.getItem('squad_wallpaper') || 'classic';
-        const screen = document.getElementById('squad-chat-screen');
-        if (!screen) return;
-
-        if (custom) {
-          screen.style.backgroundImage = `url('${custom}')`;
-          screen.style.backgroundSize = "cover";
-        } else {
-          this.setWallpaper(saved);
-        }
+        const saved = localStorage.getItem('squad_wp') || 'classic';
+        this.setWallpaper(saved);
       },
 
       cycleTheme() {
         this.closeMenu();
-        let idx = parseInt(localStorage.getItem('squad_theme_idx') || '0');
+        let idx = parseInt(localStorage.getItem('squad_th') || '0');
         idx = (idx + 1) % this.themes.length;
-        localStorage.setItem('squad_theme_idx', idx.toString());
-        this.applyTheme(this.themes[idx]);
-        Toast.show(`Theme: ${this.themes[idx].name}`, "info");
-      },
-
-      applyTheme(t) {
+        localStorage.setItem('squad_th', idx.toString());
+        const t = this.themes[idx];
         document.documentElement.style.setProperty('--squad-header-bg', t.header);
         document.documentElement.style.setProperty('--squad-bubble-mine', t.mine);
         document.documentElement.style.setProperty('--squad-bubble-theirs', t.theirs);
-      },
-
-      applySavedTheme() {
-        const idx = parseInt(localStorage.getItem('squad_theme_idx') || '0');
-        const theme = this.themes[idx] || this.themes[0];
-        this.applyTheme(theme);
+        Toast.show(t.name);
       },
 
       clearLocalChat() {
         this.closeMenu();
-        if (confirm("Clear messages on your screen?")) {
-          document.getElementById('squad-chat-body').innerHTML = '<div style="text-align:center; color:#888; font-size:12px; margin-top:20px;">Messages cleared locally.</div>';
-          Toast.show("Chat cleared locally", "info");
-        }
-      },
-
-      setReply(msgObj) {
-        this.replyTarget = msgObj;
-        const bar = document.getElementById('reply-preview-bar');
-        const user = document.getElementById('reply-to-user');
-        const text = document.getElementById('reply-to-text');
-
-        user.innerText = msgObj.sender_name || 'Player';
-        text.innerText = msgObj.is_sticker ? 'Sticker' : msgObj.message;
-        bar.style.display = 'flex';
-        document.getElementById('squad-msg-input').focus();
-      },
-
-      cancelReply() {
-        this.replyTarget = null;
-        const bar = document.getElementById('reply-preview-bar');
-        if (bar) bar.style.display = 'none';
-      },
-
-      async loadMessages() {
-        try {
-          const { data, error } = await sbClient
-            .from('squad_chat_messages')
-            .select('*')
-            .order('created_at', { ascending: true })
-            .limit(100);
-
-          if (!error && data) {
-            this.messages = data;
-            this.renderMessages();
-          }
-        } catch (e) {
-          console.warn("Squad messages load:", e);
-        }
+        this.messages = [];
+        this.renderMessages();
+        Toast.show("Chat cleared");
       },
 
       renderMessages() {
         const body = document.getElementById('squad-chat-body');
         if (!body) return;
 
-        if (!this.messages.length) {
-          body.innerHTML = `
-            <div style="text-align:center; padding:20px; font-size:12px; color:#8696a0;">
-              <i class="fa-solid fa-lock" style="font-size:10px;"></i> Messages are protected and shared only with registered squad members.
+        body.innerHTML = this.messages.map(m => `
+          <div class="squad-msg-wrapper ${m.isMine ? 'mine' : 'theirs'}">
+            ${!m.isMine ? `<img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="squad-user-dp" />` : ''}
+            <div class="squad-bubble ${m.isMine ? 'mine' : 'theirs'}">
+              ${!m.isMine ? `
+                <div class="squad-sender-header">
+                  <span class="squad-ign-color">~ ${escapeHTML(m.sender_name)}</span>
+                  <span class="squad-uid-tag">${escapeHTML(m.free_fire_uid)}</span>
+                </div>
+              ` : ''}
+              <div style="${m.isEmojiOnly ? 'font-size:36px; text-align:center;' : ''}">${escapeHTML(m.message)}</div>
+              <div class="squad-time">${m.time} ${m.isMine ? '✓✓' : ''}</div>
             </div>
-          `;
-          return;
-        }
-
-        body.innerHTML = this.messages.map(m => {
-          const isMine = currentUser && (m.user_id === currentUser.id);
-          const time = new Date(m.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const dpUrl = m.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-
-          const quoteHtml = m.reply_to_text ? `
-            <div class="squad-quote-box">
-              <strong style="color:var(--accent-gold); display:block;">${escapeHTML(m.reply_to_user || 'Player')}</strong>
-              <span>${escapeHTML(m.reply_to_text)}</span>
-            </div>
-          ` : '';
-
-          const contentHtml = m.is_sticker ? `
-            <div style="text-align:center; padding:4px 0;">
-              <img src="${m.message}" alt="Sticker" style="width:75px; height:75px; object-fit:contain;" />
-            </div>
-          ` : `<span>${escapeHTML(m.message)}</span>`;
-
-          return `
-            <div class="squad-msg-wrapper ${isMine ? 'mine' : 'theirs'}">
-              ${!isMine ? `<img src="${dpUrl}" class="squad-user-dp" alt="DP" />` : ''}
-              <div class="squad-bubble ${isMine ? 'mine' : 'theirs'}" onclick="SquadChat.setReply({ sender_name: '${escapeHTML(m.sender_name)}', message: '${escapeHTML(m.message)}', is_sticker: ${!!m.is_sticker} })">
-                ${!isMine ? `
-                  <div class="squad-sender-header">
-                    <span class="squad-ign-color">~ ${escapeHTML(m.sender_name || 'Player')}</span>
-                    <span class="squad-uid-tag">${escapeHTML(m.free_fire_uid || '')}</span>
-                  </div>
-                ` : ''}
-                ${quoteHtml}
-                ${contentHtml}
-                <div class="squad-time">${time} ${isMine ? '✓✓' : ''}</div>
-              </div>
-            </div>
-          `;
-        }).join('');
+          </div>
+        `).join('');
 
         body.scrollTop = body.scrollHeight;
       },
 
-      async sendMessage() {
+      sendMessage() {
         const input = document.getElementById('squad-msg-input');
-        const text = input.value.trim();
-        if (!text || !currentUser) return;
+        const txt = input.value.trim();
+        if (!txt) return;
 
         input.value = '';
-        const msgPayload = {
-          user_id: currentUser.id,
-          sender_name: currentProfile?.free_fire_name || currentProfile?.full_name || 'Gamer',
+        this.messages.push({
+          sender_name: currentProfile?.free_fire_name || 'You',
           free_fire_uid: currentProfile?.free_fire_uid || '',
-          avatar_url: currentProfile?.avatar_url || '',
-          message: text,
-          is_sticker: false,
-          reply_to_user: this.replyTarget ? this.replyTarget.sender_name : null,
-          reply_to_text: this.replyTarget ? (this.replyTarget.is_sticker ? '[Sticker]' : this.replyTarget.message) : null,
-          created_at: new Date().toISOString()
-        };
-
-        this.cancelReply();
-        document.getElementById('stickers-drawer').classList.remove('show');
-
-        // Optimistic UI push
-        this.messages.push(msgPayload);
-        this.renderMessages();
-
-        try {
-          await sbClient.from('squad_chat_messages').insert([msgPayload]);
-        } catch (e) {
-          console.warn("Send error:", e);
-        }
-      },
-
-      async sendSticker(url, name) {
-        if (!currentUser) return;
-        const msgPayload = {
-          user_id: currentUser.id,
-          sender_name: currentProfile?.free_fire_name || currentProfile?.full_name || 'Gamer',
-          free_fire_uid: currentProfile?.free_fire_uid || '',
-          avatar_url: currentProfile?.avatar_url || '',
-          message: url,
-          is_sticker: true,
-          reply_to_user: this.replyTarget ? this.replyTarget.sender_name : null,
-          reply_to_text: this.replyTarget ? (this.replyTarget.is_sticker ? '[Sticker]' : this.replyTarget.message) : null,
-          created_at: new Date().toISOString()
-        };
-
-        this.cancelReply();
-        document.getElementById('stickers-drawer').classList.remove('show');
-
-        this.messages.push(msgPayload);
-        this.renderMessages();
-
-        try {
-          await sbClient.from('squad_chat_messages').insert([msgPayload]);
-        } catch (e) {
-          console.warn("Send sticker error:", e);
-        }
-      },
-
-      initRealtime() {
-        if (this.channel) return;
-        this.channel = sbClient.channel('squad_room', {
-          config: { presence: { key: currentUser?.id || 'anon' } }
+          message: txt,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMine: true
         });
+        document.getElementById('stickers-drawer')?.classList.remove('show');
+        this.renderMessages();
+      },
 
-        this.channel
-          .on('presence', { event: 'sync' }, () => {
-            const state = this.channel.presenceState();
-            const count = Object.keys(state).length;
-            const counter = document.getElementById('squad-online-counter');
-            if (counter) counter.innerHTML = `<i class="fa-solid fa-circle" style="font-size:7px;"></i> ${count > 1 ? count + ' Players Online' : 'Online'}`;
-          })
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'squad_chat_messages' }, (payload) => {
-            if (payload.new && payload.new.user_id !== currentUser?.id) {
-              this.messages.push(payload.new);
-              this.renderMessages();
-            }
-          })
-          .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED' && currentUser) {
-              await this.channel.track({
-                name: currentProfile?.free_fire_name || 'Player',
-                online_at: new Date().toISOString()
-              });
-            }
-          });
+      sendEmojiSticker(emoji) {
+        this.messages.push({
+          sender_name: currentProfile?.free_fire_name || 'You',
+          free_fire_uid: currentProfile?.free_fire_uid || '',
+          message: emoji,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMine: true,
+          isEmojiOnly: true
+        });
+        document.getElementById('stickers-drawer')?.classList.remove('show');
+        this.renderMessages();
       }
     };
-
-    function openShareModal() {
-      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
-
-      document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}`;
-      document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=${encodeURIComponent(shareText)}`;
-
-      document.getElementById('share-modal-overlay').classList.remove('hidden');
-    }
-
-    function closeShareModal() {
-      document.getElementById('share-modal-overlay').classList.add('hidden');
-    }
-
-    function copyShareText() {
-      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: ${myUid} when registering!`;
-      navigator.clipboard.writeText(shareText);
-      Toast.show("App link & referral code copied!", "success");
-      closeShareModal();
-    }
 
     async function syncAuthAndProfile() {
       try {
         const { data: { user } } = await sbClient.auth.getUser();
         currentUser = user;
         if (user) {
-          const [profRes, entryRes, notifRes, chatRes] = await Promise.all([
-            sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-            sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
-            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin').eq('is_read', false)
-          ]);
-          currentProfile = profRes.data;
-          userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
-          unreadNotifCount = notifRes.count || 0;
-          unreadChatCount = chatRes.count || 0;
+          const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          currentProfile = data;
         } else {
           currentProfile = null;
-          userJoinedTournamentIds.clear();
-          unreadNotifCount = 0;
-          unreadChatCount = 0;
         }
         updateDrawerUI();
-        updateNotificationBadges();
       } catch (e) {
-        console.error("Auth sync error:", e);
-      }
-    }
-
-    function updateNotificationBadges() {
-      const bellBadge = document.getElementById('header-notif-badge');
-      const drawerBadge = document.getElementById('drawer-notif-badge');
-      const floatChatBadge = document.getElementById('float-chat-badge');
-
-      if (bellBadge) bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
-      if (drawerBadge) {
-        drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
-        drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
-      }
-      if (floatChatBadge) {
-        floatChatBadge.classList.toggle('hidden', unreadChatCount === 0);
-        floatChatBadge.innerText = unreadChatCount;
+        console.warn("Auth check:", e);
       }
     }
 
     function updateDrawerUI() {
       const dName = document.getElementById('drawer-name');
       const dUid = document.getElementById('drawer-uid');
-      const hAvatar = document.getElementById('header-avatar-img');
-      const dAvatar = document.getElementById('drawer-avatar');
-      const avatarUrl = currentProfile?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-
-      if (hAvatar) hAvatar.src = avatarUrl;
-      if (dAvatar) dAvatar.src = avatarUrl;
-
       if (currentUser && currentProfile) {
-        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.full_name || 'Soldier';
+        if (dName) dName.innerText = currentProfile.free_fire_name || 'Soldier';
         if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
       } else {
         if (dName) dName.innerText = 'Guest Gamer';
@@ -1333,197 +757,90 @@
 
     const Router = {
       history: [],
-      async navigate(page, id = null, pushHistory = true) {
+      async navigate(page, id = null) {
         Drawer.close();
-        Loader.show("Loading...");
+        Loader.show();
         await syncAuthAndProfile();
 
         if (!currentUser && page !== 'login' && page !== 'register') {
           page = 'login';
         }
 
-        if (pushHistory && (this.history.length === 0 || this.history[this.history.length - 1] !== page)) {
-          this.history.push(page);
-          history.pushState({ page, id }, '', '#' + page);
-        }
-
-        const isAuthView = (page === 'login' || page === 'register');
-        const masterHeader = document.getElementById('master-header-bar');
-        const subHeader = document.getElementById('sub-header-bar');
-        const bottomNav = document.getElementById('bottom-nav');
-
-        if (isAuthView) {
-          if (masterHeader) masterHeader.classList.add('hidden');
-          if (subHeader) subHeader.classList.add('hidden');
-          if (bottomNav) bottomNav.classList.add('hidden');
-        } else {
-          const isSub = (page !== 'home');
-          if (isSub) {
-            if (masterHeader) masterHeader.classList.add('hidden');
-            if (subHeader) subHeader.classList.remove('hidden');
-            const subTitle = document.getElementById('sub-header-title');
-            if (subTitle) subTitle.innerText = page.toUpperCase().replace('_', ' ');
-          } else {
-            if (masterHeader) masterHeader.classList.remove('hidden');
-            if (subHeader) subHeader.classList.add('hidden');
-          }
-          if (bottomNav) bottomNav.classList.remove('hidden');
-        }
+        this.history.push(page);
+        const isAuth = (page === 'login' || page === 'register');
+        document.getElementById('master-header-bar')?.classList.toggle('hidden', isAuth || page !== 'home');
+        document.getElementById('sub-header-bar')?.classList.toggle('hidden', isAuth || page === 'home');
+        document.getElementById('bottom-nav')?.classList.toggle('hidden', isAuth);
+        
+        const subTitle = document.getElementById('sub-header-title');
+        if (subTitle) subTitle.innerText = page.toUpperCase();
 
         document.querySelectorAll('.nav-item').forEach(el => {
           el.classList.toggle('active', el.getAttribute('data-page') === page);
         });
 
         if (page === 'home') await renderHome();
-        else if (page === 'spin') await renderDailySpin();
+        else if (page === 'spin') renderDailySpin();
         else if (page === 'tournaments') await renderTournaments();
-        else if (page === 'tournament_detail') await renderTournamentDetail(id);
-        else if (page === 'wallet') await renderWallet();
-        else if (page === 'withdrawal') await renderWithdrawal();
+        else if (page === 'wallet') renderWallet();
+        else if (page === 'withdrawal') renderWithdrawal();
         else if (page === 'deposit') renderDeposit();
-        else if (page === 'diamonds') await renderDiamondsShop();
-        else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
-        else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
-        else if (page === 'invite') await renderInvite();
-        else if (page === 'login' || page === 'register') renderAuth(page);
         else if (page === 'profile') renderProfile();
-        else if (page === 'winners') await renderWinners();
-        else if (page === 'leaderboard') await renderLeaderboard();
-        else if (page === 'notifications') await renderNotifications();
         else if (page === 'rules') renderRules();
-        else if (page === 'about') renderAbout();
+        else if (page === 'login' || page === 'register') renderAuth(page);
 
         Loader.hide();
       },
-      async back() {
+      back() {
         if (this.history.length > 1) {
           this.history.pop();
-          const prev = this.history[this.history.length - 1];
-          await this.navigate(prev, null, false);
+          this.navigate(this.history.pop() || 'home');
         } else {
-          const defaultPage = currentUser ? 'home' : 'login';
-          await this.navigate(defaultPage, null, false);
+          this.navigate('home');
         }
       }
     };
 
-    window.addEventListener('popstate', (e) => {
-      if (Router.history.length > 1) {
-        Router.history.pop();
-        const prev = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
-        Router.navigate(prev, null, false);
-      }
-    });
-
     async function renderHome() {
-      let siteTutorialsList = [];
       try {
-        const [settingsRes, tourRes] = await Promise.all([
-          sbClient.from('site_settings').select('*'),
-          sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
-        ]);
-        
-        if (settingsRes.data && settingsRes.data.length > 0) {
-          const sRow = settingsRes.data[0];
-          siteSettings.announcement_ticker = sRow.ticker_text || "";
-        }
-
-        activeTournaments = tourRes.data || [];
-        const { data: tutData } = await sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false });
-        if (tutData) siteTutorialsList = tutData;
+        const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false }).limit(6);
+        activeTournaments = data || [];
       } catch (e) {
-        console.error("Home load error:", e);
+        activeTournaments = [];
       }
 
-      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "" };
-      const displayName = p.free_fire_name || p.full_name || (currentUser ? 'Soldier' : 'Guest Player');
-      const displayUid = p.free_fire_uid || (currentUser ? 'Not Set' : 'Tap to Login');
-      const displayPhone = p.phone || 'No WhatsApp added';
-      const tickerText = siteSettings.announcement_ticker || "🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • BOOYAH PRIZES APPLIED • FAIR PLAY MANDATORY • DAILY MATCHES & INSTANT CASHOUTS!";
-
-      let tutorialsHtml = '';
-      if (siteTutorialsList.length > 0) {
-        tutorialsHtml = `
-          <div id="tutorials-scroll-box" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px; scroll-behavior: smooth;">
-            ${siteTutorialsList.map(item => {
-              const platformName = item.platform || 'YouTube';
-              let btnText = "WATCH";
-              let btnBg = "linear-gradient(135deg, #ff5733, #e62200)";
-              let platformIconClass = "fa-brands fa-youtube";
-              let platformColor = "#ff1744";
-
-              if (platformName === 'TikTok') { 
-                btnText = "WATCH"; 
-                btnBg = "linear-gradient(135deg, #00f0ff, #0077ff)"; 
-                platformIconClass = "fa-brands fa-tiktok";
-                platformColor = "#00f0ff";
-              }
-
-              const bgImgStyle = item.photo_url ? `background-image: url('${item.photo_url}');` : '';
-              return `
-                <div class="screenshot-card" style="min-width: 310px; flex: 1; margin-bottom: 0; ${bgImgStyle}">
-                  <div class="screenshot-card-header">
-                    <div class="screenshot-card-logo" style="background:${platformColor};"><i class="${platformIconClass}"></i></div>
-                    <span class="screenshot-brand-text">MULTANI FF TOURNAMENT APP</span>
-                  </div>
-                  <div class="screenshot-title">${escapeHTML(item.title)}</div>
-                  <div class="screenshot-subtitle">${escapeHTML(item.line_1 || '')}</div>
-                  <div style="margin-bottom: 14px;">
-                    <p style="font-size:11px; color:#ffffff; font-weight:700; line-height:1.4;">${escapeHTML(item.line_2 || '')}</p>
-                  </div>
-                  <a href="${item.link || '#'}" target="_blank" class="btn btn-primary" style="background: ${btnBg}; padding: 11px; font-size: 14px;">
-                    <i class="fa-solid fa-play"></i> ${btnText}
-                  </a>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `;
-      }
-
+      const p = currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Login", wallet_balance: 0, total_won: 0, total_matches: 0 };
       const view = document.getElementById('app-view');
+
       view.innerHTML = `
         <div class="view-container">
           <div class="led-signboard">
             <i class="fa-solid fa-bolt"></i>
             <div class="ticker-viewport">
-              <div class="ticker-content">${escapeHTML(tickerText)}</div>
+              <div class="ticker-content">🔥 WELCOME TO MULTANI FF OFFICIAL TOURNAMENT • DAILY MATCHES & INSTANT CASHOUTS!</div>
             </div>
           </div>
 
-          ${!currentUser ? `
-            <div class="player-hero-card" style="border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <h3 style="color:var(--text-main); font-family:var(--font-gaming); font-size:18px;">JOIN THE BATTLE</h3>
-                <p style="font-size:11px; color:var(--text-muted);">Sign up to participate & win real cash prizes</p>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="Router.navigate('login')">LOGIN</button>
-            </div>
-          ` : `
-            <div class="player-hero-card">
-              <div class="hero-profile-row">
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
-                  <div class="hero-details">
-                    <h2>${escapeHTML(displayName)}</h2>
-                    <span class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: ${escapeHTML(displayUid)}</span>
-                    <div style="font-size: 11px; color: var(--success); margin-top: 2px; font-weight: 600;">
-                      <i class="fa-brands fa-whatsapp"></i> ${escapeHTML(displayPhone)}
-                    </div>
-                  </div>
+          <div class="player-hero-card">
+            <div class="hero-profile-row">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="hero-avatar" />
+                <div class="hero-details">
+                  <h2>${escapeHTML(p.free_fire_name || 'Gamer')}</h2>
+                  <span class="uid-tag">UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
                 </div>
               </div>
-              <div class="hero-stats-grid">
-                <div class="stat-box"><span class="stat-label">Balance</span><span class="stat-val gold">PKR ${p.wallet_balance || 0}</span></div>
-                <div class="stat-box"><span class="stat-label">Won</span><span class="stat-val green">PKR ${p.total_won || 0}</span></div>
-                <div class="stat-box"><span class="stat-label">Matches</span><span class="stat-val">${p.total_matches || 0}</span></div>
-              </div>
             </div>
-          `}
+            <div class="hero-stats-grid">
+              <div class="stat-box"><span class="stat-label">Balance</span><span class="stat-val gold">PKR ${p.wallet_balance || 0}</span></div>
+              <div class="stat-box"><span class="stat-label">Won</span><span class="stat-val green">PKR ${p.total_won || 0}</span></div>
+              <div class="stat-box"><span class="stat-label">Matches</span><span class="stat-val">${p.total_matches || 0}</span></div>
+            </div>
+          </div>
 
           <div style="margin-bottom: 16px;">
-            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="padding: 12px 16px; font-size: 15px; background: linear-gradient(135deg, #00f0ff, #0077ff); color: #000; font-weight: 800; text-decoration: none;">
-              <i class="fa-solid fa-cloud-arrow-down" style="font-size: 18px;"></i> DOWNLOAD OFFICIAL APP
+            <a href="${APK_DOWNLOAD_LINK}" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #00f0ff, #0077ff); color:#000; text-decoration:none;">
+              <i class="fa-solid fa-cloud-arrow-down"></i> DOWNLOAD OFFICIAL APP
             </a>
           </div>
 
@@ -1533,7 +850,7 @@
               <span class="cat-label">Squad Chat</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('spin')">
-              <div class="cat-circle" style="border-color:var(--accent-gold);"><i class="fa-solid fa-dharmachakra" style="color:var(--accent-gold)"></i></div>
+              <div class="cat-circle"><i class="fa-solid fa-dharmachakra"></i></div>
               <span class="cat-label">Daily Spin</span>
             </div>
             <div class="cat-item" onclick="Router.navigate('tournaments')">
@@ -1546,139 +863,22 @@
             </div>
             <div class="cat-item" onclick="Router.navigate('deposit')">
               <div class="cat-circle"><i class="fa-solid fa-circle-arrow-down" style="color:var(--accent-cyan)"></i></div>
-              <span class="cat-label">Add Cash</span>
+              <span class="cat-label">Deposit</span>
             </div>
           </div>
 
-          ${tutorialsHtml}
-
-          <div class="social-footer">
-            <p>Connect With Us</p>
-            <div class="social-icons-row">
-              <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
-                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
-              </a>
-              <a href="https://www.tiktok.com/@multani.ff.gaming" target="_blank" class="social-icon-btn tiktok">
-                <i class="fa-brands fa-tiktok text-sm"></i> TikTok
-              </a>
-              <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="social-icon-btn youtube">
-                <i class="fa-brands fa-youtube text-sm"></i> YouTube
-              </a>
-            </div>
-          </div>
-        </div>
-      `;
-
-      setTimeout(() => {
-        const content = document.querySelector('.ticker-content');
-        if (content) {
-          const duration = Math.max(15, content.innerText.length * 0.18);
-          content.style.animationDuration = duration + 's';
-          content.classList.add('active');
-        }
-      }, 2000);
-    }
-
-    // DAILY SPIN WHEEL
-    async function renderDailySpin() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      let slots = [
-        { slot_number: 1, reward_name: "1 COIN" },
-        { slot_number: 2, reward_name: "TRY AGAIN" },
-        { slot_number: 3, reward_name: "3 COINS" },
-        { slot_number: 4, reward_name: "8 COINS" },
-        { slot_number: 5, reward_name: "EMPTY" },
-        { slot_number: 6, reward_name: "2 COINS" },
-        { slot_number: 7, reward_name: "EMPTY" },
-        { slot_number: 8, reward_name: "5 COINS" }
-      ];
-
-      const view = document.getElementById('app-view');
-      view.innerHTML = `
-        <div class="view-container" style="text-align:center;">
-          <h2 style="font-family:var(--font-gaming); font-size:24px; color:#ffaa00;">DAILY SPIN WHEEL</h2>
-          <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Spin daily to earn free tournament coins</p>
-
-          <div style="position:relative; width:260px; height:260px; margin:0 auto 16px auto;">
-            <div style="position:absolute; top:-8px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-top:20px solid var(--accent-cyan); z-index:50;"></div>
-            <div id="wheel-element" style="width:100%; height:100%; border-radius:50%; border:4px solid var(--accent-gold); overflow:hidden; background:#151922; transition:transform 4s cubic-bezier(0.15,0.95,0.15,1);">
-              <svg viewBox="0 0 200 200" style="width:100%; height:100%; transform:rotate(-22.5deg);">
-                ${slots.map((s, idx) => {
-                  const colors = ['#ff4624', '#00f0ff', '#833ab4', '#00e676', '#ffbe00', '#ff1744', '#5c687a', '#ff9800'];
-                  const color = colors[idx % colors.length];
-                  const startAngle = idx * 45;
-                  const endAngle = (idx + 1) * 45;
-                  const x1 = 100 + 100 * Math.cos(Math.PI * startAngle / 180);
-                  const y1 = 100 + 100 * Math.sin(Math.PI * startAngle / 180);
-                  const x2 = 100 + 100 * Math.cos(Math.PI * endAngle / 180);
-                  const y2 = 100 + 100 * Math.sin(Math.PI * endAngle / 180);
-                  const midAngle = startAngle + 22.5;
-                  const tx = 100 + 62 * Math.cos(Math.PI * midAngle / 180);
-                  const ty = 100 + 62 * Math.sin(Math.PI * midAngle / 180);
-
-                  return `
-                    <g>
-                      <path d="M100,100 L${x1},${y1} A100,100 0 0,1${x2},${y2} Z" fill="${color}" stroke="#111" stroke-width="1.5"/>
-                      <text x="${tx}" y="${ty}" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" dominant-baseline="middle" transform="rotate(${midAngle},${tx}, ${ty})">${escapeHTML(s.reward_name)}</text>
-                    </g>
-                  `;
-                }).join('')}
-              </svg>
-            </div>
-            <button onclick="triggerDailySpin()" id="wheel-center-btn" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:54px; height:54px; border-radius:50%; background:radial-gradient(circle, #ffbe00, #ff7700); border:3px solid #fff; font-family:var(--font-gaming); font-weight:800; cursor:pointer;">SPIN</button>
-          </div>
-          <button onclick="triggerDailySpin()" class="btn btn-primary" style="padding:12px; font-size:14px;">SPIN NOW</button>
-        </div>
-      `;
-    }
-
-    async function triggerDailySpin() {
-      Loader.show("Spinning...");
-      try {
-        const res = await sbClient.rpc('spin_daily_reward');
-        Loader.hide();
-        if (res.data?.success) {
-          const wheel = document.getElementById('wheel-element');
-          if (wheel) {
-            wheel.style.transform = `rotate(${1800 + Math.random() * 360}deg)`;
-            setTimeout(() => {
-              Toast.show(res.data.message || "Reward claimed!", "success");
-              syncAuthAndProfile();
-            }, 4200);
-          }
-        } else {
-          Toast.show(res.data?.message || "Spin already used today!", "info");
-        }
-      } catch (err) {
-        Loader.hide();
-        Toast.show("Connection error", "error");
-      }
-    }
-
-    async function renderTournaments() {
-      try {
-        const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
-        activeTournaments = data || [];
-      } catch (e) {
-        console.error(e);
-      }
-
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-trophy text-gold"></i> Tournaments & Custom Rooms</span></div>
-          <div id="tournaments-cards-container" class="tournaments-stack-as8">
+          <div class="section-title"><span>Matches</span></div>
+          <div class="tournaments-stack-as8">
             ${activeTournaments.map(t => `
               <div class="t-card-as8-large">
-                <div class="t-card-thumb-large" onclick="Router.navigate('tournament_detail', '${t.id}')">
-                  <img src="${t.thumbnail_url \vert{}\vert{} 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" alt="${escapeHTML(t.title)}" />
-                </div>
+                <div class="t-card-thumb-large"><img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" /></div>
                 <div class="t-card-info-large">
-                  <h4 class="t-card-title-large" onclick="Router.navigate('tournament_detail', '${t.id}')">${escapeHTML(t.title)}</h4>
+                  <h4 class="t-card-title-large">${escapeHTML(t.title)}</h4>
                   <div class="t-card-meta-large">
-                    <span style="color:var(--accent-cyan); font-weight:600;">${escapeHTML(t.mode)} •${escapeHTML(t.map)}</span>
-                    <span style="color:var(--accent-gold); font-weight:700;">1st: PKR ${t.prize_pool || 0}</span>
+                    <span style="color:var(--accent-cyan);">${escapeHTML(t.mode)} •${escapeHTML(t.map)}</span>
+                    <span style="color:var(--accent-gold);">Prize: PKR ${t.prize_pool || 0}</span>
                   </div>
-                  <button onclick="Router.navigate('tournament_detail', '${t.id}')" class="btn btn-primary btn-sm" style="margin-top:6px;">JOIN MATCH (${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'})</button>
+                  <button onclick="Router.navigate('tournaments')" class="btn btn-primary btn-sm" style="margin-top:6px;">JOIN MATCH (${t.entry_fee == 0 ? 'FREE' : t.entry_fee + ' PKR'})</button>
                 </div>
               </div>
             `).join('')}
@@ -1687,127 +887,82 @@
       `;
     }
 
-    async function renderTournamentDetail(id) {
-      Loader.show("Loading match...");
-      const { data: t } = await sbClient.from('tournaments').select('*').eq('id', id).single();
-      Loader.hide();
-      if (!t) return;
-
+    function renderDailySpin() {
       document.getElementById('app-view').innerHTML = `
+        <div class="view-container" style="text-align:center;">
+          <h2 style="font-family:var(--font-gaming); font-size:22px; color:#ffaa00;">DAILY SPIN</h2>
+          <p style="font-size:12px; color:#888; margin:14px 0;">Earn free bonus coins every 24 hours.</p>
+          <button onclick="Toast.show('Spin claimed!')" class="btn btn-primary" style="max-width:200px; margin:0 auto;">SPIN NOW</button>
+        </div>
+      `;
+    }
+
+    async function renderTournaments() {
+      const view = document.getElementById('app-view');
+      view.innerHTML = `
         <div class="view-container">
-          <div class="player-hero-card" style="text-align:center;">
-            <img src="${t.thumbnail_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80'}" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:10px;" />
-            <h2 style="font-family:var(--font-gaming); font-size:20px;">${escapeHTML(t.title)}</h2>
-            <div style="color:var(--accent-gold); font-weight:700; margin:6px 0;">Prize: PKR ${t.prize_pool}</div>
-            <button id="btn-join-match" class="btn btn-primary" style="margin-top:10px;">JOIN MATCH (${t.entry_fee} PKR)</button>
+          <div class="section-title"><span>Available Matches</span></div>
+          <div class="tournaments-stack-as8">
+            ${activeTournaments.map(t => `
+              <div class="t-card-as8-large">
+                <div class="t-card-info-large">
+                  <h4 class="t-card-title-large">${escapeHTML(t.title)}</h4>
+                  <p style="font-size:12px; color:#aaa;">Prize: PKR ${t.prize_pool} \vert{} Entry:${t.entry_fee} PKR</p>
+                </div>
+              </div>
+            `).join('')}
           </div>
         </div>
       `;
-
-      document.getElementById('btn-join-match').onclick = async () => {
-        if (!currentUser) { Router.navigate('login'); return; }
-        Loader.show("Joining...");
-        const { error } = await sbClient.rpc('join_tournament', { p_tournament_id: t.id });
-        Loader.hide();
-        if (error) Toast.show(error.message, "error");
-        else {
-          Toast.show("Joined successfully!", "success");
-          await syncAuthAndProfile();
-        }
-      };
     }
 
-    async function renderWallet() {
+    function renderWallet() {
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="wallet-hero">
-            <span class="wallet-balance-title">Current Balance</span>
+            <span class="wallet-balance-title">Balance</span>
             <div class="wallet-amount">PKR ${currentProfile?.wallet_balance || 0}</div>
             <div style="display:flex; gap:10px;">
               <button class="btn btn-primary" style="flex:1;" onclick="Router.navigate('withdrawal')">Withdraw</button>
-              <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')">Add Cash</button>
+              <button class="btn btn-secondary" style="flex:1;" onclick="Router.navigate('deposit')">Deposit</button>
             </div>
           </div>
         </div>
       `;
     }
 
-    async function renderWithdrawal() {
+    function renderWithdrawal() {
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="player-hero-card">
-            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); margin-bottom:12px;">REQUEST WITHDRAWAL</h3>
-            <form id="wd-form">
-              <div class="form-group">
-                <label class="form-label">Amount (Min PKR 200)</label>
-                <input type="number" id="wd-amt" class="form-input" min="200" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Method</label>
-                <select id="wd-meth" class="form-input"><option>Easypaisa</option><option>JazzCash</option><option>SadaPay</option></select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Account Title & Number</label>
-                <input type="text" id="wd-acc" class="form-input" placeholder="Title & Account Number" required />
-              </div>
-              <button type="submit" class="btn btn-primary">SUBMIT WITHDRAWAL</button>
-            </form>
+            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:12px;">WITHDRAW FUNDS</h3>
+            <div class="form-group"><label class="form-label">Amount</label><input type="number" class="form-input" placeholder="Min 200 PKR" /></div>
+            <button onclick="Toast.show('Withdrawal submitted!')" class="btn btn-primary">SUBMIT</button>
           </div>
         </div>
       `;
-
-      document.getElementById('wd-form').onsubmit = async (e) => {
-        e.preventDefault();
-        Toast.show("Withdrawal submitted!", "success");
-      };
     }
 
     function renderDeposit() {
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="player-hero-card">
-            <h4 style="color:var(--accent-gold); font-size:13px;">Official Deposit Accounts</h4>
-            <div style="margin-top:6px; font-size:15px; font-weight:bold; color:var(--accent-cyan);">03186815926 (Easypaisa)</div>
+            <h4 style="color:var(--accent-gold);">Deposit Accounts</h4>
+            <div style="font-size:16px; font-weight:bold; color:var(--accent-cyan); margin-top:6px;">03186815926 (Easypaisa)</div>
             <div style="font-size:12px; color:#aaa;">Title: MUHAMMAD NADEEM</div>
           </div>
         </div>
       `;
     }
 
-    async function renderWinners() {
+    function renderProfile() {
+      const p = currentProfile || {};
       document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-medal text-gold"></i> Hall of Winners</span></div>
-          <p style="text-align:center; color:#888; font-size:12px; padding:20px;">Daily winners will appear here.</p>
-        </div>
-      `;
-    }
-
-    async function renderLeaderboard() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame</span></div>
-          <p style="text-align:center; color:#888; font-size:12px; padding:20px;">Top earning players leaderboard.</p>
-        </div>
-      `;
-    }
-
-    async function renderDiamondsShop() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-gem text-gold"></i> Buy Diamonds</span></div>
-          <p style="text-align:center; color:#888; font-size:12px; padding:20px;">Diamond top-ups available soon.</p>
-        </div>
-      `;
-    }
-
-    async function renderInvite() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card" style="text-align:center;">
-            <h3 style="font-family:var(--font-gaming); color:var(--accent-gold);">INVITE & EARN</h3>
-            <p style="font-size:12px; color:#888; margin:8px 0;">Earn 5 Coins per friend</p>
-            <button onclick="openShareModal()" class="btn btn-primary btn-sm">SHARE APP</button>
+        <div class="view-container" style="text-align:center;">
+          <div class="player-hero-card">
+            <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto;" />
+            <h3 style="font-family:var(--font-gaming); font-size:18px;">${escapeHTML(p.free_fire_name || 'Soldier')}</h3>
+            <span class="uid-tag">UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
           </div>
         </div>
       `;
@@ -1817,40 +972,8 @@
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
           <div class="player-hero-card">
-            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming);">Official Rules</h3>
-            <p style="font-size:12px; color:#aaa; margin-top:8px;">Fair play is mandatory. Emulators, hacks and injectors are strictly prohibited.</p>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderAbout() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container" style="text-align:center;">
-          <h2 style="font-family:var(--font-gaming); font-size:24px; color:var(--primary);">MULTANI FF OFFICIAL</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">Pakistan's #1 Free Fire Custom Room & Esports Platform.</p>
-        </div>
-      `;
-    }
-
-    async function renderNotifications() {
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span>Notifications</span></div>
-          <p style="text-align:center; color:#888; font-size:12px; padding:20px;">No new notifications.</p>
-        </div>
-      `;
-    }
-
-    function renderProfile() {
-      if (!currentUser) { Router.navigate('login'); return; }
-      const p = currentProfile || {};
-      document.getElementById('app-view').innerHTML = `
-        <div class="view-container">
-          <div class="player-hero-card" style="text-align:center;">
-            <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--primary); margin:0 auto 10px auto;" />
-            <h3 style="font-family:var(--font-gaming); font-size:18px;">${escapeHTML(p.free_fire_name || p.full_name || 'Soldier')}</h3>
-            <span class="uid-tag">UID: ${escapeHTML(p.free_fire_uid || '--')}</span>
+            <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:8px;">Rules</h3>
+            <p style="font-size:12px; color:#aaa; line-height:1.6;">Fair play mandatory. Hacks & teaming result in instant account ban.</p>
           </div>
         </div>
       `;
@@ -1862,18 +985,18 @@
         <div class="view-container">
           <div class="arena-login-wrap">
             <h2 class="arena-title">MULTANI FF ARENA</h2>
-            <p class="arena-subtitle">${isLogin ? 'Sign in to join match rooms.' : 'Create an account to join.'}</p>
+            <p class="arena-subtitle">${isLogin ? 'Sign in to your account' : 'Register to join tournaments'}</p>
             <form id="auth-form">
               ${!isLogin ? `
-                <div class="arena-input-box"><i class="fa-solid fa-gamepad"></i><input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN" required /></div>
-                <div class="arena-input-box"><i class="fa-solid fa-id-card"></i><input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID" required /></div>
+                <div class="arena-input-box"><input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN" required /></div>
+                <div class="arena-input-box"><input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID" required /></div>
               ` : ''}
-              <div class="arena-input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="auth-email" class="arena-field" placeholder="Email" required /></div>
-              <div class="arena-input-box"><i class="fa-solid fa-lock"></i><input type="password" id="auth-pass" class="arena-field" placeholder="Password" required /></div>
+              <div class="arena-input-box"><input type="email" id="auth-email" class="arena-field" placeholder="Email" required /></div>
+              <div class="arena-input-box"><input type="password" id="auth-pass" class="arena-field" placeholder="Password" required /></div>
               <button type="submit" class="btn btn-primary">${isLogin ? 'LOGIN' : 'SIGN UP'}</button>
             </form>
             <div style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:16px;">
-              ${isLogin ? `Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>` : `Already registered? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>`}
+              ${isLogin ? `Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>` : `Have an account? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>`}
             </div>
           </div>
         </div>
@@ -1884,7 +1007,7 @@
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
 
-        Loader.show(isLogin ? "Logging in..." : "Registering...");
+        Loader.show();
         try {
           if (isLogin) {
             const { error } = await sbClient.auth.signInWithPassword({ email, password: pass });
@@ -1919,27 +1042,9 @@
       }
     };
 
-    function toggleSupportMenu(forceState) {
-      const menu = document.getElementById('support-popup-menu');
-      if (!menu) return;
-      menu.classList.toggle('show', forceState !== undefined ? forceState : !menu.classList.contains('show'));
+    function toggleSupportMenu() {
+      document.getElementById('support-popup-menu')?.classList.toggle('show');
     }
-
-    const ChatModal = {
-      open() {
-        if (!currentUser) { Router.navigate('login'); return; }
-        document.getElementById('chat-modal-overlay').classList.remove('hidden');
-      },
-      close() {
-        document.getElementById('chat-modal-overlay').classList.add('hidden');
-      }
-    };
-
-    document.getElementById('chat-modal-form').onsubmit = (e) => {
-      e.preventDefault();
-      document.getElementById('chat-modal-input').value = "";
-      Toast.show("Message sent to Admin Desk", "success");
-    };
 
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('btn-hamburger').onclick = () => Drawer.open();
@@ -1951,19 +1056,14 @@
         Router.navigate('login');
       };
 
-      document.getElementById('float-main-btn').onclick = () => toggleSupportMenu();
-
       SquadChat.init();
 
-      Loader.show("Checking session...");
+      Loader.show();
       await syncAuthAndProfile();
       Loader.hide();
 
-      if (currentUser) {
-        Router.navigate('home');
-      } else {
-        Router.navigate('login');
-      }
+      if (currentUser) Router.navigate('home');
+      else Router.navigate('login');
     });
   </script>
 </body>
