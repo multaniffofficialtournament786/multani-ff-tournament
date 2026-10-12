@@ -81,24 +81,24 @@
         <p class="text-xs text-gray-400">Master Control Console</p>
       </div>
 
-      <form id="admin-login-form" class="space-y-3 pt-2" onsubmit="handleAdminLogin(event)">
+      <div class="space-y-3 pt-2">
         <div class="space-y-1">
           <label class="block text-xs font-bold text-gray-400 uppercase">Admin Email</label>
-          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
+          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="email" />
         </div>
         <div class="space-y-1">
           <label class="block text-xs font-bold text-gray-400 uppercase">Password</label>
           <div class="relative">
-            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="current-password" onkeydown="if(event.key==='Enter') executeAdminLogin()" />
             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
               <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
             </button>
           </div>
         </div>
-        <button type="submit" id="btn-adm-login" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+        <button type="button" id="btn-adm-login" onclick="executeAdminLogin()" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
           AUTHENTICATE CONSOLE
         </button>
-      </form>
+      </div>
       <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
     </div>
   </div>
@@ -483,8 +483,6 @@
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentAdmin = null;
-    window.currentAdminUser = null;
     let globalAllPlayersCache = [];
     let dailySpinSlotsCache = [];
     let globalSpinHistoryCache = [];
@@ -506,32 +504,43 @@
       }
     }
 
-    // SAFE AUTH CHECK: Automatically unlocks if session exists
+    // 100% PERSISTENT AUTO-LOGIN CHECK (NO RELOAD, NO FREEZE)
     async function checkAdminAuth() {
       const authScreen = document.getElementById('admin-auth-screen');
+      const localAdminSession = localStorage.getItem("multani_admin_active");
+
+      if (localAdminSession === "true") {
+        authScreen.classList.add('hidden');
+        loadDashboardStats();
+        return;
+      }
+
       try {
         const { data: { session } } = await sbClient.auth.getSession();
         if (session && session.user) {
-          currentAdmin = session.user;
-          window.currentAdminUser = session.user;
+          localStorage.setItem("multani_admin_active", "true");
           authScreen.classList.add('hidden');
-          document.getElementById('admin-user-name').innerText = session.user.email ? session.user.email.split('@')[0] : 'Master Admin';
           loadDashboardStats();
           return;
         }
       } catch (err) {
-        console.warn("Session check bypass:", err);
+        console.warn("Session check error:", err);
       }
       authScreen.classList.remove('hidden');
     }
 
-    // SAFE LOGIN: No freezing, clear status
-    async function handleAdminLogin(e) {
-      if (e) e.preventDefault();
+    // DIRECT LOGIN FUNCTION (BUTTON CLICK HANDLER)
+    async function executeAdminLogin() {
       const email = document.getElementById('adm-email').value.trim();
       const password = document.getElementById('adm-pass').value;
       const btn = document.getElementById('btn-adm-login');
       const msg = document.getElementById('admin-auth-msg');
+
+      if (!email || !password) {
+        msg.innerText = "Please enter both Email and Password.";
+        msg.classList.remove('hidden');
+        return;
+      }
 
       btn.disabled = true;
       btn.innerText = "AUTHENTICATING...";
@@ -541,8 +550,10 @@
         const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        currentAdmin = data.user;
-        window.currentAdminUser = data.user;
+        // Save persistent access
+        localStorage.setItem("multani_admin_active", "true");
+        localStorage.setItem("multani_admin_email", email);
+
         document.getElementById('admin-auth-screen').classList.add('hidden');
         document.getElementById('admin-user-name').innerText = email.split('@')[0] || 'Master Admin';
         loadDashboardStats();
@@ -556,6 +567,684 @@
     }
 
     async function adminSignOut() {
+      localStorage.removeItem("multani_admin_active");
+      localStorage.removeItem("multani_admin_email");
+      await sbClient.auth.signOut();
+      document.getElementById('admin-auth-screen').classList.remove('hidden');
+    }
+
+    function toggleSidebar(forceState = null) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      if (forceState === false) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      } else if (forceState === true) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      }
+    }
+
+    const tabs = ['overview', 'tournaments', 'winners', 'chatroom', 'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'support', 'settings'];
+
+    function selectTab(tabId) {
+      toggleSidebar(false);
+      tabs.forEach(t => {
+        const sec = document.getElementById(`section-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if(sec) sec.classList.add('hidden');
+        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition";
+      });
+
+      const activeSec = document.getElementById(`section-${tabId}`);
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if(activeSec) activeSec.classList.remove('hidden');
+      if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white";
+
+      const backBtn = document.getElementById('btn-back-dashboard');
+      if (tabId === 'overview') {
+        document.getElementById('panel-title').innerText = "DASHBOARD";
+        backBtn.classList.add('hidden');
+        loadDashboardStats();
+      } else {
+        document.getElementById('panel-title').innerText = tabId.toUpperCase().replace(/_/g, ' ');
+        backBtn.classList.remove('hidden');
+      }
+
+      if (tabId === 'users') loadUsers();
+      if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
+      if (tabId === 'daily_spin_mgmt') loadAdminDailySpinMgmt();
+      if (tabId === 'daily_spin_history') loadAdminSpinHistory();
+      if (tabId === 'deposits') loadDeposits();
+    }
+
+    async function loadDashboardStats() {
+      try {
+        const [deps, users] = await Promise.all([
+          sbClient.from('deposit_requests').select('*'),
+          sbClient.from('profiles').select('*', { count: 'exact', head: true })
+        ]);
+        const safeDeps = deps.data || [];
+        const approvedSum = safeDeps.filter(d => (d.status || '').toLowerCase() === 'approved').reduce((s, d) => s + Number(d.amount || 0), 0);
+        document.getElementById('stat-total-deposits').innerText = `PKR ${approvedSum}`;
+        document.getElementById('stat-pending-deposits').innerText = safeDeps.filter(d => (d.status || '').toLowerCase() === 'pending').length;
+        document.getElementById('stat-total-players').innerText = users.count || 0;
+      } catch (e) { console.error(e); }
+    }
+
+    // ALL PLAYERS MODAL
+    async function openAllPlayersModal() {
+      document.getElementById('modal-all-players').classList.remove('hidden');
+      const body = document.getElementById('modal-all-players-body');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-6"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading registered players...</p>`;
+
+      try {
+        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        globalAllPlayersCache = data || [];
+        renderModalAllPlayers(globalAllPlayersCache);
+      } catch (err) {
+        body.innerHTML = `<p class="text-red-500 text-xs text-center py-6">Failed: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    function closeAllPlayersModal() {
+      document.getElementById('modal-all-players').classList.add('hidden');
+    }
+
+    function filterAllPlayersModal() {
+      const q = document.getElementById('all-players-search').value.toLowerCase().trim();
+      if (!q) { renderModalAllPlayers(globalAllPlayersCache); return; }
+      const filtered = globalAllPlayersCache.filter(u => 
+        (u.free_fire_name && u.free_fire_name.toLowerCase().Yeh raha aapka **Admin Panel (`admin.html`)** ka mukammal theek kiya hua code.
+
+Isme dono maslay hal kar diye gaye hain:
+1. **Auto-Back / Page Reload Loop Fix:** Form ka default submit khatam kar ke button ko direct click par set kar diya gaya hai, ab page kabhi khud refresh ya auto-back nahi hoga.
+2. **Permanent Remember / Auto-Login:** Ek dafa login karne par session hamesha ke liye browser mein save rahega, har baar kholne par seedha **Dashboard** open hoga.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>MULTANI FF - Admin Console</title>
+  <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
+  <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+  <link href="[https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap)" rel="stylesheet">
+  <script src="[https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2)"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    .font-gaming { font-family: 'Rajdhani', sans-serif; }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
+    @keyframes blink-green {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .blink-heart { animation: blink-green 1.2s infinite ease-in-out; }
+
+    .admin-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background-color: #0e1118;
+      border-top: 1px solid #262f40;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 100;
+    }
+    .admin-nav-btn {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      gap: 3px;
+      flex: 1;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .admin-nav-btn i { font-size: 18px; }
+    .admin-nav-btn:hover, .admin-nav-btn:active { color: #ff4624; }
+    .admin-center-plus {
+      position: relative;
+      top: -18px;
+      background: linear-gradient(135deg, #ff4624, #ff8424);
+      border: 4px solid #06070a;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 22px;
+      box-shadow: 0 4px 15px rgba(255, 70, 36, 0.4);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative pb-20 md:pb-0">
+
+  <!-- AUTH OVERLAY -->
+  <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <i class="fa-solid fa-shield-halved text-[#ff4624] text-4xl mb-2"></i>
+        <h2 class="font-gaming text-2xl font-bold tracking-wider text-white">MULTANI FF ADMIN</h2>
+        <p class="text-xs text-gray-400">Master Control Console</p>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Admin Email</label>
+          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="email" />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Password</label>
+          <div class="relative">
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="current-password" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
+              <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <button type="button" id="btn-adm-login" onclick="handleAdminLoginDirect()" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          AUTHENTICATE CONSOLE
+        </button>
+      </div>
+      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
+    </div>
+  </div>
+
+  <div id="mobile-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#0e1118] border-r border-[#262f40] transform -translate-x-full md:translate-x-0 md:static md:w-64 transition-transform duration-300 ease-in-out flex flex-col justify-between shrink-0">
+    <div class="flex flex-col h-full">
+      <div class="p-4 border-b border-[#262f40] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-shield-halved text-[#ff4624] text-2xl"></i>
+          <div>
+            <h2 class="font-gaming text-xl font-bold tracking-wider text-white">MULTANI FF</h2>
+            <span class="text-[10px] text-gray-400 uppercase tracking-widest block font-bold">Admin Console</span>
+          </div>
+        </div>
+        <button onclick="toggleSidebar(false)" class="md:hidden text-gray-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <nav class="p-3 space-y-1 overflow-y-auto sidebar-scroll flex-1 text-sm">
+        <button onclick="selectTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white">
+          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        </button>
+        <button onclick="selectTab('tournaments')" id="nav-tournaments" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-trophy w-5"></i> Tournaments & Rooms
+        </button>
+        <button onclick="selectTab('winners')" id="nav-winners" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-medal w-5 text-yellow-400"></i> Declare Winners
+        </button>
+        <button onclick="selectTab('chatroom')" id="nav-chatroom" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-comments w-5 text-indigo-400"></i> Global Chat Room
+        </button>
+        <button onclick="selectTab('referral_rewards_mgmt')" id="nav-referral_rewards_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gift w-5 text-amber-400"></i> Referral Rewards
+        </button>
+        <button onclick="selectTab('daily_spin_mgmt')" id="nav-daily_spin_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-dharmachakra w-5 text-cyan-400"></i> Daily Spin Slots
+        </button>
+        <button onclick="selectTab('daily_spin_history')" id="nav-daily_spin_history" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-clock-rotate-left w-5 text-purple-400"></i> Spin History
+        </button>
+        <button onclick="selectTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
+        </button>
+        <button onclick="selectTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-money-bill-transfer w-5 text-amber-400"></i> Withdrawal Requests
+        </button>
+        <button onclick="selectTab('diamond_requests')" id="nav-diamond_requests" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gem w-5 text-amber-400"></i> Diamond Requests
+        </button>
+        <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-users w-5"></i> Gamers & Balance
+        </button>
+        <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
+        </button>
+        <button onclick="selectTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-bullhorn w-5 text-red-400"></i> Announcement Ticker
+        </button>
+      </nav>
+
+      <div class="p-3 border-t border-[#262f40] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img id="admin-user-avatar" src="[https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80](https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80)" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
+          <div class="text-xs">
+            <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
+            <p class="text-emerald-400 text-[10px]">Active Session</p>
+          </div>
+        </div>
+        <button onclick="adminSignOut()" title="Logout" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-power-off"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+    <header class="h-14 bg-[#0e1118] border-b border-[#262f40] px-3 md:px-6 flex items-center justify-between shrink-0 z-30 gap-2">
+      <div class="flex items-center gap-2">
+        <button id="btn-back-dashboard" onclick="selectTab('overview')" class="text-gray-300 hover:text-white bg-[#151922] border border-[#262f40] px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hidden">
+          <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Dashboard
+        </button>
+        <button id="btn-open-sidebar" onclick="toggleSidebar(true)" class="md:hidden text-white p-2 rounded-lg bg-[#151922] border border-[#262f40]">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <h1 id="panel-title" class="font-gaming text-base md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
+      <!-- DASHBOARD OVERVIEW -->
+      <section id="section-overview" class="space-y-4">
+        <div class="grid grid-cols-2 gap-2.5 w-full max-w-full md:max-w-2xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
+            <h3 id="stat-total-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ffbe00] mt-1">PKR 0</h3>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl cursor-pointer relative flex flex-col justify-between" onclick="selectTab('deposits')">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] uppercase font-bold text-gray-400">Pending Slips</span>
+              <button onclick="event.stopPropagation(); loadDashboardStats(); alert('Refreshed!');" class="text-cyan-400 hover:text-cyan-300 text-xs p-1"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <h3 id="stat-pending-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ff4624] mt-1">0</h3>
+          </div>
+        </div>
+
+        <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl w-full max-w-full md:max-w-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
+            <h3 id="stat-total-players" class="text-lg font-bold font-gaming text-white mt-0.5">0</h3>
+          </div>
+          <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+            <i class="fa-solid fa-list-ul"></i> LIST
+          </button>
+        </div>
+      </section>
+
+      <!-- WINNERS SECTION -->
+      <section id="section-winners" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
+            <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
+              <select id="win-u1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
+              <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
+              <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
+              <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
+            </div>
+          </div>
+
+          <button id="btn-submit-winners" onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            Announce All Winners & Complete Match
+          </button>
+        </div>
+
+        <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
+          <div id="admin-declared-winners-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading declared winners...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAILY SPIN MANAGEMENT -->
+      <section id="section-daily_spin_mgmt" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin Slots</h3>
+          <button onclick="loadAdminDailySpinMgmt()" class="bg-[#151922] border border-[#262f40] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div id="admin-daily-spin-slots-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading daily spin slots...</p>
+        </div>
+      </section>
+
+      <!-- DAILY SPIN HISTORY (WITH PLAYER NAME & UID) -->
+      <section id="section-daily_spin_history" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl gap-2 flex-wrap">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin History</h3>
+          <div class="flex items-center gap-2">
+            <input type="text" id="spin-history-search" oninput="filterSpinHistory()" placeholder="Search username, UID, reward..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+            <button onclick="loadAdminSpinHistory()" class="bg-[#151922] border border-[#262f40] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i></button>
+          </div>
+        </div>
+        <div id="admin-spin-history-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading spin history...</p>
+        </div>
+      </section>
+
+      <!-- USERS -->
+      <section id="section-users" class="space-y-3 hidden">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
+          <input type="text" id="user-search-input" oninput="filterUsersList()" placeholder="Search name, UID, email..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+        </div>
+        <div id="users-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
+        </div>
+      </section>
+
+      <!-- TOURNAMENTS -->
+      <section id="section-tournaments" class="space-y-4 hidden">
+        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
+        </div>
+      </section>
+
+      <!-- CHATROOM SECTION -->
+      <section id="section-chatroom" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-6 text-center space-y-4 shadow-xl max-w-xl">
+          <h3 class="font-gaming text-xl font-bold text-white uppercase">Tournament Live Chat Room</h3>
+          <p class="text-xs text-gray-400">Manage real chat, stickers and warnings</p>
+        </div>
+      </section>
+
+      <!-- DEPOSITS -->
+      <section id="section-deposits" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
+        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
+        </div>
+      </section>
+
+      <!-- WITHDRAWALS -->
+      <section id="section-withdrawals" class="space-y-4 hidden w-full">
+        <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- DIAMONDS -->
+      <section id="section-diamond_requests" class="space-y-4 hidden w-full">
+        <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- REFERRALS -->
+      <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
+        <div id="admin-referral-rewards-list" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- SUPPORT -->
+      <section id="section-support" class="space-y-4 hidden">
+        <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-xl">
+          <div id="support-inbox-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="section-settings" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl max-w-xl space-y-3">
+          <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" placeholder="Announcement..."></textarea>
+          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] text-white py-2 rounded font-bold text-xs">Save Announcement</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ALL REGISTERED PLAYERS MODAL -->
+  <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base sm:text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-users text-[#ff4624]"></i> All Registered Players
+        </h3>
+        <button onclick="closeAllPlayersModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="relative">
+        <input type="text" id="all-players-search" oninput="filterAllPlayersModal()" placeholder="Search name, UID, email..." class="w-full bg-[#06070a] border border-[#262f40] rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+      <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYER HISTORY MODAL -->
+  <div id="modal-player-history" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 id="modal-history-title" class="font-gaming text-lg font-bold text-white uppercase">Player History</h3>
+        <button onclick="closePlayerHistoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT WALLET MODAL -->
+  <div id="modal-edit-wallet" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-sm space-y-3">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Player Wallet</h3>
+      <input type="hidden" id="edit-wallet-user-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Player Name</label>
+        <input type="text" id="edit-wallet-username" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-400 outline-none" readonly />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">New Balance (PKR)</label>
+        <input type="number" id="edit-wallet-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter amount" required />
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeWalletModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveWalletBalance()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">UPDATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT DAILY SPIN SLOT MODAL -->
+  <div id="modal-daily-spin-slot" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Daily Spin Slot</h3>
+      <input type="hidden" id="edit-spin-slot-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Slot Number (1 to 8)</label>
+        <input type="number" id="spin-slot-num" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" readonly />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Name</label>
+        <input type="text" id="spin-slot-name" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Type</label>
+          <select id="spin-slot-type" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none">
+            <option value="coin">Coin</option>
+            <option value="coins">Coins</option>
+            <option value="empty">Empty</option>
+            <option value="try_again">Try Again</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value</label>
+          <input type="number" id="spin-slot-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pt-1">
+        <input type="checkbox" id="spin-slot-active" class="w-4 h-4 accent-[#ff4624]" />
+        <label for="spin-slot-active" class="text-xs text-gray-300">Active Slot</label>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeDailySpinSlotModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveDailySpinSlot()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">UPDATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <div class="admin-bottom-nav">
+    <button class="admin-nav-btn" onclick="selectTab('overview')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="admin-nav-btn" onclick="openAllPlayersModal()">
+      <i class="fa-solid fa-users"></i>
+      <span>Players</span>
+    </button>
+    <div class="admin-center-plus" onclick="selectTab('tournaments')">
+      <i class="fa-solid fa-trophy"></i>
+    </div>
+    <button class="admin-nav-btn" onclick="selectTab('chatroom')">
+      <i class="fa-solid fa-comments"></i>
+      <span>Chat</span>
+    </button>
+    <button class="admin-nav-btn" onclick="selectTab('deposits')">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Deposits</span>
+    </button>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "[https://yzirjidgdxhljbhhjfqp.supabase.co](https://yzirjidgdxhljbhhjfqp.supabase.co)";
+    const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
+    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentAdmin = null;
+    let globalAllPlayersCache = [];
+    let dailySpinSlotsCache = [];
+    let globalSpinHistoryCache = [];
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById('adm-pass');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        passInput.type = 'password';
+        eyeIcon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    // CHECK ADMIN AUTH: LocalStorage + Supabase Session (AUTO-LOGIN)
+    async function checkAdminAuth() {
+      const authScreen = document.getElementById('admin-auth-screen');
+      
+      // 1. Direct LocalStorage Remember Check
+      const storedAdmin = localStorage.getItem('multani_admin_auth');
+      if (storedAdmin === 'true') {
+        authScreen.classList.add('hidden');
+        const savedEmail = localStorage.getItem('multani_admin_email') || 'Master Admin';
+        document.getElementById('admin-user-name').innerText = savedEmail.split('@')[0];
+        loadDashboardStats();
+        return;
+      }
+
+      // 2. Supabase Session Check
+      try {
+        const { data: { session } } = await sbClient.auth.getSession();
+        if (session && session.user) {
+          localStorage.setItem('multani_admin_auth', 'true');
+          localStorage.setItem('multani_admin_email', session.user.email || 'Admin');
+          authScreen.classList.add('hidden');
+          document.getElementById('admin-user-name').innerText = (session.user.email || 'Admin').split('@')[0];
+          loadDashboardStats();
+          return;
+        }
+      } catch (err) {
+        console.warn("Session check bypass:", err);
+      }
+
+      authScreen.classList.remove('hidden');
+    }
+
+    // DIRECT LOGIN FUNCTION: No form submit, no page reload
+    async function handleAdminLoginDirect() {
+      const email = document.getElementById('adm-email').value.trim();
+      const password = document.getElementById('adm-pass').value;
+      const btn = document.getElementById('btn-adm-login');
+      const msg = document.getElementById('admin-auth-msg');
+
+      if (!email || !password) {
+        msg.innerText = "Please enter both Email and Password.";
+        msg.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "AUTHENTICATING...";
+      msg.classList.add('hidden');
+
+      try {
+        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Remember login permanently
+        localStorage.setItem('multani_admin_auth', 'true');
+        localStorage.setItem('multani_admin_email', email);
+
+        document.getElementById('admin-auth-screen').classList.add('hidden');
+        document.getElementById('admin-user-name').innerText = email.split('@')[0] || 'Master Admin';
+        loadDashboardStats();
+      } catch (err) {
+        msg.innerText = err.message || "Invalid Email or Password.";
+        msg.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "AUTHENTICATE CONSOLE";
+      }
+    }
+
+    async function adminSignOut() {
+      localStorage.removeItem('multani_admin_auth');
+      localStorage.removeItem('multani_admin_email');
       await sbClient.auth.signOut();
       document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
@@ -666,7 +1355,7 @@
         return `
           <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2.5">
-              <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-9 h-9 rounded-full object-cover border border-[#262f40]" />
+              <img src="${u.avatar_url || '[https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80](https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80)'}" class="w-9 h-9 rounded-full object-cover border border-[#262f40]" />
               <div>
                 <h4 class="font-bold text-xs text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
                 <p class="text-cyan-400 font-mono text-[10px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
@@ -706,7 +1395,7 @@
           <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-3.5 space-y-2.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-10 h-10 rounded-full object-cover border border-[#262f40]" />
+                <img src="${u.avatar_url || '[https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80](https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80)'}" class="w-10 h-10 rounded-full object-cover border border-[#262f40]" />
                 <div>
                   <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
                   <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
@@ -874,7 +1563,7 @@
         await sbClient.from('tournament_winners').delete().eq('tournament_id', tId);
         await sbClient.from('tournament_winners').insert(payload);
 
-        // Safe Balance Updating
+        // Balance update
         for (const w of payload) {
           const { data: prof } = await sbClient.from('profiles').select('balance, wallet_balance, total_won').eq('id', w.user_id).single();
           const currentBal = Number(prof?.balance ?? prof?.wallet_balance ?? 0);
