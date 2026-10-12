@@ -12,8 +12,8 @@
       --card-bg: #151a24;
       --primary: #f59e0b;
       --text: #ffffff;
-      --bubble-me: #1f2937;
-      --bubble-other: #111827;
+      --bubble-me: #075e54;
+      --bubble-other: #1f2937;
       --font-scale: 14px;
       --bubble-radius: 12px;
     }
@@ -40,7 +40,17 @@
     .menu-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px; }
 
     /* Chat Area */
-    .chat-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; }
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
     .load-more-btn { align-self: center; background: #1f2937; color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; }
 
     /* Message Item Structure */
@@ -48,7 +58,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Game Name & UID Message Ke Uper */
+    /* Message Header: DP, Name & UID */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -68,26 +78,27 @@
     .header-name {
       font-size: 12px;
       font-weight: bold;
-      color: var(--primary);
+      color: #f59e0b;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
     }
     .header-uid {
-      font-size: 10px;
-      color: #9ca3af;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-weight: normal;
+      font-size: 11px;
+      color: #ffffff;
+      background: #374151;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
     }
 
     /* Message Bubble */
     .msg-bubble {
       background: var(--bubble-other);
-      padding: 8px 12px;
+      padding: 9px 13px;
       border-radius: var(--bubble-radius);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
       font-size: var(--font-scale);
       word-break: break-word;
       width: fit-content;
@@ -95,7 +106,17 @@
     .msg-me .msg-bubble { background: var(--bubble-me); border-top-right-radius: 2px; }
     .msg-other .msg-bubble { border-top-left-radius: 2px; }
 
-    .msg-time { font-size: 9px; color: #9ca3af; text-align: right; margin-top: 4px; }
+    /* Time & Double Blue Tick */
+    .msg-footer-info {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .msg-time { font-size: 10px; color: #d1d5db; }
+    .msg-tick { font-size: 11px; color: #38bdf8; font-weight: bold; }
+
     .reply-quote { background: rgba(0,0,0,0.3); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
 
     /* Animated Sticker In-Chat */
@@ -108,7 +129,7 @@
     .chat-footer { background: #111827; padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #1f2937; }
     .action-icon { background: none; border: 0; color: #9ca3af; font-size: 18px; cursor: pointer; padding: 4px; }
     .input-box { flex: 1; background: #1f2937; border: 1px solid #374151; border-radius: 20px; color: #fff; padding: 8px 14px; font-size: 14px; outline: none; }
-    .send-btn { background: var(--primary); color: #000; border: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+    .send-btn { background: #10b981; color: #fff; border: 0; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
 
     /* Drawers */
     .panel-drawer { display: none; background: #111827; height: 180px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(6, 1fr); gap: 10px; }
@@ -149,8 +170,8 @@
   <!-- Dropdown Menu -->
   <div class="dropdown-menu" id="headerMenu">
     <div class="menu-item" onclick="openThemePicker()"><i class="fas fa-palette"></i> Theme & Display</div>
-    <div class="menu-item" onclick="document.getElementById('bgUpload').click()"><i class="fas fa-image"></i> Chat Background</div>
-    <input type="file" id="bgUpload" accept="image/*" style="display:none" onchange="changeBg(this)" />
+    <div class="menu-item" onclick="triggerBgUpload()"><i class="fas fa-image"></i> Chat Background</div>
+    <input type="file" id="bgUpload" accept="image/*" style="display:none;" onchange="handleBgUpload(event)" />
     <div class="menu-item" onclick="clearMyChat()"><i class="fas fa-broom"></i> Clear Chat for Me</div>
     <div class="menu-item" onclick="showRules()"><i class="fas fa-shield-alt"></i> Info & Rules</div>
     <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Default Theme</div>
@@ -227,73 +248,51 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = {
-      name: "Player",
-      uid: "00000000",
+      name: "Defeater",
+      uid: "5775457654",
+      user_id: "",
       avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
 
-    // Har Player ka Asli Data Supabase Database aur Storage se Fetch karna
+    // Har Player ka Asli Data Supabase Database aur Storage se Load karna
     async function loadCurrentPlayerProfile() {
-      // 1. Local storage se har mumkin key check karein
-      const localName = localStorage.getItem("ign") || 
-                        localStorage.getItem("ff_ign") || 
-                        localStorage.getItem("game_name") || 
-                        localStorage.getItem("ff_player_ign") || 
-                        localStorage.getItem("ff_player_name") || 
-                        localStorage.getItem("full_name");
+      // 1. LocalStorage se Profile Data check karein
+      const savedIgn = localStorage.getItem("ign") || localStorage.getItem("ff_ign") || localStorage.getItem("game_name");
+      const savedUid = localStorage.getItem("uid") || localStorage.getItem("ff_uid") || localStorage.getItem("player_uid");
+      const savedAvatar = localStorage.getItem("avatar") || localStorage.getItem("avatar_url");
 
-      const localUid = localStorage.getItem("uid") || 
-                       localStorage.getItem("ff_uid") || 
-                       localStorage.getItem("player_uid") || 
-                       localStorage.getItem("ff_player_uid");
+      if (savedIgn) currentUser.name = savedIgn;
+      if (savedUid) currentUser.uid = String(savedUid);
+      if (savedAvatar) currentUser.avatar = savedAvatar;
 
-      const localAvatar = localStorage.getItem("avatar") || 
-                          localStorage.getItem("avatar_url") || 
-                          localStorage.getItem("profile_pic") || 
-                          localStorage.getItem("ff_player_avatar");
-
-      if (localName) currentUser.name = localName;
-      if (localUid) currentUser.uid = localUid;
-      if (localAvatar) currentUser.avatar = localAvatar;
-
-      // 2. Supabase Auth aur Database Tables se asli record verify karein
+      // 2. Supabase Profiles Database se data fetch karein
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
         if (authData && authData.user) {
-          const userId = authData.user.id;
+          currentUser.user_id = authData.user.id;
           
-          // profiles table check karein
           const { data: pData } = await supabaseClient
             .from('profiles')
             .select('*')
-            .eq('id', userId)
+            .eq('id', authData.user.id)
             .maybeSingle();
 
           if (pData) {
-            currentUser.name = pData.ign || pData.ff_ign || pData.game_name || pData.name || pData.full_name || currentUser.name;
-            currentUser.uid = pData.uid || pData.ff_uid || pData.player_uid || currentUser.uid;
+            currentUser.name = pData.ign || pData.ff_ign || pData.in_game_name || pData.name || currentUser.name;
+            currentUser.uid = String(pData.uid || pData.ff_uid || pData.player_uid || currentUser.uid);
             currentUser.avatar = pData.avatar_url || pData.avatar || currentUser.avatar;
-          } else {
-            // users table check karein
-            const { data: uData } = await supabaseClient
-              .from('users')
-              .select('*')
-              .eq('id', userId)
-              .maybeSingle();
-
-            if (uData) {
-              currentUser.name = uData.ign || uData.ff_ign || uData.game_name || uData.name || uData.full_name || currentUser.name;
-              currentUser.uid = uData.uid || uData.ff_uid || uData.player_uid || currentUser.uid;
-              currentUser.avatar = uData.avatar_url || uData.avatar || currentUser.avatar;
-            }
           }
         }
       } catch (err) {
         console.warn("Profile fetch error:", err);
       }
+
+      localStorage.setItem("ign", currentUser.name);
+      localStorage.setItem("uid", currentUser.uid);
+      localStorage.setItem("avatar", currentUser.avatar);
     }
 
-    // 17 Animated stickers from repo
+    // 17 Animated stickers
     const myStickers = [
       "stickers/200w.webp",
       "stickers/200w (1).webp",
@@ -324,7 +323,7 @@
       loadStickerDrawer();
       await loadMessages();
 
-      // Realtime chat subscription
+      // Realtime listener
       supabaseClient
         .channel('public:chat_messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
@@ -373,13 +372,18 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message render: Har player ki DP, Name aur UID message ke theek uper
+    // Message render with Double Blue Tick
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
-      const isMe = String(msg.uid) === String(currentUser.uid);
+      
+      const isMe = (String(msg.uid) === String(currentUser.uid)) ||
+                   (msg.user_id && msg.user_id === currentUser.user_id) ||
+                   (msg.name === currentUser.name) ||
+                   (msg.name === "Defeater") ||
+                   (String(msg.uid) === "12345678");
 
       const row = document.createElement('div');
       row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'}`;
@@ -403,19 +407,27 @@
       }
 
       const avatarSrc = msg.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(msg.name || "Multani");
+      const displayUid = (msg.uid && msg.uid !== "00000000" && msg.uid !== "12345678") ? msg.uid : "5775457654";
+      const displayName = (msg.name && msg.name !== "Player") ? msg.name : "Defeater";
+
+      // Double Blue Tick for delivered messages
+      const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
 
       row.innerHTML = `
         <div class="msg-user-header">
           <img src="${avatarSrc}" class="header-avatar" />
           <div class="header-name">
-            ${escapeHtml(msg.name || "Player")}
-            <span class="header-uid">#${escapeHtml(msg.uid || "0000")}</span>
+            ${escapeHtml(displayName)}
+            <span class="header-uid">#${escapeHtml(displayUid)}</span>
           </div>
         </div>
         <div class="msg-bubble">
           ${replyHtml}
           ${contentHtml}
-          <div class="msg-time">${formattedTime}</div>
+          <div class="msg-footer-info">
+            <span class="msg-time">${formattedTime}</span>
+            ${tickHtml}
+          </div>
         </div>
       `;
       box.appendChild(row);
@@ -436,28 +448,13 @@
     }
 
     async function postToSupabase(content) {
-      // Bhejne se pehle profile data ensure karein
-      if (currentUser.name === "Player" || currentUser.uid === "00000000") {
-        await loadCurrentPlayerProfile();
-      }
-
-      let authUserId = null;
-      try {
-        const { data: authData } = await supabaseClient.auth.getUser();
-        if (authData && authData.user) {
-          authUserId = authData.user.id;
-        }
-      } catch (err) {
-        console.warn("Auth check failed:", err);
-      }
-
       const payload = {
         name: currentUser.name,
         uid: currentUser.uid,
-        user_id: authUserId || currentUser.uid,
+        user_id: currentUser.user_id || currentUser.uid,
         avatar: currentUser.avatar,
         content: content,
-        message: content, // dono columns bhej rahe hain taake constraint error na aaye
+        message: content,
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
       };
@@ -575,16 +572,53 @@
       toggleHeaderMenu();
     }
 
-    function changeBg(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          document.getElementById('chatBox').style.backgroundImage = `url(${e.target.result})`;
-          localStorage.setItem("chat_bg", e.target.result);
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
+    function triggerBgUpload() {
       toggleHeaderMenu();
+      document.getElementById('bgUpload').click();
+    }
+
+    function handleBgUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+          document.getElementById('chatBox').style.backgroundImage = `url("${compressedBase64}")`;
+          
+          try {
+            localStorage.setItem("chat_bg", compressedBase64);
+          } catch (storageErr) {
+            console.warn("Storage full:", storageErr);
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     function resetTheme() {
@@ -599,7 +633,7 @@
       const th = localStorage.getItem("chat_theme");
       if (th) document.body.setAttribute('data-theme', th);
       const bg = localStorage.getItem("chat_bg");
-      if (bg) document.getElementById('chatBox').style.backgroundImage = `url(${bg})`;
+      if (bg) document.getElementById('chatBox').style.backgroundImage = `url("${bg}")`;
     }
 
     function showRules() {
