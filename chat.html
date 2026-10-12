@@ -80,7 +80,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Real IGN & UID */
+    /* Message Header: DP, Name & UID */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -320,7 +320,7 @@
     const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Current player information
+    // Current player state
     let currentUser = {
       name: "",
       uid: "",
@@ -328,7 +328,7 @@
       avatar: ""
     };
 
-    // Database & LocalStorage se profile fetch karna
+    // Asli User Session aur Profile Table Data Sync
     async function syncPlayerProfile() {
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
@@ -343,40 +343,35 @@
             .maybeSingle();
 
           if (pData) {
-            // Jo bhi column aapke profile me use hua ho: ign / in_game_name / game_name / name
-            currentUser.name = pData.ign || pData.in_game_name || pData.game_name || pData.ff_ign || pData.name || "";
-            // uid / ff_uid / free_fire_uid
+            currentUser.name = pData.ign || pData.in_game_name || pData.game_name || pData.name || pData.ff_ign || "";
             currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || "");
             currentUser.avatar = pData.avatar_url || pData.avatar || "";
           }
         }
       } catch (err) {
-        console.warn("Profile fetch error:", err);
+        console.warn("Auth error:", err);
       }
 
-      // Agar database me khali ho to LocalStorage se uthayein (profile page jo save karta hai)
+      // Agar profiles me empty mila to localStorage (Profile screen) se check karein
       if (!currentUser.name) {
         currentUser.name = localStorage.getItem("ign") || 
                            localStorage.getItem("in_game_name") || 
-                           localStorage.getItem("ff_ign") || 
                            localStorage.getItem("ff_player_ign") || 
-                           localStorage.getItem("full_name") || "";
+                           localStorage.getItem("ff_ign") || "";
       }
       if (!currentUser.uid) {
         currentUser.uid = localStorage.getItem("uid") || 
                           localStorage.getItem("ff_uid") || 
-                          localStorage.getItem("free_fire_uid") || 
-                          localStorage.getItem("ff_player_uid") || "";
+                          localStorage.getItem("free_fire_uid") || "";
       }
       if (!currentUser.avatar) {
         currentUser.avatar = localStorage.getItem("avatar") || 
-                             localStorage.getItem("avatar_url") || 
-                             localStorage.getItem("profile_pic") || "";
+                             localStorage.getItem("avatar_url") || "";
       }
 
-      // Fallback agar bilkul naya user ho
-      if (!currentUser.name) currentUser.name = "Player";
-      if (!currentUser.uid) currentUser.uid = "00000000";
+      // Agar abhi bhi empty ho to temporary username/guest assign karo
+      if (!currentUser.name) currentUser.name = "Guest_" + Math.floor(1000 + Math.random() * 9000);
+      if (!currentUser.uid) currentUser.uid = "0000";
       if (!currentUser.avatar) {
         currentUser.avatar = "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(currentUser.name);
       }
@@ -408,7 +403,6 @@
 
     async function initChat() {
       applyStoredTheme();
-      // Pehle profile sync hone dein
       await syncPlayerProfile();
       loadStickerDrawer();
       await loadMessages();
@@ -462,18 +456,18 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Apne Right par, Doosre ke Left par. Data 100% Asli!
+    // Message Render: Isme Left/Right check 100% Unique auth user_id se hoga!
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       
-      // Right side (Me) sirf tabhi hoga jab sender ka Auth ID ya UID is device ke user se match kare
+      // Right side (Me) sirf tabhi hoga jab sender ka Auth user_id is phone ke user se match kare
       let isMe = false;
       if (currentUser.user_id && msg.user_id) {
         isMe = (String(msg.user_id) === String(currentUser.user_id));
-      } else if (currentUser.uid && msg.uid && currentUser.uid !== "00000000") {
+      } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000" && currentUser.uid !== "00000000") {
         isMe = (String(msg.uid) === String(currentUser.uid));
       }
 
@@ -498,12 +492,12 @@
         contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
-      // Jo database mein save hua hai wahi dikhayega
+      // Database se jo Name, UID aur Avatar aaya hai sirf wahi render hoga
       const senderName = msg.name || "Player";
-      const senderUid = msg.uid || "00000000";
+      const senderUid = msg.uid || "0000";
       const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
 
-      // Double Blue Tick sirf apne message par
+      // Double Blue Tick sirf sender ke message par
       const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
 
       row.innerHTML = `
@@ -541,15 +535,15 @@
     }
 
     async function postToSupabase(content) {
-      // Ensure karein ke bhejne se pehle profile load ho chuki ho
-      if (!currentUser.user_id || currentUser.name === "Player" || currentUser.uid === "00000000") {
+      // Message bhejne se pehle ensure karein profile sync hai
+      if (!currentUser.user_id) {
         await syncPlayerProfile();
       }
 
       const payload = {
         name: currentUser.name,
         uid: currentUser.uid,
-        user_id: currentUser.user_id || currentUser.uid,
+        user_id: currentUser.user_id,
         avatar: currentUser.avatar,
         content: content,
         message: content,
