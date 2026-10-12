@@ -80,7 +80,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Name & UID Bilkul Real */
+    /* Message Header: DP, Real IGN & UID */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -320,7 +320,7 @@
     const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Current player state
+    // Current player information
     let currentUser = {
       name: "",
       uid: "",
@@ -328,14 +328,14 @@
       avatar: ""
     };
 
-    // Har device par login player ka apna real record pakadna
+    // Database & LocalStorage se profile fetch karna
     async function syncPlayerProfile() {
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
         if (authData && authData.user) {
           currentUser.user_id = authData.user.id;
-          
-          // Profiles table check
+
+          // profiles table check
           const { data: pData } = await supabaseClient
             .from('profiles')
             .select('*')
@@ -343,38 +343,40 @@
             .maybeSingle();
 
           if (pData) {
-            currentUser.name = pData.ign || pData.ff_ign || pData.in_game_name || pData.name || "Player";
-            currentUser.uid = String(pData.uid || pData.ff_uid || pData.player_uid || "00000000");
+            // Jo bhi column aapke profile me use hua ho: ign / in_game_name / game_name / name
+            currentUser.name = pData.ign || pData.in_game_name || pData.game_name || pData.ff_ign || pData.name || "";
+            // uid / ff_uid / free_fire_uid
+            currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || "");
             currentUser.avatar = pData.avatar_url || pData.avatar || "";
-          } else {
-            // Users table check
-            const { data: uData } = await supabaseClient
-              .from('users')
-              .select('*')
-              .eq('id', authData.user.id)
-              .maybeSingle();
-
-            if (uData) {
-              currentUser.name = uData.ign || uData.ff_ign || uData.in_game_name || uData.name || "Player";
-              currentUser.uid = String(uData.uid || uData.ff_uid || uData.player_uid || "00000000");
-              currentUser.avatar = uData.avatar_url || uData.avatar || "";
-            }
           }
         }
       } catch (err) {
-        console.warn("Auth sync error:", err);
+        console.warn("Profile fetch error:", err);
       }
 
-      // Agar database se na mila ho to localStorage se uthayein
+      // Agar database me khali ho to LocalStorage se uthayein (profile page jo save karta hai)
       if (!currentUser.name) {
-        currentUser.name = localStorage.getItem("ign") || localStorage.getItem("ff_player_ign") || localStorage.getItem("full_name") || "Player";
+        currentUser.name = localStorage.getItem("ign") || 
+                           localStorage.getItem("in_game_name") || 
+                           localStorage.getItem("ff_ign") || 
+                           localStorage.getItem("ff_player_ign") || 
+                           localStorage.getItem("full_name") || "";
       }
-      if (!currentUser.uid || currentUser.uid === "00000000") {
-        currentUser.uid = String(localStorage.getItem("uid") || localStorage.getItem("ff_player_uid") || localStorage.getItem("ff_uid") || "00000000");
+      if (!currentUser.uid) {
+        currentUser.uid = localStorage.getItem("uid") || 
+                          localStorage.getItem("ff_uid") || 
+                          localStorage.getItem("free_fire_uid") || 
+                          localStorage.getItem("ff_player_uid") || "";
       }
       if (!currentUser.avatar) {
-        currentUser.avatar = localStorage.getItem("avatar") || localStorage.getItem("ff_player_avatar") || "";
+        currentUser.avatar = localStorage.getItem("avatar") || 
+                             localStorage.getItem("avatar_url") || 
+                             localStorage.getItem("profile_pic") || "";
       }
+
+      // Fallback agar bilkul naya user ho
+      if (!currentUser.name) currentUser.name = "Player";
+      if (!currentUser.uid) currentUser.uid = "00000000";
       if (!currentUser.avatar) {
         currentUser.avatar = "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(currentUser.name);
       }
@@ -406,6 +408,7 @@
 
     async function initChat() {
       applyStoredTheme();
+      // Pehle profile sync hone dein
       await syncPlayerProfile();
       loadStickerDrawer();
       await loadMessages();
@@ -459,17 +462,20 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Bilkul Jo Database me Save hai wohi Dikhayega
+    // Message Render: Apne Right par, Doosre ke Left par. Data 100% Asli!
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       
-      // Apne aur doosre message ka check
-      const isMe = (currentUser.user_id && msg.user_id && msg.user_id === currentUser.user_id) ||
-                   (currentUser.uid && msg.uid && String(msg.uid) === String(currentUser.uid)) ||
-                   (currentUser.name && msg.name && msg.name === currentUser.name);
+      // Right side (Me) sirf tabhi hoga jab sender ka Auth ID ya UID is device ke user se match kare
+      let isMe = false;
+      if (currentUser.user_id && msg.user_id) {
+        isMe = (String(msg.user_id) === String(currentUser.user_id));
+      } else if (currentUser.uid && msg.uid && currentUser.uid !== "00000000") {
+        isMe = (String(msg.uid) === String(currentUser.uid));
+      }
 
       const row = document.createElement('div');
       row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'}`;
@@ -492,7 +498,7 @@
         contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
-      // Sender ki apni real details (kisi aur ka data mix nahi hoga)
+      // Jo database mein save hua hai wahi dikhayega
       const senderName = msg.name || "Player";
       const senderUid = msg.uid || "00000000";
       const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
@@ -535,7 +541,8 @@
     }
 
     async function postToSupabase(content) {
-      if (!currentUser.user_id || !currentUser.name || currentUser.name === "Player") {
+      // Ensure karein ke bhejne se pehle profile load ho chuki ho
+      if (!currentUser.user_id || currentUser.name === "Player" || currentUser.uid === "00000000") {
         await syncPlayerProfile();
       }
 
