@@ -72,6 +72,37 @@
 </head>
 <body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative pb-20 md:pb-0">
 
+  <!-- AUTH OVERLAY -->
+  <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <i class="fa-solid fa-shield-halved text-[#ff4624] text-4xl mb-2"></i>
+        <h2 class="font-gaming text-2xl font-bold tracking-wider text-white">MULTANI FF ADMIN</h2>
+        <p class="text-xs text-gray-400">Master Control Console</p>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Admin Email</label>
+          <input type="email" id="adm-email" value="pardesinadeem7866@gmail.com" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="email" />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Password</label>
+          <div class="relative">
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" autocomplete="current-password" onkeydown="if(event.key==='Enter') doAdminLogin()" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
+              <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <button type="button" id="btn-adm-login" onclick="doAdminLogin()" class="w-full bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          AUTHENTICATE CONSOLE
+        </button>
+      </div>
+      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
+    </div>
+  </div>
+
   <div id="mobile-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
 
   <!-- SIDEBAR -->
@@ -136,10 +167,11 @@
         <div class="flex items-center gap-2">
           <img id="admin-user-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
           <div class="text-xs">
-            <p class="font-bold text-white">Master Admin</p>
+            <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
             <p class="text-emerald-400 text-[10px]">Active Session</p>
           </div>
         </div>
+        <button onclick="adminSignOut()" title="Logout" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-power-off"></i></button>
       </div>
     </div>
   </aside>
@@ -253,7 +285,7 @@
         </div>
       </section>
 
-      <!-- DAILY SPIN HISTORY -->
+      <!-- DAILY SPIN HISTORY (WITH PLAYER NAME & UID) -->
       <section id="section-daily_spin_history" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl gap-2 flex-wrap">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin History</h3>
@@ -458,6 +490,73 @@
     function escapeHTML(str) {
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById('adm-pass');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        passInput.type = 'password';
+        eyeIcon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    // CHECK AUTH SESSION
+    async function checkAdminAuth() {
+      const authScreen = document.getElementById('admin-auth-screen');
+      try {
+        const { data: { session } } = await sbClient.auth.getSession();
+        if (session && session.user) {
+          authScreen.classList.add('hidden');
+          document.getElementById('admin-user-name').innerText = (session.user.email || 'Admin').split('@')[0];
+          loadDashboardStats();
+          return;
+        }
+      } catch (err) {
+        console.warn("Session check error:", err);
+      }
+      authScreen.classList.remove('hidden');
+    }
+
+    // DIRECT LOGIN FUNCTION
+    async function doAdminLogin() {
+      const email = document.getElementById('adm-email').value.trim();
+      const password = document.getElementById('adm-pass').value;
+      const btn = document.getElementById('btn-adm-login');
+      const msg = document.getElementById('admin-auth-msg');
+
+      if (!email || !password) {
+        msg.innerText = "Please enter both Email and Password.";
+        msg.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "AUTHENTICATING...";
+      msg.classList.add('hidden');
+
+      try {
+        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        document.getElementById('admin-auth-screen').classList.add('hidden');
+        document.getElementById('admin-user-name').innerText = email.split('@')[0] || 'Master Admin';
+        loadDashboardStats();
+      } catch (err) {
+        msg.innerText = err.message || "Invalid Email or Password.";
+        msg.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "AUTHENTICATE CONSOLE";
+      }
+    }
+
+    async function adminSignOut() {
+      await sbClient.auth.signOut();
+      document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
 
     function toggleSidebar(forceState = null) {
@@ -954,7 +1053,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      loadDashboardStats();
+      checkAdminAuth();
     });
   </script>
 </body>
