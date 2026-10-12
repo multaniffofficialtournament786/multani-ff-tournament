@@ -48,7 +48,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Name & UID (Message Ke Uper) */
+    /* Message Header: DP, Game Name & UID Message Ke Uper */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -226,21 +226,43 @@
     const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Initial player data storage check
     let currentUser = {
-      name: localStorage.getItem("ff_player_ign") || localStorage.getItem("ign") || localStorage.getItem("ff_ign") || localStorage.getItem("ff_player_name") || "Player",
-      uid: localStorage.getItem("ff_player_uid") || localStorage.getItem("uid") || localStorage.getItem("ff_uid") || "12345678",
-      avatar: localStorage.getItem("ff_player_avatar") || localStorage.getItem("avatar") || localStorage.getItem("profile_pic") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
+      name: "Player",
+      uid: "00000000",
+      avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
 
-    // Har player ki database se profile auto-fetch karna
+    // Har Player ka Asli Data Supabase Database aur Storage se Fetch karna
     async function loadCurrentPlayerProfile() {
+      // 1. Local storage se har mumkin key check karein
+      const localName = localStorage.getItem("ign") || 
+                        localStorage.getItem("ff_ign") || 
+                        localStorage.getItem("game_name") || 
+                        localStorage.getItem("ff_player_ign") || 
+                        localStorage.getItem("ff_player_name") || 
+                        localStorage.getItem("full_name");
+
+      const localUid = localStorage.getItem("uid") || 
+                       localStorage.getItem("ff_uid") || 
+                       localStorage.getItem("player_uid") || 
+                       localStorage.getItem("ff_player_uid");
+
+      const localAvatar = localStorage.getItem("avatar") || 
+                          localStorage.getItem("avatar_url") || 
+                          localStorage.getItem("profile_pic") || 
+                          localStorage.getItem("ff_player_avatar");
+
+      if (localName) currentUser.name = localName;
+      if (localUid) currentUser.uid = localUid;
+      if (localAvatar) currentUser.avatar = localAvatar;
+
+      // 2. Supabase Auth aur Database Tables se asli record verify karein
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
         if (authData && authData.user) {
           const userId = authData.user.id;
           
-          // profiles table check
+          // profiles table check karein
           const { data: pData } = await supabaseClient
             .from('profiles')
             .select('*')
@@ -248,11 +270,11 @@
             .maybeSingle();
 
           if (pData) {
-            currentUser.name = pData.ign || pData.ff_ign || pData.name || pData.username || currentUser.name;
-            currentUser.uid = pData.uid || pData.ff_uid || currentUser.uid;
+            currentUser.name = pData.ign || pData.ff_ign || pData.game_name || pData.name || pData.full_name || currentUser.name;
+            currentUser.uid = pData.uid || pData.ff_uid || pData.player_uid || currentUser.uid;
             currentUser.avatar = pData.avatar_url || pData.avatar || currentUser.avatar;
           } else {
-            // users table check
+            // users table check karein
             const { data: uData } = await supabaseClient
               .from('users')
               .select('*')
@@ -260,14 +282,14 @@
               .maybeSingle();
 
             if (uData) {
-              currentUser.name = uData.ign || uData.ff_ign || uData.name || uData.username || currentUser.name;
-              currentUser.uid = uData.uid || uData.ff_uid || currentUser.uid;
+              currentUser.name = uData.ign || uData.ff_ign || uData.game_name || uData.name || uData.full_name || currentUser.name;
+              currentUser.uid = uData.uid || uData.ff_uid || uData.player_uid || currentUser.uid;
               currentUser.avatar = uData.avatar_url || uData.avatar || currentUser.avatar;
             }
           }
         }
-      } catch (e) {
-        console.warn("Profile fetch error:", e);
+      } catch (err) {
+        console.warn("Profile fetch error:", err);
       }
     }
 
@@ -302,7 +324,7 @@
       loadStickerDrawer();
       await loadMessages();
 
-      // Realtime listener
+      // Realtime chat subscription
       supabaseClient
         .channel('public:chat_messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
@@ -414,6 +436,11 @@
     }
 
     async function postToSupabase(content) {
+      // Bhejne se pehle profile data ensure karein
+      if (currentUser.name === "Player" || currentUser.uid === "00000000") {
+        await loadCurrentPlayerProfile();
+      }
+
       let authUserId = null;
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
@@ -430,7 +457,7 @@
         user_id: authUserId || currentUser.uid,
         avatar: currentUser.avatar,
         content: content,
-        message: content, // Message column constraint safety
+        message: content, // dono columns bhej rahe hain taake constraint error na aaye
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
       };
