@@ -89,6 +89,30 @@
       object-fit: cover;
       background: #111827;
     }
+
+    /* Lighting Neon Glow Admin DP Badge */
+    .admin-lighting-dp {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff4624 0%, #150a08 100%);
+      border: 2px solid #ffbe00;
+      box-shadow: 0 0 10px #ff4624, inset 0 0 6px #ffbe00;
+      animation: neon-pulse 1.8s infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    @keyframes neon-pulse {
+      0% { box-shadow: 0 0 8px #ff4624, inset 0 0 4px #ffbe00; }
+      100% { box-shadow: 0 0 16px #ff8424, inset 0 0 8px #ffea00; }
+    }
+
     .header-name {
       font-size: 12px;
       font-weight: bold;
@@ -97,6 +121,18 @@
       align-items: center;
       gap: 6px;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+    }
+    .admin-name-tag {
+      color: #ffbe00 !important;
+      background: linear-gradient(135deg, #ff4624, #ff8424);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 900;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-shadow: 0 0 8px rgba(255, 70, 36, 0.6);
     }
     .header-uid {
       font-size: 11px;
@@ -109,8 +145,15 @@
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
+    .admin-uid-tag {
+      background: linear-gradient(135deg, #ff4624, #f59e0b) !important;
+      color: #000 !important;
+      border: none !important;
+      font-weight: 900 !important;
+      box-shadow: 0 0 6px rgba(255, 70, 36, 0.5);
+    }
 
-    /* 100% Transparent Message Bubble with Only Border */
+    /* Message Bubble */
     .msg-bubble {
       background: transparent !important;
       padding: 8px 12px;
@@ -134,6 +177,13 @@
       border: 2px solid rgba(255, 255, 255, 0.55);
       border-top-left-radius: 2px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Admin Bubble: Neon Gold/Orange Glowing Border */
+    .msg-admin .msg-bubble {
+      border: 2px solid #ff8424 !important;
+      box-shadow: 0 0 12px rgba(255, 70, 36, 0.6) !important;
+      background: rgba(255, 70, 36, 0.08) !important;
     }
 
     /* Time & Double Blue Tick */
@@ -339,9 +389,8 @@
             .maybeSingle();
 
           if (pData) {
-            // Profile table ke sab fields check karein
-            currentUser.name = pData.ign || pData.in_game_name || pData.ff_ign || pData.game_name || pData.full_name || pData.name || "";
-            currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || pData.player_uid || "");
+            currentUser.name = pData.free_fire_name || pData.ign || pData.in_game_name || pData.full_name || "";
+            currentUser.uid = String(pData.free_fire_uid || pData.uid || pData.player_uid || "");
             currentUser.avatar = pData.avatar_url || pData.avatar || "";
           }
         }
@@ -349,27 +398,22 @@
         console.warn("Auth sync error:", err);
       }
 
-      // Agar database me khali ho to profile page ke storage se uthayein
       if (!currentUser.name) {
         currentUser.name = localStorage.getItem("ign") || 
+                           localStorage.getItem("free_fire_name") || 
                            localStorage.getItem("in_game_name") || 
-                           localStorage.getItem("ff_ign") || 
-                           localStorage.getItem("game_name") || 
-                           localStorage.getItem("ff_player_ign") || 
                            localStorage.getItem("full_name") || "";
       }
       if (!currentUser.uid) {
-        currentUser.uid = localStorage.getItem("uid") || 
-                          localStorage.getItem("ff_uid") || 
-                          localStorage.getItem("free_fire_uid") || 
+        currentUser.uid = localStorage.getItem("free_fire_uid") || 
+                          localStorage.getItem("uid") || 
                           localStorage.getItem("player_uid") || "";
       }
       if (!currentUser.avatar) {
-        currentUser.avatar = localStorage.getItem("avatar") || 
-                             localStorage.getItem("avatar_url") || "";
+        currentUser.avatar = localStorage.getItem("avatar_url") || 
+                             localStorage.getItem("avatar") || "";
       }
 
-      // Fallback
       if (!currentUser.name) currentUser.name = "Player";
       if (!currentUser.uid) currentUser.uid = "0000";
       if (!currentUser.avatar) {
@@ -417,6 +461,12 @@
           const el = document.getElementById(`msg-${payload.old.id}`);
           if (el) el.remove();
         })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_messages' }, payload => {
+          if (payload.new.is_deleted) {
+            const el = document.getElementById(`msg-${payload.new.id}`);
+            if (el) el.remove();
+          }
+        })
         .subscribe();
     }
 
@@ -439,6 +489,7 @@
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
+        .eq('is_deleted', false)
         .gte('created_at', todayMidnight.toISOString())
         .order('id', { ascending: true })
         .limit(limit);
@@ -456,23 +507,28 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Bilkul Transparent Bubble with Border
+    // Message Render: Lighting Admin DP & VIP Badge Fix
     function renderSingleMessage(msg) {
+      if (msg.is_deleted) return;
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       
-      // Right side check sirf user_id ya UID se
+      // Admin message verification check
+      const isAdminMsg = (msg.is_admin === true || msg.is_announcement === true || msg.name === "ADMIN" || msg.uid === "OFFICIAL");
+
       let isMe = false;
-      if (currentUser.user_id && msg.user_id) {
-        isMe = (String(msg.user_id) === String(currentUser.user_id));
-      } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000") {
-        isMe = (String(msg.uid) === String(currentUser.uid));
+      if (!isAdminMsg) {
+        if (currentUser.user_id && msg.user_id) {
+          isMe = (String(msg.user_id) === String(currentUser.user_id));
+        } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000") {
+          isMe = (String(msg.uid) === String(currentUser.uid));
+        }
       }
 
       const row = document.createElement('div');
-      row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'}`;
+      row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'} ${isAdminMsg ? 'msg-admin' : ''}`;
       row.id = `msg-${msg.id}`;
 
       let pressTimer;
@@ -492,20 +548,38 @@
         contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
-      // Jo bhejte waqt save hua tha wahi render hoga (no hardcode, no mixing)
-      const senderName = msg.name || "Player";
-      const senderUid = msg.uid || "0000";
-      const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
+      let avatarHtml = '';
+      let nameHtml = '';
+
+      if (isAdminMsg) {
+        // Glowing Lighting Admin DP & VIP Verified Tag
+        avatarHtml = `<div class="admin-lighting-dp">ADMIN</div>`;
+        nameHtml = `
+          <div class="header-name admin-name-tag">
+            <i class="fa-solid fa-crown text-[10px]"></i> ADMIN Ⓥ
+            <span class="header-uid admin-uid-tag">#OFFICIAL</span>
+          </div>
+        `;
+      } else {
+        const senderName = msg.name || "Player";
+        const senderUid = msg.uid || "0000";
+        const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
+
+        avatarHtml = `<img src="${senderAvatar}" class="header-avatar" />`;
+        nameHtml = `
+          <div class="header-name">
+            ${escapeHtml(senderName)}
+            <span class="header-uid">#${escapeHtml(senderUid)}</span>
+          </div>
+        `;
+      }
 
       const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
 
       row.innerHTML = `
         <div class="msg-user-header">
-          <img src="${senderAvatar}" class="header-avatar" />
-          <div class="header-name">
-            ${escapeHtml(senderName)}
-            <span class="header-uid">#${escapeHtml(senderUid)}</span>
-          </div>
+          ${avatarHtml}
+          ${nameHtml}
         </div>
         <div class="msg-bubble">
           ${replyHtml}
@@ -534,7 +608,6 @@
     }
 
     async function postToSupabase(content) {
-      // Bhejne se pehle lazmi confirm karein ke name "Player" na reh gaya ho
       if (!currentUser.user_id || currentUser.name === "Player" || currentUser.uid === "0000") {
         await syncPlayerProfile();
       }
@@ -546,6 +619,8 @@
         avatar: currentUser.avatar,
         content: content,
         message: content,
+        is_admin: false,
+        is_deleted: false,
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
       };
@@ -627,7 +702,9 @@
 
     async function deleteActiveMsgForEveryone() {
       if (!activeSelectedMsg) return;
-      await supabaseClient.from('chat_messages').delete().eq('id', activeSelectedMsg.id);
+      await supabaseClient.from('chat_messages').update({ is_deleted: true }).eq('id', activeSelectedMsg.id);
+      const el = document.getElementById(`msg-${activeSelectedMsg.id}`);
+      if (el) el.remove();
       document.getElementById('msgModal').style.display = 'none';
     }
 
@@ -645,6 +722,7 @@
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
+        .eq('is_deleted', false)
         .order('id', { ascending: true })
         .limit(100);
 
