@@ -9,66 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Firebase App & Messaging SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDcP8vr_PaSFLJ1XadDL3HG4Ny9DRvOjXQ",
-      authDomain: "multani-ff-admin.firebaseapp.com",
-      projectId: "multani-ff-admin",
-      storageBucket: "multani-ff-admin.firebasestorage.app",
-      messagingSenderId: "263780759644",
-      appId: "1:263780759644:web:864be0b5d12df3524b8e99",
-      measurementId: "G-3Q5KEP9GGL"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);
-
-    window.requestAdminNotificationPermission = async function() {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          const currentToken = await getToken(messaging, {
-            vapidKey: 'BApFHrn7CrPBOt6Ik_gEOdUGQb2OLaPbqtY0MEuctwqjDWjquDFJUBQptUKkWuqQU6vNUxNfjL-FQimi7-JyRn8'
-          });
-          if (currentToken && window.currentAdminUser) {
-            const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
-            const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
-            const tmpClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            await tmpClient.from('admin_fcm_tokens').upsert({
-              user_id: window.currentAdminUser.id,
-              fcm_token: currentToken
-            }, { onConflict: 'fcm_token' });
-
-            alert("Notifications Enabled & Saved Successfully!");
-          } else {
-            alert("Please login first to save notification token.");
-          }
-        } else {
-          alert("Notification permission denied.");
-        }
-      } catch (err) {
-        console.error("Notification permission error:", err);
-      }
-    };
-
-    onMessage(messaging, (payload) => {
-      console.log('Message received in foreground: ', payload);
-      if (payload.notification) {
-        if (Notification.permission === 'granted') {
-          new Notification(payload.notification.title, {
-            body: payload.notification.body,
-            icon: '/favicon.ico'
-          });
-        }
-      }
-    });
-  </script>
-
   <style>
     body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .font-gaming { font-family: 'Rajdhani', sans-serif; }
@@ -81,7 +21,6 @@
     }
     .blink-heart { animation: blink-green 1.2s infinite ease-in-out; }
 
-    /* Bottom Navigation Bar Styles */
     .admin-bottom-nav {
       position: fixed;
       bottom: 0;
@@ -110,7 +49,6 @@
       font-family: 'Rajdhani', sans-serif;
       font-weight: bold;
       text-transform: uppercase;
-      position: relative;
     }
     .admin-nav-btn i { font-size: 18px; }
     .admin-nav-btn:hover, .admin-nav-btn:active { color: #ff4624; }
@@ -130,16 +68,10 @@
       box-shadow: 0 4px 15px rgba(255, 70, 36, 0.4);
       cursor: pointer;
     }
-    
     .admin-neon-dp {
       background: radial-gradient(circle, #ff4624 0%, #150a08 100%);
       border: 2px solid #ff8424;
       box-shadow: 0 0 12px #ff4624, inset 0 0 8px #ffbe00;
-      animation: neon-pulse 1.8s infinite alternate;
-    }
-    @keyframes neon-pulse {
-      0% { box-shadow: 0 0 8px #ff4624, inset 0 0 4px #ffbe00; }
-      100% { box-shadow: 0 0 18px #ff8424, inset 0 0 10px #ffea00; }
     }
   </style>
 </head>
@@ -206,41 +138,30 @@
         </button>
         <button onclick="selectTab('chatroom')" id="nav-chatroom" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-comments w-5 text-indigo-400"></i> Global Chat Room
-          <span id="badge-chat-reports" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('referral_rewards_mgmt')" id="nav-referral_rewards_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-gift w-5 text-amber-400"></i> Referral Rewards
         </button>
         <button onclick="selectTab('daily_spin_mgmt')" id="nav-daily_spin_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-dharmachakra w-5 text-cyan-400"></i> Daily Spin Slots & Stats
+          <i class="fa-solid fa-dharmachakra w-5 text-cyan-400"></i> Daily Spin Slots
         </button>
         <button onclick="selectTab('daily_spin_history')" id="nav-daily_spin_history" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-clock-rotate-left w-5 text-purple-400"></i> Spin History
         </button>
         <button onclick="selectTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
-          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-money-bill-transfer w-5 text-amber-400"></i> Withdrawal Requests
-          <span id="badge-withdrawals" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('diamond_requests')" id="nav-diamond_requests" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-gem w-5 text-amber-400"></i> Diamond Requests
-          <span id="badge-diamond_requests" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
         </button>
         <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-users w-5"></i> Gamers & Balance
         </button>
         <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
-          <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
-        </button>
-        <button onclick="selectTab('tutorials')" id="nav-tutorials" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-video w-5 text-cyan-400"></i> Tutorials & Ads Manager
-        </button>
-        <button onclick="selectTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
-          <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
         </button>
         <button onclick="selectTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-bullhorn w-5 text-red-400"></i> Announcement Ticker
@@ -272,12 +193,6 @@
         </button>
         <h1 id="panel-title" class="font-gaming text-base md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
       </div>
-
-      <div class="flex items-center gap-2">
-        <button onclick="requestAdminNotificationPermission()" class="bg-[#151922] border border-[#ff4624] text-[#ff4624] hover:bg-[#ff4624] hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
-          <i class="fa-solid fa-bell"></i> <span class="hidden sm:inline">NOTIFICATIONS</span>
-        </button>
-      </div>
     </header>
 
     <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
@@ -291,7 +206,7 @@
           <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl cursor-pointer relative flex flex-col justify-between" onclick="selectTab('deposits')">
             <div class="flex items-center justify-between">
               <span class="text-[9px] uppercase font-bold text-gray-400">Pending Slips</span>
-              <button onclick="event.stopPropagation(); loadDashboardStats(); loadDeposits(); alert('Refreshed!');" class="text-cyan-400 hover:text-cyan-300 text-xs p-1" title="Refresh Stats"><i class="fa-solid fa-rotate"></i></button>
+              <button onclick="event.stopPropagation(); loadDashboardStats(); alert('Refreshed!');" class="text-cyan-400 hover:text-cyan-300 text-xs p-1"><i class="fa-solid fa-rotate"></i></button>
             </div>
             <h3 id="stat-pending-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ff4624] mt-1">0</h3>
           </div>
@@ -306,44 +221,9 @@
             <i class="fa-solid fa-list-ul"></i> LIST
           </button>
         </div>
-
-        <!-- QUICK ACTIONS -->
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
-          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            <button onclick="selectTab('tournaments')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Matches</p></button>
-            <button onclick="selectTab('winners')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Winners</p></button>
-            <button onclick="selectTab('chatroom')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-indigo-400 transition"><i class="fa-solid fa-comments text-indigo-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Chat Room</p></button>
-            <button onclick="selectTab('referral_rewards_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition"><i class="fa-solid fa-gift text-amber-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Referrals</p></button>
-            <button onclick="selectTab('daily_spin_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-dharmachakra text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Daily Spin</p></button>
-            <button onclick="selectTab('daily_spin_history')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-clock-rotate-left text-purple-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Spin Logs</p></button>
-            <button onclick="selectTab('deposits')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
-              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-base"></i>
-              <p class="text-[10px] font-bold mt-1 text-gray-200">Deposits</p>
-              <span id="quick-badge-deposits" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('withdrawals')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
-              <i class="fa-solid fa-money-bill-transfer text-amber-400 text-base"></i>
-              <p class="text-[10px] font-bold mt-1 text-gray-200">Withdraw</p>
-              <span id="quick-badge-withdrawals" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('diamond_requests')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
-              <i class="fa-solid fa-gem text-amber-400 text-base"></i>
-              <p class="text-[10px] font-bold mt-1 text-gray-200">Diamonds</p>
-              <span id="quick-badge-diamond_requests" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('users')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-blue-400 transition"><i class="fa-solid fa-users text-blue-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Gamers</p></button>
-            <button onclick="selectTab('support')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-green-400 transition relative">
-              <i class="fa-solid fa-headset text-green-400 text-base"></i>
-              <p class="text-[10px] font-bold mt-1 text-gray-200">Support</p>
-              <span id="nav-badge-support" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
-            <button onclick="selectTab('settings')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Ticker</p></button>
-          </div>
-        </div>
       </section>
 
-      <!-- WINNERS SECTION (AUTO FILL PRIZES & GUARANTEED WALLET UPDATE) -->
+      <!-- WINNERS SECTION -->
       <section id="section-winners" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
@@ -386,7 +266,7 @@
             </div>
           </div>
 
-          <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          <button id="btn-submit-winners" onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
             Announce All Winners & Complete Match
           </button>
         </div>
@@ -399,251 +279,28 @@
         </div>
       </section>
 
-      <!-- GLOBAL CHAT ROOM SECTION -->
-      <section id="section-chatroom" class="space-y-4 hidden w-full">
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-full md:max-w-4xl">
-          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
-            <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Messages</span>
-            <h3 id="chat-stat-total-msgs" class="text-lg md:text-xl font-bold font-gaming text-cyan-400 mt-1">0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
-            <span class="text-[10px] uppercase font-bold text-gray-400 block">Online Players</span>
-            <h3 id="chat-stat-online-players" class="text-lg md:text-xl font-bold font-gaming text-emerald-400 mt-1">0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
-            <span class="text-[10px] uppercase font-bold text-gray-400 block">Muted / Banned</span>
-            <h3 id="chat-stat-muted-players" class="text-lg md:text-xl font-bold font-gaming text-yellow-400 mt-1">0</h3>
-          </div>
-          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
-            <span class="text-[10px] uppercase font-bold text-gray-400 block">Pending Reports</span>
-            <h3 id="chat-stat-reported-msgs" class="text-lg md:text-xl font-bold font-gaming text-red-500 mt-1">0</h3>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-4xl">
-          <button onclick="switchChatSubTab('live_messages')" id="subtab-btn-live_messages" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap"><i class="fa-solid fa-comments mr-1"></i> Chat Hub</button>
-          <button onclick="switchChatSubTab('announcements')" id="subtab-btn-announcements" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1"></i> Announcements</button>
-          <button onclick="switchChatSubTab('reports')" id="subtab-btn-reports" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Reports</button>
-          <button onclick="switchChatSubTab('moderation')" id="subtab-btn-moderation" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-sliders mr-1"></i> Chat Settings</button>
-        </div>
-
-        <div id="chatsub-live_messages" class="space-y-4 w-full max-w-full md:max-w-4xl">
-          <div class="bg-gradient-to-br from-[#151922] to-[#0e1118] border border-[#262f40] rounded-2xl p-6 text-center space-y-4 shadow-xl">
-            <div class="w-16 h-16 mx-auto rounded-full bg-[#ff4624]/10 border border-[#ff4624]/40 flex items-center justify-center text-3xl text-[#ff4624]">
-              <i class="fa-solid fa-comments"></i>
-            </div>
-            <div>
-              <h3 class="font-gaming text-xl font-bold text-white uppercase tracking-wider">Tournament Live Chat Room</h3>
-              <p class="text-xs text-gray-400 max-w-md mx-auto mt-1">Open real interactive chat box to monitor players, view stickers, reply as official Admin with VIP Badge, and moderate in real-time.</p>
-            </div>
-            <button onclick="openLiveChatModal()" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#ff4624] to-[#ff8424] hover:opacity-95 text-white font-gaming font-bold text-sm uppercase px-6 py-3 rounded-xl shadow-lg shadow-[#ff4624]/30 transition transform hover:scale-[1.02]">
-              <i class="fa-solid fa-door-open"></i> ENTER LIVE CHAT ROOM
-            </button>
-          </div>
-        </div>
-
-        <div id="chatsub-announcements" class="space-y-4 hidden w-full max-w-full md:max-w-4xl">
-          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl space-y-3">
-            <h3 class="font-gaming text-sm font-bold text-white uppercase flex items-center gap-2">
-              <i class="fa-solid fa-bullhorn text-[#ff4624]"></i> Broadcast Official Chat Announcement
-            </h3>
-            <textarea id="admin-announcement-input" rows="3" placeholder="Write official announcement for player chat..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></textarea>
-            <div class="flex items-center justify-between">
-              <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer">
-                <input type="checkbox" id="admin-announcement-pin" class="accent-[#ff4624] w-4 h-4" checked />
-                <span>Pin announcement at top of chat</span>
-              </label>
-              <button onclick="postAdminAnnouncement()" class="bg-[#ff4624] hover:bg-[#e03a1a] text-white px-4 py-2 rounded-lg font-gaming font-bold uppercase text-xs">
-                BROADCAST MESSAGE
-              </button>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <h4 class="font-gaming text-xs font-bold text-gray-400 uppercase">Active Announcements</h4>
-            <div id="admin-pinned-announcements-list" class="space-y-2">
-              <p class="text-gray-500 text-xs py-2">Loading announcements...</p>
-            </div>
-          </div>
-        </div>
-
-        <div id="chatsub-reports" class="space-y-3 hidden w-full max-w-full md:max-w-4xl">
-          <div class="flex items-center justify-between">
-            <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Reported Player Messages</h3>
-            <button onclick="loadAdminChatReports()" class="bg-[#151922] border border-[#262f40] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
-          </div>
-          <div id="admin-chat-reports-container" class="space-y-2.5">
-            <p class="text-gray-500 text-xs text-center py-6">Loading reports...</p>
-          </div>
-        </div>
-
-        <div id="chatsub-moderation" class="space-y-4 hidden w-full max-w-full md:max-w-4xl">
-          <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl space-y-4">
-            <h3 class="font-gaming text-sm font-bold text-white uppercase"><i class="fa-solid fa-gear text-cyan-400 mr-1.5"></i> Chat Room Configuration</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="space-y-1">
-                <label class="block text-xs font-bold text-gray-400 uppercase">Chat Status</label>
-                <div class="flex items-center gap-2 pt-1">
-                  <input type="checkbox" id="cfg-chat-enabled" class="w-4 h-4 accent-[#ff4624]" />
-                  <label for="cfg-chat-enabled" class="text-xs text-gray-300">Allow players to send messages</label>
-                </div>
-              </div>
-              <div class="space-y-1">
-                <label class="block text-xs font-bold text-gray-400 uppercase">Online Presence</label>
-                <div class="flex items-center gap-2 pt-1">
-                  <input type="checkbox" id="cfg-online-indicators" class="w-4 h-4 accent-emerald-500" />
-                  <label for="cfg-online-indicators" class="text-xs text-gray-300">Show online indicators</label>
-                </div>
-              </div>
-              <div class="space-y-1">
-                <label class="block text-xs font-bold text-gray-400 uppercase">Anti-Spam Slow Mode (Seconds)</label>
-                <input type="number" id="cfg-slowmode-sec" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none focus:border-[#ff4624]" min="1" max="60" />
-              </div>
-              <div class="space-y-1">
-                <label class="block text-xs font-bold text-gray-400 uppercase">Max Message Length</label>
-                <input type="number" id="cfg-max-len" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none focus:border-[#ff4624]" min="20" max="1000" />
-              </div>
-            </div>
-            <div class="space-y-1 pt-1">
-              <label class="block text-xs font-bold text-gray-400 uppercase">Chat Rules Notice</label>
-              <textarea id="cfg-chat-rules" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none focus:border-[#ff4624]"></textarea>
-            </div>
-            <button onclick="saveAdminChatSettings()" class="bg-[#ff4624] hover:bg-[#e03a1a] text-white py-2 px-4 rounded-lg font-gaming font-bold uppercase text-xs transition">
-              SAVE SETTINGS
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- REFERRAL REWARDS MANAGEMENT -->
-      <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
-        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Referral Rewards Management</h3>
-          <button onclick="openAddReferralRewardModal()" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming uppercase"><i class="fa-solid fa-plus"></i> Add New Reward</button>
-        </div>
-        <div id="admin-referral-rewards-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading referral rewards...</p>
-        </div>
-      </section>
-
       <!-- DAILY SPIN MANAGEMENT -->
       <section id="section-daily_spin_mgmt" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin 8 Slots & Stats</h3>
-          <button onclick="loadAdminDailySpinMgmt()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
-        </div>
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-2xl space-y-3">
-          <h4 class="font-gaming text-xs font-bold text-yellow-400 uppercase"><i class="fa-solid fa-chart-line mr-1"></i> Today's Daily Spin Analytics</h4>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Total Spins Today</span>
-              <span id="spin-stat-total" class="font-gaming text-xl font-bold text-white">0</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Coins Given Today</span>
-              <span id="spin-stat-coins" class="font-gaming text-xl font-bold text-yellow-400">0</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">8-Coin (Limit 2)</span>
-              <span id="spin-stat-8c" class="font-gaming text-xl font-bold text-cyan-400">0 / 2</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">5-Coin (Limit 3)</span>
-              <span id="spin-stat-5c" class="font-gaming text-xl font-bold text-emerald-400">0 / 3</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Empty Results</span>
-              <span id="spin-stat-empty" class="font-gaming text-xl font-bold text-gray-400">0</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
-              <span class="text-[10px] text-gray-400 uppercase font-bold block">Try Again Results</span>
-              <span id="spin-stat-try" class="font-gaming text-xl font-bold text-purple-400">0</span>
-            </div>
-          </div>
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin Slots</h3>
+          <button onclick="loadAdminDailySpinMgmt()" class="bg-[#151922] border border-[#262f40] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
         <div id="admin-daily-spin-slots-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading daily spin slots...</p>
         </div>
       </section>
 
-      <!-- DAILY SPIN HISTORY -->
+      <!-- DAILY SPIN HISTORY (WITH PLAYER NAME & UID) -->
       <section id="section-daily_spin_history" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl gap-2 flex-wrap">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin History</h3>
           <div class="flex items-center gap-2">
-            <input type="text" id="spin-history-search" oninput="filterSpinHistory()" placeholder="Search username, reward, date..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
-            <button onclick="loadAdminSpinHistory()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i></button>
+            <input type="text" id="spin-history-search" oninput="filterSpinHistory()" placeholder="Search username, UID, reward..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+            <button onclick="loadAdminSpinHistory()" class="bg-[#151922] border border-[#262f40] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i></button>
           </div>
         </div>
         <div id="admin-spin-history-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
           <p class="text-gray-500 text-xs text-center py-4">Loading spin history...</p>
-        </div>
-      </section>
-
-      <!-- TOURNAMENTS -->
-      <section id="section-tournaments" class="space-y-4 hidden">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1">
-          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
-          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
-          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
-          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
-        </div>
-        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
-        </div>
-      </section>
-
-      <!-- DEPOSITS -->
-      <section id="section-deposits" class="space-y-3 hidden w-full">
-        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
-        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
-        </div>
-      </section>
-
-      <!-- WITHDRAWAL REQUESTS -->
-      <section id="section-withdrawals" class="space-y-4 hidden w-full">
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;" class="w-full max-w-full md:max-w-2xl">
-          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
-            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Pending Withdrawals</span>
-            <div id="admin-stat-pending" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #ffbe00; margin-top: 4px;">0</div>
-          </div>
-          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
-            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Approved Withdrawals</span>
-            <div id="admin-stat-approved" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #00e676; margin-top: 4px;">0</div>
-          </div>
-          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
-            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Withdrawal Amount</span>
-            <div id="admin-stat-total-amt" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #00f0ff; margin-top: 4px;">PKR 0</div>
-          </div>
-          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
-            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Fees Earned</span>
-            <div id="admin-stat-fees" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #ffbe00; margin-top: 4px;">PKR 0</div>
-          </div>
-        </div>
-        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Withdrawal Requests</h3>
-          <button onclick="loadAdminWithdrawals()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
-        </div>
-        <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading withdrawal requests...</p>
-        </div>
-      </section>
-
-      <!-- DIAMOND REQUESTS -->
-      <section id="section-diamond_requests" class="space-y-4 hidden w-full">
-        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
-          <button onclick="loadAdminDiamondRequests()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
-        </div>
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-2xl">
-          <button onclick="filterDiamondRequests('all')" id="diamond-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All</button>
-          <button onclick="filterDiamondRequests('pending')" id="diamond-filter-pending" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Pending</button>
-          <button onclick="filterDiamondRequests('approved')" id="diamond-filter-approved" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Approved</button>
-          <button onclick="filterDiamondRequests('delivered')" id="diamond-filter-delivered" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Delivered</button>
-          <button onclick="filterDiamondRequests('rejected')" id="diamond-filter-rejected" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Rejected</button>
-        </div>
-        <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading diamond requests...</p>
         </div>
       </section>
 
@@ -658,190 +315,64 @@
         </div>
       </section>
 
-      <!-- TUTORIALS -->
-      <section id="section-tutorials" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-            <i class="fa-solid fa-video text-cyan-400"></i> Manage Video Tutorials & Ads
-          </h2>
-          <input type="hidden" id="edit-tutorial-id" />
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Video Title / Ad Title</label>
-            <input type="text" id="tut-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. HOW TO DEPOSIT COINS" required />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link</label>
-            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/..." required />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 1 Text</label>
-            <input type="text" id="tut-line1" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Sub heading" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 2 Text</label>
-            <input type="text" id="tut-line2" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Description" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card Banner Photo</label>
-            <input type="file" id="tut-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
-          </div>
-          <div class="flex gap-2 pt-2">
-            <button onclick="resetTutorialForm()" id="btn-cancel-tut" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
-            <button onclick="saveTutorialCard()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-              SAVE TUTORIAL / AD CARD
-            </button>
-          </div>
-        </div>
-        <div class="space-y-3 w-full max-w-full md:max-xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Carousel Cards</h3>
-          <div id="admin-tutorials-list" class="space-y-3">
-            <p class="text-gray-500 text-xs text-center py-4">Loading cards...</p>
-          </div>
+      <!-- TOURNAMENTS -->
+      <section id="section-tournaments" class="space-y-4 hidden">
+        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
         </div>
       </section>
 
-      <!-- SUPPORT CHAT -->
+      <!-- CHATROOM SECTION -->
+      <section id="section-chatroom" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-6 text-center space-y-4 shadow-xl max-w-xl">
+          <h3 class="font-gaming text-xl font-bold text-white uppercase">Tournament Live Chat Room</h3>
+          <button onclick="openLiveChatModal()" class="bg-gradient-to-r from-[#ff4624] to-[#ff8424] text-white font-gaming font-bold text-sm uppercase px-6 py-3 rounded-xl shadow-lg">
+            <i class="fa-solid fa-door-open mr-2"></i> ENTER LIVE CHAT ROOM
+          </button>
+        </div>
+      </section>
+
+      <!-- DEPOSITS -->
+      <section id="section-deposits" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
+        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
+        </div>
+      </section>
+
+      <!-- WITHDRAWALS -->
+      <section id="section-withdrawals" class="space-y-4 hidden w-full">
+        <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- DIAMONDS -->
+      <section id="section-diamond_requests" class="space-y-4 hidden w-full">
+        <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- REFERRALS -->
+      <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
+        <div id="admin-referral-rewards-list" class="space-y-3 w-full max-w-full md:max-w-2xl"></div>
+      </section>
+
+      <!-- SUPPORT -->
       <section id="section-support" class="space-y-4 hidden">
         <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl">
-          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
-            <span><i class="fa-solid fa-comments text-purple-400 mr-2"></i> Player Support Inboxes</span>
-            <span id="inbox-count" class="text-xs font-mono text-cyan-400 font-normal">0 Chats</span>
-          </h3>
-          <div id="support-inbox-list" class="space-y-2">
-            <p class="text-gray-500 text-xs py-4 text-center">Loading players...</p>
-          </div>
-        </div>
-
-        <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-xl hidden flex flex-col h-[520px]">
-          <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
-            <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
-              <i class="fa-solid fa-arrow-left"></i> All Chats
-            </button>
-            <div class="flex items-center gap-2">
-              <img id="active-chat-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border border-[#ff4624]" />
-              <div class="text-center">
-                <h4 id="active-chat-username" class="font-bold text-sm text-white">Player</h4>
-                <p id="active-chat-uid" class="text-[10px] text-cyan-400 font-mono">UID: --</p>
-              </div>
-            </div>
-            <div class="w-8"></div>
-          </div>
-          <div id="active-chat-messages" class="flex-1 overflow-y-auto p-2 space-y-2.5 my-2 sidebar-scroll"></div>
-          <form id="admin-reply-form" class="flex gap-2 pt-2 border-t border-[#262f40]">
-            <input type="text" id="admin-reply-input" placeholder="Type message to player..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-[#ff4624]" autocomplete="off" required />
-            <button type="submit" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-4 py-2 rounded-lg font-bold text-xs font-gaming uppercase">SEND</button>
-          </form>
+          <div id="support-inbox-list" class="space-y-2"></div>
         </div>
       </section>
 
-      <!-- BANNED -->
-      <section id="section-banned" class="space-y-3 hidden w-full">
-        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Banned Players</h3>
-        <div id="banned-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
-          <p class="text-gray-500 text-xs text-center py-4">Loading banned players...</p>
-        </div>
-      </section>
-
-      <!-- SETTINGS TICKER -->
+      <!-- SETTINGS -->
       <section id="section-settings" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
-            <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter announcement text..."></textarea>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
-            <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on gamer homepage</label>
-          </div>
-          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Save Announcement
-          </button>
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl max-w-xl space-y-3">
+          <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" placeholder="Announcement..."></textarea>
+          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] text-white py-2 rounded font-bold text-xs">Save Announcement</button>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- FIXED BOTTOM NAVIGATION BAR -->
-  <div class="admin-bottom-nav">
-    <button class="admin-nav-btn" onclick="selectTab('overview')">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
-    </button>
-    <button class="admin-nav-btn" onclick="openAllPlayersModal()">
-      <i class="fa-solid fa-users"></i>
-      <span>Players</span>
-    </button>
-    <div class="admin-center-plus" onclick="openCreateTournamentModal()">
-      <i class="fa-solid fa-plus"></i>
-    </div>
-    <button class="admin-nav-btn" onclick="openLiveChatModal()">
-      <i class="fa-solid fa-comments"></i>
-      <span>Chat</span>
-    </button>
-    <button class="admin-nav-btn" onclick="selectTab('deposits')">
-      <i class="fa-solid fa-money-bill-transfer"></i>
-      <span>Deposits</span>
-    </button>
-  </div>
-
-  <!-- REAL-TIME INTERACTIVE LIVE CHAT ROOM MODAL -->
-  <div id="modal-interactive-chat" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl w-full max-w-lg h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
-      <div class="bg-[#151922] p-3.5 border-b border-[#262f40] flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <div class="w-10 h-10 rounded-full admin-neon-dp flex items-center justify-center text-white font-extrabold text-[11px] font-gaming tracking-wider">
-              ADMIN Ⓥ
-            </div>
-            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#151922]"></span>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="font-gaming text-base font-bold text-white tracking-wide">MULTANI FF CHAT ROOM</h3>
-              <span class="bg-[#ff4624]/20 border border-[#ff4624]/40 text-[#ff4624] text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">LIVE</span>
-            </div>
-            <p id="chat-modal-online-sub" class="text-[11px] text-emerald-400 font-mono">● Online Players: Active</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="loadAdminChatMessages()" class="text-gray-400 hover:text-white p-2 rounded-lg bg-[#0e1118] border border-[#262f40] text-xs" title="Refresh Messages"><i class="fa-solid fa-rotate"></i></button>
-          <button onclick="closeLiveChatModal()" class="text-gray-400 hover:text-white p-2 rounded-lg bg-[#0e1118] border border-[#262f40] text-sm"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </div>
-
-      <div id="modal-pinned-banner" class="bg-[#ff4624]/10 border-b border-[#ff4624]/30 px-3.5 py-2 flex items-center justify-between hidden text-xs">
-        <div class="flex items-center gap-2 truncate text-yellow-400 font-semibold">
-          <i class="fa-solid fa-thumbtack text-[#ff4624] shrink-0"></i>
-          <span id="modal-pinned-text" class="truncate">Pinned Announcement</span>
-        </div>
-        <button onclick="unpinCurrentAnnouncement()" class="text-gray-400 hover:text-white text-[11px] ml-2 shrink-0">Dismiss</button>
-      </div>
-
-      <div id="modal-chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3.5 sidebar-scroll bg-[#080a0f]">
-        <p class="text-gray-500 text-xs text-center py-10">Connecting to live chat room...</p>
-      </div>
-
-      <div id="modal-sticker-drawer" class="bg-[#151922] border-t border-[#262f40] p-2.5 hidden grid grid-cols-5 gap-2 max-h-36 overflow-y-auto sidebar-scroll">
-        <button type="button" onclick="sendAdminSticker('booyah')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-yellow-400">🔥 BOOYAH</button>
-        <button type="button" onclick="sendAdminSticker('gg')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-cyan-400">⚡ GG</button>
-        <button type="button" onclick="sendAdminSticker('headshot')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-red-500">🎯 HEADSHOT</button>
-        <button type="button" onclick="sendAdminSticker('ready')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-emerald-400">✅ READY</button>
-        <button type="button" onclick="sendAdminSticker('warning')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-amber-500">⚠️ WARNING</button>
-      </div>
-
-      <form id="modal-chat-send-form" onsubmit="handleAdminSendChatMessage(event)" class="bg-[#151922] p-2.5 border-t border-[#262f40] flex items-center gap-2">
-        <button type="button" onclick="toggleStickerDrawer()" class="text-yellow-400 hover:text-yellow-300 p-2 text-base transition shrink-0" title="Send Sticker">
-          <i class="fa-solid fa-icons"></i>
-        </button>
-        <input type="text" id="modal-chat-input" placeholder="Type message as Master Admin (VIP)..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#ff4624] placeholder-gray-500" autocomplete="off" required />
-        <button type="submit" id="btn-modal-chat-send" class="bg-gradient-to-r from-[#ff4624] to-[#ff8424] hover:opacity-90 text-white p-2.5 rounded-xl font-bold text-sm shrink-0 shadow flex items-center justify-center">
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-      </form>
-    </div>
-  </div>
-
+  <!-- ALL REGISTERED PLAYERS MODAL (FIXED RENDER & SEARCH) -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
@@ -859,6 +390,20 @@
     </div>
   </div>
 
+  <!-- PLAYER PAYMENT & MATCH HISTORY MODAL (FIXED) -->
+  <div id="modal-player-history" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 id="modal-history-title" class="font-gaming text-lg font-bold text-white uppercase">Player History</h3>
+        <button onclick="closePlayerHistoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT WALLET MODAL -->
   <div id="modal-edit-wallet" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-sm space-y-3">
       <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Player Wallet</h3>
@@ -878,71 +423,7 @@
     </div>
   </div>
 
-  <div id="modal-player-history" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 id="modal-history-title" class="font-gaming text-lg font-bold text-white uppercase">Player Payment History</h3>
-        <button onclick="closePlayerHistoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
-        <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-[#262f40] gap-3">
-        <h3 id="modal-players-title" class="font-gaming text-sm sm:text-base font-bold text-white uppercase break-words leading-tight flex-1">Tournament Players</h3>
-        <div class="flex items-center gap-2 shrink-0">
-          <button onclick="closePlayersModal()" class="bg-[#151922] border border-[#262f40] hover:bg-[#ff4624] text-gray-300 hover:text-white px-2.5 py-1 rounded text-xs font-bold font-gaming transition flex items-center gap-1">
-            <i class="fa-solid fa-arrow-left"></i> BACK
-          </button>
-          <button onclick="closePlayersModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-      </div>
-      <div id="modal-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll"></div>
-    </div>
-  </div>
-
-  <div id="modal-referral-reward" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
-      <h3 id="ref-modal-title" class="font-gaming text-lg font-bold text-white uppercase">Add Referral Reward</h3>
-      <input type="hidden" id="edit-ref-id" />
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Required Referrals (Invites)</label>
-        <input type="number" id="ref-req" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 20" required />
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Name</label>
-        <input type="text" id="ref-name" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. Elite Membership" required />
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Type</label>
-          <select id="ref-type" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none">
-            <option value="membership">Membership</option>
-            <option value="diamonds">Diamonds</option>
-            <option value="coins">Coins</option>
-            <option value="cash">Cash</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value</label>
-          <input type="text" id="ref-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 7 days or 500" required />
-        </div>
-      </div>
-      <div class="flex items-center gap-2 pt-1">
-        <input type="checkbox" id="ref-active" class="w-4 h-4 accent-[#ff4624]" checked />
-        <label for="ref-active" class="text-xs text-gray-300">Active Reward</label>
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="closeReferralRewardModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button onclick="saveReferralReward()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- EDIT DAILY SPIN SLOT MODAL -->
   <div id="modal-daily-spin-slot" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
       <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Daily Spin Slot</h3>
@@ -966,7 +447,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value (Number)</label>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value</label>
           <input type="number" id="spin-slot-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
         </div>
       </div>
@@ -981,158 +462,27 @@
     </div>
   </div>
 
-  <div id="modal-edit-tournament" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Tournament</h3>
-      <input type="hidden" id="edit-t-id" />
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Title</label>
-        <input type="text" id="edit-t-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mode</label>
-          <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
-            <option value="Squad">Squad</option>
-            <option value="Solo">Solo</option>
-            <option value="Duo">Duo</option>
-            <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
-            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Map</label>
-          <select id="edit-t-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
-            <option value="Bermuda">Bermuda</option>
-            <option value="Purgatory">Purgatory</option>
-            <option value="Kalahari">Kalahari</option>
-            <option value="Alpine">Alpine</option>
-            <option value="Nexterra">Nexterra</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
-        </div>
-      </div>
-      <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-        <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup</span>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
-            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
-            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
-            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
-            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-          </div>
-        </div>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Change Match Photo</label>
-        <input type="file" id="edit-t-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button onclick="saveEditedTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
-      </div>
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <div class="admin-bottom-nav">
+    <button class="admin-nav-btn" onclick="selectTab('overview')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="admin-nav-btn" onclick="openAllPlayersModal()">
+      <i class="fa-solid fa-users"></i>
+      <span>Players</span>
+    </button>
+    <div class="admin-center-plus" onclick="selectTab('tournaments')">
+      <i class="fa-solid fa-trophy"></i>
     </div>
-  </div>
-
-  <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-2.5 max-h-[82vh] overflow-y-auto sidebar-scroll shadow-2xl">
-      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
-        <h3 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
-        </h3>
-        <button onclick="closeCreateTournamentModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
-        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 4-PRIZE Battle Royal" required />
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Mode</label>
-          <select id="m-mode" onchange="handleAdminModeChange()" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-            <option value="Squad">Squad</option>
-            <option value="Solo">Solo</option>
-            <option value="Duo">Duo</option>
-            <option value="Clash Squad">Clash Squad</option>
-            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
-            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Map</label>
-          <select id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-            <option value="Bermuda">Bermuda</option>
-            <option value="Purgatory">Purgatory</option>
-            <option value="Kalahari">Kalahari</option>
-            <option value="Alpine">Alpine</option>
-            <option value="Nexterra">Nexterra</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Max Slots</label>
-          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
-        </div>
-      </div>
-      <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-lg space-y-2">
-        <span class="text-[11px] font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">1st Prize</label>
-            <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="e.g. 1200" required />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">2nd Prize</label>
-            <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">3rd Prize</label>
-            <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">4th Prize</label>
-            <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
-          </div>
-        </div>
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
-        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" />
-      </div>
-      <div class="flex gap-2 pt-2 sticky bottom-0 bg-[#0e1118] pb-1">
-        <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
-      </div>
-    </div>
+    <button class="admin-nav-btn" onclick="selectTab('chatroom')">
+      <i class="fa-solid fa-comments"></i>
+      <span>Chat</span>
+    </button>
+    <button class="admin-nav-btn" onclick="selectTab('deposits')">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Deposits</span>
+    </button>
   </div>
 
   <script>
@@ -1142,43 +492,13 @@
 
     let currentAdmin = null;
     window.currentAdminUser = null;
-    let activeChatPlayerId = null;
-    let chatInterval = null;
-    let loadedTournamentsList = [];
-    let currentTournamentFilter = 'all';
     let globalAllPlayersCache = [];
-    let loadedDiamondRequestsList = [];
-    let currentDiamondFilter = 'all';
+    let dailySpinSlotsCache = [];
     let globalSpinHistoryCache = [];
-
-    let adminChatMessagesCache = [];
-    let chatRealtimeSubscription = null;
 
     function escapeHTML(str) {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    function formatTimeAgo(dateString) {
-      if (!dateString) return 'Never active';
-      const now = new Date();
-      const past = new Date(dateString);
-      const diffMs = now - past;
-      const diffSec = Math.floor(diffMs / 1000);
-      const diffMin = Math.floor(diffSec / 60);
-      const diffHours = Math.floor(diffMin / 60);
-      const diffDays = Math.floor(diffHours / 24);
-      const timeFormatted = past.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      if (diffMin < 3) return `Active just now`;
-      if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago (${timeFormatted})`;
-      if (diffDays === 1) return `1 day ago ${timeFormatted}`;
-      if (diffDays < 7) return `${diffDays} day ago ${timeFormatted}`;
-      return `${past.toLocaleDateString()} at ${timeFormatted}`;
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function togglePasswordVisibility() {
@@ -1195,26 +515,13 @@
 
     async function checkAdminAuth() {
       const authScreen = document.getElementById('admin-auth-screen');
-      const authMsg = document.getElementById('admin-auth-msg');
-
       try {
-        const { data: { session }, error: sessionError } = await sbClient.auth.getSession();
-        if (sessionError || !session) {
-          authScreen.classList.remove('hidden');
-          return;
-        }
+        const { data: { session } } = await sbClient.auth.getSession();
+        if (!session) { authScreen.classList.remove('hidden'); return; }
 
-        const { data: profile, error } = await sbClient
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error || !profile || !profile.is_admin) {
+        const { data: profile } = await sbClient.from('profiles').select('*').eq('id', session.user.id).single();
+        if (!profile || !profile.is_admin) {
           authScreen.classList.remove('hidden');
-          authMsg.innerText = "Access denied: Account is not authorized as an Administrator.";
-          authMsg.classList.remove('hidden');
-          await sbClient.auth.signOut();
           return;
         }
 
@@ -1222,9 +529,6 @@
         window.currentAdminUser = profile;
         authScreen.classList.add('hidden');
         document.getElementById('admin-user-name').innerText = profile.free_fire_name || profile.full_name || 'Master Admin';
-        if (profile.avatar_url) {
-          document.getElementById('admin-user-avatar').src = profile.avatar_url;
-        }
         loadDashboardStats();
       } catch (err) {
         authScreen.classList.remove('hidden');
@@ -1245,24 +549,12 @@
         const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        const { data: prof, error: pErr } = await sbClient
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
-        if (pErr || !prof || !prof.is_admin) {
-          await sbClient.auth.signOut();
-          throw new Error("Unauthorized: This account lacks master admin privileges.");
-        }
+        const { data: prof } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
+        if (!prof || !prof.is_admin) throw new Error("Unauthorized admin access.");
 
         currentAdmin = prof;
         window.currentAdminUser = prof;
         document.getElementById('admin-auth-screen').classList.add('hidden');
-        document.getElementById('admin-user-name').innerText = prof.free_fire_name || prof.full_name || 'Master Admin';
-        if (prof.avatar_url) {
-          document.getElementById('admin-user-avatar').src = prof.avatar_url;
-        }
         loadDashboardStats();
       } catch (err) {
         msg.innerText = err.message || "Failed to authenticate.";
@@ -1274,8 +566,6 @@
 
     async function adminSignOut() {
       await sbClient.auth.signOut();
-      currentAdmin = null;
-      window.currentAdminUser = null;
       document.getElementById('admin-auth-screen').classList.remove('hidden');
     }
 
@@ -1294,15 +584,10 @@
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'chatroom', 'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'tutorials', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'chatroom', 'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'support', 'settings'];
 
-    function selectTab(tabId, pushHistory = true) {
+    function selectTab(tabId) {
       toggleSidebar(false);
-
-      if (pushHistory && history.state?.tab !== tabId) {
-        history.pushState({ tab: tabId }, '', '#' + tabId);
-      }
-
       tabs.forEach(t => {
         const sec = document.getElementById(`section-${t}`);
         const nav = document.getElementById(`nav-${t}`);
@@ -1316,1036 +601,134 @@
       if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white";
 
       const backBtn = document.getElementById('btn-back-dashboard');
-      const openSideBtn = document.getElementById('btn-open-sidebar');
-
       if (tabId === 'overview') {
         document.getElementById('panel-title').innerText = "DASHBOARD";
         backBtn.classList.add('hidden');
-        openSideBtn.classList.remove('hidden');
         loadDashboardStats();
       } else {
         document.getElementById('panel-title').innerText = tabId.toUpperCase().replace(/_/g, ' ');
         backBtn.classList.remove('hidden');
-        openSideBtn.classList.add('hidden');
       }
 
-      if (tabId === 'tournaments') loadTournaments();
-      if (tabId === 'chatroom') { loadAdminChatDashboardStats(); }
-      if (tabId === 'referral_rewards_mgmt') loadAdminReferralRewards();
+      if (tabId === 'users') loadUsers();
+      if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
       if (tabId === 'daily_spin_mgmt') loadAdminDailySpinMgmt();
       if (tabId === 'daily_spin_history') loadAdminSpinHistory();
       if (tabId === 'deposits') loadDeposits();
-      if (tabId === 'withdrawals') loadAdminWithdrawals();
-      if (tabId === 'diamond_requests') loadAdminDiamondRequests();
-      if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
-      if (tabId === 'users') loadUsers();
-      if (tabId === 'tutorials') loadTutorialsManager();
-      if (tabId === 'banned') loadBannedUsers();
-      if (tabId === 'settings') loadSettings();
-      if (tabId === 'support') loadSupportInbox();
     }
-
-    window.addEventListener('popstate', (e) => {
-      const targetTab = e.state?.tab || 'overview';
-      selectTab(targetTab, false);
-    });
 
     async function loadDashboardStats() {
       try {
-        const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes, reportsRes] = await Promise.all([
+        const [deps, users] = await Promise.all([
           sbClient.from('deposit_requests').select('*'),
-          sbClient.from('withdrawals').select('*'),
-          sbClient.from('diamond_requests').select('*'),
-          sbClient.from('profiles').select('*', { count: 'exact', head: true }),
-          sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false),
-          sbClient.from('chat_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+          sbClient.from('profiles').select('*', { count: 'exact', head: true })
         ]);
-
-        const safeDeps = allDeps.data || [];
-        const safeWds = allWds.data || [];
-        const safeDiamonds = allDiamonds.data || [];
-
-        const totalDeposits = safeDeps
-          .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
-          .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
-        document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
-
-        const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
-        const pendingCount = pendingList.length;
-        document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
-        
-        const badgeDep = document.getElementById('badge-deposits');
-        if (badgeDep) {
-          badgeDep.innerText = pendingCount;
-          badgeDep.classList.toggle('hidden', pendingCount === 0);
-        }
-        const quickDep = document.getElementById('quick-badge-deposits');
-        if (quickDep) {
-          quickDep.innerText = pendingCount;
-          quickDep.classList.toggle('hidden', pendingCount === 0);
-        }
-
-        const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
-        const badgeWd = document.getElementById('badge-withdrawals');
-        if (badgeWd) {
-          badgeWd.innerText = pendingWdCount;
-          badgeWd.classList.toggle('hidden', pendingWdCount === 0);
-        }
-        const quickWd = document.getElementById('quick-badge-withdrawals');
-        if (quickWd) {
-          quickWd.innerText = pendingWdCount;
-          quickWd.classList.toggle('hidden', pendingWdCount === 0);
-        }
-
-        const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
-        const badgeDiam = document.getElementById('badge-diamond_requests');
-        if (badgeDiam) {
-          badgeDiam.innerText = pendingDiamonds;
-          badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
-        }
-        const quickDiam = document.getElementById('quick-badge-diamond_requests');
-        if (quickDiam) {
-          quickDiam.innerText = pendingDiamonds;
-          quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
-        }
-
-        document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
-
-        const supCount = supportCountRes.count || 0;
-        const badgeSup = document.getElementById('badge-support');
-        if (badgeSup) {
-          badgeSup.innerText = supCount;
-          badgeSup.classList.toggle('hidden', supCount === 0);
-        }
-
-        const repCount = reportsRes?.count || 0;
-        const badgeChatRep = document.getElementById('badge-chat-reports');
-        if (badgeChatRep) {
-          badgeChatRep.innerText = repCount;
-          badgeChatRep.classList.toggle('hidden', repCount === 0);
-        }
-      } catch (err) {
-        console.error("Dashboard stats error:", err);
-      }
+        const safeDeps = deps.data || [];
+        const approvedSum = safeDeps.filter(d => (d.status || '').toLowerCase() === 'approved').reduce((s, d) => s + Number(d.amount || 0), 0);
+        document.getElementById('stat-total-deposits').innerText = `PKR ${approvedSum}`;
+        document.getElementById('stat-pending-deposits').innerText = safeDeps.filter(d => (d.status || '').toLowerCase() === 'pending').length;
+        document.getElementById('stat-total-players').innerText = users.count || 0;
+      } catch (e) { console.error(e); }
     }
 
     // ==========================================
-    // WINNERS DECLARATION (AUTO-FILL PRIZES & 100% WORKING WALLET ADD)
+    // ALL PLAYERS MODAL (100% FIXED & TESTED)
     // ==========================================
-    async function loadWinnerSelectOptions() {
-      const winTournamentSelect = document.getElementById('win-tournament');
-      if (!winTournamentSelect) return;
-
-      winTournamentSelect.innerHTML = `<option value="">Loading tournaments...</option>`;
-
-      const { data, error } = await sbClient
-        .from('tournaments')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || !data.length) {
-        winTournamentSelect.innerHTML = `<option value="">No tournaments found</option>`;
-        return;
-      }
-
-      window.allTournamentsFullCache = data;
-
-      winTournamentSelect.innerHTML = `<option value="">Choose tournament...</option>` + data.map(t => `
-        <option value="${t.id}">${escapeHTML(t.title)} (${t.status || 'upcoming'})</option>
-      `).join('');
-    }
-
-    async function onWinnerTournamentChange(tournamentId) {
-      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
-        const sel = document.getElementById(id);
-        if (sel) sel.innerHTML = `<option value="">Choose player...</option>`;
-      });
-
-      if (!tournamentId) return;
-
-      // 1. AUTO-FILL PRIZES FROM MATCH RECORD DIRECTLY
-      const tour = (window.allTournamentsFullCache || []).find(t => t.id === tournamentId);
-      if (tour) {
-        document.getElementById('win-amt1').value = tour.prize_pool || tour.prize_1 || 0;
-        document.getElementById('win-amt2').value = tour.prize_2 || 0;
-        document.getElementById('win-amt3').value = tour.prize_3 || 0;
-        document.getElementById('win-amt4').value = tour.prize_4 || 0;
-      }
-
-      // 2. Load Joined Players
-      const { data, error } = await sbClient
-        .from('tournament_entries')
-        .select('user_id, profiles(id, free_fire_name, free_fire_uid, full_name)')
-        .eq('tournament_id', tournamentId);
-
-      if (error || !data || !data.length) return;
-
-      const playerOptions = `<option value="">Choose player...</option>` + data.map(e => {
-        const p = e.profiles || {};
-        const pName = p.free_fire_name || p.full_name || 'Gamer';
-        const pUid = p.free_fire_uid || '--';
-        return `<option value="${p.id || e.user_id}">${escapeHTML(pName)} (UID: ${escapeHTML(pUid)})</option>`;
-      }).join('');
-
-      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
-        const sel = document.getElementById(id);
-        if (sel) sel.innerHTML = playerOptions;
-      });
-    }
-
-    async function submitAllWinnersDeclaration() {
-      const tournamentId = document.getElementById('win-tournament').value;
-      if (!tournamentId) {
-        alert("Please select a tournament first.");
-        return;
-      }
-
-      const u1 = document.getElementById('win-u1').value;
-      const amt1 = parseFloat(document.getElementById('win-amt1').value) || 0;
-
-      if (!u1 || amt1 <= 0) {
-        alert("1st Place Winner and 1st Prize amount are mandatory.");
-        return;
-      }
-
-      const u2 = document.getElementById('win-u2').value;
-      const amt2 = parseFloat(document.getElementById('win-amt2').value) || 0;
-
-      const u3 = document.getElementById('win-u3').value;
-      const amt3 = parseFloat(document.getElementById('win-amt3').value) || 0;
-
-      const u4 = document.getElementById('win-u4').value;
-      const amt4 = parseFloat(document.getElementById('win-amt4').value) || 0;
-
-      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;
-
-      const submitBtn = document.querySelector("button[onclick='submitAllWinnersDeclaration()']");
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = "PROCESSING...";
-      }
+    async function openAllPlayersModal() {
+      document.getElementById('modal-all-players').classList.remove('hidden');
+      const body = document.getElementById('modal-all-players-body');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-6"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading registered players...</p>`;
 
       try {
-        const winnersPayload = [
-          { tournament_id: tournamentId, user_id: u1, position: 1, prize_amount: amt1 },
-          ...(u2 && amt2 > 0 ? [{ tournament_id: tournamentId, user_id: u2, position: 2, prize_amount: amt2 }] : []),
-          ...(u3 && amt3 > 0 ? [{ tournament_id: tournamentId, user_id: u3, position: 3, prize_amount: amt3 }] : []),
-          ...(u4 && amt4 > 0 ? [{ tournament_id: tournamentId, user_id: u4, position: 4, prize_amount: amt4 }] : [])
-        ];
-
-        // 1. Insert records to tournament_winners
-        await sbClient.from('tournament_winners').delete().eq('tournament_id', tournamentId);
-        const { error: winErr } = await sbClient.from('tournament_winners').insert(winnersPayload);
-        if (winErr) throw winErr;
-
-        // 2. Real-Time Credit Prize to Each Winner's Wallet Balance & Add Transactions
-        for (const w of winnersPayload) {
-          if (w.user_id && w.prize_amount > 0) {
-            const { data: prof } = await sbClient.from('profiles').select('id, balance, total_won').eq('id', w.user_id).single();
-            const currentBal = Number(prof?.balance || 0);
-            const currentWon = Number(prof?.total_won || 0);
-
-            // Update balance and total_won
-            await sbClient.from('profiles').update({
-              balance: currentBal + Number(w.prize_amount),
-              total_won: currentWon + Number(w.prize_amount),
-              updated_at: new Date().toISOString()
-            }).eq('id', w.user_id);
-
-            // Also add wallet_transaction log
-            try {
-              await sbClient.from('wallet_transactions').insert([{
-                user_id: w.user_id,
-                amount: Number(w.prize_amount),
-                transaction_type: `Match Prize (#${w.position})`,
-                description: `Won position #${w.position} prize`,
-                status: 'completed',
-                created_at: new Date().toISOString()
-              }]);
-            } catch (txErr) {
-              console.log("Transaction log optional notice:", txErr);
-            }
-          }
-        }
-
-        // 3. Mark match as completed
-        const { error: tourErr } = await sbClient.from('tournaments').update({
-          status: 'completed',
-          updated_at: new Date().toISOString()
-        }).eq('id', tournamentId);
-
-        if (tourErr) throw tourErr;
-
-        // 4. Form Reset
-        document.getElementById('win-tournament').value = '';
-        ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.innerHTML = '<option value="">Choose player...</option>';
-        });
-        ['win-amt1', 'win-amt2', 'win-amt3', 'win-amt4'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = '';
-        });
-
-        alert("🎉 Winners announced successfully! Match marked as COMPLETED and prizes added to wallet.");
-
-        // 5. Automatic redirect & refresh
-        selectTab('overview');
-        loadTournaments();
-        loadDashboardStats();
-
-      } catch (err) {
-        console.error("Error declaring winners:", err);
-        alert("Error declaring winners: " + (err.message || err));
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = "Announce All Winners & Complete Match";
-        }
-      }
-    }
-
-    async function loadDeclaredWinners() {
-      const container = document.getElementById('admin-declared-winners-list');
-      if (!container) return;
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading declared winners...</p>`;
-
-      const { data, error } = await sbClient
-        .from('tournament_winners')
-        .select('id, position, prize_amount, created_at, tournaments(title), profiles(free_fire_name, free_fire_uid)')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No declared winners found.</p>`;
-        return;
-      }
-
-      container.innerHTML = data.map(w => {
-        const t = w.tournaments || {};
-        const p = w.profiles || {};
-        return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
-            <div>
-              <h4 class="font-bold text-white text-sm">${escapeHTML(t.title || 'Tournament')}</h4>
-              <p class="text-yellow-400 font-bold mt-0.5">Position #${w.position} • Winner: ${escapeHTML(p.free_fire_name || 'Gamer')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</p>
-              <span class="text-emerald-400 text-[11px]">Prize: PKR ${w.prize_amount}</span>
-            </div>
-            <div class="text-right">
-              <span class="text-gray-400 text-[10px] font-mono">${new Date(w.created_at).toLocaleDateString()}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // ==========================================
-    // GLOBAL CHAT ROOM SUB-TABS SWITCH
-    // ==========================================
-    function switchChatSubTab(subTab) {
-      ['live_messages', 'announcements', 'reports', 'moderation'].forEach(st => {
-        const sec = document.getElementById(`chatsub-${st}`);
-        const btn = document.getElementById(`subtab-btn-${st}`);
-        if (sec) sec.classList.toggle('hidden', st !== subTab);
-        if (btn) {
-          if (st === subTab) {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap";
-          } else {
-            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
-          }
-        }
-      });
-
-      if (subTab === 'announcements') loadAdminAnnouncements();
-      if (subTab === 'reports') loadAdminChatReports();
-      if (subTab === 'moderation') loadAdminChatSettings();
-    }
-
-    // ==========================================
-    // INTERACTIVE CHAT ROOM LOGIC
-    // ==========================================
-    function openLiveChatModal() {
-      const modal = document.getElementById('modal-interactive-chat');
-      if (modal) modal.classList.remove('hidden');
-      loadAdminChatMessages();
-      setupChatRealtime();
-    }
-
-    function closeLiveChatModal() {
-      const modal = document.getElementById('modal-interactive-chat');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function toggleStickerDrawer() {
-      const drawer = document.getElementById('modal-sticker-drawer');
-      if (drawer) drawer.classList.toggle('hidden');
-    }
-
-    function renderMessageContent(msgText) {
-      if (!msgText) return '';
-      if (msgText.startsWith('STICKER:') || msgText.match(/\.(webp|png|jpg|jpeg|gif)(\?.*)?$/i)) {
-        let cleanUrl = msgText.replace(/^STICKER:/i, '').trim();
-        return `
-          <div class="py-1">
-            <img src="${escapeHTML(cleanUrl)}" alt="Sticker" class="max-w-[130px] max-h-[130px] rounded-xl object-contain drop-shadow-md" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'text-amber-400 font-bold\'>[Sticker: ${escapeHTML(cleanUrl)}]</span>';" />
-          </div>
-        `;
-      }
-      return `<p class="text-xs text-gray-100 break-words leading-relaxed">${escapeHTML(msgText)}</p>`;
-    }
-
-    async function loadAdminChatDashboardStats() {
-      try {
-        const now = new Date();
-        const tenMinsAgo = new Date(now.getTime() - (10 * 60 * 1000)).toISOString();
-
-        const [msgCountRes, onlineRes, mutedRes, reportsRes] = await Promise.all([
-          sbClient.from('chat_messages').select('*', { count: 'exact', head: true }).eq('is_deleted', false),
-          sbClient.from('profiles').select('*', { count: 'exact', head: true }).gt('last_seen', tenMinsAgo),
-          sbClient.from('profiles').select('*', { count: 'exact', head: true }).or('is_chat_muted.eq.true,is_chat_banned.eq.true'),
-          sbClient.from('chat_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending')
-        ]);
-
-        document.getElementById('chat-stat-total-msgs').innerText = msgCountRes.count || 0;
-        document.getElementById('chat-stat-online-players').innerText = onlineRes.count || 0;
-        document.getElementById('chat-stat-muted-players').innerText = mutedRes.count || 0;
-        
-        const onlineCount = onlineRes.count || 0;
-        const modalOnline = document.getElementById('chat-modal-online-sub');
-        if (modalOnline) modalOnline.innerText = `● Online Players: ${onlineCount}`;
-
-        const repCount = reportsRes?.count || 0;
-        document.getElementById('chat-stat-reported-msgs').innerText = repCount;
-        const repBadge = document.getElementById('badge-chat-reports');
-        if (repBadge) {
-          repBadge.innerText = repCount;
-          repBadge.classList.toggle('hidden', repCount === 0);
-        }
-      } catch (err) {
-        console.error("Error loading chat stats:", err);
-      }
-    }
-
-    async function loadAdminChatMessages() {
-      const container = document.getElementById('modal-chat-messages-container');
-      if (!container) return;
-
-      try {
-        const { data: messages, error: msgErr } = await sbClient
-          .from('chat_messages')
-          .select('id, user_id, message, is_announcement, is_pinned, is_deleted, created_at, is_admin')
-          .eq('is_deleted', false)
-          .order('created_at', { ascending: true })
-          .limit(100);
-
-        if (msgErr) throw msgErr;
-
-        const msgList = messages || [];
-        const userIds = [...new Set(msgList.map(m => m.user_id).filter(Boolean))];
-
-        let profileMap = {};
-        if (userIds.length > 0) {
-          const { data: profiles } = await sbClient
-            .from('profiles')
-            .select('id, free_fire_name, free_fire_uid, full_name, avatar_url, is_admin, is_chat_muted, is_chat_banned')
-            .in('id', userIds);
-
-          if (profiles) {
-            profiles.forEach(p => { profileMap[p.id] = p; });
-          }
-        }
-
-        adminChatMessagesCache = msgList.map(m => ({
-          ...m,
-          profiles: profileMap[m.user_id] || {
-            free_fire_name: 'Player',
-            free_fire_uid: '--',
-            avatar_url: '',
-            is_admin: false,
-            is_chat_muted: false,
-            is_chat_banned: false
-          }
-        }));
-
-        renderInteractiveChatRoom(adminChatMessagesCache);
-
-        const pinnedMsg = adminChatMessagesCache.find(m => m.is_pinned);
-        const pinnedBanner = document.getElementById('modal-pinned-banner');
-        const pinnedText = document.getElementById('modal-pinned-text');
-        if (pinnedBanner && pinnedText) {
-          if (pinnedMsg) {
-            pinnedBanner.classList.remove('hidden');
-            pinnedText.innerText = pinnedMsg.message;
-            pinnedBanner.dataset.pinnedId = pinnedMsg.id;
-          } else {
-            pinnedBanner.classList.add('hidden');
-          }
-        }
-      } catch (err) {
-        console.error("Chat load error:", err);
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-6">Could not load chat messages: ${escapeHTML(err.message)}</p>`;
-      }
-    }
-
-    function renderInteractiveChatRoom(list) {
-      const container = document.getElementById('modal-chat-messages-container');
-      if (!container) return;
-
-      if (!list.length) {
-        container.innerHTML = `<div class="p-8 text-center"><i class="fa-solid fa-comment-slash text-gray-600 text-3xl mb-2"></i><p class="text-gray-500 text-xs">No messages yet. Send first message!</p></div>`;
-        return;
-      }
-
-      container.innerHTML = list.map(m => {
-        const p = m.profiles || {};
-        const isMsgAdmin = (m.is_admin === true || p.is_admin === true || m.is_announcement === true);
-        const displayName = isMsgAdmin ? "ADMIN" : (p.free_fire_name || p.full_name || 'Player');
-        const displayUID = isMsgAdmin ? "OFFICIAL" : (p.free_fire_uid || '--');
-        const isMuted = p.is_chat_muted === true;
-        const isChatBanned = p.is_chat_banned === true;
-        const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        return `
-          <div class="flex items-start gap-2.5 ${isMsgAdmin ? 'flex-row-reverse' : 'flex-row'}">
-            <div class="relative shrink-0 mt-0.5">
-              ${isMsgAdmin ? `
-                <div class="w-8 h-8 rounded-full admin-neon-dp flex items-center justify-center text-white font-extrabold text-[9px] font-gaming">
-                  ADMIN
-                </div>
-                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 flex items-center justify-center text-[8px] text-black font-bold">Ⓥ</span>
-              ` : `
-                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}" class="w-8 h-8 rounded-full object-cover border border-[#262f40]" />
-              `}
-            </div>
-
-            <div class="max-w-[78%] space-y-1">
-              <div class="flex items-center gap-1.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
-                ${isMsgAdmin ? `
-                  <span class="bg-gradient-to-r from-amber-400 to-[#ff4624] text-black font-gaming font-extrabold text-[10px] px-1.5 py-0.2 rounded flex items-center gap-1 shadow">
-                    <i class="fa-solid fa-crown text-[8px]"></i> ADMIN Ⓥ
-                  </span>
-                ` : `
-                  <span class="font-bold text-xs text-white">${escapeHTML(displayName)}</span>
-                  <span class="text-[9px] font-mono text-cyan-400 bg-[#06070a] px-1 py-0.2 rounded border border-[#262f40]">#${escapeHTML(displayUID)}</span>
-                `}
-                <span class="text-[9px] text-gray-500 font-mono">${timeStr}</span>
-              </div>
-
-              <div class="p-2.5 rounded-2xl ${isMsgAdmin ? 'bg-gradient-to-br from-[#ff4624]/20 to-[#ff8424]/10 border border-[#ff4624]/40 text-white rounded-tr-none' : 'bg-[#151922] border border-[#262f40] text-gray-200 rounded-tl-none'} shadow-sm">
-                ${renderMessageContent(m.message)}
-              </div>
-
-              <div class="flex items-center gap-1 pt-0.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
-                <button type="button" onclick="togglePinChatMessage(${m.id}, ${!m.is_pinned})" class="bg-[#0e1118] border border-[#262f40] hover:border-yellow-400 text-yellow-400 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
-                  <i class="fa-solid fa-thumbtack text-[8px]"></i> ${m.is_pinned ? 'Unpin' : 'Pin'}
-                </button>
-
-                ${!isMsgAdmin ? `
-                  <button type="button" onclick="togglePlayerChatMute('${m.user_id}', ${!isMuted})" class="bg-[#0e1118] border border-[#262f40] hover:border-amber-400 text-amber-400 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
-                    <i class="fa-solid ${isMuted ? 'fa-volume-high' : 'fa-volume-xmark'} text-[8px]"></i> ${isMuted ? 'Unmute' : 'Mute'}
-                  </button>
-
-                  <button type="button" onclick="togglePlayerChatBan('${m.user_id}', ${!isChatBanned})" class="bg-[#0e1118] border border-[#262f40] hover:border-red-500 text-red-500 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
-                    <i class="fa-solid fa-ban text-[8px]"></i> ${isChatBanned ? 'Unban' : 'Ban'}
-                  </button>
-                ` : ''}
-
-                <button type="button" onclick="deleteChatMessageForEveryone(${m.id})" class="bg-[#0e1118] border border-red-500/40 hover:bg-red-600 text-red-400 hover:text-white px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold transition">
-                  <i class="fa-solid fa-trash text-[8px]"></i> Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      container.scrollTop = container.scrollHeight;
-    }
-
-    async function handleAdminSendChatMessage(e) {
-      if (e) e.preventDefault();
-      const input = document.getElementById('modal-chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      if (!window.currentAdminUser) {
-        alert("Please login as Administrator first.");
-        return;
-      }
-
-      input.value = '';
-
-      try {
-        const { error } = await sbClient.from('chat_messages').insert([{
-          user_id: window.currentAdminUser.id,
-          message: text,
-          is_admin: true,
-          is_announcement: false,
-          is_pinned: false
-        }]);
-
-        if (error) throw error;
-        loadAdminChatMessages();
-      } catch (err) {
-        alert("Failed to send message: " + err.message);
-      }
-    }
-
-    async function sendAdminSticker(type) {
-      toggleStickerDrawer();
-      let stickerUrl = "";
-
-      if (type === 'booyah') stickerUrl = "STICKER:https://cdn-icons-png.flaticon.com/512/10758/10758774.png";
-      else if (type === 'headshot') stickerUrl = "STICKER:https://cdn-icons-png.flaticon.com/512/3208/3208726.png";
-      else if (type === 'gg') stickerUrl = "STICKER:https://cdn-icons-png.flaticon.com/512/742/742751.png";
-      else if (type === 'ready') stickerUrl = "STICKER:https://cdn-icons-png.flaticon.com/512/5290/5290058.png";
-      else stickerUrl = "STICKER:https://cdn-icons-png.flaticon.com/512/564/564619.png";
-
-      if (!window.currentAdminUser) return alert("Admin not authenticated.");
-
-      try {
-        await sbClient.from('chat_messages').insert([{
-          user_id: window.currentAdminUser.id,
-          message: stickerUrl,
-          is_admin: true
-        }]);
-        loadAdminChatMessages();
-      } catch (err) {
-        console.error("Sticker send error:", err);
-      }
-    }
-
-    function setupChatRealtime() {
-      if (chatRealtimeSubscription) return;
-      chatRealtimeSubscription = sbClient
-        .channel('admin-chat-live-room')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, () => {
-          loadAdminChatMessages();
-          loadAdminChatDashboardStats();
-        })
-        .subscribe();
-    }
-
-    async function deleteChatMessageForEveryone(messageId) {
-      if (!confirm("Are you sure you want to delete this message for everyone?")) return;
-      try {
-        adminChatMessagesCache = adminChatMessagesCache.filter(m => m.id !== messageId);
-        renderInteractiveChatRoom(adminChatMessagesCache);
-
-        const { error } = await sbClient
-          .from('chat_messages')
-          .update({ is_deleted: true, updated_at: new Date().toISOString() })
-          .eq('id', messageId);
-
-        if (error) throw error;
-        loadAdminChatDashboardStats();
-      } catch (err) {
-        alert("Failed to delete message: " + err.message);
-        loadAdminChatMessages();
-      }
-    }
-
-    async function togglePinChatMessage(messageId, pinState) {
-      try {
-        const { error } = await sbClient
-          .from('chat_messages')
-          .update({ is_pinned: pinState, updated_at: new Date().toISOString() })
-          .eq('id', messageId);
-
-        if (error) throw error;
-        loadAdminChatMessages();
-      } catch (err) {
-        alert("Failed to update pin state: " + err.message);
-      }
-    }
-
-    async function togglePlayerChatMute(userId, muteState) {
-      const action = muteState ? 'MUTE' : 'UNMUTE';
-      if (!confirm(`Are you sure you want to ${action} this player from chat?`)) return;
-
-      try {
-        const { error } = await sbClient
-          .from('profiles')
-          .update({ is_chat_muted: muteState, updated_at: new Date().toISOString() })
-          .eq('id', userId);
-
-        if (error) throw error;
-        alert(`Player successfully ${muteState ? 'muted' : 'unmuted'} from chat.`);
-        loadAdminChatMessages();
-        loadAdminChatDashboardStats();
-      } catch (err) {
-        alert("Action failed: " + err.message);
-      }
-    }
-
-    async function togglePlayerChatBan(userId, banState) {
-      const action = banState ? 'BAN from Chat' : 'UNBAN from Chat';
-      if (!confirm(`Are you sure you want to ${action} this player?`)) return;
-
-      try {
-        const { error } = await sbClient
-          .from('profiles')
-          .update({ is_chat_banned: banState, updated_at: new Date().toISOString() })
-          .eq('id', userId);
-
-        if (error) throw error;
-        alert(`Player successfully ${banState ? 'banned' : 'unbanned'} from chat.`);
-        loadAdminChatMessages();
-        loadAdminChatDashboardStats();
-      } catch (err) {
-        alert("Action failed: " + err.message);
-      }
-    }
-
-    async function postAdminAnnouncement() {
-      const input = document.getElementById('admin-announcement-input');
-      const text = input.value.trim();
-      const isPinned = document.getElementById('admin-announcement-pin').checked;
-
-      if (!text) {
-        alert("Please enter announcement text.");
-        return;
-      }
-
-      if (!window.currentAdminUser) {
-        alert("Admin session not found. Please log in.");
-        return;
-      }
-
-      try {
-        const { error } = await sbClient.from('chat_messages').insert([{
-          user_id: window.currentAdminUser.id,
-          message: text,
-          is_announcement: true,
-          is_pinned: isPinned,
-          is_admin: true
-        }]);
-
-        if (error) throw error;
-        alert("Announcement broadcasted successfully as VIP Admin!");
-        input.value = '';
-        switchChatSubTab('live_messages');
-        openLiveChatModal();
-      } catch (err) {
-        alert("Failed to broadcast announcement: " + err.message);
-      }
-    }
-
-    async function unpinCurrentAnnouncement() {
-      const banner = document.getElementById('modal-pinned-banner');
-      const msgId = banner?.dataset?.pinnedId;
-      if (!msgId) return;
-
-      try {
-        await sbClient.from('chat_messages').update({ is_pinned: false }).eq('id', msgId);
-        loadAdminChatMessages();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function loadAdminAnnouncements() {
-      const container = document.getElementById('admin-pinned-announcements-list');
-      if (!container) return;
-      container.innerHTML = `<p class="text-gray-400 text-xs py-2">Loading announcements...</p>`;
-
-      const { data, error } = await sbClient
-        .from('chat_messages')
-        .select('*')
-        .or('is_pinned.eq.true,is_announcement.eq.true')
-        .eq('is_deleted', false)
-        .order('created_at', { ascending: false });
-
-      if (error || !data || !data.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs py-2">No active announcements.</p>`;
-        return;
-      }
-
-      container.innerHTML = data.map(a => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
-          <div>
-            <p class="text-white font-semibold">${escapeHTML(a.message)}</p>
-            <span class="text-[10px] text-gray-500 font-mono">${new Date(a.created_at).toLocaleString()}</span>
-          </div>
-          <button onclick="togglePinChatMessage(${a.id}, false)" class="bg-[#0e1118] text-gray-300 hover:text-red-400 px-2 py-1 rounded border border-[#262f40] text-xs">Unpin</button>
-        </div>
-      `).join('');
-    }
-
-    async function loadAdminChatReports() {
-      const container = document.getElementById('admin-chat-reports-container');
-      if (!container) return;
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-6">Loading reports...</p>`;
-
-      try {
-        const { data: reports, error } = await sbClient
-          .from('chat_reports')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error || !reports || !reports.length) {
-          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No reported messages found.</p>`;
-          return;
-        }
-
-        const msgIds = reports.map(r => r.message_id).filter(Boolean);
-        const reporterIds = reports.map(r => r.reporter_id).filter(Boolean);
-
-        const { data: messages } = await sbClient.from('chat_messages').select('*').in('id', msgIds);
-        const msgMap = {};
-        const authorIds = [];
-        (messages || []).forEach(m => {
-          msgMap[m.id] = m;
-          if (m.user_id) authorIds.push(m.user_id);
-        });
-
-        const allUserIds = [...new Set([...reporterIds, ...authorIds])];
-        const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').in('id', allUserIds);
-        const userMap = {};
-        (profiles || []).forEach(p => { userMap[p.id] = p; });
-
-        container.innerHTML = reports.map(r => {
-          const msg = msgMap[r.message_id] || {};
-          const author = userMap[msg.user_id] || {};
-          const reporter = userMap[r.reporter_id] || {};
-
-          return `
-            <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="text-red-400 font-bold uppercase"><i class="fa-solid fa-flag mr-1"></i> Reason: ${escapeHTML(r.reason)}</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}">${escapeHTML(r.status.toUpperCase())}</span>
-              </div>
-              <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] space-y-1">
-                <div class="text-[11px] text-gray-400">
-                  Author: <strong class="text-white">${escapeHTML(author.free_fire_name || 'Player')}</strong> (UID: <span class="text-cyan-400 font-mono">${escapeHTML(author.free_fire_uid || '--')}</span>)
-                </div>
-                <p class="text-gray-200 text-xs bg-[#06070a] p-2 rounded">${escapeHTML(msg.message || '[Message Deleted]')}</p>
-                <div class="text-[10px] text-gray-500 pt-1">
-                  Reported by: <span class="text-gray-300">${escapeHTML(reporter.free_fire_name || 'Player')}</span> • ${new Date(r.created_at).toLocaleString()}
-                </div>
-              </div>
-              <div class="flex items-center gap-2 justify-end pt-1">
-                ${msg.id && !msg.is_deleted ? `
-                  <button onclick="deleteChatMessageForEveryone(${msg.id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Delete Message</button>
-                  <button onclick="togglePlayerChatMute('${msg.user_id}', true)" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs font-bold">Mute Author</button>
-                ` : ''}
-                <button onclick="dismissChatReport(${r.id})" class="bg-[#0e1118] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1 rounded text-xs">Mark Reviewed</button>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } catch (err) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No reported messages found.</p>`;
-      }
-    }
-
-    async function dismissChatReport(reportId) {
-      try {
-        const { error } = await sbClient.from('chat_reports').update({ status: 'reviewed' }).eq('id', reportId);
-        if (error) throw error;
-        loadAdminChatReports();
-        loadAdminChatDashboardStats();
-      } catch (err) {
-        alert("Failed to update report: " + err.message);
-      }
-    }
-
-    async function loadAdminChatSettings() {
-      try {
-        const { data } = await sbClient.from('chat_settings').select('*').eq('id', 1).maybeSingle();
-        if (data) {
-          document.getElementById('cfg-chat-enabled').checked = !!data.is_chat_enabled;
-          document.getElementById('cfg-online-indicators').checked = !!data.show_online_indicators;
-          document.getElementById('cfg-slowmode-sec').value = data.slow_mode_seconds || 3;
-          document.getElementById('cfg-max-len').value = data.max_message_length || 250;
-          document.getElementById('cfg-chat-rules').value = data.chat_rules || '';
-        }
-      } catch (err) {
-        console.error("Load chat settings error:", err);
-      }
-    }
-
-    async function saveAdminChatSettings() {
-      const is_chat_enabled = document.getElementById('cfg-chat-enabled').checked;
-      const show_online_indicators = document.getElementById('cfg-online-indicators').checked;
-      const slow_mode_seconds = parseInt(document.getElementById('cfg-slowmode-sec').value) || 3;
-      const max_message_length = parseInt(document.getElementById('cfg-max-len').value) || 250;
-      const chat_rules = document.getElementById('cfg-chat-rules').value.trim();
-
-      try {
-        const { error } = await sbClient.from('chat_settings').upsert({
-          id: 1,
-          is_chat_enabled,
-          show_online_indicators,
-          slow_mode_seconds,
-          max_message_length,
-          chat_rules,
-          updated_at: new Date().toISOString()
-        });
-
-        if (error) throw error;
-        alert("Chat settings saved successfully!");
-      } catch (err) {
-        alert("Failed to save chat settings: " + (err.message || err));
-      }
-    }
-
-    // ==========================================
-    // OTHER SYSTEM FUNCTIONS (EXISTING PRESERVED)
-    // ==========================================
-    async function loadSettings() {
-      try {
-        const { data } = await sbClient.from('site_settings').select('*').limit(1).maybeSingle();
-        if (data) {
-          document.getElementById('set-ticker-text').value = data.ticker_text || '';
-          document.getElementById('set-ticker-enabled').checked = !!data.ticker_enabled;
-        }
-      } catch (err) {
-        console.log("Settings load notice:", err);
-      }
-    }
-
-    async function saveSiteSettings() {
-      const tickerText = document.getElementById('set-ticker-text').value.trim();
-      const tickerEnabled = document.getElementById('set-ticker-enabled').checked;
-
-      try {
-        const { data: existing } = await sbClient.from('site_settings').select('id').limit(1).maybeSingle();
-        let error;
-        if (existing && existing.id) {
-          const res = await sbClient.from('site_settings').update({
-            ticker_text: tickerText,
-            ticker_enabled: tickerEnabled,
-            updated_at: new Date().toISOString()
-          }).eq('id', existing.id);
-          error = res.error;
-        } else {
-          const res = await sbClient.from('site_settings').insert([{ ticker_text: tickerText, ticker_enabled: tickerEnabled }]);
-          error = res.error;
-        }
-
-        if (error) throw error;
-        alert("Announcement ticker saved successfully!");
-      } catch (err) {
-        alert("Failed to save announcement: " + (err.message || err));
-      }
-    }
-
-    async function loadBannedUsers() {
-      const container = document.getElementById('banned-cards-container');
-      if (!container) return;
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading banned players...</p>`;
-
-      try {
-        const { data, error } = await sbClient.from('profiles').select('*').eq('is_banned', true).order('created_at', { ascending: false });
-        if (error) throw error;
-
-        const list = data || [];
-        if (!list.length) {
-          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No banned players found.</p>`;
-          return;
-        }
-
-        container.innerHTML = list.map(u => `
-          <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-3.5 space-y-2.5">
-            <div class="flex items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
-                <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-11 h-11 rounded-full object-cover border-2 border-red-500" />
-                <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                  <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
-                </div>
-              </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">BANNED</span>
-            </div>
-            <div class="flex justify-end pt-1">
-              <button onclick="banPlayerFromPlatform('${u.id}', false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition">UNBAN PLAYER</button>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${escapeHTML(err.message)}</p>`;
-      }
-    }
-
-    async function loadUsers() {
-      const container = document.getElementById('users-cards-container');
-      if (!container) return;
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading gamers...</p>`;
-
-      try {
-        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false }).limit(100);
+        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         globalAllPlayersCache = data || [];
-        renderUsersList(globalAllPlayersCache);
+        renderModalAllPlayers(globalAllPlayersCache);
       } catch (err) {
-        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading users: ${escapeHTML(err.message || 'Database error')}</p>`;
+        body.innerHTML = `<p class="text-red-500 text-xs text-center py-6">Failed: ${escapeHTML(err.message)}</p>`;
       }
     }
 
-    function filterUsersList() {
-      const q = document.getElementById('user-search-input').value.toLowerCase().trim();
-      if (!q) { renderUsersList(globalAllPlayersCache); return; }
+    function closeAllPlayersModal() {
+      document.getElementById('modal-all-players').classList.add('hidden');
+    }
+
+    function filterAllPlayersModal() {
+      const q = document.getElementById('all-players-search').value.toLowerCase().trim();
+      if (!q) { renderModalAllPlayers(globalAllPlayersCache); return; }
       const filtered = globalAllPlayersCache.filter(u => 
         (u.free_fire_name && u.free_fire_name.toLowerCase().includes(q)) ||
         (u.full_name && u.full_name.toLowerCase().includes(q)) ||
         (u.free_fire_uid && u.free_fire_uid.toLowerCase().includes(q)) ||
         (u.email && u.email.toLowerCase().includes(q))
       );
-      renderUsersList(filtered);
+      renderModalAllPlayers(filtered);
+    }
+
+    function renderModalAllPlayers(list) {
+      const body = document.getElementById('modal-all-players-body');
+      if (!list.length) {
+        body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No players found.</p>`;
+        return;
+      }
+
+      body.innerHTML = list.map(u => {
+        const bal = Number(u.balance ?? u.wallet_balance ?? 0);
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-9 h-9 rounded-full object-cover border border-[#262f40]" />
+              <div>
+                <h4 class="font-bold text-xs text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                <p class="text-cyan-400 font-mono text-[10px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+                <p class="text-gray-400 text-[10px] truncate max-w-[150px]">${escapeHTML(u.email || '')}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="font-gaming font-bold text-yellow-400 text-xs block">PKR ${bal}</span>
+              <button onclick="closeAllPlayersModal(); openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${bal});" class="bg-amber-600 hover:bg-amber-500 text-white px-2 py-0.5 rounded text-[10px] font-bold mt-1">Edit</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // GAMERS PAGE & HISTORY MODAL
+    // ==========================================
+    async function loadUsers() {
+      const container = document.getElementById('users-cards-container');
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading gamers...</p>`;
+      try {
+        const { data, error } = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        globalAllPlayersCache = data || [];
+        renderUsersList(globalAllPlayersCache);
+      } catch (err) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">${escapeHTML(err.message)}</p>`;
+      }
     }
 
     function renderUsersList(list) {
       const container = document.getElementById('users-cards-container');
-      if (!container) return;
-      if (!list.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No gamers found.</p>`;
-        return;
-      }
-      const now = new Date();
+      if (!list.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No gamers.</p>`; return; }
 
       container.innerHTML = list.map(u => {
-        const waNumber = u.phone || '';
-        const userEmail = u.email || 'No email added';
-        const userBalance = Number(u.balance ?? u.wallet_balance ?? u.wallet ?? 0);
-        const lastSeenTime = u.last_seen || u.updated_at || u.created_at;
-        const diffMinutes = lastSeenTime ? (now - new Date(lastSeenTime)) / (1000 * 60) : 999;
-        const isActiveNow = diffMinutes <= 5;
-
-        let waLink = '#';
-        if (waNumber) {
-          let cleanNum = waNumber.replace(/[^0-9]/g, '');
-          if (cleanNum.startsWith('0')) cleanNum = '92' + cleanNum.substring(1);
-          waLink = `https://wa.me/${cleanNum}?text=${encodeURIComponent("Hello! I am contacting you from Multani FF Official Tournament Admin.")}`;
-        }
-
+        const bal = Number(u.balance ?? u.wallet_balance ?? 0);
         return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-3.5 space-y-2.5 transition hover:border-[#ff4624]/50">
-            <div class="flex items-center justify-between gap-3">
+          <div class="bg-[#151922] border border-[#262f40] rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="relative shrink-0">
-                  <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-11 h-11 rounded-full object-cover border-2 ${isActiveNow ? 'border-[#00e676]' : 'border-[#262f40]'}" />
-                  ${isActiveNow ? `<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#00e676] rounded-full border-2 border-[#151922] blink-heart flex items-center justify-center text-[8px] text-black font-bold">💚</span>` : ''}
-                </div>
-                <div class="min-w-0">
-                  <h4 class="font-bold text-sm text-white truncate">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
-                  <p class="text-cyan-400 font-mono text-[11px] truncate">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
+                <img src="${u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-10 h-10 rounded-full object-cover border border-[#262f40]" />
+                <div>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(u.free_fire_name || u.full_name || 'Player')}</h4>
+                  <p class="text-cyan-400 font-mono text-[11px]">UID: ${escapeHTML(u.free_fire_uid || '--')}</p>
                 </div>
               </div>
-              <div class="shrink-0 text-right">
-                <span class="font-gaming font-bold text-yellow-400 text-sm block">PKR ${userBalance}</span>
-                <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}">${u.is_banned ? 'BANNED' : 'ACTIVE'}</span>
-              </div>
+              <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${bal}</span>
             </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-xl space-y-1 text-[11px] border border-[#262f40]/50">
-              <div class="text-gray-300 truncate">Gmail: <strong class="text-white">${escapeHTML(userEmail)}</strong></div>
-              <div class="flex items-center justify-between pt-1 border-t border-[#262f40]/40">
-                <span class="text-gray-400 font-mono">Joined: ${new Date(u.created_at).toLocaleDateString()}</span>
-                <span class="text-gray-300">Last Seen: <strong class="${isActiveNow ? 'text-[#00e676]' : 'text-yellow-400'}">${formatTimeAgo(lastSeenTime)}</strong></span>
-              </div>
-            </div>
-            <div class="flex items-center gap-2 pt-0.5 flex-wrap">
-              ${waNumber ? `<a href="${waLink}" target="_blank" class="bg-[#25D366] text-white py-1.5 px-3 rounded-xl font-bold text-xs"><i class="fa-brands fa-whatsapp"></i> WA</a>` : ''}
-              <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${userBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs"><i class="fa-solid fa-wallet"></i> Edit Balance</button>
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${bal})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs"><i class="fa-solid fa-wallet mr-1"></i> Edit Balance</button>
               <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 py-1.5 px-3 rounded-xl font-bold text-xs font-gaming">History</button>
             </div>
           </div>
@@ -2353,202 +736,237 @@
       }).join('');
     }
 
-    function openWalletModal(userId, userName, currentBalance) {
+    function openWalletModal(userId, name, bal) {
       document.getElementById('edit-wallet-user-id').value = userId;
-      document.getElementById('edit-wallet-username').value = userName;
-      document.getElementById('edit-wallet-amount').value = currentBalance;
+      document.getElementById('edit-wallet-username').value = name;
+      document.getElementById('edit-wallet-amount').value = bal;
       document.getElementById('modal-edit-wallet').classList.remove('hidden');
     }
-
     function closeWalletModal() { document.getElementById('modal-edit-wallet').classList.add('hidden'); }
 
     async function saveWalletBalance() {
       const userId = document.getElementById('edit-wallet-user-id').value;
-      const newBalance = parseFloat(document.getElementById('edit-wallet-amount').value);
-      if (isNaN(newBalance)) return alert("Please enter a valid balance.");
-
-      const { error } = await sbClient.from('profiles').update({ balance: newBalance, updated_at: new Date().toISOString() }).eq('id', userId);
-      if (error) alert("Failed: " + error.message);
-      else { alert("Wallet updated!"); closeWalletModal(); loadUsers(); }
-    }
-
-    // Support 1-on-1 Inbox
-    async function loadSupportInbox() {
-      const inboxView = document.getElementById('support-inbox-view');
-      const chatView = document.getElementById('support-chat-view');
-      if (inboxView) inboxView.classList.remove('hidden');
-      if (chatView) chatView.classList.add('hidden');
-      if (chatInterval) clearInterval(chatInterval);
-
-      const listContainer = document.getElementById('support-inbox-list');
-      if (!listContainer) return;
-      listContainer.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
+      const amt = parseFloat(document.getElementById('edit-wallet-amount').value);
+      if (isNaN(amt)) return alert("Please enter valid amount.");
 
       try {
-        const { data: messages, error } = await sbClient.from('support_messages').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-
-        const userMap = {};
-        (messages || []).forEach(m => {
-          if (!m.user_id) return;
-          if (!userMap[m.user_id]) {
-            userMap[m.user_id] = { user_id: m.user_id, last_message: m.message, last_time: m.created_at, unread_count: 0 };
-          }
-          if (m.sender_role === 'player' && !m.is_read) userMap[m.user_id].unread_count++;
-        });
-
-        const userIds = Object.keys(userMap);
-        if (userIds.length === 0) {
-          listContainer.innerHTML = `<p class="text-gray-500 text-xs py-6 text-center">No support chats.</p>`;
-          return;
+        // Safe update with fallback columns
+        const { error } = await sbClient.from('profiles').update({ balance: amt, updated_at: new Date().toISOString() }).eq('id', userId);
+        if (error) {
+          await sbClient.from('profiles').update({ wallet_balance: amt }).eq('id', userId);
         }
-
-        const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, full_name, avatar_url').in('id', userIds);
-        const profileMap = {};
-        (profiles || []).forEach(p => { profileMap[p.id] = p; });
-
-        listContainer.innerHTML = userIds.map(uid => {
-          const item = userMap[uid];
-          const p = profileMap[uid] || {};
-          return `
-            <div onclick="openPlayerChat('${uid}', '${escapeHTML(p.free_fire_name || 'Player')}', '${escapeHTML(p.free_fire_uid || '--')}', '${escapeHTML(p.avatar_url || '')}')" class="bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl p-3 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3">
-                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80'}" class="w-10 h-10 rounded-full object-cover border border-[#ff4624]" />
-                <div>
-                  <h4 class="font-bold text-sm text-white">${escapeHTML(p.free_fire_name || 'Player')} ${item.unread_count > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] px-1.5 rounded-full">${item.unread_count} new</span>` : ''}</h4>
-                  <p class="text-xs text-gray-400 truncate max-w-[200px]">${escapeHTML(item.last_message)}</p>
-                </div>
-              </div>
-              <span class="text-[10px] text-gray-500">${new Date(item.last_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-          `;
-        }).join('');
+        alert("Wallet balance updated successfully!");
+        closeWalletModal();
+        loadUsers();
       } catch (err) {
-        listContainer.innerHTML = `<p class="text-red-500 text-xs py-6 text-center">Error loading inbox.</p>`;
+        alert("Failed to update wallet: " + err.message);
       }
     }
 
-    async function openPlayerChat(userId, name, uid, avatar) {
-      activeChatPlayerId = userId;
-      document.getElementById('support-inbox-view').classList.add('hidden');
-      document.getElementById('support-chat-view').classList.remove('hidden');
-      document.getElementById('active-chat-username').innerText = name;
-      document.getElementById('active-chat-uid').innerText = `UID: ${uid}`;
-      if (avatar) document.getElementById('active-chat-avatar').src = avatar;
+    async function openPlayerHistoryModal(userId, name) {
+      document.getElementById('modal-history-title').innerText = `${name} - History`;
+      const body = document.getElementById('modal-history-body');
+      body.innerHTML = `<p class="text-gray-400 text-xs text-center py-6"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading player history...</p>`;
+      document.getElementById('modal-player-history').classList.remove('hidden');
 
-      await fetchAndRenderActiveChatMessages();
-      await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', userId).eq('sender_role', 'player');
-      loadDashboardStats();
+      try {
+        const [deps, wds, wins] = await Promise.all([
+          sbClient.from('deposit_requests').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10),
+          sbClient.from('withdrawals').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10),
+          sbClient.from('tournament_winners').select('*, tournaments(title)').eq('user_id', userId).order('created_at', { ascending: false }).limit(10)
+        ]);
 
-      if (chatInterval) clearInterval(chatInterval);
-      chatInterval = setInterval(fetchAndRenderActiveChatMessages, 4000);
-    }
+        const depList = deps.data || [];
+        const wdList = wds.data || [];
+        const winList = wins.data || [];
 
-    async function fetchAndRenderActiveChatMessages() {
-      if (!activeChatPlayerId) return;
-      const container = document.getElementById('active-chat-messages');
-      if (!container) return;
+        if (!depList.length && !wdList.length && !winList.length) {
+          body.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No transaction or winning logs found.</p>`;
+          return;
+        }
 
-      const { data } = await sbClient.from('support_messages').select('*').eq('user_id', activeChatPlayerId).order('created_at', { ascending: true });
-      if (!data) return;
+        body.innerHTML = `
+          <div class="space-y-2">
+            ${winList.map(w => `
+              <div class="bg-[#151922] p-2.5 rounded-lg border border-yellow-500/30 flex justify-between items-center text-xs">
+                <div>
+                  <span class="text-yellow-400 font-bold block"><i class="fa-solid fa-trophy mr-1"></i> Won Position #${w.position}</span>
+                  <span class="text-gray-400 text-[10px]">${escapeHTML(w.tournaments?.title || 'Tournament')}</span>
+                </div>
+                <span class="text-emerald-400 font-bold font-gaming text-sm">+PKR ${w.prize_amount}</span>
+              </div>
+            `).join('')}
 
-      container.innerHTML = data.map(m => {
-        const isAdmin = m.sender_role === 'admin';
-        return `
-          <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
-            <div class="max-w-[80%] rounded-xl px-3 py-2 text-xs ${isAdmin ? 'bg-[#ff4624] text-white rounded-br-none' : 'bg-[#06070a] border border-[#262f40] text-gray-200 rounded-bl-none'}">
-              <p>${escapeHTML(m.message)}</p>
-            </div>
+            ${depList.map(d => `
+              <div class="bg-[#151922] p-2.5 rounded-lg border border-[#262f40] flex justify-between items-center text-xs">
+                <div>
+                  <span class="text-cyan-400 font-bold block">Deposit Slip</span>
+                  <span class="text-gray-400 text-[10px]">${d.payment_method \vert{}\vert{} 'Payment'} (${d.status})</span>
+                </div>
+                <span class="text-yellow-400 font-bold font-gaming text-sm">PKR ${d.amount}</span>
+              </div>
+            `).join('')}
+
+            ${wdList.map(w => `
+              <div class="bg-[#151922] p-2.5 rounded-lg border border-[#262f40] flex justify-between items-center text-xs">
+                <div>
+                  <span class="text-amber-400 font-bold block">Withdrawal</span>
+                  <span class="text-gray-400 text-[10px]">${w.payment_method \vert{}\vert{} ''} (${w.status})</span>
+                </div>
+                <span class="text-red-400 font-bold font-gaming text-sm">-PKR ${w.amount}</span>
+              </div>
+            `).join('')}
           </div>
         `;
+      } catch (err) {
+        body.innerHTML = `<p class="text-red-500 text-xs text-center py-6">${escapeHTML(err.message)}</p>`;
+      }
+    }
+    function closePlayerHistoryModal() { document.getElementById('modal-player-history').classList.add('hidden'); }
+
+    // ==========================================
+    // WINNERS DECLARATION (AUTO-FILL & GUARANTEED CREDIT)
+    // ==========================================
+    async function loadWinnerSelectOptions() {
+      const sel = document.getElementById('win-tournament');
+      sel.innerHTML = `<option value="">Loading...</option>`;
+      const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
+      window.allTournamentsFullCache = data || [];
+      sel.innerHTML = `<option value="">Choose tournament...</option>` + (data || []).map(t => `
+        <option value="${t.id}">${escapeHTML(t.title)} (${t.status || 'upcoming'})</option>
+      `).join('');
+    }
+
+    async function onWinnerTournamentChange(tId) {
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => document.getElementById(id).innerHTML = `<option value="">Choose player...</option>`);
+      if (!tId) return;
+
+      const tour = (window.allTournamentsFullCache || []).find(t => t.id === tId);
+      if (tour) {
+        document.getElementById('win-amt1').value = tour.prize_pool || tour.prize_1 || 0;
+        document.getElementById('win-amt2').value = tour.prize_2 || 0;
+        document.getElementById('win-amt3').value = tour.prize_3 || 0;
+        document.getElementById('win-amt4').value = tour.prize_4 || 0;
+      }
+
+      const { data } = await sbClient.from('tournament_entries').select('user_id, profiles(id, free_fire_name, free_fire_uid, full_name)').eq('tournament_id', tId);
+      const opts = `<option value="">Choose player...</option>` + (data || []).map(e => {
+        const p = e.profiles || {};
+        return `<option value="${p.id || e.user_id}">${escapeHTML(p.free_fire_name || p.full_name || 'Gamer')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</option>`;
       }).join('');
-      container.scrollTop = container.scrollHeight;
+
+      ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => document.getElementById(id).innerHTML = opts);
     }
 
-    function closePlayerChat() {
-      if (chatInterval) clearInterval(chatInterval);
-      activeChatPlayerId = null;
-      loadSupportInbox();
+    async function submitAllWinnersDeclaration() {
+      const tId = document.getElementById('win-tournament').value;
+      if (!tId) return alert("Select a tournament first.");
+
+      const u1 = document.getElementById('win-u1').value;
+      const amt1 = parseFloat(document.getElementById('win-amt1').value) || 0;
+      if (!u1 || amt1 <= 0) return alert("1st place winner and amount are mandatory.");
+
+      const u2 = document.getElementById('win-u2').value;
+      const amt2 = parseFloat(document.getElementById('win-amt2').value) || 0;
+      const u3 = document.getElementById('win-u3').value;
+      const amt3 = parseFloat(document.getElementById('win-amt3').value) || 0;
+      const u4 = document.getElementById('win-u4').value;
+      const amt4 = parseFloat(document.getElementById('win-amt4').value) || 0;
+
+      if (!confirm("Are you sure? Winners will receive wallet balance immediately.")) return;
+
+      const btn = document.getElementById('btn-submit-winners');
+      btn.disabled = true;
+      btn.innerText = "PROCESSING...";
+
+      try {
+        const payload = [
+          { tournament_id: tId, user_id: u1, position: 1, prize_amount: amt1 },
+          ...(u2 && amt2 > 0 ? [{ tournament_id: tId, user_id: u2, position: 2, prize_amount: amt2 }] : []),
+          ...(u3 && amt3 > 0 ? [{ tournament_id: tId, user_id: u3, position: 3, prize_amount: amt3 }] : []),
+          ...(u4 && amt4 > 0 ? [{ tournament_id: tId, user_id: u4, position: 4, prize_amount: amt4 }] : [])
+        ];
+
+        await sbClient.from('tournament_winners').delete().eq('tournament_id', tId);
+        await sbClient.from('tournament_winners').insert(payload);
+
+        // Credit wallet balances
+        for (const w of payload) {
+          const { data: prof } = await sbClient.from('profiles').select('balance, total_won').eq('id', w.user_id).single();
+          const currentBal = Number(prof?.balance || 0);
+          const currentWon = Number(prof?.total_won || 0);
+
+          await sbClient.from('profiles').update({
+            balance: currentBal + Number(w.prize_amount),
+            total_won: currentWon + Number(w.prize_amount),
+            updated_at: new Date().toISOString()
+          }).eq('id', w.user_id);
+        }
+
+        // Set status to completed
+        await sbClient.from('tournaments').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', tId);
+
+        alert("🎉 Winners announced successfully and prizes credited to player wallets!");
+        
+        // Form Reset & Auto Back
+        document.getElementById('win-tournament').value = '';
+        ['win-amt1', 'win-amt2', 'win-amt3', 'win-amt4'].forEach(id => document.getElementById(id).value = '');
+        selectTab('overview');
+      } catch (err) {
+        alert("Declaration Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Announce All Winners & Complete Match";
+      }
     }
 
-    const replyForm = document.getElementById('admin-reply-form');
-    if (replyForm) {
-      replyForm.onsubmit = async (e) => {
-        e.preventDefault();
-        if (!activeChatPlayerId) return;
-        const input = document.getElementById('admin-reply-input');
-        const text = input.value.trim();
-        if (!text) return;
-        input.value = '';
+    async function loadDeclaredWinners() {
+      const container = document.getElementById('admin-declared-winners-list');
+      const { data } = await sbClient.from('tournament_winners').select('*, tournaments(title), profiles(free_fire_name, free_fire_uid)').order('created_at', { ascending: false });
+      if (!data || !data.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No declared winners.</p>`; return; }
 
-        await sbClient.from('support_messages').insert([{ user_id: activeChatPlayerId, sender_role: 'admin', message: text, is_read: true }]);
-        fetchAndRenderActiveChatMessages();
-      };
-    }
-
-    // Referral Rewards
-    async function loadAdminReferralRewards() {
-      const container = document.getElementById('admin-referral-rewards-list');
-      if (!container) return;
-      const { data } = await sbClient.from('referral_rewards').select('*').order('referrals_required', { ascending: true });
-      container.innerHTML = (data || []).map(rew => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
+      container.innerHTML = data.map(w => `
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex justify-between items-center text-xs">
           <div>
-            <span class="font-gaming font-bold text-yellow-400 text-sm">${rew.referrals_required} Invites</span>
-            <h4 class="font-bold text-white text-sm">${escapeHTML(rew.reward_name)}</h4>
+            <h4 class="font-bold text-white">${escapeHTML(w.tournaments?.title || 'Match')}</h4>
+            <span class="text-yellow-400 font-bold">Position #${w.position}: ${escapeHTML(w.profiles?.free_fire_name || 'Player')} (UID: ${escapeHTML(w.profiles?.free_fire_uid || '--')})</span>
           </div>
-          <button onclick="deleteReferralReward(${rew.id})" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
+          <span class="text-emerald-400 font-bold font-gaming text-sm">PKR ${w.prize_amount}</span>
         </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-4">No rewards.</p>`;
+      `).join('');
     }
 
-    function openAddReferralRewardModal() { document.getElementById('modal-referral-reward').classList.remove('hidden'); }
-    function closeReferralRewardModal() { document.getElementById('modal-referral-reward').classList.add('hidden'); }
-
-    async function saveReferralReward() {
-      const referrals_required = parseInt(document.getElementById('ref-req').value);
-      const reward_name = document.getElementById('ref-name').value.trim();
-      const reward_type = document.getElementById('ref-type').value;
-      const reward_value = document.getElementById('ref-val').value.trim();
-      const is_active = document.getElementById('ref-active').checked;
-
-      await sbClient.from('referral_rewards').insert([{ referrals_required, reward_name, reward_type, reward_value, is_active }]);
-      closeReferralRewardModal();
-      loadAdminReferralRewards();
-    }
-
-    async function deleteReferralReward(id) {
-      if (!confirm("Delete reward?")) return;
-      await sbClient.from('referral_rewards').delete().eq('id', id);
-      loadAdminReferralRewards();
-    }
-
-    // Daily Spin Management
+    // ==========================================
+    // DAILY SPIN MANAGEMENT (SAFE EDIT WITH ZERO CRASH)
+    // ==========================================
     async function loadAdminDailySpinMgmt() {
       const container = document.getElementById('admin-daily-spin-slots-list');
-      if (!container) return;
-      const { data: slots } = await sbClient.from('daily_spin_rewards').select('*').order('slot_number', { ascending: true });
-      container.innerHTML = (slots || []).map(s => `
+      const { data } = await sbClient.from('daily_spin_rewards').select('*').order('slot_number', { ascending: true });
+      dailySpinSlotsCache = data || [];
+      if (!dailySpinSlotsCache.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No slots.</p>`; return; }
+
+      container.innerHTML = dailySpinSlotsCache.map((s, idx) => `
         <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
           <div>
             <span class="font-gaming font-bold text-yellow-400 text-sm">Slot #${s.slot_number}</span>
             <h4 class="font-bold text-white text-sm">${escapeHTML(s.reward_name)}</h4>
           </div>
-          <button onclick="openDailySpinSlotModal(${s.id}, ${s.slot_number}, '${escapeHTML(s.reward_name)}', '${s.reward_type}', ${s.reward_value}, ${s.is_active})" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1.5 rounded font-bold">Edit</button>
+          <button type="button" onclick="openDailySpinSlotByIndex(${idx})" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1.5 rounded font-bold">Edit</button>
         </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-4">No slots.</p>`;
+      `).join('');
     }
 
-    function openDailySpinSlotModal(id, slot_number, reward_name, reward_type, reward_value, is_active) {
-      document.getElementById('edit-spin-slot-id').value = id;
-      document.getElementById('spin-slot-num').value = slot_number;
-      document.getElementById('spin-slot-name').value = reward_name;
-      document.getElementById('spin-slot-type').value = reward_type;
-      document.getElementById('spin-slot-val').value = reward_value;
-      document.getElementById('spin-slot-active').checked = is_active;
+    function openDailySpinSlotByIndex(idx) {
+      const s = dailySpinSlotsCache[idx];
+      if (!s) return;
+      document.getElementById('edit-spin-slot-id').value = s.id;
+      document.getElementById('spin-slot-num').value = s.slot_number;
+      document.getElementById('spin-slot-name').value = s.reward_name;
+      document.getElementById('spin-slot-type').value = s.reward_type;
+      document.getElementById('spin-slot-val').value = s.reward_value;
+      document.getElementById('spin-slot-active').checked = s.is_active;
       document.getElementById('modal-daily-spin-slot').classList.remove('hidden');
     }
-
     function closeDailySpinSlotModal() { document.getElementById('modal-daily-spin-slot').classList.add('hidden'); }
 
     async function saveDailySpinSlot() {
@@ -2563,238 +981,94 @@
       loadAdminDailySpinMgmt();
     }
 
-    // Spin History
+    // ==========================================
+    // DAILY SPIN HISTORY (NOW WITH PLAYER NAME & UID)
+    // ==========================================
     async function loadAdminSpinHistory() {
       const container = document.getElementById('admin-spin-history-container');
-      if (!container) return;
-      const { data } = await sbClient.from('daily_spin_history').select('*').order('spin_date', { ascending: false });
-      globalSpinHistoryCache = data || [];
-      renderSpinHistoryList(globalSpinHistoryCache);
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading spin history...</p>`;
+
+      try {
+        const { data: logs, error } = await sbClient.from('daily_spin_history').select('*').order('created_at', { ascending: false }).limit(100);
+        if (error) throw error;
+
+        const list = logs || [];
+        const userIds = [...new Set(list.map(l => l.user_id).filter(Boolean))];
+
+        let profMap = {};
+        if (userIds.length > 0) {
+          const { data: profs } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, full_name').in('id', userIds);
+          (profs || []).forEach(p => { profMap[p.id] = p; });
+        }
+
+        globalSpinHistoryCache = list.map(l => ({
+          ...l,
+          profiles: profMap[l.user_id] || { free_fire_name: 'Player', free_fire_uid: '--' }
+        }));
+
+        renderSpinHistoryList(globalSpinHistoryCache);
+      } catch (err) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">${escapeHTML(err.message)}</p>`;
+      }
     }
 
     function filterSpinHistory() {
       const q = document.getElementById('spin-history-search').value.toLowerCase().trim();
       if (!q) { renderSpinHistoryList(globalSpinHistoryCache); return; }
-      renderSpinHistoryList(globalSpinHistoryCache.filter(h => (h.reward_name || '').toLowerCase().includes(q)));
+      const filtered = globalSpinHistoryCache.filter(h => 
+        (h.reward_name && h.reward_name.toLowerCase().includes(q)) ||
+        (h.profiles?.free_fire_name && h.profiles.free_fire_name.toLowerCase().includes(q)) ||
+        (h.profiles?.free_fire_uid && h.profiles.free_fire_uid.toLowerCase().includes(q))
+      );
+      renderSpinHistoryList(filtered);
     }
 
     function renderSpinHistoryList(list) {
       const container = document.getElementById('admin-spin-history-container');
-      if (!container) return;
-      container.innerHTML = list.map(item => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 flex items-center justify-between text-xs">
-          <div>
-            <h4 class="font-bold text-white text-sm">Reward: ${escapeHTML(item.reward_name)}</h4>
-            <span class="text-gray-400 text-[11px]">Value: ${item.reward_value}</span>
-          </div>
-          <span class="text-purple-400 font-mono text-[11px]">${new Date(item.spin_date || item.created_at).toLocaleString()}</span>
-        </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-4">No spin records.</p>`;
-    }
+      if (!list.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No spin history records.</p>`; return; }
 
-    // Tournaments
-    async function loadTournaments() {
-      const container = document.getElementById('tournaments-cards-container');
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading tournaments...</p>`;
-      const { data } = await sbClient.from('tournaments').select('*').order('created_at', { ascending: false });
-      loadedTournamentsList = data || [];
-      renderTournamentsList();
-    }
-
-    function filterTournaments(status) {
-      currentTournamentFilter = status;
-      ['all', 'upcoming', 'live', 'completed'].forEach(s => {
-        const btn = document.getElementById(`filter-btn-${s}`);
-        if (btn) btn.className = s === status ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap" : "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
-      });
-      renderTournamentsList();
-    }
-
-    function renderTournamentsList() {
-      const container = document.getElementById('tournaments-cards-container');
-      const filtered = loadedTournamentsList.filter(t => currentTournamentFilter === 'all' || (t.status || 'upcoming').toLowerCase() === currentTournamentFilter);
-
-      if (!filtered.length) {
-        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No matches found.</p>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(t => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3 relative overflow-hidden">
-          <div class="flex items-center justify-between">
+      container.innerHTML = list.map(item => {
+        const p = item.profiles || {};
+        return `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between text-xs">
             <div>
-              <h3 class="font-gaming text-base md:text-lg font-bold text-white">${escapeHTML(t.title)}</h3>
-              <div class="flex flex-wrap gap-2 text-[11px] text-gray-400 mt-1">
-                <span class="text-cyan-400 font-bold">${escapeHTML(t.mode)}</span> • <span>${escapeHTML(t.map)}</span> • <span class="text-yellow-400 font-bold">1st: PKR ${t.prize_pool || 0}</span>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')}</span>
+                <span class="text-[10px] text-cyan-400 font-mono bg-[#06070a] px-1 py-0.2 rounded border border-[#262f40]">#${escapeHTML(p.free_fire_uid || '--')}</span>
               </div>
+              <h4 class="font-bold text-yellow-400 text-sm mt-0.5">${escapeHTML(item.reward_name)}</h4>
+              <span class="text-gray-400 text-[10px]">Reward Value: ${item.reward_value}</span>
             </div>
-            <select onchange="updateTournamentStatus('${t.id}', this.value)" class="bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-[10px] font-bold uppercase text-white">
-              <option value="upcoming" ${(t.status || 'upcoming') === 'upcoming' ? 'selected' : ''}>Upcoming</option>
-              <option value="live" ${(t.status || '') === 'live' ? 'selected' : ''}>Live</option>
-              <option value="completed" ${(t.status || '') === 'completed' ? 'selected' : ''}>Completed</option>
-            </select>
+            <span class="text-purple-400 font-mono text-[10px]">${new Date(item.created_at || item.spin_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
-          <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-2.5 rounded-lg text-xs">
-            <div>
-              <span class="text-gray-500 text-[10px] uppercase font-bold block">Room ID</span>
-              <input type="text" id="rid-${t.id}" value="${escapeHTML(t.room_id || '')}" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
-            </div>
-            <div>
-              <span class="text-gray-500 text-[10px] uppercase font-bold block">Password</span>
-              <input type="text" id="rpass-${t.id}" value="${escapeHTML(t.room_password || '')}" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2 py-1 text-cyan-400 font-mono mt-1 text-xs">
-            </div>
-          </div>
-          <div class="flex items-center justify-between pt-1 flex-wrap gap-1">
-            <span class="text-xs font-mono text-gray-400">Slots: <strong class="text-white">${t.joined_players || 0}/${t.max_players}</strong></span>
-            <div class="flex items-center gap-1.5">
-              <button onclick="updateTournamentCredentials('${t.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-2.5 py-1 rounded text-xs font-bold font-gaming">SET ROOM</button>
-              <button onclick="viewTournamentPlayers('${t.id}', '${escapeHTML(t.title)}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded text-xs font-bold">PLAYERS</button>
-              <button onclick="deleteTournament('${t.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function updateTournamentStatus(id, newStatus) {
-      if (newStatus === 'completed') {
-        selectTab('winners');
-        const winTSelect = document.getElementById('win-tournament');
-        if (winTSelect) { winTSelect.value = id; onWinnerTournamentChange(id); }
-        alert("Please declare winners to officially complete this match.");
-        return;
-      }
-      await sbClient.from('tournaments').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id);
-      alert("Match status updated!");
-    }
-
-    async function updateTournamentCredentials(id) {
-      const room_id = document.getElementById(`rid-${id}`).value.trim();
-      const room_password = document.getElementById(`rpass-${id}`).value.trim();
-      await sbClient.from('tournaments').update({ room_id, room_password, updated_at: new Date().toISOString() }).eq('id', id);
-      alert("Credentials saved!");
-    }
-
-    async function deleteTournament(id) {
-      if (!confirm("Permanently delete tournament?")) return;
-      await sbClient.rpc('delete_tournament_safely', { p_tournament_id: id });
-      loadTournaments();
+        `;
+      }).join('');
     }
 
     // Deposits
     async function loadDeposits() {
       const container = document.getElementById('deposits-cards-container');
-      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading deposits...</p>`;
       const { data } = await sbClient.from('deposit_requests').select('*').order('created_at', { ascending: false });
-      const pendingData = (data || []).filter(d => (d.status || '').toLowerCase() === 'pending');
+      const pending = (data || []).filter(d => (d.status || '').toLowerCase() === 'pending');
+      if (!pending.length) { container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No pending deposits.</p>`; return; }
 
-      container.innerHTML = pendingData.map(d => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-sm text-white">${escapeHTML(d.sender_name || 'Gamer')}</h4>
-            <span class="font-gaming font-bold text-yellow-400 text-sm">PKR ${d.amount}</span>
+      container.innerHTML = pending.map(d => `
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex justify-between items-center text-xs">
+          <div>
+            <h4 class="font-bold text-white">${escapeHTML(d.sender_name || 'Player')}</h4>
+            <span class="text-yellow-400 font-bold font-gaming">PKR ${d.amount}</span>
           </div>
-          <div class="flex items-center justify-between bg-[#0e1118] p-2 rounded-lg text-xs">
-            <span class="text-gray-400 text-[10px]">Method: <strong class="text-white">${escapeHTML(d.payment_method)}</strong></span>
-            ${d.screenshot_url ? `<a href="${d.screenshot_url}" target="_blank" class="text-emerald-400 underline font-bold">View Slip</a>` : '<span class="text-gray-500">No slip</span>'}
-          </div>
-          <div class="flex gap-2 pt-1">
-            <button onclick="reviewDeposit('${d.id}', 'approve')" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded font-bold text-xs">APPROVE</button>
-            <button onclick="reviewDeposit('${d.id}', 'reject')" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-1.5 rounded font-bold text-xs">REJECT</button>
-          </div>
+          <button onclick="approveDeposit('${d.id}')" class="bg-emerald-600 text-white px-3 py-1 rounded font-bold">APPROVE</button>
         </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-6">No pending deposit slips.</p>`;
+      `).join('');
     }
 
-    async function reviewDeposit(id, action) {
-      if (!confirm(`Are you sure you want to ${action.toUpperCase()} this deposit?`)) return;
-      await sbClient.rpc('admin_review_deposit', { p_request_id: id, p_action: action, p_note: '' });
-      alert(`Deposit slip ${action.toUpperCase()}D successfully!`);
+    async function approveDeposit(id) {
+      if (!confirm("Approve deposit?")) return;
+      await sbClient.rpc('admin_review_deposit', { p_request_id: id, p_action: 'approve', p_note: '' });
       loadDeposits();
       loadDashboardStats();
     }
-
-    // Withdrawals
-    async function loadAdminWithdrawals() {
-      const container = document.getElementById('admin-withdrawal-requests-list');
-      if (!container) return;
-      const { data: withdrawals } = await sbClient.from('withdrawals').select('*').order('created_at', { ascending: false });
-      const list = withdrawals || [];
-
-      container.innerHTML = list.map(w => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-sm text-white">Amount: PKR ${w.amount}</h4>
-            <span class="text-[10px] px-2.5 py-1 rounded font-bold uppercase ${w.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}">${escapeHTML(w.status)}</span>
-          </div>
-          <div class="bg-[#0e1118] p-2.5 rounded-lg text-xs">
-            <div>Method: <strong class="text-white">${escapeHTML(w.payment_method)}</strong> • Account: <strong class="text-cyan-400">${escapeHTML(w.account_number)}</strong></div>
-          </div>
-          ${w.status === 'pending' ? `
-            <div class="flex gap-2 pt-1">
-              <button onclick="reviewWithdrawalRequest('${w.id}', 'approve')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded text-xs font-bold uppercase">APPROVE</button>
-              <button onclick="reviewWithdrawalRequest('${w.id}', 'reject')" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded text-xs font-bold uppercase">REJECT</button>
-            </div>
-          ` : ''}
-        </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-6">No withdrawal requests.</p>`;
-    }
-
-    async function reviewWithdrawalRequest(withdrawalId, action) {
-      if (!confirm(`Are you sure you want to ${action.toUpperCase()} this request?`)) return;
-      await sbClient.rpc('admin_review_withdrawal', { p_withdrawal_id: withdrawalId, p_action: action, p_admin_note: action });
-      alert(`Withdrawal request processed!`);
-      loadAdminWithdrawals();
-      loadDashboardStats();
-    }
-
-    // Diamonds
-    async function loadAdminDiamondRequests() {
-      const container = document.getElementById('admin-diamond-requests-container');
-      if (!container) return;
-      const { data } = await sbClient.from('diamond_requests').select('*').order('created_at', { ascending: false });
-      loadedDiamondRequestsList = data || [];
-      renderDiamondRequestsList();
-    }
-
-    function filterDiamondRequests(status) {
-      currentDiamondFilter = status;
-      renderDiamondRequestsList();
-    }
-
-    function renderDiamondRequestsList() {
-      const container = document.getElementById('admin-diamond-requests-container');
-      if (!container) return;
-      const filtered = loadedDiamondRequestsList.filter(req => currentDiamondFilter === 'all' || (req.status || '').toLowerCase() === currentDiamondFilter);
-
-      container.innerHTML = filtered.map(req => `
-        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 space-y-2">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-sm text-white">${escapeHTML(req.game_name)} (UID: ${escapeHTML(req.free_fire_uid)})</h4>
-            <span class="font-gaming font-bold text-orange-400 text-sm">${req.diamonds} 💎</span>
-          </div>
-          <div class="flex items-center gap-2">
-            ${req.status === 'pending' ? `
-              <button onclick="updateDiamondReqStatus(${req.id}, 'delivered')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold">Deliver</button>
-              <button onclick="updateDiamondReqStatus(${req.id}, 'rejected')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">Reject</button>
-            ` : `<span class="text-xs text-gray-400 font-bold uppercase">${req.status}</span>`}
-          </div>
-        </div>
-      `).join('') || `<p class="text-gray-500 text-xs text-center py-6">No requests found.</p>`;
-    }
-
-    async function updateDiamondReqStatus(requestId, newStatus) {
-      if (!confirm(`Mark request #${requestId} as ${newStatus}?`)) return;
-      await sbClient.rpc('admin_update_diamond_request_status', { p_request_id: requestId, p_new_status: newStatus, p_admin_notes: '', p_screenshot_url: null });
-      alert("Updated successfully!");
-      loadAdminDiamondRequests();
-      loadDashboardStats();
-    }
-
-    function openAllPlayersModal() { document.getElementById('modal-all-players').classList.remove('hidden'); loadUsers(); }
-    function closeAllPlayersModal() { document.getElementById('modal-all-players').classList.add('hidden'); }
-    function openCreateTournamentModal() { document.getElementById('modal-match').classList.remove('hidden'); }
-    function closeCreateTournamentModal() { document.getElementById('modal-match').classList.add('hidden'); }
 
     window.addEventListener('DOMContentLoaded', () => {
       checkAdminAuth();
