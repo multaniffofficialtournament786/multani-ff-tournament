@@ -48,7 +48,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Game Name & UID Message Ke Uper */
+    /* Message Header: DP, Name & UID (Message Ke Uper) */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -58,8 +58,8 @@
     }
     .msg-me .msg-user-header { flex-direction: row-reverse; }
     .header-avatar {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       border: 1.5px solid var(--primary);
       object-fit: cover;
@@ -226,11 +226,50 @@
     const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const currentUser = {
-      name: localStorage.getItem("ff_player_name") || "Player",
-      uid: localStorage.getItem("ff_player_uid") || "12345678",
-      avatar: localStorage.getItem("ff_player_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
+    // Initial player data storage check
+    let currentUser = {
+      name: localStorage.getItem("ff_player_ign") || localStorage.getItem("ign") || localStorage.getItem("ff_ign") || localStorage.getItem("ff_player_name") || "Player",
+      uid: localStorage.getItem("ff_player_uid") || localStorage.getItem("uid") || localStorage.getItem("ff_uid") || "12345678",
+      avatar: localStorage.getItem("ff_player_avatar") || localStorage.getItem("avatar") || localStorage.getItem("profile_pic") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
+
+    // Har player ki database se profile auto-fetch karna
+    async function loadCurrentPlayerProfile() {
+      try {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        if (authData && authData.user) {
+          const userId = authData.user.id;
+          
+          // profiles table check
+          const { data: pData } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
+          if (pData) {
+            currentUser.name = pData.ign || pData.ff_ign || pData.name || pData.username || currentUser.name;
+            currentUser.uid = pData.uid || pData.ff_uid || currentUser.uid;
+            currentUser.avatar = pData.avatar_url || pData.avatar || currentUser.avatar;
+          } else {
+            // users table check
+            const { data: uData } = await supabaseClient
+              .from('users')
+              .select('*')
+              .eq('id', userId)
+              .maybeSingle();
+
+            if (uData) {
+              currentUser.name = uData.ign || uData.ff_ign || uData.name || uData.username || currentUser.name;
+              currentUser.uid = uData.uid || uData.ff_uid || currentUser.uid;
+              currentUser.avatar = uData.avatar_url || uData.avatar || currentUser.avatar;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Profile fetch error:", e);
+      }
+    }
 
     // 17 Animated stickers from repo
     const myStickers = [
@@ -259,6 +298,7 @@
 
     async function initChat() {
       applyStoredTheme();
+      await loadCurrentPlayerProfile();
       loadStickerDrawer();
       await loadMessages();
 
@@ -311,7 +351,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message render: DP, Name aur UID message ke uper
+    // Message render: Har player ki DP, Name aur UID message ke theek uper
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
@@ -331,15 +371,16 @@
       const replyHtml = msg.reply_text ? `<div class="reply-quote">${escapeHtml(msg.reply_text)}</div>` : '';
       const formattedTime = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+      const msgText = msg.content || msg.message || "";
       let contentHtml = '';
-      if (msg.content && msg.content.startsWith('STICKER:')) {
-        const rawUrl = msg.content.replace('STICKER:', '');
+      if (msgText.startsWith('STICKER:')) {
+        const rawUrl = msgText.replace('STICKER:', '');
         contentHtml = `<img src="${encodeURI(rawUrl)}" class="animated-sticker-msg" />`;
       } else {
-        contentHtml = `<div>${escapeHtml(msg.content)}</div>`;
+        contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
-      const avatarSrc = msg.avatar || currentUser.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani";
+      const avatarSrc = msg.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(msg.name || "Multani");
 
       row.innerHTML = `
         <div class="msg-user-header">
@@ -373,7 +414,6 @@
     }
 
     async function postToSupabase(content) {
-      // Supabase se login user ka session hasil karein
       let authUserId = null;
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
@@ -387,14 +427,13 @@
       const payload = {
         name: currentUser.name,
         uid: currentUser.uid,
+        user_id: authUserId || currentUser.uid,
         avatar: currentUser.avatar,
         content: content,
+        message: content, // Message column constraint safety
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
       };
-
-      // Agar login hai to user_id bhejo, warna UID ko fallback assign karo
-      payload.user_id = authUserId || currentUser.uid;
 
       cancelReply();
 
@@ -440,7 +479,8 @@
       if (!activeSelectedMsg) return;
       activeReply = activeSelectedMsg;
       document.getElementById('replyBar').style.display = 'flex';
-      const preview = activeSelectedMsg.content.startsWith('STICKER:') ? '[Animated Sticker]' : activeSelectedMsg.content;
+      const rawText = activeSelectedMsg.content || activeSelectedMsg.message || "";
+      const preview = rawText.startsWith('STICKER:') ? '[Animated Sticker]' : rawText;
       document.getElementById('replyText').innerText = `Replying to ${activeReply.name}: ${preview.slice(0, 25)}...`;
       document.getElementById('msgModal').style.display = 'none';
     }
@@ -452,7 +492,8 @@
 
     function copyActiveMsg() {
       if (activeSelectedMsg) {
-        const textToCopy = activeSelectedMsg.content.startsWith('STICKER:') ? 'Sticker' : activeSelectedMsg.content;
+        const rawText = activeSelectedMsg.content || activeSelectedMsg.message || "";
+        const textToCopy = rawText.startsWith('STICKER:') ? 'Sticker' : rawText;
         navigator.clipboard.writeText(textToCopy);
       }
       document.getElementById('msgModal').style.display = 'none';
