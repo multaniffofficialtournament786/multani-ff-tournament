@@ -48,7 +48,7 @@
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Name & UID (Message Ke Uper) */
+    /* Message Header: DP, Game Name & UID Message Ke Uper */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -232,7 +232,7 @@
       avatar: localStorage.getItem("ff_player_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
 
-    // Repository stickers
+    // 17 Animated stickers from repo
     const myStickers = [
       "stickers/200w.webp",
       "stickers/200w (1).webp",
@@ -311,7 +311,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message render: DP, Name aur UID msg ke uper
+    // Message render: DP, Name aur UID message ke uper
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
@@ -373,6 +373,17 @@
     }
 
     async function postToSupabase(content) {
+      // Supabase se login user ka session hasil karein
+      let authUserId = null;
+      try {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        if (authData && authData.user) {
+          authUserId = authData.user.id;
+        }
+      } catch (err) {
+        console.warn("Auth check failed:", err);
+      }
+
       const payload = {
         name: currentUser.name,
         uid: currentUser.uid,
@@ -381,6 +392,9 @@
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
       };
+
+      // Agar login hai to user_id bhejo, warna UID ko fallback assign karo
+      payload.user_id = authUserId || currentUser.uid;
 
       cancelReply();
 
