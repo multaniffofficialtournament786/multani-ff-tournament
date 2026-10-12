@@ -59,10 +59,10 @@
     .msg-time { font-size: 9px; color: #9ca3af; text-align: right; margin-top: 4px; }
     .reply-quote { background: rgba(0,0,0,0.3); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
 
-    /* Animated Sticker In-Chat */
+    /* Animated Sticker */
     .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
 
-    /* Reply preview bar */
+    /* Reply preview */
     .reply-preview-bar { background: #1f2937; padding: 6px 12px; display: none; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary); font-size: 12px; }
 
     /* Footer Input */
@@ -75,11 +75,11 @@
     .panel-drawer { display: none; background: #111827; height: 180px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(6, 1fr); gap: 10px; }
     .sticker-drawer { display: none; background: #111827; height: 210px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .emoji-item { font-size: 24px; text-align: center; cursor: pointer; }
-    .sticker-card { background: #1f2937; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #374151; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
+    .sticker-card { background: #1f2937; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #374151; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .sticker-card:hover { border-color: var(--primary); transform: scale(1.04); }
     .sticker-card img { width: 50px; height: 50px; object-fit: contain; }
 
-    /* Menus & Modals */
+    /* Menu & Modals */
     .dropdown-menu { display: none; position: absolute; top: 52px; right: 12px; background: #1f2937; border-radius: 8px; border: 1px solid #374151; width: 190px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100; }
     .menu-item { padding: 10px 14px; font-size: 13px; display: flex; gap: 8px; align-items: center; color: #fff; cursor: pointer; }
     .menu-item:hover { background: #374151; }
@@ -107,7 +107,7 @@
     <button class="menu-btn" onclick="toggleHeaderMenu()"><i class="fas fa-ellipsis-v"></i></button>
   </header>
 
-  <!-- Three-Dot Menu -->
+  <!-- Dropdown Menu -->
   <div class="dropdown-menu" id="headerMenu">
     <div class="menu-item" onclick="openThemePicker()"><i class="fas fa-palette"></i> Theme & Display</div>
     <div class="menu-item" onclick="document.getElementById('bgUpload').click()"><i class="fas fa-image"></i> Chat Background</div>
@@ -152,7 +152,7 @@
     <span class="emoji-item" onclick="insertEmoji('👏')">👏</span>
   </div>
 
-  <!-- Stickers Drawer (Auto-Populated from repository 'stickers' folder) -->
+  <!-- Stickers Drawer -->
   <div class="sticker-drawer" id="stickerDrawer"></div>
 
   <!-- Message Action Modal -->
@@ -188,12 +188,12 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const currentUser = {
-      name: localStorage.getItem("ff_player_name") || "Defeater",
-      uid: localStorage.getItem("ff_player_uid") || "5775457654",
-      avatar: localStorage.getItem("ff_player_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=Defeater"
+      name: localStorage.getItem("ff_player_name") || "Player",
+      uid: localStorage.getItem("ff_player_uid") || "12345678",
+      avatar: localStorage.getItem("ff_player_avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
 
-    // All uploaded sticker files from repository 'stickers' folder
+    // Repository stickers
     const myStickers = [
       "stickers/200w.webp",
       "stickers/200w (1).webp",
@@ -221,7 +221,7 @@
     async function initChat() {
       applyStoredTheme();
       loadStickerDrawer();
-      loadMessages();
+      await loadMessages();
 
       // Realtime listener
       supabaseClient
@@ -248,10 +248,15 @@
       });
     }
 
-    async function loadMessages(limit = 50) {
+    async function loadMessages(limit = 100) {
+      // Aaj raat 12:00 AM ka timestamp
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
+        .gte('created_at', todayMidnight.toISOString())
         .order('id', { ascending: true })
         .limit(limit);
 
@@ -262,12 +267,16 @@
 
       const box = document.getElementById('chatBox');
       box.querySelectorAll('.msg-row').forEach(e => e.remove());
-      data.forEach(m => renderSingleMessage(m));
+      if (data) {
+        data.forEach(m => renderSingleMessage(m));
+      }
       box.scrollTop = box.scrollHeight;
     }
 
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
+      if (document.getElementById(`msg-${msg.id}`)) return; // Duplicate prevention
+
       const box = document.getElementById('chatBox');
       const isMe = String(msg.uid) === String(currentUser.uid);
 
@@ -414,8 +423,19 @@
       toggleHeaderMenu();
     }
 
-    function loadOldMessages() {
-      loadMessages(100);
+    async function loadOldMessages() {
+      // Pichle tamam messages load karein
+      const { data, error } = await supabaseClient
+        .from('chat_messages')
+        .select('*')
+        .order('id', { ascending: true })
+        .limit(100);
+
+      if (!error && data) {
+        const box = document.getElementById('chatBox');
+        box.querySelectorAll('.msg-row').forEach(e => e.remove());
+        data.forEach(m => renderSingleMessage(m));
+      }
     }
 
     function openThemePicker() {
