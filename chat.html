@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MULTANI FF - Player Chat</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080b12;color:#fff;font-family:Arial,sans-serif}
+.app{max-width:480px;margin:auto;height:100dvh;display:flex;flex-direction:column;background:#0d111b}
+.header{padding:16px;background:#151b29;border-bottom:1px solid #293247;display:flex;align-items:center;gap:12px}
+.back{color:#ff572e;text-decoration:none;font-size:24px}
+.title{font-weight:bold;font-size:17px}
+.sub{font-size:12px;color:#9ca8bd;margin-top:4px}
+.messages{flex:1;overflow-y:auto;padding:14px}
+.notice{text-align:center;color:#a7b0c2;font-size:12px;margin:12px 0}
+.bubble{background:#192235;padding:10px 12px;border-radius:12px;margin:10px 0;max-width:85%;overflow-wrap:anywhere}
+.name{color:#ff704d;font-weight:bold;font-size:12px;margin-bottom:5px}
+.uid{font-size:10px;color:#91a1bb;margin-top:5px}
+.time{font-size:10px;color:#91a1bb;text-align:right;margin-top:5px}
+.composer{padding:10px;display:flex;gap:7px;background:#151b29}
+.composer input{min-width:0;flex:1;border:1px solid #303b50;background:#0b101a;color:#fff;padding:12px;border-radius:22px;outline:none}
+button{border:0;border-radius:20px;padding:10px;background:#ff572e;color:white;font-weight:bold}
+#send{padding:0 16px}
+.footer{text-align:center;padding:6px;color:#7d8aa2;font-size:10px;background:#151b29}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<a class="back" href="index.html">‹</a>
+<div>
+<div class="title">💬 MULTANI PLAYER CHAT</div>
+<div class="sub">Public Room · All Players</div>
+</div>
+</header>
+<main class="messages" id="messages">
+<div class="notice">Welcome to MULTANI FF Public Chat!</div>
+<div class="notice">Chat messages will appear here.</div>
+</main>
+<div class="composer">
+<button id="emoji" type="button">😀</button>
+<input id="message" maxlength="1000" placeholder="Write a message..." autocomplete="off">
+<button id="send" type="button">Send</button>
+</div>
+<div class="footer">Follow the rules · Be respectful to all players</div>
+</div>
+<script>
+document.getElementById('emoji').addEventListener('click',()=>{
+ const box=document.getElementById('message');
+ box.value += '😀';
+ box.focus();
+});
+document.getElementById('send').addEventListener('click',()=>{
+ alert('Chat database connection will be added in the next step.');
+});
+document.getElementById('message').addEventListener('keydown',e=>{
+ if(e.key==='Enter') document.getElementById('send').click();
+});
+</script>
+</body>
+  </html>
