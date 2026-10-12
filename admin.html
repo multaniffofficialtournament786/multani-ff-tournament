@@ -745,7 +745,7 @@
 
       <!-- SETTINGS TICKER -->
       <section id="section-settings" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
@@ -1297,82 +1297,86 @@
     });
 
     async function loadDashboardStats() {
-      const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes, reportsRes] = await Promise.all([
-        sbClient.from('deposit_requests').select('*'),
-        sbClient.from('withdrawals').select('*'),
-        sbClient.from('diamond_requests').select('*'),
-        sbClient.from('profiles').select('*', { count: 'exact', head: true }),
-        sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false),
-        sbClient.from('chat_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending')
-      ]);
+      try {
+        const [allDeps, allWds, allDiamonds, userCountRes, supportCountRes, reportsRes] = await Promise.all([
+          sbClient.from('deposit_requests').select('*'),
+          sbClient.from('withdrawals').select('*'),
+          sbClient.from('diamond_requests').select('*'),
+          sbClient.from('profiles').select('*', { count: 'exact', head: true }),
+          sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('sender_role', 'player').eq('is_read', false),
+          sbClient.from('chat_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+        ]);
 
-      const safeDeps = allDeps.data || [];
-      const safeWds = allWds.data || [];
-      const safeDiamonds = allDiamonds.data || [];
+        const safeDeps = allDeps.data || [];
+        const safeWds = allWds.data || [];
+        const safeDiamonds = allDiamonds.data || [];
 
-      const totalDeposits = safeDeps
-        .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
-        .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
-      document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
+        const totalDeposits = safeDeps
+          .filter(r => r.status && r.status.toString().toLowerCase() === 'approved')
+          .reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
+        document.getElementById('stat-total-deposits').innerText = `PKR ${totalDeposits}`;
 
-      const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
-      const pendingCount = pendingList.length;
-      document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
-      
-      const badgeDep = document.getElementById('badge-deposits');
-      if (badgeDep) {
-        badgeDep.innerText = pendingCount;
-        badgeDep.classList.toggle('hidden', pendingCount === 0);
-      }
-      const quickDep = document.getElementById('quick-badge-deposits');
-      if (quickDep) {
-        quickDep.innerText = pendingCount;
-        quickDep.classList.toggle('hidden', pendingCount === 0);
-      }
+        const pendingList = safeDeps.filter(r => r.status && r.status.toString().toLowerCase() === 'pending');
+        const pendingCount = pendingList.length;
+        document.getElementById('stat-pending-deposits').innerText = `${pendingCount}`;
+        
+        const badgeDep = document.getElementById('badge-deposits');
+        if (badgeDep) {
+          badgeDep.innerText = pendingCount;
+          badgeDep.classList.toggle('hidden', pendingCount === 0);
+        }
+        const quickDep = document.getElementById('quick-badge-deposits');
+        if (quickDep) {
+          quickDep.innerText = pendingCount;
+          quickDep.classList.toggle('hidden', pendingCount === 0);
+        }
 
-      const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
-      const badgeWd = document.getElementById('badge-withdrawals');
-      if (badgeWd) {
-        badgeWd.innerText = pendingWdCount;
-        badgeWd.classList.toggle('hidden', pendingWdCount === 0);
-      }
-      const quickWd = document.getElementById('quick-badge-withdrawals');
-      if (quickWd) {
-        quickWd.innerText = pendingWdCount;
-        quickWd.classList.toggle('hidden', pendingWdCount === 0);
-      }
+        const pendingWdCount = safeWds.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+        const badgeWd = document.getElementById('badge-withdrawals');
+        if (badgeWd) {
+          badgeWd.innerText = pendingWdCount;
+          badgeWd.classList.toggle('hidden', pendingWdCount === 0);
+        }
+        const quickWd = document.getElementById('quick-badge-withdrawals');
+        if (quickWd) {
+          quickWd.innerText = pendingWdCount;
+          quickWd.classList.toggle('hidden', pendingWdCount === 0);
+        }
 
-      const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
-      const badgeDiam = document.getElementById('badge-diamond_requests');
-      if (badgeDiam) {
-        badgeDiam.innerText = pendingDiamonds;
-        badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
-      }
-      const quickDiam = document.getElementById('quick-badge-diamond_requests');
-      if (quickDiam) {
-        quickDiam.innerText = pendingDiamonds;
-        quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
-      }
+        const pendingDiamonds = safeDiamonds.filter(r => r.status && r.status.toString().toLowerCase() === 'pending').length;
+        const badgeDiam = document.getElementById('badge-diamond_requests');
+        if (badgeDiam) {
+          badgeDiam.innerText = pendingDiamonds;
+          badgeDiam.classList.toggle('hidden', pendingDiamonds === 0);
+        }
+        const quickDiam = document.getElementById('quick-badge-diamond_requests');
+        if (quickDiam) {
+          quickDiam.innerText = pendingDiamonds;
+          quickDiam.classList.toggle('hidden', pendingDiamonds === 0);
+        }
 
-      document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
+        document.getElementById('stat-total-players').innerText = userCountRes.count || 0;
 
-      const supCount = supportCountRes.count || 0;
-      const badgeSup = document.getElementById('badge-support');
-      if (badgeSup) {
-        badgeSup.innerText = supCount;
-        badgeSup.classList.toggle('hidden', supCount === 0);
-      }
+        const supCount = supportCountRes.count || 0;
+        const badgeSup = document.getElementById('badge-support');
+        if (badgeSup) {
+          badgeSup.innerText = supCount;
+          badgeSup.classList.toggle('hidden', supCount === 0);
+        }
 
-      const repCount = reportsRes.count || 0;
-      const badgeChatRep = document.getElementById('badge-chat-reports');
-      if (badgeChatRep) {
-        badgeChatRep.innerText = repCount;
-        badgeChatRep.classList.toggle('hidden', repCount === 0);
+        const repCount = reportsRes?.count || 0;
+        const badgeChatRep = document.getElementById('badge-chat-reports');
+        if (badgeChatRep) {
+          badgeChatRep.innerText = repCount;
+          badgeChatRep.classList.toggle('hidden', repCount === 0);
+        }
+      } catch (err) {
+        console.error("Dashboard stats error:", err);
       }
     }
 
     // ==========================================
-    // WINNERS DECLARATION (FIXED & COMPLETE AUTO BACK)
+    // WINNERS DECLARATION (FIXED & AUTO BACK)
     // ==========================================
     async function loadWinnerSelectOptions() {
       const winTournamentSelect = document.getElementById('win-tournament');
@@ -1544,7 +1548,7 @@
     }
 
     // ==========================================
-    // GLOBAL CHAT ROOM MANAGEMENT (SUB-TABS & REALTIME)
+    // GLOBAL CHAT ROOM MANAGEMENT (FAIL-SAFE WITHOUT SCHEMA JOIN)
     // ==========================================
     function switchChatSubTab(subTab) {
       ['live_messages', 'announcements', 'reports', 'moderation'].forEach(st => {
@@ -1582,7 +1586,7 @@
         document.getElementById('chat-stat-online-players').innerText = onlineRes.count || 0;
         document.getElementById('chat-stat-muted-players').innerText = mutedRes.count || 0;
         
-        const repCount = reportsRes.count || 0;
+        const repCount = reportsRes?.count || 0;
         document.getElementById('chat-stat-reported-msgs').innerText = repCount;
         const repBadge = document.getElementById('badge-chat-reports');
         if (repBadge) {
@@ -1594,40 +1598,54 @@
       }
     }
 
+    // 100% Fail-safe: No direct foreign key join used to prevent schema cache errors
     async function loadAdminChatMessages() {
       const container = document.getElementById('admin-chat-messages-container');
       if (!container) return;
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-6"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading live messages...</p>`;
 
       try {
-        const { data, error } = await sbClient
+        // 1. Fetch raw messages safely
+        const { data: messages, error: msgErr } = await sbClient
           .from('chat_messages')
-          .select(`
-            id,
-            user_id,
-            message,
-            is_announcement,
-            is_pinned,
-            is_deleted,
-            created_at,
-            profiles (
-              id,
-              free_fire_name,
-              free_fire_uid,
-              full_name,
-              avatar_url,
-              is_admin,
-              is_chat_muted,
-              is_chat_banned
-            )
-          `)
+          .select('id, user_id, message, is_announcement, is_pinned, is_deleted, created_at')
           .eq('is_deleted', false)
           .order('created_at', { ascending: false })
           .limit(100);
 
-        if (error) throw error;
+        if (msgErr) throw msgErr;
 
-        adminChatMessagesCache = data || [];
+        const msgList = messages || [];
+        const userIds = [...new Set(msgList.map(m => m.user_id).filter(Boolean))];
+
+        // 2. Fetch sender profiles in batch
+        let profileMap = {};
+        if (userIds.length > 0) {
+          const { data: profiles } = await sbClient
+            .from('profiles')
+            .select('id, free_fire_name, free_fire_uid, full_name, avatar_url, is_admin, is_chat_muted, is_chat_banned')
+            .in('id', userIds);
+
+          if (profiles) {
+            profiles.forEach(p => {
+              profileMap[p.id] = p;
+            });
+          }
+        }
+
+        // 3. Map sender's real profile to message
+        adminChatMessagesCache = msgList.map(m => ({
+          ...m,
+          profiles: profileMap[m.user_id] || {
+            free_fire_name: 'Player',
+            free_fire_uid: '--',
+            avatar_url: '',
+            is_admin: false,
+            is_chat_muted: false,
+            is_chat_banned: false
+          }
+        }));
+
         renderAdminChatMessages(adminChatMessagesCache);
         setupChatRealtime();
       } catch (err) {
@@ -1854,64 +1872,72 @@
       `).join('');
     }
 
+    // Reports loaded safely without relationship join
     async function loadAdminChatReports() {
       const container = document.getElementById('admin-chat-reports-container');
       if (!container) return;
       container.innerHTML = `<p class="text-gray-400 text-xs text-center py-6">Loading reports...</p>`;
 
-      const { data, error } = await sbClient
-        .from('chat_reports')
-        .select(`
-          id,
-          reason,
-          status,
-          created_at,
-          reporter:profiles!chat_reports_reporter_id_fkey(free_fire_name, free_fire_uid),
-          chat_messages(
-            id,
-            user_id,
-            message,
-            is_deleted,
-            profiles(free_fire_name, free_fire_uid)
-          )
-        `)
-        .order('created_at', { ascending: false });
+      try {
+        const { data: reports, error } = await sbClient
+          .from('chat_reports')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error || !data || !data.length) {
+        if (error || !reports || !reports.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No reported messages found.</p>`;
+          return;
+        }
+
+        const msgIds = reports.map(r => r.message_id).filter(Boolean);
+        const reporterIds = reports.map(r => r.reporter_id).filter(Boolean);
+
+        const { data: messages } = await sbClient.from('chat_messages').select('*').in('id', msgIds);
+        const msgMap = {};
+        const authorIds = [];
+        (messages || []).forEach(m => {
+          msgMap[m.id] = m;
+          if (m.user_id) authorIds.push(m.user_id);
+        });
+
+        const allUserIds = [...new Set([...reporterIds, ...authorIds])];
+        const { data: profiles } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').in('id', allUserIds);
+        const userMap = {};
+        (profiles || []).forEach(p => { userMap[p.id] = p; });
+
+        container.innerHTML = reports.map(r => {
+          const msg = msgMap[r.message_id] || {};
+          const author = userMap[msg.user_id] || {};
+          const reporter = userMap[r.reporter_id] || {};
+
+          return `
+            <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-red-400 font-bold uppercase"><i class="fa-solid fa-flag mr-1"></i> Reason: ${escapeHTML(r.reason)}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}">${escapeHTML(r.status.toUpperCase())}</span>
+              </div>
+              <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] space-y-1">
+                <div class="text-[11px] text-gray-400">
+                  Author: <strong class="text-white">${escapeHTML(author.free_fire_name || 'Player')}</strong> (UID: <span class="text-cyan-400 font-mono">${escapeHTML(author.free_fire_uid || '--')}</span>)
+                </div>
+                <p class="text-gray-200 text-xs bg-[#06070a] p-2 rounded">${escapeHTML(msg.message || '[Message Deleted]')}</p>
+                <div class="text-[10px] text-gray-500 pt-1">
+                  Reported by: <span class="text-gray-300">${escapeHTML(reporter.free_fire_name || 'Player')}</span> • ${new Date(r.created_at).toLocaleString()}
+                </div>
+              </div>
+              <div class="flex items-center gap-2 justify-end pt-1">
+                ${msg.id && !msg.is_deleted ? `
+                  <button onclick="deleteChatMessageForEveryone(${msg.id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Delete Message</button>
+                  <button onclick="togglePlayerChatMute('${msg.user_id}', true)" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs font-bold">Mute Author</button>
+                ` : ''}
+                <button onclick="dismissChatReport(${r.id})" class="bg-[#0e1118] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1 rounded text-xs">Mark Reviewed</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
         container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No reported messages found.</p>`;
-        return;
       }
-
-      container.innerHTML = data.map(r => {
-        const msg = r.chat_messages || {};
-        const author = msg.profiles || {};
-        const reporter = r.reporter || {};
-
-        return `
-          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-2 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="text-red-400 font-bold uppercase"><i class="fa-solid fa-flag mr-1"></i> Reason: ${escapeHTML(r.reason)}</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}">${escapeHTML(r.status.toUpperCase())}</span>
-            </div>
-            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] space-y-1">
-              <div class="text-[11px] text-gray-400">
-                Author: <strong class="text-white">${escapeHTML(author.free_fire_name || 'Player')}</strong> (UID: <span class="text-cyan-400 font-mono">${escapeHTML(author.free_fire_uid || '--')}</span>)
-              </div>
-              <p class="text-gray-200 text-xs bg-[#06070a] p-2 rounded">${escapeHTML(msg.message || '[Message Deleted]')}</p>
-              <div class="text-[10px] text-gray-500 pt-1">
-                Reported by: <span class="text-gray-300">${escapeHTML(reporter.free_fire_name || 'Player')}</span> • ${new Date(r.created_at).toLocaleString()}
-              </div>
-            </div>
-            <div class="flex items-center gap-2 justify-end pt-1">
-              ${msg.id && !msg.is_deleted ? `
-                <button onclick="deleteChatMessageForEveryone(${msg.id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Delete Message</button>
-                <button onclick="togglePlayerChatMute('${msg.user_id}', true)" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded text-xs font-bold">Mute Author</button>
-              ` : ''}
-              <button onclick="dismissChatReport(${r.id})" class="bg-[#0e1118] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1 rounded text-xs">Mark Reviewed</button>
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
     async function dismissChatReport(reportId) {
@@ -1927,12 +1953,10 @@
 
     async function loadAdminChatSettings() {
       try {
-        const { data, error } = await sbClient.from('chat_settings').select('*').eq('id', 1).single();
-        if (error && error.code !== 'PGRST116') throw error;
-
+        const { data, error } = await sbClient.from('chat_settings').select('*').eq('id', 1).maybeSingle();
         if (data) {
-          document.getElementById('cfg-chat-enabled').checked = data.is_chat_enabled;
-          document.getElementById('cfg-online-indicators').checked = data.show_online_indicators;
+          document.getElementById('cfg-chat-enabled').checked = !!data.is_chat_enabled;
+          document.getElementById('cfg-online-indicators').checked = !!data.show_online_indicators;
           document.getElementById('cfg-slowmode-sec').value = data.slow_mode_seconds || 3;
           document.getElementById('cfg-max-len').value = data.max_message_length || 250;
           document.getElementById('cfg-chat-rules').value = data.chat_rules || '';
@@ -1963,7 +1987,7 @@
         if (error) throw error;
         alert("Chat settings saved successfully!");
       } catch (err) {
-        alert("Failed to save chat settings: " + err.message);
+        alert("Failed to save chat settings: " + (err.message || err));
       }
     }
 
