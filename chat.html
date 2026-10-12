@@ -1,61 +1,136 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MULTANI FF - Player Chat</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MULTANI FF Player Chat</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080b12;color:#fff;font-family:Arial,sans-serif}
+body{margin:0;background:#080b12;color:#fff;font-family:Arial}
 .app{max-width:480px;margin:auto;height:100dvh;display:flex;flex-direction:column;background:#0d111b}
-.header{padding:16px;background:#151b29;border-bottom:1px solid #293247;display:flex;align-items:center;gap:12px}
-.back{color:#ff572e;text-decoration:none;font-size:24px}
-.title{font-weight:bold;font-size:17px}
-.sub{font-size:12px;color:#9ca8bd;margin-top:4px}
-.messages{flex:1;overflow-y:auto;padding:14px}
-.notice{text-align:center;color:#a7b0c2;font-size:12px;margin:12px 0}
-.bubble{background:#192235;padding:10px 12px;border-radius:12px;margin:10px 0;max-width:85%;overflow-wrap:anywhere}
-.name{color:#ff704d;font-weight:bold;font-size:12px;margin-bottom:5px}
-.uid{font-size:10px;color:#91a1bb;margin-top:5px}
-.time{font-size:10px;color:#91a1bb;text-align:right;margin-top:5px}
-.composer{padding:10px;display:flex;gap:7px;background:#151b29}
-.composer input{min-width:0;flex:1;border:1px solid #303b50;background:#0b101a;color:#fff;padding:12px;border-radius:22px;outline:none}
-button{border:0;border-radius:20px;padding:10px;background:#ff572e;color:white;font-weight:bold}
-#send{padding:0 16px}
-.footer{text-align:center;padding:6px;color:#7d8aa2;font-size:10px;background:#151b29}
+header{padding:15px;background:#151b29;display:flex;justify-content:space-between;align-items:center}
+header a{color:#ff572e;text-decoration:none}
+#status{font-size:12px;color:#9ca8bd}
+#messages{flex:1;overflow:auto;padding:12px}
+.msg{background:#192235;border-radius:12px;padding:10px;margin:9px 0;overflow-wrap:anywhere}
+.name{color:#ff704d;font-size:12px;font-weight:bold}
+.uid{color:#9ca8bd;font-size:10px;margin-top:4px}
+.time{color:#9ca8bd;font-size:10px;text-align:right}
+form{display:flex;gap:7px;padding:10px;background:#151b29}
+input{min-width:0;flex:1;background:#080b12;color:white;border:1px solid #303b50;border-radius:22px;padding:12px}
+button{background:#ff572e;color:white;border:0;border-radius:20px;padding:10px}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header">
-<a class="back" href="index.html">‹</a>
+<header>
+<a href="index.html">‹ Back</a>
 <div>
-<div class="title">💬 MULTANI PLAYER CHAT</div>
-<div class="sub">Public Room · All Players</div>
+<strong>💬 PLAYER CHAT</strong>
+<div id="status">Connecting...</div>
 </div>
 </header>
-<main class="messages" id="messages">
-<div class="notice">Welcome to MULTANI FF Public Chat!</div>
-<div class="notice">Chat messages will appear here.</div>
-</main>
-<div class="composer">
-<button id="emoji" type="button">😀</button>
-<input id="message" maxlength="1000" placeholder="Write a message..." autocomplete="off">
-<button id="send" type="button">Send</button>
+<main id="messages"></main>
+<form id="form">
+<input id="text" maxlength="1000" placeholder="Write a message..." autocomplete="off">
+<button type="submit">Send</button>
+</form>
 </div>
-<div class="footer">Follow the rules · Be respectful to all players</div>
-</div>
-<script>
-document.getElementById('emoji').addEventListener('click',()=>{
- const box=document.getElementById('message');
- box.value += '😀';
- box.focus();
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://yzirjidgdxhljbhhjfqp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const messages = document.getElementById('messages');
+const status = document.getElementById('status');
+const form = document.getElementById('form');
+const input = document.getElementById('text');
+
+function showMessage(m) {
+  const item = document.createElement('div');
+  item.className = 'msg';
+
+  const name = document.createElement('div');
+  name.className = 'name';
+  name.textContent = 'Player';
+
+  const body = document.createElement('div');
+  body.textContent = m.message;
+
+  const time = document.createElement('div');
+  time.className = 'time';
+  time.textContent = new Date(m.created_at).toLocaleTimeString();
+
+  item.append(name, body, time);
+  messages.appendChild(item);
+}
+
+async function start() {
+  const { data: { session }, error } = await supabase.auth.getSession();
+
+  if (error || !session) {
+    status.textContent = 'Please log in first';
+    form.style.display = 'none';
+    return;
+  }
+
+  status.textContent = 'Connected';
+  const { data, error: readError } = await supabase
+    .from('chat_messages')
+    .select('id,user_id,message,created_at')
+    .order('created_at', { ascending: true })
+    .limit(100);
+
+  if (readError) {
+    status.textContent = 'Chat setup required';
+    console.error(readError);
+    return;
+  }
+
+  messages.replaceChildren();
+  data.forEach(showMessage);
+
+  supabase.channel('public-chat')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'chat_messages'
+    }, payload => {
+      showMessage(payload.new);
+      messages.scrollTop = messages.scrollHeight;
+    })
+    .subscribe();
+}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const message = input.value.trim();
+  if (!message) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    status.textContent = 'Please log in again';
+    return;
+  }
+
+  const { error } = await supabase.from('chat_messages').insert({
+    user_id: user.id,
+    message
+  });
+
+  if (error) {
+    status.textContent = 'Send failed: check database access';
+    console.error(error);
+    return;
+  }
+
+  input.value = '';
 });
-document.getElementById('send').addEventListener('click',()=>{
- alert('Chat database connection will be added in the next step.');
-});
-document.getElementById('message').addEventListener('keydown',e=>{
- if(e.key==='Enter') document.getElementById('send').click();
-});
+
+start();
 </script>
 </body>
-  </html>
+</html>
