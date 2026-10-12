@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
   <title>MULTANI FF CHAT</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,12 +25,29 @@
     body[data-theme="whatsapp"] { --primary: #25d366; --bubble-me: #075e54; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
 
     /* Header */
     .chat-header {
-      background: #111827; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid #1f2937; z-index: 20; height: 56px;
+      background: #111827;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1f2937;
+      z-index: 60;
+      height: 56px;
+      flex-shrink: 0;
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .back-btn { background: #1f2937; color: #fff; border: 0; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 13px; }
@@ -123,17 +140,37 @@
     .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
 
     /* Reply preview */
-    .reply-preview-bar { background: #1f2937; padding: 6px 12px; display: none; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary); font-size: 12px; }
+    .reply-preview-bar {
+      background: #1f2937;
+      padding: 6px 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      border-left: 4px solid var(--primary);
+      font-size: 12px;
+      flex-shrink: 0;
+      z-index: 55;
+    }
 
-    /* Footer Input */
-    .chat-footer { background: #111827; padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #1f2937; }
-    .action-icon { background: none; border: 0; color: #9ca3af; font-size: 18px; cursor: pointer; padding: 4px; }
-    .input-box { flex: 1; background: #1f2937; border: 1px solid #374151; border-radius: 20px; color: #fff; padding: 8px 14px; font-size: 14px; outline: none; }
-    .send-btn { background: #10b981; color: #fff; border: 0; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
+    /* Footer Input - Guaranteed Visible on All Devices */
+    .chat-footer {
+      background: #111827;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #1f2937;
+      z-index: 50;
+      flex-shrink: 0;
+      min-height: 52px;
+    }
+    .action-icon { background: none; border: 0; color: #9ca3af; font-size: 20px; cursor: pointer; padding: 6px; }
+    .input-box { flex: 1; background: #1f2937; border: 1px solid #374151; border-radius: 20px; color: #fff; padding: 9px 14px; font-size: 14px; outline: none; }
+    .send-btn { background: #10b981; color: #fff; border: 0; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; flex-shrink: 0; }
 
     /* Drawers */
-    .panel-drawer { display: none; background: #111827; height: 180px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-    .sticker-drawer { display: none; background: #111827; height: 210px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .panel-drawer { display: none; background: #111827; height: 180px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(6, 1fr); gap: 10px; flex-shrink: 0; z-index: 45; }
+    .sticker-drawer { display: none; background: #111827; height: 210px; overflow-y: auto; padding: 10px; border-top: 1px solid #1f2937; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; z-index: 45; }
     .emoji-item { font-size: 24px; text-align: center; cursor: pointer; }
     .sticker-card { background: #1f2937; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #374151; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .sticker-card:hover { border-color: var(--primary); transform: scale(1.04); }
@@ -248,24 +285,14 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = {
-      name: "Defeater",
-      uid: "5775457654",
+      name: localStorage.getItem("ign") || localStorage.getItem("full_name") || "Player",
+      uid: localStorage.getItem("uid") || localStorage.getItem("ff_uid") || "00000000",
       user_id: "",
-      avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
+      avatar: localStorage.getItem("avatar") || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani"
     };
 
-    // Har Player ka Asli Data Supabase Database aur Storage se Load karna
+    // Har Player ka Data Load karna
     async function loadCurrentPlayerProfile() {
-      // 1. LocalStorage se Profile Data check karein
-      const savedIgn = localStorage.getItem("ign") || localStorage.getItem("ff_ign") || localStorage.getItem("game_name");
-      const savedUid = localStorage.getItem("uid") || localStorage.getItem("ff_uid") || localStorage.getItem("player_uid");
-      const savedAvatar = localStorage.getItem("avatar") || localStorage.getItem("avatar_url");
-
-      if (savedIgn) currentUser.name = savedIgn;
-      if (savedUid) currentUser.uid = String(savedUid);
-      if (savedAvatar) currentUser.avatar = savedAvatar;
-
-      // 2. Supabase Profiles Database se data fetch karein
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
         if (authData && authData.user) {
@@ -292,7 +319,6 @@
       localStorage.setItem("avatar", currentUser.avatar);
     }
 
-    // 17 Animated stickers
     const myStickers = [
       "stickers/200w.webp",
       "stickers/200w (1).webp",
@@ -372,7 +398,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message render with Double Blue Tick
+    // Message render
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
@@ -381,9 +407,7 @@
       
       const isMe = (String(msg.uid) === String(currentUser.uid)) ||
                    (msg.user_id && msg.user_id === currentUser.user_id) ||
-                   (msg.name === currentUser.name) ||
-                   (msg.name === "Defeater") ||
-                   (String(msg.uid) === "12345678");
+                   (msg.name === currentUser.name);
 
       const row = document.createElement('div');
       row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'}`;
@@ -407,10 +431,10 @@
       }
 
       const avatarSrc = msg.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(msg.name || "Multani");
-      const displayUid = (msg.uid && msg.uid !== "00000000" && msg.uid !== "12345678") ? msg.uid : "5775457654";
-      const displayName = (msg.name && msg.name !== "Player") ? msg.name : "Defeater";
+      const displayUid = (msg.uid && msg.uid !== "00000000") ? msg.uid : "0000";
+      const displayName = msg.name || "Player";
 
-      // Double Blue Tick for delivered messages
+      // Double Blue Tick for sender's messages
       const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
 
       row.innerHTML = `
@@ -469,13 +493,15 @@
 
     function toggleEmojiDrawer(force) {
       const d = document.getElementById('emojiDrawer');
-      d.style.display = (force !== undefined ? force : d.style.display === 'grid') ? 'none' : 'grid';
+      const shouldOpen = (force !== undefined ? force : d.style.display !== 'grid');
+      d.style.display = shouldOpen ? 'grid' : 'none';
       document.getElementById('stickerDrawer').style.display = 'none';
     }
 
     function toggleStickerDrawer(force) {
       const d = document.getElementById('stickerDrawer');
-      d.style.display = (force !== undefined ? force : d.style.display === 'grid') ? 'none' : 'grid';
+      const shouldOpen = (force !== undefined ? force : d.style.display !== 'grid');
+      d.style.display = shouldOpen ? 'grid' : 'none';
       document.getElementById('emojiDrawer').style.display = 'none';
     }
 
