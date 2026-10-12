@@ -134,9 +134,17 @@
       box-shadow: 0 4px 15px rgba(255, 70, 36, 0.4);
       cursor: pointer;
     }
-    .v-badge-glow {
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    
+    /* Neon Glow & Lighting Styles for Admin DP */
+    .admin-neon-dp {
+      background: radial-gradient(circle, #ff4624 0%, #150a08 100%);
+      border: 2px solid #ff8424;
+      box-shadow: 0 0 12px #ff4624, inset 0 0 8px #ffbe00;
+      animation: neon-pulse 1.8s infinite alternate;
+    }
+    @keyframes neon-pulse {
+      0% { box-shadow: 0 0 8px #ff4624, inset 0 0 4px #ffbe00; }
+      100% { box-shadow: 0 0 18px #ff8424, inset 0 0 10px #ffea00; }
     }
   </style>
 </head>
@@ -340,9 +348,9 @@
         </div>
       </section>
 
-      <!-- GLOBAL CHAT ROOM SECTION (RE-DESIGNED WITH BUTTON & REAL INTERACTIVE APP MODAL) -->
+      <!-- GLOBAL CHAT ROOM SECTION -->
       <section id="section-chatroom" class="space-y-4 hidden w-full">
-        <!-- CHAT COUNTER STATS -->
+        <!-- COUNTERS -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-full md:max-w-4xl">
           <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
             <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Messages</span>
@@ -362,7 +370,7 @@
           </div>
         </div>
 
-        <!-- CHAT HUB TABS -->
+        <!-- SUB-TABS (NOW 100% CLICKABLE) -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-4xl">
           <button onclick="switchChatSubTab('live_messages')" id="subtab-btn-live_messages" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap"><i class="fa-solid fa-comments mr-1"></i> Chat Hub</button>
           <button onclick="switchChatSubTab('announcements')" id="subtab-btn-announcements" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1"></i> Announcements</button>
@@ -370,7 +378,7 @@
           <button onclick="switchChatSubTab('moderation')" id="subtab-btn-moderation" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-sliders mr-1"></i> Chat Settings</button>
         </div>
 
-        <!-- SUBTAB 1: LIVE CHAT (DIRECT LIST REPLACED WITH ENTER CHAT ROOM BUTTON) -->
+        <!-- SUBTAB 1: LIVE CHAT HUB -->
         <div id="chatsub-live_messages" class="space-y-4 w-full max-w-full md:max-w-4xl">
           <div class="bg-gradient-to-br from-[#151922] to-[#0e1118] border border-[#262f40] rounded-2xl p-6 text-center space-y-4 shadow-xl">
             <div class="w-16 h-16 mx-auto rounded-full bg-[#ff4624]/10 border border-[#ff4624]/40 flex items-center justify-center text-3xl text-[#ff4624]">
@@ -695,7 +703,7 @@
             </button>
           </div>
         </div>
-        <div class="space-y-3 w-full max-w-full md:max-w-xl">
+        <div class="space-y-3 w-full max-w-full md:max-xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Carousel Cards</h3>
           <div id="admin-tutorials-list" class="space-y-3">
             <p class="text-gray-500 text-xs text-center py-4">Loading cards...</p>
@@ -795,8 +803,8 @@
       <div class="bg-[#151922] p-3.5 border-b border-[#262f40] flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="relative">
-            <div class="w-10 h-10 rounded-full v-badge-glow flex items-center justify-center text-white font-bold text-lg font-gaming">
-              Ⓥ
+            <div class="w-10 h-10 rounded-full admin-neon-dp flex items-center justify-center text-white font-extrabold text-[11px] font-gaming tracking-wider">
+              ADMIN Ⓥ
             </div>
             <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#151922]"></span>
           </div>
@@ -814,7 +822,7 @@
         </div>
       </div>
 
-      <!-- Pinned Banner (If available) -->
+      <!-- Pinned Banner -->
       <div id="modal-pinned-banner" class="bg-[#ff4624]/10 border-b border-[#ff4624]/30 px-3.5 py-2 flex items-center justify-between hidden text-xs">
         <div class="flex items-center gap-2 truncate text-yellow-400 font-semibold">
           <i class="fa-solid fa-thumbtack text-[#ff4624] shrink-0"></i>
@@ -824,13 +832,12 @@
       </div>
 
       <!-- Real Chat Messages List -->
-      <div id="modal-chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3 sidebar-scroll bg-[#080a0f]">
+      <div id="modal-chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3.5 sidebar-scroll bg-[#080a0f]">
         <p class="text-gray-500 text-xs text-center py-10">Connecting to live chat room...</p>
       </div>
 
-      <!-- Sticker Selector Drawer (Toggleable) -->
+      <!-- Sticker Selector Drawer -->
       <div id="modal-sticker-drawer" class="bg-[#151922] border-t border-[#262f40] p-2.5 hidden grid grid-cols-5 gap-2 max-h-36 overflow-y-auto sidebar-scroll">
-        <!-- Common Free Fire themed sticker buttons -->
         <button type="button" onclick="sendAdminSticker('booyah')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-yellow-400">🔥 BOOYAH</button>
         <button type="button" onclick="sendAdminSticker('gg')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-cyan-400">⚡ GG</button>
         <button type="button" onclick="sendAdminSticker('headshot')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-red-500">🎯 HEADSHOT</button>
@@ -1614,7 +1621,29 @@
     }
 
     // ==========================================
-    // INTERACTIVE CHAT ROOM LOGIC (MODAL + STICKERS + VIP ADMIN)
+    // GLOBAL CHAT ROOM SUB-TABS SWITCH (FIXED & FULLY WORKING)
+    // ==========================================
+    function switchChatSubTab(subTab) {
+      ['live_messages', 'announcements', 'reports', 'moderation'].forEach(st => {
+        const sec = document.getElementById(`chatsub-${st}`);
+        const btn = document.getElementById(`subtab-btn-${st}`);
+        if (sec) sec.classList.toggle('hidden', st !== subTab);
+        if (btn) {
+          if (st === subTab) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap";
+          }
+        }
+      });
+
+      if (subTab === 'announcements') loadAdminAnnouncements();
+      if (subTab === 'reports') loadAdminChatReports();
+      if (subTab === 'moderation') loadAdminChatSettings();
+    }
+
+    // ==========================================
+    // INTERACTIVE CHAT ROOM LOGIC (WITH ACTION BUTTONS UNDER EVERY MESSAGE)
     // ==========================================
     function openLiveChatModal() {
       const modal = document.getElementById('modal-interactive-chat');
@@ -1635,7 +1664,7 @@
 
     function renderMessageContent(msgText) {
       if (!msgText) return '';
-      // Support for Free Fire stickers and images format: STICKER:... or direct webp/png/jpg
+      // Direct sticker render
       if (msgText.startsWith('STICKER:') || msgText.match(/\.(webp|png|jpg|jpeg|gif)(\?.*)?$/i)) {
         let cleanUrl = msgText.replace(/^STICKER:/i, '').trim();
         return `
@@ -1722,7 +1751,6 @@
 
         renderInteractiveChatRoom(adminChatMessagesCache);
 
-        // Check if there is any pinned message
         const pinnedMsg = adminChatMessagesCache.find(m => m.is_pinned);
         const pinnedBanner = document.getElementById('modal-pinned-banner');
         const pinnedText = document.getElementById('modal-pinned-text');
@@ -1753,26 +1781,29 @@
       container.innerHTML = list.map(m => {
         const p = m.profiles || {};
         const isMsgAdmin = (m.is_admin === true || p.is_admin === true || m.is_announcement === true);
-        
-        // Exact identity resolution
         const displayName = isMsgAdmin ? "ADMIN" : (p.free_fire_name || p.full_name || 'Player');
         const displayUID = isMsgAdmin ? "OFFICIAL" : (p.free_fire_uid || '--');
-        const avatarUrl = isMsgAdmin 
-          ? "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" 
-          : (p.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80');
-
+        const isMuted = p.is_chat_muted === true;
+        const isChatBanned = p.is_chat_banned === true;
         const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
-          <div class="flex items-start gap-2.5 ${isMsgAdmin ? 'flex-row-reverse' : 'flex-row'} group">
+          <div class="flex items-start gap-2.5 ${isMsgAdmin ? 'flex-row-reverse' : 'flex-row'}">
+            <!-- AVATAR / LIGHTING ADMIN DP -->
             <div class="relative shrink-0 mt-0.5">
-              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border-2 ${isMsgAdmin ? 'border-amber-400 shadow-md shadow-amber-500/30' : 'border-[#262f40]'}" />
-              ${isMsgAdmin ? `<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full v-badge-glow flex items-center justify-center text-[9px] text-white font-bold font-gaming" title="Official VIP Badge">Ⓥ</span>` : ''}
+              ${isMsgAdmin ? `
+                <div class="w-8 h-8 rounded-full admin-neon-dp flex items-center justify-center text-white font-extrabold text-[9px] font-gaming">
+                  ADMIN
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 flex items-center justify-center text-[8px] text-black font-bold">Ⓥ</span>
+              ` : `
+                <img src="${p.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}" class="w-8 h-8 rounded-full object-cover border border-[#262f40]" />
+              `}
             </div>
 
-            <div class="max-w-[75%] space-y-1">
-              <!-- Sender Info Header -->
-              <div class="flex items-center gap-1.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[78%] space-y-1">
+              <!-- Name & UID Header -->
+              <div class="flex items-center gap-1.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
                 ${isMsgAdmin ? `
                   <span class="bg-gradient-to-r from-amber-400 to-[#ff4624] text-black font-gaming font-extrabold text-[10px] px-1.5 py-0.2 rounded flex items-center gap-1 shadow">
                     <i class="fa-solid fa-crown text-[8px]"></i> ADMIN Ⓥ
@@ -1785,16 +1816,29 @@
               </div>
 
               <!-- Message Bubble -->
-              <div class="p-2.5 rounded-2xl ${isMsgAdmin ? 'bg-gradient-to-br from-[#ff4624]/20 to-[#ff8424]/10 border border-[#ff4624]/40 text-white rounded-tr-none' : 'bg-[#151922] border border-[#262f40] text-gray-200 rounded-tl-none'} shadow-sm relative">
+              <div class="p-2.5 rounded-2xl ${isMsgAdmin ? 'bg-gradient-to-br from-[#ff4624]/20 to-[#ff8424]/10 border border-[#ff4624]/40 text-white rounded-tr-none' : 'bg-[#151922] border border-[#262f40] text-gray-200 rounded-tl-none'} shadow-sm">
                 ${renderMessageContent(m.message)}
+              </div>
 
-                <!-- Hover Admin Actions -->
-                <div class="opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5 ${isMsgAdmin ? 'left-0' : 'right-0'} flex items-center gap-1 bg-[#06070a] px-1.5 py-0.5 rounded border border-[#262f40] text-[10px] z-10">
-                  <button type="button" onclick="deleteChatMessageForEveryone(${m.id})" class="text-red-400 hover:text-white" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                  ${!isMsgAdmin ? `
-                    <button type="button" onclick="togglePlayerChatMute('${m.user_id}', true)" class="text-yellow-400 hover:text-white" title="Mute Player"><i class="fa-solid fa-volume-xmark"></i></button>
-                  ` : ''}
-                </div>
+              <!-- PERMANENT MODERATION BUTTONS (HAR MESSAGE KE NEECHE) -->
+              <div class="flex items-center gap-1 pt-0.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
+                <button type="button" onclick="togglePinChatMessage(${m.id}, ${!m.is_pinned})" class="bg-[#0e1118] border border-[#262f40] hover:border-yellow-400 text-yellow-400 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
+                  <i class="fa-solid fa-thumbtack text-[8px]"></i> ${m.is_pinned ? 'Unpin' : 'Pin'}
+                </button>
+
+                ${!isMsgAdmin ? `
+                  <button type="button" onclick="togglePlayerChatMute('${m.user_id}', ${!isMuted})" class="bg-[#0e1118] border border-[#262f40] hover:border-amber-400 text-amber-400 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
+                    <i class="fa-solid ${isMuted ? 'fa-volume-high' : 'fa-volume-xmark'} text-[8px]"></i> ${isMuted ? 'Unmute' : 'Mute'}
+                  </button>
+
+                  <button type="button" onclick="togglePlayerChatBan('${m.user_id}', ${!isChatBanned})" class="bg-[#0e1118] border border-[#262f40] hover:border-red-500 text-red-500 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
+                    <i class="fa-solid fa-ban text-[8px]"></i> ${isChatBanned ? 'Unban' : 'Ban'}
+                  </button>
+                ` : ''}
+
+                <button type="button" onclick="deleteChatMessageForEveryone(${m.id})" class="bg-[#0e1118] border border-red-500/40 hover:bg-red-600 text-red-400 hover:text-white px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold transition">
+                  <i class="fa-solid fa-trash text-[8px]"></i> Delete
+                </button>
               </div>
             </div>
           </div>
@@ -1818,7 +1862,6 @@
       input.value = '';
 
       try {
-        // Enforce VIP Admin payload
         const { error } = await sbClient.from('chat_messages').insert([{
           user_id: window.currentAdminUser.id,
           message: text,
@@ -1872,15 +1915,34 @@
     async function deleteChatMessageForEveryone(messageId) {
       if (!confirm("Are you sure you want to delete this message for everyone?")) return;
       try {
+        // Immediate UI removal
+        adminChatMessagesCache = adminChatMessagesCache.filter(m => m.id !== messageId);
+        renderInteractiveChatRoom(adminChatMessagesCache);
+
         const { error } = await sbClient
           .from('chat_messages')
           .update({ is_deleted: true, updated_at: new Date().toISOString() })
           .eq('id', messageId);
 
         if (error) throw error;
-        loadAdminChatMessages();
+        loadAdminChatDashboardStats();
       } catch (err) {
         alert("Failed to delete message: " + err.message);
+        loadAdminChatMessages();
+      }
+    }
+
+    async function togglePinChatMessage(messageId, pinState) {
+      try {
+        const { error } = await sbClient
+          .from('chat_messages')
+          .update({ is_pinned: pinState, updated_at: new Date().toISOString() })
+          .eq('id', messageId);
+
+        if (error) throw error;
+        loadAdminChatMessages();
+      } catch (err) {
+        alert("Failed to update pin state: " + err.message);
       }
     }
 
@@ -1896,6 +1958,25 @@
 
         if (error) throw error;
         alert(`Player successfully ${muteState ? 'muted' : 'unmuted'} from chat.`);
+        loadAdminChatMessages();
+        loadAdminChatDashboardStats();
+      } catch (err) {
+        alert("Action failed: " + err.message);
+      }
+    }
+
+    async function togglePlayerChatBan(userId, banState) {
+      const action = banState ? 'BAN from Chat' : 'UNBAN from Chat';
+      if (!confirm(`Are you sure you want to ${action} this player?`)) return;
+
+      try {
+        const { error } = await sbClient
+          .from('profiles')
+          .update({ is_chat_banned: banState, updated_at: new Date().toISOString() })
+          .eq('id', userId);
+
+        if (error) throw error;
+        alert(`Player successfully ${banState ? 'banned' : 'unbanned'} from chat.`);
         loadAdminChatMessages();
         loadAdminChatDashboardStats();
       } catch (err) {
