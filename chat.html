@@ -65,7 +65,7 @@
       background-position: center;
       background-repeat: no-repeat;
     }
-    .load-more-btn { align-self: center; background: rgba(31, 41, 55, 0.8); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; backdrop-filter: blur(4px); }
+    .load-more-btn { align-self: center; background: rgba(31, 41, 55, 0.85); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; backdrop-filter: blur(4px); }
 
     /* Message Item */
     .msg-row { display: flex; flex-direction: column; max-width: 82%; position: relative; user-select: none; }
@@ -96,42 +96,44 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
     }
     .header-uid {
       font-size: 11px;
       color: #ffffff;
-      background: rgba(31, 41, 55, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       padding: 2px 7px;
       border-radius: 6px;
       font-weight: bold;
       letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
 
-    /* Transparent Message Bubble with Border (No solid box) */
+    /* 100% Transparent Message Bubble with Only Border */
     .msg-bubble {
-      padding: 9px 13px;
+      background: transparent !important;
+      padding: 8px 12px;
       border-radius: var(--bubble-radius);
       font-size: var(--font-scale);
       word-break: break-word;
       width: fit-content;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
     
-    /* Apna Message: Transparent with Glowing Emerald Green Border */
+    /* Sender: Glowing Green Border */
     .msg-me .msg-bubble {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1.5px solid #10b981;
+      border: 2px solid #10b981;
       border-top-right-radius: 2px;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
     }
 
-    /* Dusre Player ka Message: Transparent with Slate/Cyan Border */
+    /* Receiver: Silver / White Border */
     .msg-other .msg-bubble {
-      background: rgba(31, 41, 55, 0.35);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.55);
       border-top-left-radius: 2px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
     }
 
     /* Time & Double Blue Tick */
@@ -142,10 +144,10 @@
       gap: 4px;
       margin-top: 4px;
     }
-    .msg-time { font-size: 10px; color: #e5e7eb; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+    .msg-time { font-size: 10px; color: #f3f4f6; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
     .msg-tick { font-size: 11px; color: #38bdf8; font-weight: bold; }
 
-    .reply-quote { background: rgba(0,0,0,0.4); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
+    .reply-quote { background: rgba(0,0,0,0.6); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
     .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
 
     /* Reply bar */
@@ -251,7 +253,7 @@
     <input type="file" id="bgUpload" accept="image/*" style="display:none;" onchange="handleBgUpload(event)" />
     <div class="menu-item" onclick="clearMyChat()"><i class="fas fa-broom"></i> Clear Chat for Me</div>
     <div class="menu-item" onclick="showRules()"><i class="fas fa-shield-alt"></i> Info & Rules</div>
-    <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Default Background</div>
+    <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Background</div>
   </div>
 
   <main class="chat-container" id="chatBox">
@@ -323,7 +325,7 @@
       avatar: ""
     };
 
-    // Har Player ka Asli Free Fire Game Name (IGN), UID aur DP Sync karna
+    // Har device par login user ki apni asli Profile pakadna
     async function syncPlayerProfile() {
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
@@ -337,9 +339,9 @@
             .maybeSingle();
 
           if (pData) {
-            // Free Fire IGN ko pehli tarjeeh dein taake "Ali raza" ki jagah "Defeater" ya jo IGN hai wahi aaye
-            currentUser.name = pData.ign || pData.in_game_name || pData.ff_ign || pData.game_name || pData.name || "";
-            currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || "");
+            // Profile table ke sab fields check karein
+            currentUser.name = pData.ign || pData.in_game_name || pData.ff_ign || pData.game_name || pData.full_name || pData.name || "";
+            currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || pData.player_uid || "");
             currentUser.avatar = pData.avatar_url || pData.avatar || "";
           }
         }
@@ -347,7 +349,7 @@
         console.warn("Auth sync error:", err);
       }
 
-      // Agar database me khali ho to profile screen ke localStorage se read karein
+      // Agar database me khali ho to profile page ke storage se uthayein
       if (!currentUser.name) {
         currentUser.name = localStorage.getItem("ign") || 
                            localStorage.getItem("in_game_name") || 
@@ -359,14 +361,15 @@
       if (!currentUser.uid) {
         currentUser.uid = localStorage.getItem("uid") || 
                           localStorage.getItem("ff_uid") || 
-                          localStorage.getItem("free_fire_uid") || "";
+                          localStorage.getItem("free_fire_uid") || 
+                          localStorage.getItem("player_uid") || "";
       }
       if (!currentUser.avatar) {
         currentUser.avatar = localStorage.getItem("avatar") || 
                              localStorage.getItem("avatar_url") || "";
       }
 
-      // Final default fallback
+      // Fallback
       if (!currentUser.name) currentUser.name = "Player";
       if (!currentUser.uid) currentUser.uid = "0000";
       if (!currentUser.avatar) {
@@ -453,14 +456,14 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Transparent Glass with Border & Double Tick
+    // Message Render: Bilkul Transparent Bubble with Border
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       
-      // IsMe check: Unique user_id ya UID se
+      // Right side check sirf user_id ya UID se
       let isMe = false;
       if (currentUser.user_id && msg.user_id) {
         isMe = (String(msg.user_id) === String(currentUser.user_id));
@@ -489,6 +492,7 @@
         contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
+      // Jo bhejte waqt save hua tha wahi render hoga (no hardcode, no mixing)
       const senderName = msg.name || "Player";
       const senderUid = msg.uid || "0000";
       const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
@@ -530,7 +534,8 @@
     }
 
     async function postToSupabase(content) {
-      if (!currentUser.user_id || currentUser.name === "Player") {
+      // Bhejne se pehle lazmi confirm karein ke name "Player" na reh gaya ho
+      if (!currentUser.user_id || currentUser.name === "Player" || currentUser.uid === "0000") {
         await syncPlayerProfile();
       }
 
