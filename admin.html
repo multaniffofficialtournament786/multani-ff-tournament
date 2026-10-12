@@ -112,12 +112,8 @@
       text-transform: uppercase;
       position: relative;
     }
-    .admin-nav-btn i {
-      font-size: 18px;
-    }
-    .admin-nav-btn:hover, .admin-nav-btn:active {
-      color: #ff4624;
-    }
+    .admin-nav-btn i { font-size: 18px; }
+    .admin-nav-btn:hover, .admin-nav-btn:active { color: #ff4624; }
     .admin-center-plus {
       position: relative;
       top: -18px;
@@ -135,7 +131,6 @@
       cursor: pointer;
     }
     
-    /* Neon Glow & Lighting Styles for Admin DP */
     .admin-neon-dp {
       background: radial-gradient(circle, #ff4624 0%, #150a08 100%);
       border: 2px solid #ff8424;
@@ -348,9 +343,64 @@
         </div>
       </section>
 
+      <!-- WINNERS SECTION (AUTO FILL PRIZES & GUARANTEED WALLET UPDATE) -->
+      <section id="section-winners" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
+            <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
+              <select id="win-u1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
+              <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
+              <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
+              <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
+            </div>
+          </div>
+
+          <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            Announce All Winners & Complete Match
+          </button>
+        </div>
+
+        <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
+          <div id="admin-declared-winners-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading declared winners...</p>
+          </div>
+        </div>
+      </section>
+
       <!-- GLOBAL CHAT ROOM SECTION -->
       <section id="section-chatroom" class="space-y-4 hidden w-full">
-        <!-- COUNTERS -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-full md:max-w-4xl">
           <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl text-center">
             <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Messages</span>
@@ -370,7 +420,6 @@
           </div>
         </div>
 
-        <!-- SUB-TABS (NOW 100% CLICKABLE) -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-4xl">
           <button onclick="switchChatSubTab('live_messages')" id="subtab-btn-live_messages" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap"><i class="fa-solid fa-comments mr-1"></i> Chat Hub</button>
           <button onclick="switchChatSubTab('announcements')" id="subtab-btn-announcements" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1"></i> Announcements</button>
@@ -378,7 +427,6 @@
           <button onclick="switchChatSubTab('moderation')" id="subtab-btn-moderation" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap"><i class="fa-solid fa-sliders mr-1"></i> Chat Settings</button>
         </div>
 
-        <!-- SUBTAB 1: LIVE CHAT HUB -->
         <div id="chatsub-live_messages" class="space-y-4 w-full max-w-full md:max-w-4xl">
           <div class="bg-gradient-to-br from-[#151922] to-[#0e1118] border border-[#262f40] rounded-2xl p-6 text-center space-y-4 shadow-xl">
             <div class="w-16 h-16 mx-auto rounded-full bg-[#ff4624]/10 border border-[#ff4624]/40 flex items-center justify-center text-3xl text-[#ff4624]">
@@ -394,7 +442,6 @@
           </div>
         </div>
 
-        <!-- SUBTAB 2: ANNOUNCEMENTS -->
         <div id="chatsub-announcements" class="space-y-4 hidden w-full max-w-full md:max-w-4xl">
           <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl space-y-3">
             <h3 class="font-gaming text-sm font-bold text-white uppercase flex items-center gap-2">
@@ -419,7 +466,6 @@
           </div>
         </div>
 
-        <!-- SUBTAB 3: REPORTS -->
         <div id="chatsub-reports" class="space-y-3 hidden w-full max-w-full md:max-w-4xl">
           <div class="flex items-center justify-between">
             <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Reported Player Messages</h3>
@@ -430,7 +476,6 @@
           </div>
         </div>
 
-        <!-- SUBTAB 4: SETTINGS -->
         <div id="chatsub-moderation" class="space-y-4 hidden w-full max-w-full md:max-w-4xl">
           <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl space-y-4">
             <h3 class="font-gaming text-sm font-bold text-white uppercase"><i class="fa-solid fa-gear text-cyan-400 mr-1.5"></i> Chat Room Configuration</h3>
@@ -602,62 +647,6 @@
         </div>
       </section>
 
-      <!-- WINNERS -->
-      <section id="section-winners" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
-          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
-            <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
-              <select id="win-u1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-                <option value="">Choose player...</option>
-              </select>
-              <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
-            </div>
-
-            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
-              <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-                <option value="">Choose player...</option>
-              </select>
-              <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
-            </div>
-
-            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
-              <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-                <option value="">Choose player...</option>
-              </select>
-              <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
-            </div>
-
-            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
-              <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
-                <option value="">Choose player...</option>
-              </select>
-              <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
-            </div>
-          </div>
-
-          <button onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
-            Announce All Winners & Complete Match
-          </button>
-        </div>
-
-        <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
-          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
-          <div id="admin-declared-winners-list" class="space-y-3">
-            <p class="text-gray-500 text-xs text-center py-4">Loading declared winners...</p>
-          </div>
-        </div>
-      </section>
-
       <!-- USERS -->
       <section id="section-users" class="space-y-3 hidden">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
@@ -671,7 +660,7 @@
 
       <!-- TUTORIALS -->
       <section id="section-tutorials" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
             <i class="fa-solid fa-video text-cyan-400"></i> Manage Video Tutorials & Ads
           </h2>
@@ -799,7 +788,6 @@
   <!-- REAL-TIME INTERACTIVE LIVE CHAT ROOM MODAL -->
   <div id="modal-interactive-chat" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl w-full max-w-lg h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
-      <!-- Chat Header -->
       <div class="bg-[#151922] p-3.5 border-b border-[#262f40] flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="relative">
@@ -822,7 +810,6 @@
         </div>
       </div>
 
-      <!-- Pinned Banner -->
       <div id="modal-pinned-banner" class="bg-[#ff4624]/10 border-b border-[#ff4624]/30 px-3.5 py-2 flex items-center justify-between hidden text-xs">
         <div class="flex items-center gap-2 truncate text-yellow-400 font-semibold">
           <i class="fa-solid fa-thumbtack text-[#ff4624] shrink-0"></i>
@@ -831,12 +818,10 @@
         <button onclick="unpinCurrentAnnouncement()" class="text-gray-400 hover:text-white text-[11px] ml-2 shrink-0">Dismiss</button>
       </div>
 
-      <!-- Real Chat Messages List -->
       <div id="modal-chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3.5 sidebar-scroll bg-[#080a0f]">
         <p class="text-gray-500 text-xs text-center py-10">Connecting to live chat room...</p>
       </div>
 
-      <!-- Sticker Selector Drawer -->
       <div id="modal-sticker-drawer" class="bg-[#151922] border-t border-[#262f40] p-2.5 hidden grid grid-cols-5 gap-2 max-h-36 overflow-y-auto sidebar-scroll">
         <button type="button" onclick="sendAdminSticker('booyah')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-yellow-400">🔥 BOOYAH</button>
         <button type="button" onclick="sendAdminSticker('gg')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-cyan-400">⚡ GG</button>
@@ -845,7 +830,6 @@
         <button type="button" onclick="sendAdminSticker('warning')" class="p-1.5 bg-[#0e1118] rounded border border-[#262f40] hover:border-[#ff4624] transition text-center text-xs font-bold text-amber-500">⚠️ WARNING</button>
       </div>
 
-      <!-- Chat Bottom Input Bar -->
       <form id="modal-chat-send-form" onsubmit="handleAdminSendChatMessage(event)" class="bg-[#151922] p-2.5 border-t border-[#262f40] flex items-center gap-2">
         <button type="button" onclick="toggleStickerDrawer()" class="text-yellow-400 hover:text-yellow-300 p-2 text-base transition shrink-0" title="Send Sticker">
           <i class="fa-solid fa-icons"></i>
@@ -858,7 +842,6 @@
     </div>
   </div>
 
-  <!-- ALL PLAYERS MODAL -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
@@ -876,7 +859,6 @@
     </div>
   </div>
 
-  <!-- MODAL: EDIT WALLET -->
   <div id="modal-edit-wallet" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-sm space-y-3">
       <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Player Wallet</h3>
@@ -1169,7 +1151,6 @@
     let currentDiamondFilter = 'all';
     let globalSpinHistoryCache = [];
 
-    // Global Chat Room State
     let adminChatMessagesCache = [];
     let chatRealtimeSubscription = null;
 
@@ -1449,7 +1430,7 @@
     }
 
     // ==========================================
-    // WINNERS DECLARATION (FIXED & AUTO BACK)
+    // WINNERS DECLARATION (AUTO-FILL PRIZES & 100% WORKING WALLET ADD)
     // ==========================================
     async function loadWinnerSelectOptions() {
       const winTournamentSelect = document.getElementById('win-tournament');
@@ -1459,13 +1440,15 @@
 
       const { data, error } = await sbClient
         .from('tournaments')
-        .select('id, title, status')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error || !data || !data.length) {
         winTournamentSelect.innerHTML = `<option value="">No tournaments found</option>`;
         return;
       }
+
+      window.allTournamentsFullCache = data;
 
       winTournamentSelect.innerHTML = `<option value="">Choose tournament...</option>` + data.map(t => `
         <option value="${t.id}">${escapeHTML(t.title)} (${t.status || 'upcoming'})</option>
@@ -1480,16 +1463,28 @@
 
       if (!tournamentId) return;
 
+      // 1. AUTO-FILL PRIZES FROM MATCH RECORD DIRECTLY
+      const tour = (window.allTournamentsFullCache || []).find(t => t.id === tournamentId);
+      if (tour) {
+        document.getElementById('win-amt1').value = tour.prize_pool || tour.prize_1 || 0;
+        document.getElementById('win-amt2').value = tour.prize_2 || 0;
+        document.getElementById('win-amt3').value = tour.prize_3 || 0;
+        document.getElementById('win-amt4').value = tour.prize_4 || 0;
+      }
+
+      // 2. Load Joined Players
       const { data, error } = await sbClient
         .from('tournament_entries')
-        .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
+        .select('user_id, profiles(id, free_fire_name, free_fire_uid, full_name)')
         .eq('tournament_id', tournamentId);
 
       if (error || !data || !data.length) return;
 
       const playerOptions = `<option value="">Choose player...</option>` + data.map(e => {
         const p = e.profiles || {};
-        return `<option value="${p.id}">${escapeHTML(p.free_fire_name || 'Gamer')} (UID: ${escapeHTML(p.free_fire_uid || '--')})</option>`;
+        const pName = p.free_fire_name || p.full_name || 'Gamer';
+        const pUid = p.free_fire_uid || '--';
+        return `<option value="${p.id || e.user_id}">${escapeHTML(pName)} (UID: ${escapeHTML(pUid)})</option>`;
       }).join('');
 
       ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
@@ -1538,22 +1533,42 @@
           ...(u4 && amt4 > 0 ? [{ tournament_id: tournamentId, user_id: u4, position: 4, prize_amount: amt4 }] : [])
         ];
 
+        // 1. Insert records to tournament_winners
+        await sbClient.from('tournament_winners').delete().eq('tournament_id', tournamentId);
         const { error: winErr } = await sbClient.from('tournament_winners').insert(winnersPayload);
         if (winErr) throw winErr;
 
-        // Auto Credit Prize Money to player wallets
+        // 2. Real-Time Credit Prize to Each Winner's Wallet Balance & Add Transactions
         for (const w of winnersPayload) {
           if (w.user_id && w.prize_amount > 0) {
-            const { data: prof } = await sbClient.from('profiles').select('balance').eq('id', w.user_id).single();
+            const { data: prof } = await sbClient.from('profiles').select('id, balance, total_won').eq('id', w.user_id).single();
             const currentBal = Number(prof?.balance || 0);
+            const currentWon = Number(prof?.total_won || 0);
+
+            // Update balance and total_won
             await sbClient.from('profiles').update({
               balance: currentBal + Number(w.prize_amount),
+              total_won: currentWon + Number(w.prize_amount),
               updated_at: new Date().toISOString()
             }).eq('id', w.user_id);
+
+            // Also add wallet_transaction log
+            try {
+              await sbClient.from('wallet_transactions').insert([{
+                user_id: w.user_id,
+                amount: Number(w.prize_amount),
+                transaction_type: `Match Prize (#${w.position})`,
+                description: `Won position #${w.position} prize`,
+                status: 'completed',
+                created_at: new Date().toISOString()
+              }]);
+            } catch (txErr) {
+              console.log("Transaction log optional notice:", txErr);
+            }
           }
         }
 
-        // Auto mark match as completed
+        // 3. Mark match as completed
         const { error: tourErr } = await sbClient.from('tournaments').update({
           status: 'completed',
           updated_at: new Date().toISOString()
@@ -1561,6 +1576,7 @@
 
         if (tourErr) throw tourErr;
 
+        // 4. Form Reset
         document.getElementById('win-tournament').value = '';
         ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
           const el = document.getElementById(id);
@@ -1571,7 +1587,9 @@
           if (el) el.value = '';
         });
 
-        alert("🎉 Winners announced successfully! Match marked as COMPLETED.");
+        alert("🎉 Winners announced successfully! Match marked as COMPLETED and prizes added to wallet.");
+
+        // 5. Automatic redirect & refresh
         selectTab('overview');
         loadTournaments();
         loadDashboardStats();
@@ -1621,7 +1639,7 @@
     }
 
     // ==========================================
-    // GLOBAL CHAT ROOM SUB-TABS SWITCH (FIXED & FULLY WORKING)
+    // GLOBAL CHAT ROOM SUB-TABS SWITCH
     // ==========================================
     function switchChatSubTab(subTab) {
       ['live_messages', 'announcements', 'reports', 'moderation'].forEach(st => {
@@ -1643,7 +1661,7 @@
     }
 
     // ==========================================
-    // INTERACTIVE CHAT ROOM LOGIC (WITH ACTION BUTTONS UNDER EVERY MESSAGE)
+    // INTERACTIVE CHAT ROOM LOGIC
     // ==========================================
     function openLiveChatModal() {
       const modal = document.getElementById('modal-interactive-chat');
@@ -1664,7 +1682,6 @@
 
     function renderMessageContent(msgText) {
       if (!msgText) return '';
-      // Direct sticker render
       if (msgText.startsWith('STICKER:') || msgText.match(/\.(webp|png|jpg|jpeg|gif)(\?.*)?$/i)) {
         let cleanUrl = msgText.replace(/^STICKER:/i, '').trim();
         return `
@@ -1789,7 +1806,6 @@
 
         return `
           <div class="flex items-start gap-2.5 ${isMsgAdmin ? 'flex-row-reverse' : 'flex-row'}">
-            <!-- AVATAR / LIGHTING ADMIN DP -->
             <div class="relative shrink-0 mt-0.5">
               ${isMsgAdmin ? `
                 <div class="w-8 h-8 rounded-full admin-neon-dp flex items-center justify-center text-white font-extrabold text-[9px] font-gaming">
@@ -1802,7 +1818,6 @@
             </div>
 
             <div class="max-w-[78%] space-y-1">
-              <!-- Name & UID Header -->
               <div class="flex items-center gap-1.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
                 ${isMsgAdmin ? `
                   <span class="bg-gradient-to-r from-amber-400 to-[#ff4624] text-black font-gaming font-extrabold text-[10px] px-1.5 py-0.2 rounded flex items-center gap-1 shadow">
@@ -1815,12 +1830,10 @@
                 <span class="text-[9px] text-gray-500 font-mono">${timeStr}</span>
               </div>
 
-              <!-- Message Bubble -->
               <div class="p-2.5 rounded-2xl ${isMsgAdmin ? 'bg-gradient-to-br from-[#ff4624]/20 to-[#ff8424]/10 border border-[#ff4624]/40 text-white rounded-tr-none' : 'bg-[#151922] border border-[#262f40] text-gray-200 rounded-tl-none'} shadow-sm">
                 ${renderMessageContent(m.message)}
               </div>
 
-              <!-- PERMANENT MODERATION BUTTONS (HAR MESSAGE KE NEECHE) -->
               <div class="flex items-center gap-1 pt-0.5 ${isMsgAdmin ? 'justify-end' : 'justify-start'} flex-wrap">
                 <button type="button" onclick="togglePinChatMessage(${m.id}, ${!m.is_pinned})" class="bg-[#0e1118] border border-[#262f40] hover:border-yellow-400 text-yellow-400 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 font-bold">
                   <i class="fa-solid fa-thumbtack text-[8px]"></i> ${m.is_pinned ? 'Unpin' : 'Pin'}
@@ -1915,7 +1928,6 @@
     async function deleteChatMessageForEveryone(messageId) {
       if (!confirm("Are you sure you want to delete this message for everyone?")) return;
       try {
-        // Immediate UI removal
         adminChatMessagesCache = adminChatMessagesCache.filter(m => m.id !== messageId);
         renderInteractiveChatRoom(adminChatMessagesCache);
 
