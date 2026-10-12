@@ -15,7 +15,7 @@
       --bubble-me: #1f2937;
       --bubble-other: #111827;
       --font-scale: 14px;
-      --bubble-radius: 14px;
+      --bubble-radius: 12px;
     }
     body[data-theme="neon"] { --primary: #ff7700; --bubble-me: #2b1800; }
     body[data-theme="cyan"] { --primary: #00f0ff; --bubble-me: #002b33; }
@@ -40,26 +40,65 @@
     .menu-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px; }
 
     /* Chat Area */
-    .chat-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; background-size: cover; background-position: center; }
+    .chat-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; }
     .load-more-btn { align-self: center; background: #1f2937; color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; }
 
-    /* Messages */
-    .msg-row { display: flex; gap: 8px; max-width: 82%; position: relative; user-select: none; }
-    .msg-me { align-self: flex-end; flex-direction: row-reverse; }
-    .msg-other { align-self: flex-start; }
-    .avatar { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--primary); object-fit: cover; }
+    /* Message Item Structure */
+    .msg-row { display: flex; flex-direction: column; max-width: 82%; position: relative; user-select: none; }
+    .msg-me { align-self: flex-end; align-items: flex-end; }
+    .msg-other { align-self: flex-start; align-items: flex-start; }
+
+    /* Message Header: DP, Name & UID (Message Ke Uper) */
+    .msg-user-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+    .msg-me .msg-user-header { flex-direction: row-reverse; }
+    .header-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--primary);
+      object-fit: cover;
+      background: #111827;
+    }
+    .header-name {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .header-uid {
+      font-size: 10px;
+      color: #9ca3af;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: normal;
+    }
+
+    /* Message Bubble */
     .msg-bubble {
-      background: var(--bubble-other); padding: 8px 12px; border-radius: var(--bubble-radius);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.4); font-size: var(--font-scale); position: relative; word-break: break-word;
+      background: var(--bubble-other);
+      padding: 8px 12px;
+      border-radius: var(--bubble-radius);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      font-size: var(--font-scale);
+      word-break: break-word;
+      width: fit-content;
     }
     .msg-me .msg-bubble { background: var(--bubble-me); border-top-right-radius: 2px; }
     .msg-other .msg-bubble { border-top-left-radius: 2px; }
-    .msg-sender { font-size: 11px; color: var(--primary); font-weight: bold; margin-bottom: 3px; display: flex; gap: 6px; align-items: center; }
-    .msg-uid { font-size: 9px; color: #9ca3af; }
+
     .msg-time { font-size: 9px; color: #9ca3af; text-align: right; margin-top: 4px; }
     .reply-quote { background: rgba(0,0,0,0.3); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
 
-    /* Animated Sticker */
+    /* Animated Sticker In-Chat */
     .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
 
     /* Reply preview */
@@ -117,7 +156,7 @@
     <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Default Theme</div>
   </div>
 
-  <!-- Messages -->
+  <!-- Messages Container -->
   <main class="chat-container" id="chatBox">
     <button class="load-more-btn" onclick="loadOldMessages()"><i class="fas fa-history"></i> Load Old Messages</button>
   </main>
@@ -249,7 +288,6 @@
     }
 
     async function loadMessages(limit = 100) {
-      // Aaj raat 12:00 AM ka timestamp
       const todayMidnight = new Date();
       todayMidnight.setHours(0, 0, 0, 0);
 
@@ -273,9 +311,10 @@
       box.scrollTop = box.scrollHeight;
     }
 
+    // Message render: DP, Name aur UID msg ke uper
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
-      if (document.getElementById(`msg-${msg.id}`)) return; // Duplicate prevention
+      if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       const isMe = String(msg.uid) === String(currentUser.uid);
@@ -300,10 +339,17 @@
         contentHtml = `<div>${escapeHtml(msg.content)}</div>`;
       }
 
+      const avatarSrc = msg.avatar || currentUser.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=Multani";
+
       row.innerHTML = `
-        <img src="${msg.avatar || currentUser.avatar}" class="avatar" />
+        <div class="msg-user-header">
+          <img src="${avatarSrc}" class="header-avatar" />
+          <div class="header-name">
+            ${escapeHtml(msg.name || "Player")}
+            <span class="header-uid">#${escapeHtml(msg.uid || "0000")}</span>
+          </div>
+        </div>
         <div class="msg-bubble">
-          <div class="msg-sender">${escapeHtml(msg.name)} <span class="msg-uid">#${escapeHtml(msg.uid)}</span></div>
           ${replyHtml}
           ${contentHtml}
           <div class="msg-time">${formattedTime}</div>
@@ -424,7 +470,6 @@
     }
 
     async function loadOldMessages() {
-      // Pichle tamam messages load karein
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
