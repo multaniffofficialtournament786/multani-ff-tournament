@@ -12,18 +12,9 @@
       --card-bg: #151a24;
       --primary: #f59e0b;
       --text: #ffffff;
-      --bubble-me: #075e54;
-      --bubble-other: #1f2937;
       --font-scale: 14px;
       --bubble-radius: 12px;
     }
-    body[data-theme="neon"] { --primary: #ff7700; --bubble-me: #2b1800; }
-    body[data-theme="cyan"] { --primary: #00f0ff; --bubble-me: #002b33; }
-    body[data-theme="purple"] { --primary: #b026ff; --bubble-me: #230038; }
-    body[data-theme="green"] { --primary: #10b981; --bubble-me: #063321; }
-    body[data-theme="red"] { --primary: #ef4444; --bubble-me: #380707; }
-    body[data-theme="whatsapp"] { --primary: #25d366; --bubble-me: #075e54; }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     
     html, body {
@@ -42,7 +33,8 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: #111827;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
       padding: 10px 14px;
       display: flex;
       align-items: center;
@@ -73,14 +65,14 @@
       background-position: center;
       background-repeat: no-repeat;
     }
-    .load-more-btn { align-self: center; background: #1f2937; color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; }
+    .load-more-btn { align-self: center; background: rgba(31, 41, 55, 0.8); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; backdrop-filter: blur(4px); }
 
     /* Message Item */
     .msg-row { display: flex; flex-direction: column; max-width: 82%; position: relative; user-select: none; }
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
-    /* Message Header: DP, Name & UID */
+    /* Message Header: DP, Game Name & UID */
     .msg-user-header {
       display: flex;
       align-items: center;
@@ -104,29 +96,43 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
     .header-uid {
       font-size: 11px;
       color: #ffffff;
-      background: #374151;
+      background: rgba(31, 41, 55, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       padding: 2px 7px;
       border-radius: 6px;
       font-weight: bold;
       letter-spacing: 0.5px;
     }
 
-    /* Message Bubble */
+    /* Transparent Message Bubble with Border (No solid box) */
     .msg-bubble {
-      background: var(--bubble-other);
       padding: 9px 13px;
       border-radius: var(--bubble-radius);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
       font-size: var(--font-scale);
       word-break: break-word;
       width: fit-content;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
-    .msg-me .msg-bubble { background: var(--bubble-me); border-top-right-radius: 2px; }
-    .msg-other .msg-bubble { border-top-left-radius: 2px; }
+    
+    /* Apna Message: Transparent with Glowing Emerald Green Border */
+    .msg-me .msg-bubble {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1.5px solid #10b981;
+      border-top-right-radius: 2px;
+    }
+
+    /* Dusre Player ka Message: Transparent with Slate/Cyan Border */
+    .msg-other .msg-bubble {
+      background: rgba(31, 41, 55, 0.35);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-top-left-radius: 2px;
+    }
 
     /* Time & Double Blue Tick */
     .msg-footer-info {
@@ -136,10 +142,10 @@
       gap: 4px;
       margin-top: 4px;
     }
-    .msg-time { font-size: 10px; color: #d1d5db; }
+    .msg-time { font-size: 10px; color: #e5e7eb; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
     .msg-tick { font-size: 11px; color: #38bdf8; font-weight: bold; }
 
-    .reply-quote { background: rgba(0,0,0,0.3); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
+    .reply-quote { background: rgba(0,0,0,0.4); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
     .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
 
     /* Reply bar */
@@ -158,14 +164,15 @@
       z-index: 101;
     }
 
-    /* Footer Input Fixed */
+    /* Footer Input */
     .chat-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       height: 58px;
-      background: #111827;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
       padding: 8px 10px;
       display: flex;
       align-items: center;
@@ -228,7 +235,6 @@
 </head>
 <body id="chatBody">
 
-  <!-- Header -->
   <header class="chat-header">
     <div class="header-left">
       <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Home</a>
@@ -240,28 +246,23 @@
     <button class="menu-btn" onclick="toggleHeaderMenu()"><i class="fas fa-ellipsis-v"></i></button>
   </header>
 
-  <!-- Dropdown Menu -->
   <div class="dropdown-menu" id="headerMenu">
-    <div class="menu-item" onclick="openThemePicker()"><i class="fas fa-palette"></i> Theme & Display</div>
     <div class="menu-item" onclick="triggerBgUpload()"><i class="fas fa-image"></i> Chat Background</div>
     <input type="file" id="bgUpload" accept="image/*" style="display:none;" onchange="handleBgUpload(event)" />
     <div class="menu-item" onclick="clearMyChat()"><i class="fas fa-broom"></i> Clear Chat for Me</div>
     <div class="menu-item" onclick="showRules()"><i class="fas fa-shield-alt"></i> Info & Rules</div>
-    <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Default Theme</div>
+    <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Default Background</div>
   </div>
 
-  <!-- Messages Container -->
   <main class="chat-container" id="chatBox">
     <button class="load-more-btn" onclick="loadOldMessages()"><i class="fas fa-history"></i> Load Old Messages</button>
   </main>
 
-  <!-- Reply Preview -->
   <div class="reply-preview-bar" id="replyBar">
     <span id="replyText">Replying to...</span>
     <i class="fas fa-times" style="cursor:pointer;" onclick="cancelReply()"></i>
   </div>
 
-  <!-- Footer Input Fixed -->
   <footer class="chat-footer">
     <button class="action-icon" onclick="toggleEmojiDrawer()"><i class="far fa-smile"></i></button>
     <button class="action-icon" onclick="toggleStickerDrawer()"><i class="fas fa-fire"></i></button>
@@ -269,7 +270,6 @@
     <button class="send-btn" onclick="sendTextMessage()"><i class="fas fa-paper-plane"></i></button>
   </footer>
 
-  <!-- Emoji Drawer -->
   <div class="panel-drawer" id="emojiDrawer">
     <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
     <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
@@ -285,10 +285,8 @@
     <span class="emoji-item" onclick="insertEmoji('👏')">👏</span>
   </div>
 
-  <!-- Stickers Drawer -->
   <div class="sticker-drawer" id="stickerDrawer"></div>
 
-  <!-- Message Action Modal -->
   <div class="msg-modal" id="msgModal" onclick="closeModal(event)">
     <div class="modal-content">
       <div class="menu-item" onclick="triggerReply()"><i class="fas fa-reply"></i> Reply</div>
@@ -299,7 +297,6 @@
     </div>
   </div>
 
-  <!-- Rules Modal -->
   <div class="rules-modal" id="rulesModal">
     <div class="rules-card">
       <h3><i class="fas fa-shield-alt"></i> MULTANI FF RULES</h3>
@@ -309,7 +306,6 @@
         <li><b>Hacks / Panel Baazi:</b> Hack ya config use karne wale ki UID blacklist hogi.</li>
         <li><b>Scam & Fraud:</b> Fake payment screenshot ya fraud par account freeze hoga.</li>
         <li><b>Spamming:</b> Links ya promotion bar-bar bhejna sakht mana hai.</li>
-        <li><b>Admin Decision Final:</b> Multani FF Admin ka faisla aakhri aur hatmi hoga.</li>
       </ol>
       <button class="rules-close" onclick="document.getElementById('rulesModal').style.display='none'">I Agree</button>
     </div>
@@ -320,7 +316,6 @@
     const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Current player state
     let currentUser = {
       name: "",
       uid: "",
@@ -328,14 +323,13 @@
       avatar: ""
     };
 
-    // Asli User Session aur Profile Table Data Sync
+    // Har Player ka Asli Free Fire Game Name (IGN), UID aur DP Sync karna
     async function syncPlayerProfile() {
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
         if (authData && authData.user) {
           currentUser.user_id = authData.user.id;
 
-          // profiles table check
           const { data: pData } = await supabaseClient
             .from('profiles')
             .select('*')
@@ -343,21 +337,24 @@
             .maybeSingle();
 
           if (pData) {
-            currentUser.name = pData.ign || pData.in_game_name || pData.game_name || pData.name || pData.ff_ign || "";
+            // Free Fire IGN ko pehli tarjeeh dein taake "Ali raza" ki jagah "Defeater" ya jo IGN hai wahi aaye
+            currentUser.name = pData.ign || pData.in_game_name || pData.ff_ign || pData.game_name || pData.name || "";
             currentUser.uid = String(pData.uid || pData.ff_uid || pData.free_fire_uid || "");
             currentUser.avatar = pData.avatar_url || pData.avatar || "";
           }
         }
       } catch (err) {
-        console.warn("Auth error:", err);
+        console.warn("Auth sync error:", err);
       }
 
-      // Agar profiles me empty mila to localStorage (Profile screen) se check karein
+      // Agar database me khali ho to profile screen ke localStorage se read karein
       if (!currentUser.name) {
         currentUser.name = localStorage.getItem("ign") || 
                            localStorage.getItem("in_game_name") || 
+                           localStorage.getItem("ff_ign") || 
+                           localStorage.getItem("game_name") || 
                            localStorage.getItem("ff_player_ign") || 
-                           localStorage.getItem("ff_ign") || "";
+                           localStorage.getItem("full_name") || "";
       }
       if (!currentUser.uid) {
         currentUser.uid = localStorage.getItem("uid") || 
@@ -369,8 +366,8 @@
                              localStorage.getItem("avatar_url") || "";
       }
 
-      // Agar abhi bhi empty ho to temporary username/guest assign karo
-      if (!currentUser.name) currentUser.name = "Guest_" + Math.floor(1000 + Math.random() * 9000);
+      // Final default fallback
+      if (!currentUser.name) currentUser.name = "Player";
       if (!currentUser.uid) currentUser.uid = "0000";
       if (!currentUser.avatar) {
         currentUser.avatar = "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(currentUser.name);
@@ -456,18 +453,18 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Isme Left/Right check 100% Unique auth user_id se hoga!
+    // Message Render: Transparent Glass with Border & Double Tick
     function renderSingleMessage(msg) {
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
       
-      // Right side (Me) sirf tabhi hoga jab sender ka Auth user_id is phone ke user se match kare
+      // IsMe check: Unique user_id ya UID se
       let isMe = false;
       if (currentUser.user_id && msg.user_id) {
         isMe = (String(msg.user_id) === String(currentUser.user_id));
-      } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000" && currentUser.uid !== "00000000") {
+      } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000") {
         isMe = (String(msg.uid) === String(currentUser.uid));
       }
 
@@ -492,12 +489,10 @@
         contentHtml = `<div>${escapeHtml(msgText)}</div>`;
       }
 
-      // Database se jo Name, UID aur Avatar aaya hai sirf wahi render hoga
       const senderName = msg.name || "Player";
       const senderUid = msg.uid || "0000";
       const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
 
-      // Double Blue Tick sirf sender ke message par
       const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
 
       row.innerHTML = `
@@ -535,8 +530,7 @@
     }
 
     async function postToSupabase(content) {
-      // Message bhejne se pehle ensure karein profile sync hai
-      if (!currentUser.user_id) {
+      if (!currentUser.user_id || currentUser.name === "Player") {
         await syncPlayerProfile();
       }
 
@@ -656,16 +650,6 @@
       }
     }
 
-    function openThemePicker() {
-      const choice = prompt("Select Theme:\n1. neon\n2. cyan\n3. purple\n4. green\n5. red\n6. whatsapp");
-      const map = { "1": "neon", "2": "cyan", "3": "purple", "4": "green", "5": "red", "6": "whatsapp" };
-      if (map[choice]) {
-        document.body.setAttribute('data-theme', map[choice]);
-        localStorage.setItem("chat_theme", map[choice]);
-      }
-      toggleHeaderMenu();
-    }
-
     function triggerBgUpload() {
       toggleHeaderMenu();
       document.getElementById('bgUpload').click();
@@ -716,16 +700,12 @@
     }
 
     function resetTheme() {
-      document.body.removeAttribute('data-theme');
       document.getElementById('chatBox').style.backgroundImage = 'none';
-      localStorage.removeItem("chat_theme");
       localStorage.removeItem("chat_bg");
       toggleHeaderMenu();
     }
 
     function applyStoredTheme() {
-      const th = localStorage.getItem("chat_theme");
-      if (th) document.body.setAttribute('data-theme', th);
       const bg = localStorage.getItem("chat_bg");
       if (bg) document.getElementById('chatBox').style.backgroundImage = `url("${bg}")`;
     }
