@@ -991,8 +991,6 @@
     let loadedDiamondRequestsList = [];
     let currentDiamondFilter = 'all';
     let globalSpinHistoryCache = [];
-
-    // Global tournaments map to auto-populate prizes
     let tournamentsCacheMap = {};
 
     function escapeHTML(str) {
@@ -1267,7 +1265,7 @@
     }
 
     // ==========================================
-    // WINNERS DECLARATION TAB & AUTO PRIZE FILL
+    // WINNERS DECLARATION TAB & AUTO-FILL FIX
     // ==========================================
     async function loadWinnerSelectOptions() {
       const winTournamentSelect = document.getElementById('win-tournament');
@@ -1288,7 +1286,6 @@
       tournamentsCacheMap = {};
       data.forEach(t => { tournamentsCacheMap[t.id] = t; });
 
-      // Uncompleted tournaments upper, completed marked properly
       winTournamentSelect.innerHTML = `<option value="">Choose tournament...</option>` + data.map(t => {
         const isDone = (t.status || '').toLowerCase() === 'completed';
         return `<option value="${t.id}">${escapeHTML(t.title)} (${t.status || 'upcoming'})${isDone ? ' - Finalized' : ''}</option>`;
@@ -1296,7 +1293,6 @@
     }
 
     async function onWinnerTournamentChange(tournamentId) {
-      // Clear dropdowns & prize inputs
       ['win-u1', 'win-u2', 'win-u3', 'win-u4'].forEach(id => {
         const sel = document.getElementById(id);
         if (sel) sel.innerHTML = `<option value="">Choose player...</option>`;
@@ -1309,7 +1305,7 @@
 
       if (!tournamentId) return;
 
-      // 1. AUTO-FILL PRIZES FROM SELECTED TOURNAMENT
+      // 1. AUTO-FILL PRIZES FROM MATCH RECORD
       const t = tournamentsCacheMap[tournamentId];
       if (t) {
         if (t.prize_pool) document.getElementById('win-amt1').value = t.prize_pool;
@@ -1318,7 +1314,7 @@
         if (t.prize_4) document.getElementById('win-amt4').value = t.prize_4;
       }
 
-      // 2. LOAD PLAYERS JOINED IN THIS TOURNAMENT
+      // 2. LOAD JOINED PLAYERS FOR TOURNAMENT
       const { data, error } = await sbClient
         .from('tournament_entries')
         .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
@@ -1337,6 +1333,9 @@
       });
     }
 
+    // ==========================================
+    // WINNER DECLARATION ACTION (STUCK POPUP FIXED)
+    // ==========================================
     async function submitAllWinnersDeclaration() {
       const tournamentId = document.getElementById('win-tournament').value;
       if (!tournamentId) {
@@ -1344,11 +1343,17 @@
         return;
       }
 
+      const matchObj = tournamentsCacheMap[tournamentId];
+      if (matchObj && (matchObj.status || '').toLowerCase() === 'completed') {
+        alert("Yeh tournament pehle hi COMPLETED aur FINALIZED hai! Is tournament ke winners pehle se announce ho chuke hain.");
+        return;
+      }
+
       const u1 = document.getElementById('win-u1').value;
       const amt1 = parseFloat(document.getElementById('win-amt1').value) || 0;
 
       if (!u1 || amt1 <= 0) {
-        alert("1st Place Winner and 1st Prize amount are mandatory.");
+        alert("1st Place Winner aur 1st Prize lazmi hain.");
         return;
       }
 
@@ -1361,7 +1366,7 @@
       const u4 = document.getElementById('win-u4').value;
       const amt4 = parseFloat(document.getElementById('win-amt4').value) || 0;
 
-      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;[span_5](start_span)[span_5](end_span)
+      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;[span_4](start_span)[span_4](end_span)
 
       const winnersPayload = [
         { user_id: u1, position: 1, prize: amt1 }
@@ -1382,19 +1387,24 @@
           p_winners: winnersPayload
         });
 
-        if (error) throw error;
+        if (error) {
+          throw new Error(error.message || JSON.stringify(error));
+        }
 
-        if (data && !data.success) {
-          alert("Error: " + data.message);
+        if (data && data.success === false) {
+          alert("Notice: " + data.message);
           return;
         }
 
-        alert(data.message || "Winners announced and prizes credited successfully!");[span_6](start_span)[span_6](end_span)
-        loadDeclaredWinners();
-        loadWinnerSelectOptions();
-        loadDashboardStats();
+        const successMsg = (data && data.message) ? data.message : "Winners announced and prizes credited successfully!";
+        alert(successMsg);[span_5](start_span)[span_5](end_span)
+        
+        await loadDeclaredWinners();
+        await loadWinnerSelectOptions();
+        await loadDashboardStats();
       } catch (err) {
-        alert("Failed to declare winners: " + (err.message || err));
+        console.error("Winner Declaration Error:", err);
+        alert("Error declaring winners: " + (err.message || err));
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -1437,7 +1447,7 @@
     }
 
     // ==========================================
-    // DAILY SPIN MANAGEMENT & STATS FIX
+    // DAILY SPIN MANAGEMENT & FIXED EDIT SLOT
     // ==========================================
     async function loadAdminDailySpinMgmt() {
       const container = document.getElementById('admin-daily-spin-slots-list');
@@ -1544,22 +1554,23 @@
         return;
       }
 
-      // Safe update targeting both id and slot_number fallback
-      let updateQuery = sbClient.from('daily_spin_rewards').update({
+      // NO updated_at column to avoid schema cache error
+      const updatePayload = {
         reward_name,
         reward_type,
         reward_value,
-        is_active,
-        updated_at: new Date().toISOString()
-      });
+        is_active
+      };
+
+      let error = null;
 
       if (id && id !== 'undefined' && id !== 'null') {
-        updateQuery = updateQuery.eq('id', id);
+        const res = await sbClient.from('daily_spin_rewards').update(updatePayload).eq('id', id);
+        error = res.error;
       } else {
-        updateQuery = updateQuery.eq('slot_number', slot_number);
+        const res = await sbClient.from('daily_spin_rewards').update(updatePayload).eq('slot_number', slot_number);
+        error = res.error;
       }
-
-      const { error } = await updateQuery;
 
       if (error) {
         alert("Failed to update slot: " + error.message);
