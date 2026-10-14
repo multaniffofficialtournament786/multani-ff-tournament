@@ -345,7 +345,6 @@
       <div class="menu-item" onclick="copyActiveMsg()"><i class="fas fa-copy"></i> Copy Text</div>
       <div class="menu-item" onclick="hideActiveMsg()"><i class="fas fa-eye-slash"></i> Hide for Me</div>
       <div class="menu-item" id="deleteEveryoneBtn" style="display:none;" onclick="deleteActiveMsgForEveryone()"><i class="fas fa-trash" style="color:#ef4444;"></i> <span style="color:#ef4444;">Delete for Everyone</span></div>
-      <div class="menu-item" onclick="reportMsg()"><i class="fas fa-flag"></i> Report Message</div>
     </div>
   </div>
 
@@ -705,11 +704,6 @@
       await supabaseClient.from('chat_messages').update({ is_deleted: true }).eq('id', activeSelectedMsg.id);
       const el = document.getElementById(`msg-${activeSelectedMsg.id}`);
       if (el) el.remove();
-      document.getElementById('msgModal').style.display = 'none';
-    }
-
-    function reportMsg() {
-      alert("Yeh message report kar diya gaya hai.");
       document.getElementById('msgModal').style.display = 'none';
     }
 
