@@ -360,7 +360,7 @@
         </div>
       </section>
 
-      <!-- CHAT CONTROL SECTION -->
+      <!-- CHAT CONTROL SECTION (PERFECT MATCH WITH SCREENSHOT 1 & SCREENSHOT 2) -->
       <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
         <!-- 1. Horizontal Scrollable Action Filters Row -->
         <div class="horizontal-filter-scroll">
@@ -393,7 +393,7 @@
             <input type="text" id="chat-msg-search-input" oninput="filterChatMessagesList()" placeholder="🔍 Filter msg or UID..." class="bg-[#06070a] border border-[#262f40] rounded-lg px-2.5 py-1 text-[11px] text-white outline-none focus:border-[#ff4624] w-36 sm:w-44" />
           </div>
 
-          <!-- Pinned Announcement Banner (if any) -->
+          <!-- Pinned Announcement Banner -->
           <div id="pinned-announcement-banner" class="hidden px-3 py-1.5 bg-[#ff4624]/10 border-b border-[#ff4624]/40 flex items-center justify-between text-xs">
             <div class="flex items-center gap-2 truncate pr-2">
               <i class="fa-solid fa-thumbtack text-[#ff4624] text-xs shrink-0"></i>
@@ -1296,7 +1296,6 @@
         history.pushState({ tab: tabId }, '', '#' + tabId);
       }
 
-      // Close realtime channel if navigating away to save bandwidth
       if (tabId !== 'chat_control' && chatRealtimeChannel) {
         sbClient.removeChannel(chatRealtimeChannel);
         chatRealtimeChannel = null;
@@ -1339,7 +1338,7 @@
       if (tabId === 'users') loadUsers();
       if (tabId === 'chat_control') {
         loadChatControlData();
-        setupRealtimeChat(); // Enable live syncing with chat_messages
+        setupRealtimeChat();
       }
       if (tabId === 'tutorials') loadTutorialsManager();
       if (tabId === 'banned') loadBannedUsers();
@@ -1429,7 +1428,7 @@
 
     // ==========================================
     // CHAT CONTROL LOGIC & REALTIME INTEGRATION
-    // (USING EXACT public.chat_messages TABLE)
+    // (ACCURATELY TARGETING public.chat_messages)
     // ==========================================
     async function loadChatControlData() {
       await Promise.all([
@@ -1457,9 +1456,9 @@
         )
         .subscribe((status, err) => {
           if (status === 'SUBSCRIBED') {
-            console.log('Realtime chat_messages connected.');
+            console.log('Realtime chat_messages connected successfully.');
           } else if (status === 'CHANNEL_ERROR') {
-            console.warn('Realtime connection error:', err);
+            console.warn('Realtime chat connection error:', err);
           }
         });
     }
@@ -1568,28 +1567,6 @@
       }
     }
 
-    async function clearAllChatMessages() {
-      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will soft-delete all chat messages for players.\n\nType 'DELETE ALL' to confirm:");
-      if (warningPrompt !== 'DELETE ALL') {
-        alert("Operation cancelled.");
-        return;
-      }
-
-      try {
-        const { error } = await sbClient
-          .from('chat_messages')
-          .update({ is_deleted: true, deleted_at: new Date().toISOString() })
-          .or('is_deleted.is.null,is_deleted.eq.false');
-
-        if (error) throw error;
-
-        alert("All chat messages have been cleared successfully.");
-        fetchChatMessages(true);
-      } catch (err) {
-        alert("Failed to clear chat: " + err.message);
-      }
-    }
-
     function insertAdminEmoji() {
       const input = document.getElementById('admin-chat-send-input');
       if (input) {
@@ -1598,7 +1575,7 @@
       }
     }
 
-    // Direct Admin Chat Send: Targets public.chat_messages
+    // Direct Admin Chat Send: Targets public.chat_messages accurately using user_id
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1619,12 +1596,8 @@
         }
 
         const payload = {
-          sender_id: activeAdminId,
+          user_id: activeAdminId,
           message: message,
-          message_type: 'text',
-          is_announcement: true,
-          is_pinned: false,
-          is_deleted: false,
           created_at: new Date().toISOString()
         };
 
@@ -1662,7 +1635,6 @@
         const { data: messages, error } = await sbClient
           .from('chat_messages')
           .select('*')
-          .or('is_deleted.is.null,is_deleted.eq.false')
           .order('created_at', { ascending: false })
           .range(from, to);
 
@@ -1681,7 +1653,8 @@
           pinBanner.classList.add('hidden');
         }
 
-        const senderIds = [...new Set(newItems.map(m => m.sender_id).filter(Boolean))];
+        // Support both user_id and sender_id for profiles
+        const senderIds = [...new Set(newItems.map(m => m.user_id || m.sender_id).filter(Boolean))];
         let profMap = {};
 
         if (senderIds.length > 0) {
@@ -1697,7 +1670,7 @@
 
         const formattedItems = newItems.map(m => ({
           ...m,
-          profiles: profMap[m.sender_id] || {}
+          profiles: profMap[m.user_id || m.sender_id] || {}
         }));
 
         if (reset) {
@@ -1750,7 +1723,6 @@
       renderChatMessagesList(filtered);
     }
 
-    // Helper: Render Text or Stickers exactly like Screenshot 1
     function renderMessageContentHTML(rawMsg) {
       if (!rawMsg) return '';
       const trimmed = String(rawMsg).trim();
@@ -1783,7 +1755,8 @@
 
       container.innerHTML = list.map(m => {
         const p = m.profiles || {};
-        const isAdminMsg = (m.sender_id === myAdminId) || p.is_admin || m.is_announcement;
+        const msgOwnerId = m.user_id || m.sender_id || '';
+        const isAdminMsg = (msgOwnerId === myAdminId) || p.is_admin || m.is_announcement;
         const msgDate = m.created_at ? new Date(m.created_at) : new Date();
         const timeFormatted = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const senderName = p.free_fire_name || (isAdminMsg ? 'Master Admin' : 'Defeater');
@@ -1792,9 +1765,7 @@
         const isPinned = m.is_pinned === true;
 
         if (isAdminMsg) {
-          // ==========================================
           // ADMIN MESSAGE: RIGHT ALIGNED (SCREENSHOT 1)
-          // ==========================================
           return `
             <div class="flex flex-col items-end space-y-1.5 my-2">
               <div class="flex items-center gap-1.5 pr-1">
@@ -1824,9 +1795,7 @@
             </div>
           `;
         } else {
-          // ==========================================
           // PLAYER MESSAGE: LEFT ALIGNED (SCREENSHOT 1 & 2)
-          // ==========================================
           return `
             <div class="flex flex-col items-start space-y-1.5 my-2">
               <div class="flex items-center gap-1.5 pl-1">
@@ -1845,10 +1814,10 @@
                   <button onclick="togglePinMessage('${m.id}', ${isPinned})" title="${isPinned ? 'Unpin' : 'Pin'}" class="p-1 text-gray-400 hover:text-yellow-400 transition">
                     <i class="fa-solid fa-thumbtack ${isPinned ? 'text-yellow-400' : ''}"></i>
                   </button>
-                  <button onclick="quickMutePlayer('${m.sender_id}', '${escapeHTML(senderName)}')" title="Mute Player" class="p-1 text-gray-400 hover:text-amber-400 transition">
+                  <button onclick="quickMutePlayer('${msgOwnerId}', '${escapeHTML(senderName)}')" title="Mute Player" class="p-1 text-gray-400 hover:text-amber-400 transition">
                     <i class="fa-solid fa-volume-xmark"></i>
                   </button>
-                  <button onclick="quickBanPlayer('${m.sender_id}', '${escapeHTML(senderName)}')" title="Ban Player" class="p-1 text-gray-400 hover:text-red-400 transition">
+                  <button onclick="quickBanPlayer('${msgOwnerId}', '${escapeHTML(senderName)}')" title="Ban Player" class="p-1 text-gray-400 hover:text-red-400 transition">
                     <i class="fa-solid fa-ban"></i>
                   </button>
                   <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="p-1 text-red-500 hover:text-red-400 transition">
@@ -1862,17 +1831,13 @@
       }).join('');
     }
 
-    // Toggle Pin/Unpin on public.chat_messages
+    // Toggle Pin/Unpin
     async function togglePinMessage(msgId, currentPinned) {
       const nextState = !currentPinned;
       try {
         const { error } = await sbClient
           .from('chat_messages')
-          .update({ 
-            is_pinned: nextState,
-            pinned_at: nextState ? new Date().toISOString() : null,
-            pinned_by: nextState ? currentAdmin?.id : null
-          })
+          .update({ is_pinned: nextState })
           .eq('id', msgId);
 
         if (error) throw error;
@@ -1884,8 +1849,8 @@
 
     // Quick Mute Player
     async function quickMutePlayer(userId, userName) {
-      if (!userId || userId === 'undefined') {
-        alert("User ID not found.");
+      if (!userId || userId === 'undefined' || userId === 'null') {
+        alert("User ID not found for this player.");
         return;
       }
       if (!confirm(`Are you sure you want to MUTE ${userName} for 24 Hours?`)) return;
@@ -1895,7 +1860,7 @@
         const { error } = await sbClient.from('chat_restrictions').insert([{
           user_id: userId,
           restriction_type: 'mute',
-          reason: 'Muted from chat feed',
+          reason: 'Muted from admin panel',
           expires_at: expiry,
           is_active: true,
           created_by: currentAdmin?.id,
@@ -1912,8 +1877,8 @@
 
     // Quick Ban Player
     async function quickBanPlayer(userId, userName) {
-      if (!userId || userId === 'undefined') {
-        alert("User ID not found.");
+      if (!userId || userId === 'undefined' || userId === 'null') {
+        alert("User ID not found for this player.");
         return;
       }
       if (!confirm(`Are you sure you want to BAN player ${userName} from the platform?`)) return;
@@ -1928,14 +1893,14 @@
       }
     }
 
-    // Delete Single Message
+    // Delete Single Message (Direct Delete)
     async function deleteSingleChatMessage(msgId) {
       if (!confirm(`Delete message permanently?`)) return;
 
       try {
         const { error } = await sbClient
           .from('chat_messages')
-          .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+          .delete()
           .eq('id', msgId);
 
         if (error) throw error;
@@ -1944,6 +1909,29 @@
         renderChatMessagesList(globalChatMessagesCache);
       } catch (err) {
         alert("Failed to delete message: " + err.message);
+      }
+    }
+
+    // Clear All Chat Messages (Direct Delete)
+    async function clearAllChatMessages() {
+      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will delete all messages for all players.\n\nType 'DELETE ALL' to confirm:");
+      if (warningPrompt !== 'DELETE ALL') {
+        alert("Operation cancelled.");
+        return;
+      }
+
+      try {
+        const { error } = await sbClient
+          .from('chat_messages')
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000');
+
+        if (error) throw error;
+
+        alert("All chat messages cleared successfully!");
+        fetchChatMessages(true);
+      } catch (err) {
+        alert("Failed to clear chat: " + err.message);
       }
     }
 
@@ -2105,7 +2093,7 @@
     }
 
     // ==========================================
-    // WINNER DECLARATION ACTION (GUARANTEED FIXED)
+    // WINNER DECLARATION ACTION
     // ==========================================
     async function submitAllWinnersDeclaration() {
       const tournamentId = document.getElementById('win-tournament').value;
@@ -3410,7 +3398,7 @@
               <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${userBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 transition">
                 <i class="fa-solid fa-wallet"></i> Edit Balance
               </button>
-              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition">
+              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition flex items-center justify-center gap-1.5">
                 History
               </button>
             </div>
