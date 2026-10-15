@@ -221,6 +221,9 @@
         <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-users w-5"></i> Gamers & Balance
         </button>
+        <button onclick="selectTab('chat_control')" id="nav-chat_control" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-comments w-5 text-indigo-400"></i> Chat Control
+        </button>
         <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
           <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
           <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
@@ -328,6 +331,104 @@
             <button onclick="selectTab('tutorials')" id="nav-tutorials-btn" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-video text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Tutorials</p></button>
             <button onclick="selectTab('banned')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-500 transition"><i class="fa-solid fa-ban text-red-500 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Banned</p></button>
             <button onclick="selectTab('settings')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Ticker</p></button>
+            <button onclick="selectTab('chat_control')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-indigo-400 transition"><i class="fa-solid fa-comments text-indigo-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Chat Room</p></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAT CONTROL SECTION -->
+      <section id="section-chat_control" class="space-y-4 hidden w-full">
+        <!-- Overview Stats -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-full md:max-w-2xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Total Chat Messages</span>
+            <h3 id="chat-stat-messages" class="text-base md:text-lg font-bold font-gaming text-cyan-400 mt-1">Loading...</h3>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Online Players</span>
+            <h3 id="chat-stat-online" class="text-base md:text-lg font-bold font-gaming text-emerald-400 mt-1">Loading...</h3>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Muted Players</span>
+            <h3 id="chat-stat-muted" class="text-base md:text-lg font-bold font-gaming text-amber-400 mt-1">Loading...</h3>
+          </div>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Chat Status</span>
+            <h3 id="chat-stat-status" class="text-base md:text-lg font-bold font-gaming text-[#ff4624] mt-1">Loading...</h3>
+          </div>
+        </div>
+
+        <!-- Global Chat Controls -->
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-3">
+          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase flex items-center justify-between">
+            <span><i class="fa-solid fa-sliders text-[#ff4624] mr-2"></i> Global Chat Switches</span>
+            <button onclick="loadChatControlData()" class="text-cyan-400 hover:text-cyan-300 text-xs font-mono"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+            <button id="btn-toggle-chat-active" onclick="toggleGlobalChatActive()" class="bg-[#0e1118] border border-[#262f40] hover:border-emerald-500 p-2.5 rounded-lg text-xs font-bold font-gaming text-gray-200 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-power-off text-emerald-400"></i> <span id="lbl-chat-active">CHAT: CHECKING...</span>
+            </button>
+            <button id="btn-toggle-chat-lock" onclick="toggleGlobalChatLock()" class="bg-[#0e1118] border border-[#262f40] hover:border-yellow-500 p-2.5 rounded-lg text-xs font-bold font-gaming text-gray-200 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-lock text-yellow-400"></i> <span id="lbl-chat-lock">LOCK: CHECKING...</span>
+            </button>
+            <button onclick="clearAllChatMessages()" class="bg-red-600/20 border border-red-500/40 hover:bg-red-600 text-red-300 hover:text-white p-2.5 rounded-lg text-xs font-bold font-gaming flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-trash-can"></i> CLEAR ALL CHAT
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Announcement Card -->
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-3">
+          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-[#ff4624]"></i> Admin Broadcast Announcement
+          </h3>
+          <div class="space-y-2">
+            <textarea id="admin-chat-announcement-text" rows="2" placeholder="Type official announcement message to pin or send to group chat..." class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></textarea>
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
+              <div class="flex items-center gap-2">
+                <input type="checkbox" id="admin-chat-pin-chk" class="w-4 h-4 accent-[#ff4624]" />
+                <label for="admin-chat-pin-chk" class="text-xs text-gray-300">Pin as priority notice</label>
+              </div>
+              <button onclick="sendAdminChatAnnouncement()" id="btn-send-announcement" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-4 py-2 rounded-lg font-gaming font-bold text-xs uppercase tracking-wider transition">
+                SEND BROADCAST
+              </button>
+            </div>
+            <p id="announcement-feedback-msg" class="text-xs hidden"></p>
+          </div>
+        </div>
+
+        <!-- Muted Players Section -->
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-volume-xmark text-amber-400"></i> Muted Players Management
+            </h3>
+            <button onclick="openMutePlayerModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i> Mute Player
+            </button>
+          </div>
+          <div id="muted-players-list-container" class="space-y-2 pt-1">
+            <p class="text-gray-500 text-xs text-center py-3">Loading muted players...</p>
+          </div>
+        </div>
+
+        <!-- Chat Message Moderation Area -->
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-comments text-cyan-400"></i> Chat Messages Moderation
+            </h3>
+            <input type="text" id="chat-msg-search-input" oninput="filterChatMessagesList()" placeholder="Search sender, UID, text..." class="bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-60" />
+          </div>
+
+          <div id="chat-messages-moderation-list" class="space-y-2.5 max-h-[460px] overflow-y-auto sidebar-scroll p-1">
+            <p class="text-gray-500 text-xs text-center py-6">Loading group chat messages...</p>
+          </div>
+
+          <div class="pt-2 text-center">
+            <button id="btn-load-more-chat" onclick="loadMoreChatMessages()" class="bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] text-gray-300 hover:text-white px-4 py-2 rounded-lg text-xs font-bold font-gaming uppercase transition hidden">
+              Load More Messages
+            </button>
           </div>
         </div>
       </section>
@@ -667,6 +768,56 @@
     </button>
   </div>
 
+  <!-- MODAL: MUTE PLAYER -->
+  <div id="modal-mute-player" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-5 w-full max-w-md space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-volume-xmark text-amber-400"></i> Restrict / Mute Player
+        </h3>
+        <button onclick="closeMutePlayerModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Select Registered Player</label>
+          <select id="mute-player-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="">Choose player...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Restriction Type</label>
+          <select id="mute-restriction-type" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="mute">Mute (Cannot Send Messages)</option>
+            <option value="ban">Chat Ban (Blocked from Chat)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Duration</label>
+          <select id="mute-duration-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="30m">30 Minutes</option>
+            <option value="2h">2 Hours</option>
+            <option value="24h" selected>24 Hours (1 Day)</option>
+            <option value="7d">7 Days</option>
+            <option value="permanent">Permanent</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Reason for Mute</label>
+          <input type="text" id="mute-reason-input" placeholder="e.g. Abusive language, spamming, fake proof links" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" />
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeMutePlayerModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold">CANCEL</button>
+        <button onclick="confirmApplyChatRestriction()" id="btn-confirm-mute-submit" class="w-1/2 bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-lg text-xs font-bold font-gaming uppercase tracking-wider">APPLY MUTE</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODALS -->
   <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
@@ -993,6 +1144,13 @@
     let globalSpinHistoryCache = [];
     let tournamentsCacheMap = {};
 
+    // Chat Control Cache Variables
+    let currentChatSettings = null;
+    let globalChatMessagesCache = [];
+    let chatMessagesPage = 0;
+    const CHAT_PAGE_SIZE = 40;
+    let globalMutedPlayersCache = [];
+
     function escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -1134,7 +1292,7 @@
       }
     }
 
-    const tabs = ['overview', 'tournaments', 'winners', 'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'tutorials', 'support', 'banned', 'settings'];
+    const tabs = ['overview', 'tournaments', 'winners', 'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history', 'deposits', 'withdrawals', 'diamond_requests', 'users', 'chat_control', 'tutorials', 'support', 'banned', 'settings'];
 
     function selectTab(tabId, pushHistory = true) {
       toggleSidebar(false);
@@ -1178,6 +1336,7 @@
       if (tabId === 'diamond_requests') loadAdminDiamondRequests();
       if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
       if (tabId === 'users') loadUsers();
+      if (tabId === 'chat_control') loadChatControlData();
       if (tabId === 'tutorials') loadTutorialsManager();
       if (tabId === 'banned') loadBannedUsers();
       if (tabId === 'settings') loadSettings();
@@ -1262,6 +1421,517 @@
         el.innerText = supCount;
         el.classList.toggle('hidden', supCount === 0);
       });
+    }
+
+    // ==========================================
+    // CHAT CONTROL LOGIC & DATABASE INTEGRATION
+    // ==========================================
+    async function loadChatControlData() {
+      await Promise.all([
+        fetchChatSettings(),
+        fetchChatStats(),
+        fetchMutedPlayers(),
+        fetchChatMessages(true)
+      ]);
+    }
+
+    async function fetchChatSettings() {
+      try {
+        const { data, error } = await sbClient
+          .from('chat_settings')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+        currentChatSettings = data || { id: 1, is_enabled: true, is_locked: false };
+        updateChatSettingsUI();
+      } catch (err) {
+        console.warn("Notice: chat_settings table might not be initialized:", err.message);
+        currentChatSettings = { id: 1, is_enabled: true, is_locked: false };
+        updateChatSettingsUI();
+      }
+    }
+
+    function updateChatSettingsUI() {
+      const activeBtn = document.getElementById('btn-toggle-chat-active');
+      const activeLbl = document.getElementById('lbl-chat-active');
+      const lockBtn = document.getElementById('btn-toggle-chat-lock');
+      const lockLbl = document.getElementById('lbl-chat-lock');
+      const statStatus = document.getElementById('chat-stat-status');
+
+      const isEnabled = currentChatSettings?.is_enabled ?? true;
+      const isLocked = currentChatSettings?.is_locked ?? false;
+
+      if (isEnabled) {
+        if (activeLbl) activeLbl.innerText = "CHAT: ENABLED (ON)";
+        if (activeBtn) activeBtn.className = "bg-emerald-950/40 border border-emerald-600/60 p-2.5 rounded-lg text-xs font-bold font-gaming text-emerald-300 flex items-center justify-center gap-2 cursor-pointer";
+        if (statStatus) {
+          statStatus.innerText = isLocked ? "LOCKED (READ ONLY)" : "ACTIVE (ON)";
+          statStatus.className = isLocked ? "text-base md:text-lg font-bold font-gaming text-yellow-400 mt-1" : "text-base md:text-lg font-bold font-gaming text-emerald-400 mt-1";
+        }
+      } else {
+        if (activeLbl) activeLbl.innerText = "CHAT: DISABLED (OFF)";
+        if (activeBtn) activeBtn.className = "bg-red-950/40 border border-red-600/60 p-2.5 rounded-lg text-xs font-bold font-gaming text-red-300 flex items-center justify-center gap-2 cursor-pointer";
+        if (statStatus) {
+          statStatus.innerText = "DISABLED (OFF)";
+          statStatus.className = "text-base md:text-lg font-bold font-gaming text-red-400 mt-1";
+        }
+      }
+
+      if (isLocked) {
+        if (lockLbl) lockLbl.innerText = "INPUT: LOCKED";
+        if (lockBtn) lockBtn.className = "bg-yellow-950/40 border border-yellow-600/60 p-2.5 rounded-lg text-xs font-bold font-gaming text-yellow-300 flex items-center justify-center gap-2 cursor-pointer";
+      } else {
+        if (lockLbl) lockLbl.innerText = "INPUT: UNLOCKED";
+        if (lockBtn) lockBtn.className = "bg-[#0e1118] border border-[#262f40] p-2.5 rounded-lg text-xs font-bold font-gaming text-gray-300 flex items-center justify-center gap-2 cursor-pointer";
+      }
+    }
+
+    async function toggleGlobalChatActive() {
+      if (!currentChatSettings) return;
+      const current = currentChatSettings.is_enabled ?? true;
+      const nextState = !current;
+
+      const confirmMsg = nextState 
+        ? "Are you sure you want to ENABLE group chat for all players?" 
+        : "Are you sure you want to DISABLE group chat completely? Players will not be able to view or send messages.";
+      
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const { error } = await sbClient
+          .from('chat_settings')
+          .upsert({ id: currentChatSettings.id || 1, is_enabled: nextState, updated_at: new Date().toISOString() });
+
+        if (error) throw error;
+        currentChatSettings.is_enabled = nextState;
+        updateChatSettingsUI();
+        alert(`Chat successfully ${nextState ? 'ENABLED' : 'DISABLED'}!`);
+      } catch (err) {
+        alert("Operation failed: " + err.message + "\n(Ensure 'chat_settings' table exists with update permission).");
+      }
+    }
+
+    async function toggleGlobalChatLock() {
+      if (!currentChatSettings) return;
+      const current = currentChatSettings.is_locked ?? false;
+      const nextState = !current;
+
+      const confirmMsg = nextState 
+        ? "Are you sure you want to LOCK chat? Regular players will be prevented from sending new messages." 
+        : "Are you sure you want to UNLOCK chat? Normal players will be able to send messages again.";
+
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const { error } = await sbClient
+          .from('chat_settings')
+          .upsert({ id: currentChatSettings.id || 1, is_locked: nextState, updated_at: new Date().toISOString() });
+
+        if (error) throw error;
+        currentChatSettings.is_locked = nextState;
+        updateChatSettingsUI();
+        alert(`Chat input successfully ${nextState ? 'LOCKED' : 'UNLOCKED'}!`);
+      } catch (err) {
+        alert("Operation failed: " + err.message + "\n(Ensure 'chat_settings' table exists with update permission).");
+      }
+    }
+
+    async function fetchChatStats() {
+      const msgStatEl = document.getElementById('chat-stat-messages');
+      const onlineStatEl = document.getElementById('chat-stat-online');
+
+      // 1. Total chat messages
+      try {
+        const { count, error } = await sbClient
+          .from('group_chat_messages')
+          .select('*', { count: 'exact', head: true });
+        
+        if (error) throw error;
+        if (msgStatEl) msgStatEl.innerText = count !== null ? count : '0';
+      } catch (err) {
+        if (msgStatEl) msgStatEl.innerText = 'Unavailable';
+      }
+
+      // 2. Active Online Players (seen in last 5 minutes)
+      try {
+        const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { count, error } = await sbClient
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('last_seen', fiveMinAgo);
+
+        if (error) throw error;
+        if (onlineStatEl) onlineStatEl.innerText = count !== null ? count : '0';
+      } catch (err) {
+        if (onlineStatEl) onlineStatEl.innerText = 'Unavailable';
+      }
+    }
+
+    async function clearAllChatMessages() {
+      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will permanently delete or truncate group chat messages for ALL players.\n\nType 'DELETE ALL' to confirm:");
+      if (warningPrompt !== 'DELETE ALL') {
+        alert("Operation cancelled.");
+        return;
+      }
+
+      try {
+        // Attempt using dedicated admin RPC if configured
+        const { error: rpcErr } = await sbClient.rpc('admin_delete_chat_messages', { p_delete_all: true });
+
+        if (rpcErr) {
+          // Fallback to table delete
+          const { error: delErr } = await sbClient
+            .from('group_chat_messages')
+            .delete()
+            .neq('id', '00000000-0000-0000-0000-000000000000');
+
+          if (delErr) throw delErr;
+        }
+
+        alert("All group chat messages have been cleared successfully.");
+        fetchChatMessages(true);
+        fetchChatStats();
+      } catch (err) {
+        alert("Failed to clear chat: " + err.message);
+      }
+    }
+
+    async function sendAdminChatAnnouncement() {
+      const txtInput = document.getElementById('admin-chat-announcement-text');
+      const pinChk = document.getElementById('admin-chat-pin-chk');
+      const feedbackEl = document.getElementById('announcement-feedback-msg');
+      const sendBtn = document.getElementById('btn-send-announcement');
+
+      const message = txtInput ? txtInput.value.trim() : '';
+      if (!message) {
+        alert("Please enter announcement text.");
+        return;
+      }
+
+      if (!confirm("Broadcast this announcement message to the public group chat?")) return;
+
+      sendBtn.disabled = true;
+      sendBtn.innerText = "SENDING...";
+      feedbackEl.classList.add('hidden');
+
+      try {
+        const payload = {
+          user_id: currentAdmin?.id,
+          message: `📢 [OFFICIAL ANNOUNCEMENT]: ${message}`,
+          is_announcement: true,
+          is_pinned: pinChk ? pinChk.checked : false,
+          created_at: new Date().toISOString()
+        };
+
+        const { error } = await sbClient.from('group_chat_messages').insert([payload]);
+        if (error) throw error;
+
+        txtInput.value = '';
+        if (pinChk) pinChk.checked = false;
+        feedbackEl.className = "text-xs text-emerald-400 mt-1 block";
+        feedbackEl.innerText = "✅ Announcement published to chat successfully!";
+        fetchChatMessages(true);
+        fetchChatStats();
+      } catch (err) {
+        feedbackEl.className = "text-xs text-red-400 mt-1 block";
+        feedbackEl.innerText = "❌ Failed to send announcement: " + err.message;
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = "SEND BROADCAST";
+      }
+    }
+
+    // Chat Messages Moderation List Handlers
+    async function fetchChatMessages(reset = false) {
+      const container = document.getElementById('chat-messages-moderation-list');
+      const loadMoreBtn = document.getElementById('btn-load-more-chat');
+
+      if (reset) {
+        chatMessagesPage = 0;
+        globalChatMessagesCache = [];
+        if (container) container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">Loading messages...</p>`;
+      }
+
+      const from = chatMessagesPage * CHAT_PAGE_SIZE;
+      const to = from + CHAT_PAGE_SIZE - 1;
+
+      try {
+        const { data, error } = await sbClient
+          .from('group_chat_messages')
+          .select('*, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (error) throw error;
+
+        const newItems = data || [];
+        if (reset) {
+          globalChatMessagesCache = newItems;
+        } else {
+          globalChatMessagesCache = globalChatMessagesCache.concat(newItems);
+        }
+
+        renderChatMessagesList(globalChatMessagesCache);
+
+        if (loadMoreBtn) {
+          if (newItems.length === CHAT_PAGE_SIZE) {
+            loadMoreBtn.classList.remove('hidden');
+          } else {
+            loadMoreBtn.classList.add('hidden');
+          }
+        }
+      } catch (err) {
+        if (container) container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error loading chat messages: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    function loadMoreChatMessages() {
+      chatMessagesPage++;
+      fetchChatMessages(false);
+    }
+
+    function filterChatMessagesList() {
+      const q = (document.getElementById('chat-msg-search-input')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderChatMessagesList(globalChatMessagesCache);
+        return;
+      }
+
+      const filtered = globalChatMessagesCache.filter(m => {
+        const p = m.profiles || {};
+        const name = (p.free_fire_name || '').toLowerCase();
+        const uid = (p.free_fire_uid || '').toLowerCase();
+        const text = (m.message || m.text || '').toLowerCase();
+        return name.includes(q) || uid.includes(q) || text.includes(q);
+      });
+
+      renderChatMessagesList(filtered);
+    }
+
+    function renderChatMessagesList(list) {
+      const container = document.getElementById('chat-messages-moderation-list');
+      if (!container) return;
+
+      if (!list || !list.length) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No chat messages found.</p>`;
+        return;
+      }
+
+      container.innerHTML = list.map(m => {
+        const p = m.profiles || {};
+        const senderName = p.free_fire_name || 'Gamer';
+        const senderUid = p.free_fire_uid || '--';
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        const msgText = m.message || m.text || '';
+        const msgTime = m.created_at ? new Date(m.created_at).toLocaleString() : 'Unknown';
+        const isAnnouncement = m.is_announcement || false;
+
+        return `
+          <div class="bg-[#0e1118] border ${isAnnouncement ? 'border-[#ff4624]/60 bg-[#ff4624]/5' : 'border-[#262f40]'} rounded-xl p-3 flex items-start justify-between gap-3 text-xs">
+            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-[#262f40] shrink-0 mt-0.5" />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white truncate">${escapeHTML(senderName)}</span>
+                  <span class="text-cyan-400 font-mono text-[10px]">UID: ${escapeHTML(senderUid)}</span>
+                  ${isAnnouncement ? '<span class="bg-[#ff4624]/20 text-[#ff4624] text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">Broadcast</span>' : ''}
+                </div>
+                <p class="text-gray-200 mt-1 break-words leading-relaxed select-text">${escapeHTML(msgText)}</p>
+                <div class="text-gray-500 text-[10px] font-mono mt-1 flex items-center gap-2">
+                  <span>${msgTime}</span>
+                  <span>•</span>
+                  <span>ID: ${escapeHTML(String(m.id).substring(0, 8))}...</span>
+                </div>
+              </div>
+            </div>
+            <div class="shrink-0 flex flex-col gap-1.5">
+              <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-2.5 py-1.5 rounded text-xs font-bold transition flex items-center gap-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteSingleChatMessage(msgId) {
+      if (!confirm(`Are you sure you want to delete message #${msgId}?`)) return;
+
+      try {
+        const { error } = await sbClient
+          .from('group_chat_messages')
+          .delete()
+          .eq('id', msgId);
+
+        if (error) throw error;
+
+        globalChatMessagesCache = globalChatMessagesCache.filter(m => String(m.id) !== String(msgId));
+        renderChatMessagesList(globalChatMessagesCache);
+        fetchChatStats();
+      } catch (err) {
+        alert("Failed to delete message: " + err.message);
+      }
+    }
+
+    // Muted Players Handlers
+    async function fetchMutedPlayers() {
+      const container = document.getElementById('muted-players-list-container');
+      const mutedStatEl = document.getElementById('chat-stat-muted');
+
+      try {
+        const { data, error } = await sbClient
+          .from('chat_restrictions')
+          .select('*, profiles(id, free_fire_name, free_fire_uid)')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        globalMutedPlayersCache = data || [];
+        if (mutedStatEl) mutedStatEl.innerText = globalMutedPlayersCache.length;
+
+        if (!container) return;
+
+        if (!globalMutedPlayersCache.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-4">No restricted or muted players currently.</p>`;
+          return;
+        }
+
+        container.innerHTML = globalMutedPlayersCache.map(r => {
+          const p = r.profiles || {};
+          const expiresAt = r.expires_at ? new Date(r.expires_at).toLocaleString() : 'Permanent';
+          return `
+            <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+              <div>
+                <h4 class="font-bold text-white">${escapeHTML(p.free_fire_name || 'Player')} <span class="text-cyan-400 font-mono text-[11px]">(UID: ${escapeHTML(p.free_fire_uid || '--')})</span></h4>
+                <div class="text-gray-400 text-[11px] mt-0.5 space-x-2">
+                  <span class="text-amber-400 uppercase font-bold">${escapeHTML(r.restriction_type || 'mute')}</span>
+                  <span>•</span>
+                  <span>Reason: <strong class="text-gray-200">${escapeHTML(r.reason || 'Not specified')}</strong></span>
+                  <span>•</span>
+                  <span>Expires: <strong class="text-purple-400 font-mono">${expiresAt}</strong></span>
+                </div>
+              </div>
+              <div>
+                <button onclick="unmutePlayer('${r.id}', '${p.id || r.user_id}')" class="bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600 text-emerald-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming uppercase transition">
+                  UNMUTE
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        if (mutedStatEl) mutedStatEl.innerText = 'Unavailable';
+        if (container) container.innerHTML = `<p class="text-gray-500 text-xs text-center py-3">Restrictions module is not configured or unavailable (${escapeHTML(err.message)}).</p>`;
+      }
+    }
+
+    async function openMutePlayerModal() {
+      const modal = document.getElementById('modal-mute-player');
+      const select = document.getElementById('mute-player-select');
+      modal.classList.remove('hidden');
+
+      if (select) {
+        select.innerHTML = '<option value="">Loading active players...</option>';
+        try {
+          const { data, error } = await sbClient.from('profiles').select('id, free_fire_name, free_fire_uid').order('free_fire_name');
+          if (error) throw error;
+
+          select.innerHTML = '<option value="">Choose player to restrict...</option>' + (data || []).map(u => `
+            <option value="${u.id}">${escapeHTML(u.free_fire_name || 'Gamer')} (UID: ${escapeHTML(u.free_fire_uid || '--')})</option>
+          `).join('');
+        } catch (err) {
+          select.innerHTML = '<option value="">Error loading players</option>';
+        }
+      }
+    }
+
+    function closeMutePlayerModal() {
+      document.getElementById('modal-mute-player').classList.add('hidden');
+    }
+
+    async function confirmApplyChatRestriction() {
+      const userId = document.getElementById('mute-player-select').value;
+      const restrictionType = document.getElementById('mute-restriction-type').value;
+      const durationVal = document.getElementById('mute-duration-select').value;
+      const reason = document.getElementById('mute-reason-input').value.trim() || 'Moderator action';
+      const submitBtn = document.getElementById('btn-confirm-mute-submit');
+
+      if (!userId) {
+        alert("Please select a player.");
+        return;
+      }
+
+      let expiryDate = null;
+      const now = Date.now();
+      if (durationVal === '30m') expiryDate = new Date(now + 30 * 60 * 1000).toISOString();
+      else if (durationVal === '2h') expiryDate = new Date(now + 2 * 60 * 60 * 1000).toISOString();
+      else if (durationVal === '24h') expiryDate = new Date(now + 24 * 60 * 60 * 1000).toISOString();
+      else if (durationVal === '7d') expiryDate = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      if (!confirm(`Confirm applying ${restrictionType.toUpperCase()} on selected player?`)) return;
+
+      submitBtn.disabled = true;
+
+      try {
+        // Attempt using existing RPC function if defined
+        const { error: rpcErr } = await sbClient.rpc('admin_apply_chat_restriction', {
+          p_user_id: userId,
+          p_restriction_type: restrictionType,
+          p_reason: reason,
+          p_expires_at: expiryDate
+        });
+
+        if (rpcErr) {
+          // Direct table upsert fallback
+          const { error: tabErr } = await sbClient.from('chat_restrictions').insert([{
+            user_id: userId,
+            restriction_type: restrictionType,
+            reason: reason,
+            expires_at: expiryDate,
+            is_active: true,
+            created_by: currentAdmin?.id,
+            created_at: new Date().toISOString()
+          }]);
+
+          if (tabErr) throw tabErr;
+        }
+
+        alert("Player restricted successfully!");
+        closeMutePlayerModal();
+        fetchMutedPlayers();
+      } catch (err) {
+        alert("Failed to apply restriction: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function unmutePlayer(restrictionId, userId) {
+      if (!confirm("Are you sure you want to lift restrictions for this player?")) return;
+
+      try {
+        const { error: rpcErr } = await sbClient.rpc('admin_revoke_chat_restriction', {
+          p_restriction_id: restrictionId,
+          p_user_id: userId
+        });
+
+        if (rpcErr) {
+          const { error: updErr } = await sbClient
+            .from('chat_restrictions')
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq('id', restrictionId);
+
+          if (updErr) throw updErr;
+        }
+
+        alert("Player unmuted successfully!");
+        fetchMutedPlayers();
+      } catch (err) {
+        alert("Failed to unmute: " + err.message);
+      }
     }
 
     // ==========================================
@@ -1373,7 +2043,7 @@
         return;
       }
 
-      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+      if (!confirm("Are you sure you want to announce these winners and complete the match? Prizes will be credited.")) return;
 
       const winnersPayload = [
         { user_id: u1, position: 1, prize: amt1 }
