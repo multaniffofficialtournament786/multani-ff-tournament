@@ -408,7 +408,7 @@
             </button>
           </div>
 
-          <!-- Messages Stream Viewport (Newest Messages At Bottom) -->
+          <!-- Messages Stream Viewport -->
           <div id="chat-messages-moderation-list" class="flex-1 overflow-y-auto p-3 space-y-4 sidebar-scroll flex flex-col">
             <p class="text-gray-500 text-xs text-center py-8">Loading chat messages...</p>
           </div>
@@ -661,7 +661,7 @@
           </div>
           <div class="flex gap-2 pt-2">
             <button onclick="resetTutorialForm()" id="btn-cancel-tut" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
-            <button onclick="saveTutorialCard()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            <button onclick="saveTutorialCard()" id="btn-save-tut" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
               SAVE TUTORIAL / AD CARD
             </button>
           </div>
@@ -729,7 +729,7 @@
             <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
             <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on gamer homepage</label>
           </div>
-          <button onclick="saveSiteSettings()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          <button onclick="saveSiteSettings()" id="btn-save-ticker" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
             Save Announcement
           </button>
         </div>
@@ -1138,7 +1138,7 @@
     let globalSpinHistoryCache = [];
     let tournamentsCacheMap = {};
 
-    // Chat Control Variables (Using public.chat_messages)
+    // Chat Control Cache Variables
     let currentChatSettings = null;
     let globalChatMessagesCache = [];
     let chatMessagesPage = 0;
@@ -1574,7 +1574,7 @@
       }
     }
 
-    // Direct Admin Chat Send: Targets public.chat_messages accurately using user_id
+    // Direct Admin Chat Send: Targets public.chat_messages accurately using user_id and is_announcement = true
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1597,6 +1597,8 @@
         const payload = {
           user_id: activeAdminId,
           message: message,
+          content: message,
+          is_announcement: true,
           created_at: new Date().toISOString()
         };
 
@@ -1628,7 +1630,6 @@
       const to = from + CHAT_PAGE_SIZE - 1;
 
       try {
-        // Fetch in chronological order (ascending: true) so new messages appear at the bottom
         const { data: messages, error } = await sbClient
           .from('chat_messages')
           .select('*')
@@ -1639,7 +1640,6 @@
 
         const newItems = messages || [];
         
-        // Pinned announcement display
         const pinnedMsg = newItems.slice().reverse().find(m => m.is_pinned === true);
         const pinBanner = document.getElementById('pinned-announcement-banner');
         const pinTextEl = document.getElementById('pinned-msg-text');
@@ -1679,7 +1679,6 @@
 
         renderChatMessagesList(globalChatMessagesCache);
 
-        // Auto-scroll directly to bottom
         if (container) {
           setTimeout(() => {
             container.scrollTop = container.scrollHeight;
@@ -1767,12 +1766,9 @@
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
         const isPinned = m.is_pinned === true;
         const isPlayerBanned = p.is_banned === true;
-
-        // Check if player is muted
         const isPlayerMuted = globalMutedPlayersCache.some(r => r.user_id === msgOwnerId && r.is_active);
 
         if (isAdminMsg) {
-          // ADMIN MESSAGE: RIGHT ALIGNED
           return `
             <div class="flex flex-col items-end space-y-1.5 my-2">
               <div class="flex items-center gap-1.5 pr-1">
@@ -1802,7 +1798,6 @@
             </div>
           `;
         } else {
-          // PLAYER MESSAGE: LEFT ALIGNED
           return `
             <div class="flex flex-col items-start space-y-1.5 my-2">
               <div class="flex items-center gap-1.5 pl-1">
@@ -1816,14 +1811,11 @@
                 ${isPinned ? '<span class="bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded uppercase block w-fit mb-1">📌 PINNED</span>' : ''}
                 ${renderMessageContentHTML(m.message)}
 
-                <!-- 4 Action Buttons Under Message -->
                 <div class="flex items-center justify-end gap-3 pt-1 border-t border-[#262f40]/50 text-xs">
-                  <!-- 1. Pin / Unpin Button -->
                   <button onclick="togglePinMessage('${m.id}', ${isPinned})" title="${isPinned ? 'Unpin' : 'Pin'}" class="p-1 text-gray-400 hover:text-yellow-400 transition cursor-pointer">
                     <i class="fa-solid fa-thumbtack ${isPinned ? 'text-yellow-400' : ''}"></i>
                   </button>
                   
-                  <!-- 2. Mute / Unmute Button -->
                   ${isPlayerMuted ? `
                     <button onclick="unmutePlayerDirect('${msgOwnerId}', '${escapeHTML(senderName)}')" title="Unmute Player" class="p-1 text-emerald-400 hover:text-emerald-300 transition cursor-pointer">
                       <i class="fa-solid fa-volume-high"></i>
@@ -1834,7 +1826,6 @@
                     </button>
                   `}
 
-                  <!-- 3. Ban / Unban Button -->
                   ${isPlayerBanned ? `
                     <button onclick="unbanPlayerDirect('${msgOwnerId}', '${escapeHTML(senderName)}')" title="Unban Player" class="p-1 text-emerald-400 hover:text-emerald-300 transition cursor-pointer">
                       <i class="fa-solid fa-unlock"></i>
@@ -1845,7 +1836,6 @@
                     </button>
                   `}
 
-                  <!-- 4. Delete Button -->
                   <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="p-1 text-red-500 hover:text-red-400 transition cursor-pointer">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
@@ -1857,7 +1847,6 @@
       }).join('');
     }
 
-    // Toggle Pin/Unpin
     async function togglePinMessage(msgId, currentPinned) {
       const nextState = !currentPinned;
       try {
@@ -1873,7 +1862,6 @@
       }
     }
 
-    // Open Timed Restriction Modal
     function openTimedRestrictionModal(userId, userName, type) {
       if (!userId || userId === 'undefined' || userId === 'null') {
         alert("User ID not found for this player.");
@@ -1893,7 +1881,6 @@
       document.getElementById('modal-mute-player').classList.add('hidden');
     }
 
-    // Confirm & Apply Timed Mute / Ban (Fixed to only touch existing is_banned column)
     async function confirmApplyChatRestriction() {
       const userId = document.getElementById('mute-player-id').value;
       const userName = document.getElementById('mute-player-name-display').value;
@@ -1920,7 +1907,6 @@
 
       try {
         if (restrictionType === 'ban') {
-          // Updates only the existing is_banned column
           const { error: banErr } = await sbClient
             .from('profiles')
             .update({ is_banned: true })
@@ -1930,7 +1916,6 @@
           alert(`Player ${userName} has been BANNED successfully!`);
           loadBannedUsers();
         } else {
-          // Insert chat mute record
           const { error: muteErr } = await sbClient.from('chat_restrictions').insert([{
             user_id: userId,
             restriction_type: 'mute',
@@ -1956,7 +1941,6 @@
       }
     }
 
-    // Direct Unban Player (Fixed to only touch existing is_banned column)
     async function unbanPlayerDirect(userId, userName) {
       if (!confirm(`Are you sure you want to UNBAN player ${userName}?`)) return;
 
@@ -1975,7 +1959,6 @@
       }
     }
 
-    // Direct Unmute Player
     async function unmutePlayerDirect(userId, userName) {
       if (!confirm(`Are you sure you want to UNMUTE player ${userName}?`)) return;
 
@@ -1990,7 +1973,6 @@
       }
     }
 
-    // Missing Banned Users List Handler (Defined and safe)
     async function loadBannedUsers() {
       const container = document.getElementById('banned-cards-container');
       if (!container) return;
@@ -2028,7 +2010,6 @@
       }
     }
 
-    // Delete Single Message (Direct Delete)
     async function deleteSingleChatMessage(msgId) {
       if (!confirm("Are you sure you want to delete this message permanently?")) return;
 
@@ -2047,9 +2028,9 @@
       }
     }
 
-    // Clean Clear All: Simple 1-Click Confirm Dialog
+    // FIXED: Bigint Syntax Error Fixed using .gt('id', 0)
     async function clearAllChatMessages() {
-      if (!confirm("⚠️ Are you sure you want to delete ALL messages for all players? This action cannot be undone.")) {
+      if (!confirm("⚠️ Are you sure you want to delete ALL messages permanently for all players?")) {
         return;
       }
 
@@ -2057,7 +2038,7 @@
         const { error } = await sbClient
           .from('chat_messages')
           .delete()
-          .neq('id', '00000000-0000-0000-0000-000000000000');
+          .gt('id', 0);
 
         if (error) throw error;
 
@@ -2068,7 +2049,6 @@
       }
     }
 
-    // Muted Players Handlers
     async function fetchMutedPlayers() {
       const mutedStatEl = document.getElementById('chat-stat-muted');
 
@@ -2093,7 +2073,7 @@
     }
 
     // ==========================================
-    // WINNERS DECLARATION (FIXED RPC CALL)
+    // WINNERS DECLARATION (RPC CALL)
     // ==========================================
     async function loadWinnerSelectOptions() {
       const winTournamentSelect = document.getElementById('win-tournament');
@@ -2212,7 +2192,6 @@
       }
 
       try {
-        // Explicitly format tournamentId as UUID string
         const { data, error } = await sbClient.rpc('declare_tournament_winners', {
           p_tournament_id: tournamentId,
           p_winners: winnersPayload
@@ -2300,6 +2279,535 @@
         }).join('');
       } catch (err) {
         container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading winners: ${err.message}</p>`;
+      }
+    }
+
+    // ==========================================
+    // TUTORIALS & ADS MANAGER (COMPLETE FIX)
+    // ==========================================
+    let existingTutorialsCache = [];
+
+    async function loadTutorialsManager() {
+      const container = document.getElementById('admin-tutorials-list');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading cards...</p>`;
+
+      try {
+        const { data, error } = await sbClient
+          .from('video_tutorials')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        existingTutorialsCache = data || [];
+
+        if (!existingTutorialsCache.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No carousel cards found.</p>`;
+          return;
+        }
+
+        container.innerHTML = existingTutorialsCache.map(tut => `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="${tut.banner_url || tut.image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200'}" class="w-14 h-14 object-cover rounded-lg border border-[#262f40] shrink-0" />
+              <div class="min-w-0">
+                <h4 class="font-bold text-white text-sm truncate">${escapeHTML(tut.title)}</h4>
+                <p class="text-gray-400 text-[11px] truncate mt-0.5">${escapeHTML(tut.line1 || tut.subtitle || '')}</p>
+                <a href="${tut.target_url || tut.link || '#'}" target="_blank" class="text-cyan-400 text-[10px] underline truncate block mt-0.5">${escapeHTML(tut.target_url || tut.link || '')}</a>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="editTutorialCard('${tut.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1.5 rounded font-bold text-xs"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deleteTutorialCard('${tut.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1.5 rounded font-bold text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading tutorials: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    async function saveTutorialCard() {
+      const editId = document.getElementById('edit-tutorial-id').value;
+      const title = document.getElementById('tut-title').value.trim();
+      const link = document.getElementById('tut-link').value.trim();
+      const line1 = document.getElementById('tut-line1').value.trim();
+      const line2 = document.getElementById('tut-line2').value.trim();
+      const fileInput = document.getElementById('tut-file');
+      const btn = document.getElementById('btn-save-tut');
+
+      if (!title || !link) {
+        alert("Video / Ad Title aur Target Link dono zaroori hain!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "SAVING...";
+
+      try {
+        let imageUrl = null;
+
+        if (fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          const path = `tutorials/${Date.now()}_${file.name}`;
+          const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
+          if (!upErr) {
+            const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(path);
+            imageUrl = publicUrl;
+          }
+        }
+
+        const payload = {
+          title,
+          target_url: link,
+          link,
+          line1,
+          subtitle: line1,
+          line2,
+          description: line2
+        };
+
+        if (imageUrl) {
+          payload.banner_url = imageUrl;
+          payload.image_url = imageUrl;
+        }
+
+        if (editId) {
+          const { error } = await sbClient.from('video_tutorials').update(payload).eq('id', editId);
+          if (error) throw error;
+          alert("Card updated successfully!");
+        } else {
+          payload.created_at = new Date().toISOString();
+          const { error } = await sbClient.from('video_tutorials').insert([payload]);
+          if (error) throw error;
+          alert("New tutorial / ad card saved successfully!");
+        }
+
+        resetTutorialForm();
+        loadTutorialsManager();
+
+      } catch (err) {
+        alert("Failed to save card: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "SAVE TUTORIAL / AD CARD";
+      }
+    }
+
+    function editTutorialCard(id) {
+      const tut = existingTutorialsCache.find(x => String(x.id) === String(id));
+      if (!tut) return;
+
+      document.getElementById('edit-tutorial-id').value = tut.id;
+      document.getElementById('tut-title').value = tut.title || '';
+      document.getElementById('tut-link').value = tut.target_url || tut.link || '';
+      document.getElementById('tut-line1').value = tut.line1 || tut.subtitle || '';
+      document.getElementById('tut-line2').value = tut.line2 || tut.description || '';
+      document.getElementById('btn-cancel-tut').classList.remove('hidden');
+      document.getElementById('btn-save-tut').innerText = "UPDATE TUTORIAL / AD CARD";
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetTutorialForm() {
+      document.getElementById('edit-tutorial-id').value = '';
+      document.getElementById('tut-title').value = '';
+      document.getElementById('tut-link').value = '';
+      document.getElementById('tut-line1').value = '';
+      document.getElementById('tut-line2').value = '';
+      document.getElementById('tut-file').value = '';
+      document.getElementById('btn-cancel-tut').classList.add('hidden');
+      document.getElementById('btn-save-tut').innerText = "SAVE TUTORIAL / AD CARD";
+    }
+
+    async function deleteTutorialCard(id) {
+      if (!confirm("Are you sure you want to delete this card?")) return;
+
+      try {
+        const { error } = await sbClient.from('video_tutorials').delete().eq('id', id);
+        if (error) throw error;
+        alert("Card deleted successfully!");
+        loadTutorialsManager();
+      } catch (err) {
+        alert("Failed to delete card: " + err.message);
+      }
+    }
+
+    // ==========================================
+    // ANNOUNCEMENT & SETTINGS (COMPLETE FIX)
+    // ==========================================
+    async function loadSettings() {
+      try {
+        const { data, error } = await sbClient
+          .from('site_settings')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          document.getElementById('set-ticker-text').value = data.announcement_ticker || data.ticker_text || '';
+          document.getElementById('set-ticker-enabled').checked = (data.is_ticker_enabled !== false);
+        }
+      } catch (err) {
+        console.log("Settings load notice:", err);
+      }
+    }
+
+    async function saveSiteSettings() {
+      const tickerText = document.getElementById('set-ticker-text').value.trim();
+      const isEnabled = document.getElementById('set-ticker-enabled').checked;
+      const btn = document.getElementById('btn-save-ticker');
+
+      btn.disabled = true;
+      btn.innerText = "SAVING...";
+
+      try {
+        const { data: existing } = await sbClient.from('site_settings').select('id').limit(1).maybeSingle();
+
+        const payload = {
+          announcement_ticker: tickerText,
+          ticker_text: tickerText,
+          is_ticker_enabled: isEnabled,
+          updated_at: new Date().toISOString()
+        };
+
+        let err = null;
+        if (existing && existing.id) {
+          const res = await sbClient.from('site_settings').update(payload).eq('id', existing.id);
+          err = res.error;
+        } else {
+          payload.id = 1;
+          const res = await sbClient.from('site_settings').upsert(payload);
+          err = res.error;
+        }
+
+        if (err) throw err;
+        alert("Announcement Ticker saved successfully!");
+
+      } catch (err) {
+        alert("Failed to save announcement: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Save Announcement";
+      }
+    }
+
+    // ==========================================
+    // SUPPORT INBOX SYSTEM (COMPLETE FIX)
+    // ==========================================
+    async function loadSupportInbox() {
+      const listContainer = document.getElementById('support-inbox-list');
+      const countEl = document.getElementById('inbox-count');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = `<p class="text-gray-400 text-xs py-4 text-center">Loading players...</p>`;
+
+      try {
+        const { data: messages, error } = await sbClient
+          .from('support_messages')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!messages || messages.length === 0) {
+          listContainer.innerHTML = `<p class="text-gray-500 text-xs py-6 text-center">No support messages found.</p>`;
+          if (countEl) countEl.innerText = '0 Chats';
+          return;
+        }
+
+        const userMap = {};
+        messages.forEach(m => {
+          const uid = m.user_id;
+          if (!uid) return;
+          if (!userMap[uid]) {
+            userMap[uid] = {
+              lastMsg: m,
+              unreadCount: 0
+            };
+          }
+          if (m.sender_role === 'player' && m.is_read === false) {
+            userMap[uid].unreadCount++;
+          }
+        });
+
+        const userIds = Object.keys(userMap);
+        if (countEl) countEl.innerText = `${userIds.length} Chats`;
+
+        const { data: profs } = await sbClient
+          .from('profiles')
+          .select('id, free_fire_name, free_fire_uid, avatar_url')
+          .in('id', userIds);
+
+        const profMap = {};
+        if (profs) profs.forEach(p => { profMap[p.id] = p; });
+
+        listContainer.innerHTML = userIds.map(uid => {
+          const item = userMap[uid];
+          const prof = profMap[uid] || {};
+          const name = prof.free_fire_name || 'Player';
+          const ffUid = prof.free_fire_uid || '--';
+          const avatar = prof.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+          const lastText = item.lastMsg.message || 'Attachment / Image';
+          const lastTime = new Date(item.lastMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <div onclick="openPlayerChat('${uid}', '${escapeHTML(name)}', '${escapeHTML(ffUid)}', '${avatar}')" class="flex items-center justify-between p-3 bg-[#0e1118] border border-[#262f40] hover:border-[#ff4624] rounded-xl cursor-pointer transition">
+              <div class="flex items-center gap-3 min-w-0">
+                <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-[#262f40] shrink-0" />
+                <div class="min-w-0">
+                  <h4 class="font-bold text-sm text-white truncate">${escapeHTML(name)} <span class="text-cyan-400 font-mono text-[11px]">(UID: ${escapeHTML(ffUid)})</span></h4>
+                  <p class="text-xs text-gray-400 truncate mt-0.5">${escapeHTML(lastText)}</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0 flex flex-col items-end gap-1">
+                <span class="text-[10px] text-gray-500 font-mono">${lastTime}</span>
+                ${item.unreadCount > 0 ? `<span class="bg-[#ff4624] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">${item.unreadCount}</span>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        listContainer.innerHTML = `<p class="text-red-500 text-xs py-4 text-center">Error loading inbox: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    async function openPlayerChat(userId, userName, userUid, userAvatar) {
+      activeChatPlayerId = userId;
+      document.getElementById('support-inbox-view').classList.add('hidden');
+      const chatView = document.getElementById('support-chat-view');
+      chatView.classList.remove('hidden');
+
+      document.getElementById('active-chat-username').innerText = userName;
+      document.getElementById('active-chat-uid').innerText = `UID: ${userUid}`;
+      document.getElementById('active-chat-avatar').src = userAvatar;
+
+      await sbClient
+        .from('support_messages')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('sender_role', 'player');
+
+      loadActiveChatMessages(userId);
+
+      if (chatInterval) clearInterval(chatInterval);
+      chatInterval = setInterval(() => {
+        if (activeChatPlayerId) loadActiveChatMessages(activeChatPlayerId, true);
+      }, 3000);
+
+      loadDashboardStats();
+    }
+
+    function closePlayerChat() {
+      activeChatPlayerId = null;
+      if (chatInterval) clearInterval(chatInterval);
+      document.getElementById('support-chat-view').classList.add('hidden');
+      document.getElementById('support-inbox-view').classList.remove('hidden');
+      loadSupportInbox();
+    }
+
+    async function loadActiveChatMessages(userId, silent = false) {
+      const msgBox = document.getElementById('active-chat-messages');
+      if (!msgBox) return;
+
+      try {
+        const { data: msgs, error } = await sbClient
+          .from('support_messages')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        if (!msgs || msgs.length === 0) {
+          if (!silent) msgBox.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No messages yet.</p>`;
+          return;
+        }
+
+        msgBox.innerHTML = msgs.map(m => {
+          const isAdmin = m.sender_role === 'admin';
+          const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'} my-1">
+              <div class="max-w-[85%] ${isAdmin ? 'bg-[#ff4624]/20 border border-[#ff4624]/40 text-white rounded-br-none' : 'bg-[#0e1118] border border-[#262f40] text-gray-200 rounded-bl-none'} p-2.5 rounded-xl text-xs space-y-1">
+                <p class="whitespace-pre-wrap break-words">${escapeHTML(m.message)}</p>
+                <span class="text-[9px] text-gray-400 block text-right font-mono">${time}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (!silent) {
+          msgBox.scrollTop = msgBox.scrollHeight;
+        }
+      } catch (err) {
+        if (!silent) msgBox.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error loading messages: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    const adminReplyForm = document.getElementById('admin-reply-form');
+    if (adminReplyForm) {
+      adminReplyForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const input = document.getElementById('admin-reply-input');
+        const text = input.value.trim();
+        if (!text || !activeChatPlayerId) return;
+
+        input.value = '';
+
+        try {
+          const { error } = await sbClient.from('support_messages').insert([{
+            user_id: activeChatPlayerId,
+            sender_role: 'admin',
+            message: text,
+            is_read: true,
+            created_at: new Date().toISOString()
+          }]);
+
+          if (error) throw error;
+
+          await loadActiveChatMessages(activeChatPlayerId);
+          const msgBox = document.getElementById('active-chat-messages');
+          if (msgBox) msgBox.scrollTop = msgBox.scrollHeight;
+        } catch (err) {
+          alert("Failed to send reply: " + err.message);
+        }
+      };
+    }
+
+    // ==========================================
+    // REFERRAL REWARDS MANAGEMENT (COMPLETE FIX)
+    // ==========================================
+    let existingReferralsCache = [];
+
+    async function loadAdminReferralRewards() {
+      const container = document.getElementById('admin-referral-rewards-list');
+      if (!container) return;
+      container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading referral rewards...</p>`;
+
+      try {
+        const { data, error } = await sbClient
+          .from('referral_rewards')
+          .select('*')
+          .order('required_referrals', { ascending: true });
+
+        if (error) throw error;
+
+        existingReferralsCache = data || [];
+
+        if (!existingReferralsCache.length) {
+          container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No referral rewards found.</p>`;
+          return;
+        }
+
+        container.innerHTML = existingReferralsCache.map(r => `
+          <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-gaming font-bold text-yellow-400 text-sm">${r.required_referrals} Invites Required</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-500/20 text-gray-400'}">${r.is_active ? 'ACTIVE' : 'INACTIVE'}</span>
+              </div>
+              <h4 class="font-bold text-white text-sm mt-0.5">${escapeHTML(r.reward_name)}</h4>
+              <span class="text-gray-400 text-[11px]">Type: <strong class="text-cyan-400 uppercase">${escapeHTML(r.reward_type)}</strong> • Value: <strong class="text-yellow-400">${escapeHTML(String(r.reward_value))}</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="editReferralReward('${r.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1.5 rounded font-bold text-xs"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deleteReferralReward('${r.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1.5 rounded font-bold text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading rewards: ${escapeHTML(err.message)}</p>`;
+      }
+    }
+
+    function openAddReferralRewardModal() {
+      document.getElementById('edit-ref-id').value = '';
+      document.getElementById('ref-modal-title').innerText = "Add Referral Reward";
+      document.getElementById('ref-req').value = '';
+      document.getElementById('ref-name').value = '';
+      document.getElementById('ref-type').value = 'membership';
+      document.getElementById('ref-val').value = '';
+      document.getElementById('ref-active').checked = true;
+      document.getElementById('modal-referral-reward').classList.remove('hidden');
+    }
+
+    function closeReferralRewardModal() {
+      document.getElementById('modal-referral-reward').classList.add('hidden');
+    }
+
+    function editReferralReward(id) {
+      const r = existingReferralsCache.find(x => String(x.id) === String(id));
+      if (!r) return;
+
+      document.getElementById('edit-ref-id').value = r.id;
+      document.getElementById('ref-modal-title').innerText = "Edit Referral Reward";
+      document.getElementById('ref-req').value = r.required_referrals;
+      document.getElementById('ref-name').value = r.reward_name;
+      document.getElementById('ref-type').value = r.reward_type;
+      document.getElementById('ref-val').value = r.reward_value;
+      document.getElementById('ref-active').checked = (r.is_active !== false);
+      document.getElementById('modal-referral-reward').classList.remove('hidden');
+    }
+
+    async function saveReferralReward() {
+      const editId = document.getElementById('edit-ref-id').value;
+      const required_referrals = parseInt(document.getElementById('ref-req').value);
+      const reward_name = document.getElementById('ref-name').value.trim();
+      const reward_type = document.getElementById('ref-type').value;
+      const reward_value = document.getElementById('ref-val').value.trim();
+      const is_active = document.getElementById('ref-active').checked;
+
+      if (isNaN(required_referrals) || !reward_name || !reward_value) {
+        alert("Please fill in all referral fields correctly.");
+        return;
+      }
+
+      const payload = {
+        required_referrals,
+        reward_name,
+        reward_type,
+        reward_value,
+        is_active
+      };
+
+      try {
+        if (editId) {
+          const { error } = await sbClient.from('referral_rewards').update(payload).eq('id', editId);
+          if (error) throw error;
+          alert("Referral reward updated!");
+        } else {
+          payload.created_at = new Date().toISOString();
+          const { error } = await sbClient.from('referral_rewards').insert([payload]);
+          if (error) throw error;
+          alert("Referral reward added!");
+        }
+
+        closeReferralRewardModal();
+        loadAdminReferralRewards();
+
+      } catch (err) {
+        alert("Failed to save reward: " + err.message);
+      }
+    }
+
+    async function deleteReferralReward(id) {
+      if (!confirm("Are you sure you want to delete this referral reward?")) return;
+
+      try {
+        const { error } = await sbClient.from('referral_rewards').delete().eq('id', id);
+        if (error) throw error;
+        alert("Reward deleted!");
+        loadAdminReferralRewards();
+      } catch (err) {
+        alert("Failed to delete reward: " + err.message);
       }
     }
 
@@ -2778,7 +3286,7 @@
             </div>
             <div class="flex items-center gap-1.5">
               <button onclick="kickPlayerFromMatch('${e.id}', '${tId}')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-2.5 py-1 rounded text-xs font-bold">KICK</button>
-              <button onclick="unbanPlayerDirect('${e.user_id}', '${escapeHTML(p.free_fire_name || 'Player')}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">
+              <button onclick="banPlayerFromPlatform('${e.user_id}', ${!p.is_banned})" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-xs font-bold">
                 ${p.is_banned ? 'UNBAN' : 'BAN'}
               </button>
             </div>
@@ -2802,6 +3310,18 @@
         alert("Player kicked and slot released successfully.");
         closePlayersModal();
         loadTournaments();
+      }
+    }
+
+    async function banPlayerFromPlatform(userId, newBanStatus) {
+      if (!confirm(`Are you sure you want to ${newBanStatus ? 'BAN' : 'UNBAN'} this player?`)) return;
+      const { error } = await sbClient.from('profiles').update({ is_banned: newBanStatus }).eq('id', userId);
+      if (error) {
+        alert(error.message);
+      } else {
+        alert(`Player ${newBanStatus ? 'BANNED' : 'UNBANNED'} successfully.`);
+        loadBannedUsers();
+        loadUsers();
       }
     }
 
@@ -3444,7 +3964,7 @@
 
             <div class="flex items-center gap-2 pt-0.5 flex-wrap">
               ${waNumber ? `
-                <a href="${waLink}" target="_blank" class="flex-1 bg-[#25D366] hover:bg-[#1ebe57] text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
+                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 shadow transition">
                   <i class="fa-brands fa-whatsapp text-sm"></i> WA
                 </a>
               ` : ''}
