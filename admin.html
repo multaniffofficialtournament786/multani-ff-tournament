@@ -351,7 +351,7 @@
         </div>
       </section>
 
-      <!-- CHAT CONTROL SECTION (PERFECT MATCH WITH GAMER CHAT + SIDE-SCROLL FILTERS) -->
+      <!-- CHAT CONTROL SECTION -->
       <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
         <!-- 1. Horizontal Scrollable Action Filters Row -->
         <div class="horizontal-filter-scroll">
@@ -1126,6 +1126,7 @@
     let chatMessagesPage = 0;
     const CHAT_PAGE_SIZE = 40;
     let globalMutedPlayersCache = [];
+    let chatPollingInterval = null;
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -1277,6 +1278,12 @@
         history.pushState({ tab: tabId }, '', '#' + tabId);
       }
 
+      // Stop chat auto-polling if leaving chat tab
+      if (tabId !== 'chat_control' && chatPollingInterval) {
+        clearInterval(chatPollingInterval);
+        chatPollingInterval = null;
+      }
+
       tabs.forEach(t => {
         const sec = document.getElementById(`section-${t}`);
         const nav = document.getElementById(`nav-${t}`);
@@ -1312,7 +1319,15 @@
       if (tabId === 'diamond_requests') loadAdminDiamondRequests();
       if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
       if (tabId === 'users') loadUsers();
-      if (tabId === 'chat_control') loadChatControlData();
+      if (tabId === 'chat_control') {
+        loadChatControlData();
+        // Live auto-polling every 4 seconds for new incoming player messages
+        if (!chatPollingInterval) {
+          chatPollingInterval = setInterval(() => {
+            fetchChatMessages(false, true);
+          }, 4000);
+        }
+      }
       if (tabId === 'tutorials') loadTutorialsManager();
       if (tabId === 'banned') loadBannedUsers();
       if (tabId === 'settings') loadSettings();
@@ -1522,7 +1537,7 @@
     }
 
     async function clearAllChatMessages() {
-      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will soft-delete or clear group chat messages.\n\nType 'DELETE ALL' to confirm:");
+      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will soft-delete group chat messages.\n\nType 'DELETE ALL' to confirm:");
       if (warningPrompt !== 'DELETE ALL') {
         alert("Operation cancelled.");
         return;
@@ -1532,7 +1547,7 @@
         const { error } = await sbClient
           .from('group_chat_messages')
           .update({ is_deleted: true, deleted_at: new Date().toISOString() })
-          .eq('is_deleted', false);
+          .or('is_deleted.is.null,is_deleted.eq.false');
 
         if (error) throw error;
 
@@ -1551,7 +1566,7 @@
       }
     }
 
-    // Direct Chat Send (Uses sender_id & message_type accurately)
+    // Direct Chat Send (100% Accurate with sender_id and Session Verification)
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1563,8 +1578,17 @@
       btn.disabled = true;
 
       try {
+        // Direct session verification
+        const { data: { session }, error: sErr } = await sbClient.auth.getSession();
+        const activeAdminId = session?.user?.id || currentAdmin?.id;
+
+        if (!activeAdminId) {
+          alert("Admin session expired. Please re-authenticate.");
+          return;
+        }
+
         const payload = {
-          sender_id: currentAdmin?.id,
+          sender_id: activeAdminId,
           message: message,
           message_type: 'text',
           is_announcement: false,
@@ -1589,25 +1613,26 @@
       }
     }
 
-    // Chat Messages Stream List (Mapped using sender_id from Database)
-    async function fetchChatMessages(reset = false) {
+    // Chat Messages Stream List (Shows both is_deleted = false AND is_deleted IS NULL)
+    async function fetchChatMessages(reset = false, silent = false) {
       const container = document.getElementById('chat-messages-moderation-list');
       const loadMoreBtn = document.getElementById('btn-load-more-chat');
 
       if (reset) {
         chatMessagesPage = 0;
         globalChatMessagesCache = [];
-        if (container) container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">Loading messages...</p>`;
+        if (container && !silent) container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">Loading messages...</p>`;
       }
 
       const from = chatMessagesPage * CHAT_PAGE_SIZE;
       const to = from + CHAT_PAGE_SIZE - 1;
 
       try {
+        // Safe query: retrieves messages where is_deleted is false OR null
         const { data: messages, error } = await sbClient
           .from('group_chat_messages')
           .select('*')
-          .eq('is_deleted', false)
+          .or('is_deleted.is.null,is_deleted.eq.false')
           .order('created_at', { ascending: false })
           .range(from, to);
 
@@ -1615,7 +1640,7 @@
 
         const newItems = messages || [];
         
-        // Fetch Sender Profiles via sender_id
+        // Fetch sender profiles from sender_id
         const senderIds = [...new Set(newItems.map(m => m.sender_id).filter(Boolean))];
         let profMap = {};
 
@@ -1637,8 +1662,11 @@
 
         if (reset) {
           globalChatMessagesCache = formattedItems;
-        } else {
+        } else if (!silent) {
           globalChatMessagesCache = globalChatMessagesCache.concat(formattedItems);
+        } else {
+          // Silent polling update (keep existing pagination view)
+          globalChatMessagesCache = formattedItems;
         }
 
         renderChatMessagesList(globalChatMessagesCache);
@@ -1651,7 +1679,7 @@
           }
         }
       } catch (err) {
-        if (container) container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error loading chat messages: ${escapeHTML(err.message)}</p>`;
+        if (container && !silent) container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error loading chat messages: ${escapeHTML(err.message)}</p>`;
       }
     }
 
@@ -3203,7 +3231,7 @@
               <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${userBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 transition">
                 <i class="fa-solid fa-wallet"></i> Edit Balance
               </button>
-              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition">
+              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition flex items-center justify-center gap-1.5">
                 History
               </button>
             </div>
