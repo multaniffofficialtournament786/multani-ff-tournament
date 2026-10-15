@@ -361,7 +361,6 @@
 
       <!-- CHAT CONTROL SECTION -->
       <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
-        <!-- 1. Horizontal Scrollable Action Filters Row -->
         <div class="horizontal-filter-scroll">
           <button id="btn-toggle-chat-active" onclick="toggleGlobalChatActive()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
             <i class="fa-solid fa-power-off text-[11px]"></i> <span id="lbl-chat-active">CHAT: ON</span>
@@ -380,9 +379,7 @@
           </button>
         </div>
 
-        <!-- 2. Chat Box Window -->
         <div class="bg-[#0b0e14] border border-[#262f40] rounded-2xl flex flex-col flex-1 h-[530px] overflow-hidden relative shadow-2xl">
-          <!-- Chat Top Header Banner with Pinned Announcement -->
           <div class="p-2.5 bg-[#0e1118] border-b border-[#262f40] flex items-center justify-between text-xs">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 blink-heart"></span>
@@ -392,7 +389,6 @@
             <input type="text" id="chat-msg-search-input" oninput="filterChatMessagesList()" placeholder="🔍 Filter msg or UID..." class="bg-[#06070a] border border-[#262f40] rounded-lg px-2.5 py-1 text-[11px] text-white outline-none focus:border-[#ff4624] w-36 sm:w-44" />
           </div>
 
-          <!-- Pinned Announcement Banner -->
           <div id="pinned-announcement-banner" class="hidden px-3 py-1.5 bg-[#ff4624]/10 border-b border-[#ff4624]/40 flex items-center justify-between text-xs">
             <div class="flex items-center gap-2 truncate pr-2">
               <i class="fa-solid fa-thumbtack text-[#ff4624] text-xs shrink-0"></i>
@@ -401,19 +397,16 @@
             <button onclick="dismissPinnedAnnouncementUI()" class="text-gray-400 hover:text-white text-[10px] uppercase font-bold shrink-0">Dismiss</button>
           </div>
 
-          <!-- Load Old Messages Button Row -->
           <div class="p-1.5 text-center bg-[#06070a]/40 border-b border-[#262f40]/40">
             <button id="btn-load-more-chat" onclick="loadMoreChatMessages()" class="text-[11px] font-bold font-gaming text-amber-400 hover:text-amber-300 transition flex items-center justify-center gap-1 mx-auto">
               <i class="fa-solid fa-rotate-left text-[10px]"></i> Load Old Messages
             </button>
           </div>
 
-          <!-- Messages Stream Viewport -->
           <div id="chat-messages-moderation-list" class="flex-1 overflow-y-auto p-3 space-y-4 sidebar-scroll flex flex-col">
             <p class="text-gray-500 text-xs text-center py-8">Loading chat messages...</p>
           </div>
 
-          <!-- Modern Chat Input Box -->
           <form id="admin-chat-form" onsubmit="handleAdminSendMessage(event)" class="p-2 bg-[#0e1118] border-t border-[#262f40] flex items-center gap-2">
             <button type="button" onclick="insertAdminEmoji()" class="w-9 h-9 rounded-full bg-[#151922] text-yellow-400 hover:bg-[#1f242d] flex items-center justify-center shrink-0 text-base transition" title="Insert Emoji">
               😊
@@ -426,7 +419,7 @@
         </div>
       </section>
 
-      <!-- REFERRAL REWARDS -->
+      <!-- REFERRAL REWARDS (FIXED SCHEMA) -->
       <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
         <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
           <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Referral Rewards Management</h3>
@@ -565,7 +558,7 @@
         </div>
       </section>
 
-      <!-- WINNERS SECTION WITH AUTO-FILL PRIZES -->
+      <!-- WINNERS SECTION -->
       <section id="section-winners" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
@@ -632,7 +625,7 @@
         </div>
       </section>
 
-      <!-- TUTORIALS -->
+      <!-- TUTORIALS & ADS (FIXED SCHEMA: site_tutorials) -->
       <section id="section-tutorials" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
@@ -717,7 +710,7 @@
         </div>
       </section>
 
-      <!-- SETTINGS -->
+      <!-- SETTINGS (FIXED SCHEMA: ticker_text & ticker_enabled) -->
       <section id="section-settings" class="space-y-4 hidden">
         <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
@@ -887,7 +880,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value</label>
-          <input type="text" id="ref-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 7 days or 500" required />
+          <input type="text" id="ref-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 7 or 500" required />
         </div>
       </div>
       <div class="flex items-center gap-2 pt-1">
@@ -1138,7 +1131,6 @@
     let globalSpinHistoryCache = [];
     let tournamentsCacheMap = {};
 
-    // Chat Control Cache Variables
     let currentChatSettings = null;
     let globalChatMessagesCache = [];
     let chatMessagesPage = 0;
@@ -1427,7 +1419,7 @@
     }
 
     // ==========================================
-    // CHAT CONTROL LOGIC & REALTIME INTEGRATION
+    // CHAT CONTROL LOGIC & REALTIME
     // ==========================================
     async function loadChatControlData() {
       await Promise.all([
@@ -1574,7 +1566,6 @@
       }
     }
 
-    // Direct Admin Chat Send: Targets public.chat_messages accurately using user_id and is_announcement = true
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1615,7 +1606,6 @@
       }
     }
 
-    // Fetch Messages Stream: Oldest top, newest bottom
     async function fetchChatMessages(reset = false, silent = false) {
       const container = document.getElementById('chat-messages-moderation-list');
       const loadMoreBtn = document.getElementById('btn-load-more-chat');
@@ -2283,7 +2273,7 @@
     }
 
     // ==========================================
-    // TUTORIALS & ADS MANAGER (COMPLETE FIX)
+    // TUTORIALS & ADS (FIXED SCHEMA: site_tutorials)
     // ==========================================
     let existingTutorialsCache = [];
 
@@ -2294,7 +2284,7 @@
 
       try {
         const { data, error } = await sbClient
-          .from('video_tutorials')
+          .from('site_tutorials')
           .select('*')
           .order('created_at', { ascending: false });
 
@@ -2310,11 +2300,11 @@
         container.innerHTML = existingTutorialsCache.map(tut => `
           <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
             <div class="flex items-center gap-3 min-w-0">
-              <img src="${tut.banner_url || tut.image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200'}" class="w-14 h-14 object-cover rounded-lg border border-[#262f40] shrink-0" />
+              <img src="${tut.photo_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200'}" class="w-14 h-14 object-cover rounded-lg border border-[#262f40] shrink-0" />
               <div class="min-w-0">
                 <h4 class="font-bold text-white text-sm truncate">${escapeHTML(tut.title)}</h4>
-                <p class="text-gray-400 text-[11px] truncate mt-0.5">${escapeHTML(tut.line1 || tut.subtitle || '')}</p>
-                <a href="${tut.target_url || tut.link || '#'}" target="_blank" class="text-cyan-400 text-[10px] underline truncate block mt-0.5">${escapeHTML(tut.target_url || tut.link || '')}</a>
+                <p class="text-gray-400 text-[11px] truncate mt-0.5">${escapeHTML(tut.line_1 || '')}</p>
+                <a href="${tut.link || '#'}" target="_blank" class="text-cyan-400 text-[10px] underline truncate block mt-0.5">${escapeHTML(tut.link || '')}</a>
               </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
@@ -2359,28 +2349,32 @@
           }
         }
 
+        let detectedPlatform = 'Website';
+        const lowerLink = link.toLowerCase();
+        if (lowerLink.includes('youtube') || lowerLink.includes('youtu.be')) detectedPlatform = 'YouTube';
+        else if (lowerLink.includes('tiktok')) detectedPlatform = 'TikTok';
+        else if (lowerLink.includes('whatsapp') || lowerLink.includes('chat.whatsapp')) detectedPlatform = 'Website';
+        else if (lowerLink.includes('facebook') || lowerLink.includes('fb.watch')) detectedPlatform = 'Facebook';
+
         const payload = {
           title,
-          target_url: link,
           link,
-          line1,
-          subtitle: line1,
-          line2,
-          description: line2
+          line_1: line1 || '.',
+          line_2: line2 || '.',
+          platform: detectedPlatform
         };
 
         if (imageUrl) {
-          payload.banner_url = imageUrl;
-          payload.image_url = imageUrl;
+          payload.photo_url = imageUrl;
         }
 
         if (editId) {
-          const { error } = await sbClient.from('video_tutorials').update(payload).eq('id', editId);
+          const { error } = await sbClient.from('site_tutorials').update(payload).eq('id', editId);
           if (error) throw error;
           alert("Card updated successfully!");
         } else {
           payload.created_at = new Date().toISOString();
-          const { error } = await sbClient.from('video_tutorials').insert([payload]);
+          const { error } = await sbClient.from('site_tutorials').insert([payload]);
           if (error) throw error;
           alert("New tutorial / ad card saved successfully!");
         }
@@ -2402,9 +2396,9 @@
 
       document.getElementById('edit-tutorial-id').value = tut.id;
       document.getElementById('tut-title').value = tut.title || '';
-      document.getElementById('tut-link').value = tut.target_url || tut.link || '';
-      document.getElementById('tut-line1').value = tut.line1 || tut.subtitle || '';
-      document.getElementById('tut-line2').value = tut.line2 || tut.description || '';
+      document.getElementById('tut-link').value = tut.link || '';
+      document.getElementById('tut-line1').value = (tut.line_1 === '.' ? '' : tut.line_1) || '';
+      document.getElementById('tut-line2').value = (tut.line_2 === '.' ? '' : tut.line_2) || '';
       document.getElementById('btn-cancel-tut').classList.remove('hidden');
       document.getElementById('btn-save-tut').innerText = "UPDATE TUTORIAL / AD CARD";
 
@@ -2426,7 +2420,7 @@
       if (!confirm("Are you sure you want to delete this card?")) return;
 
       try {
-        const { error } = await sbClient.from('video_tutorials').delete().eq('id', id);
+        const { error } = await sbClient.from('site_tutorials').delete().eq('id', id);
         if (error) throw error;
         alert("Card deleted successfully!");
         loadTutorialsManager();
@@ -2436,7 +2430,7 @@
     }
 
     // ==========================================
-    // ANNOUNCEMENT & SETTINGS (COMPLETE FIX)
+    // ANNOUNCEMENT & SETTINGS (FIXED SCHEMA: ticker_text)
     // ==========================================
     async function loadSettings() {
       try {
@@ -2449,8 +2443,8 @@
         if (error) throw error;
 
         if (data) {
-          document.getElementById('set-ticker-text').value = data.announcement_ticker || data.ticker_text || '';
-          document.getElementById('set-ticker-enabled').checked = (data.is_ticker_enabled !== false);
+          document.getElementById('set-ticker-text').value = data.ticker_text || '';
+          document.getElementById('set-ticker-enabled').checked = (data.ticker_enabled !== false);
         }
       } catch (err) {
         console.log("Settings load notice:", err);
@@ -2469,9 +2463,8 @@
         const { data: existing } = await sbClient.from('site_settings').select('id').limit(1).maybeSingle();
 
         const payload = {
-          announcement_ticker: tickerText,
           ticker_text: tickerText,
-          is_ticker_enabled: isEnabled,
+          ticker_enabled: isEnabled,
           updated_at: new Date().toISOString()
         };
 
@@ -2497,7 +2490,7 @@
     }
 
     // ==========================================
-    // SUPPORT INBOX SYSTEM (COMPLETE FIX)
+    // SUPPORT INBOX SYSTEM (FULL RESTORATION)
     // ==========================================
     async function loadSupportInbox() {
       const listContainer = document.getElementById('support-inbox-list');
@@ -2682,7 +2675,7 @@
     }
 
     // ==========================================
-    // REFERRAL REWARDS MANAGEMENT (COMPLETE FIX)
+    // REFERRAL REWARDS (FIXED SCHEMA: referrals_required)
     // ==========================================
     let existingReferralsCache = [];
 
@@ -2695,7 +2688,7 @@
         const { data, error } = await sbClient
           .from('referral_rewards')
           .select('*')
-          .order('required_referrals', { ascending: true });
+          .order('referrals_required', { ascending: true });
 
         if (error) throw error;
 
@@ -2710,7 +2703,7 @@
           <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
             <div>
               <div class="flex items-center gap-2">
-                <span class="font-gaming font-bold text-yellow-400 text-sm">${r.required_referrals} Invites Required</span>
+                <span class="font-gaming font-bold text-yellow-400 text-sm">${r.referrals_required} Invites Required</span>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-500/20 text-gray-400'}">${r.is_active ? 'ACTIVE' : 'INACTIVE'}</span>
               </div>
               <h4 class="font-bold text-white text-sm mt-0.5">${escapeHTML(r.reward_name)}</h4>
@@ -2749,7 +2742,7 @@
 
       document.getElementById('edit-ref-id').value = r.id;
       document.getElementById('ref-modal-title').innerText = "Edit Referral Reward";
-      document.getElementById('ref-req').value = r.required_referrals;
+      document.getElementById('ref-req').value = r.referrals_required;
       document.getElementById('ref-name').value = r.reward_name;
       document.getElementById('ref-type').value = r.reward_type;
       document.getElementById('ref-val').value = r.reward_value;
@@ -2759,19 +2752,19 @@
 
     async function saveReferralReward() {
       const editId = document.getElementById('edit-ref-id').value;
-      const required_referrals = parseInt(document.getElementById('ref-req').value);
+      const referrals_required = parseInt(document.getElementById('ref-req').value);
       const reward_name = document.getElementById('ref-name').value.trim();
       const reward_type = document.getElementById('ref-type').value;
       const reward_value = document.getElementById('ref-val').value.trim();
       const is_active = document.getElementById('ref-active').checked;
 
-      if (isNaN(required_referrals) || !reward_name || !reward_value) {
+      if (isNaN(referrals_required) || !reward_name || !reward_value) {
         alert("Please fill in all referral fields correctly.");
         return;
       }
 
       const payload = {
-        required_referrals,
+        referrals_required,
         reward_name,
         reward_type,
         reward_value,
