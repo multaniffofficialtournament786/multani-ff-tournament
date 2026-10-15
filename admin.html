@@ -75,7 +75,6 @@
     .sidebar-scroll::-webkit-scrollbar { width: 3px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
     
-    /* Horizontal side-scroll without scrollbar */
     .horizontal-filter-scroll {
       display: flex;
       overflow-x: auto;
@@ -95,6 +94,16 @@
       100% { opacity: 1; transform: scale(1); }
     }
     .blink-heart { animation: blink-green 1.2s infinite ease-in-out; }
+
+    @keyframes admin-glow {
+      0% { box-shadow: 0 0 4px #ff5722, inset 0 0 4px #ff5722; }
+      50% { box-shadow: 0 0 12px #ff7043, inset 0 0 6px #ff7043; }
+      100% { box-shadow: 0 0 4px #ff5722, inset 0 0 4px #ff5722; }
+    }
+    .admin-glowing-avatar {
+      animation: admin-glow 1.8s infinite ease-in-out;
+      border: 2px solid #ff7043;
+    }
 
     /* Bottom Navigation Bar Styles */
     .admin-bottom-nav {
@@ -351,7 +360,7 @@
         </div>
       </section>
 
-      <!-- CHAT CONTROL SECTION -->
+      <!-- CHAT CONTROL SECTION (PERFECT MATCH WITH GAMER CHAT + SIDE-SCROLL FILTERS + 4 MODERATION BUTTONS) -->
       <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
         <!-- 1. Horizontal Scrollable Action Filters Row -->
         <div class="horizontal-filter-scroll">
@@ -374,7 +383,7 @@
 
         <!-- 2. Chat Box Window (Gamer Chat Theme) -->
         <div class="bg-[#0b0e14] border border-[#262f40] rounded-2xl flex flex-col flex-1 h-[530px] overflow-hidden relative shadow-2xl">
-          <!-- Chat Top Header Banner -->
+          <!-- Chat Top Header Banner with Pinned Announcement Support -->
           <div class="p-2.5 bg-[#0e1118] border-b border-[#262f40] flex items-center justify-between text-xs">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 blink-heart"></span>
@@ -382,6 +391,15 @@
               <span class="text-[10px] text-gray-400 font-mono">(Online: <strong id="chat-stat-online" class="text-emerald-400">1</strong>)</span>
             </div>
             <input type="text" id="chat-msg-search-input" oninput="filterChatMessagesList()" placeholder="🔍 Filter msg or UID..." class="bg-[#06070a] border border-[#262f40] rounded-lg px-2.5 py-1 text-[11px] text-white outline-none focus:border-[#ff4624] w-36 sm:w-44" />
+          </div>
+
+          <!-- Pinned Announcement Banner (if any) -->
+          <div id="pinned-announcement-banner" class="hidden px-3 py-1.5 bg-[#ff4624]/10 border-b border-[#ff4624]/40 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 truncate pr-2">
+              <i class="fa-solid fa-thumbtack text-[#ff4624] text-xs shrink-0"></i>
+              <span id="pinned-msg-text" class="text-yellow-400 font-bold truncate">Announcement</span>
+            </div>
+            <button onclick="dismissPinnedAnnouncementUI()" class="text-gray-400 hover:text-white text-[10px] uppercase font-bold shrink-0">Dismiss</button>
           </div>
 
           <!-- Load Old Messages Button Row -->
@@ -392,7 +410,7 @@
           </div>
 
           <!-- Messages Stream Viewport -->
-          <div id="chat-messages-moderation-list" class="flex-1 overflow-y-auto p-3 space-y-3.5 sidebar-scroll">
+          <div id="chat-messages-moderation-list" class="flex-1 overflow-y-auto p-3 space-y-4 sidebar-scroll">
             <p class="text-gray-500 text-xs text-center py-8">Loading chat messages...</p>
           </div>
 
@@ -1278,7 +1296,6 @@
         history.pushState({ tab: tabId }, '', '#' + tabId);
       }
 
-      // Stop chat auto-polling if leaving chat tab
       if (tabId !== 'chat_control' && chatPollingInterval) {
         clearInterval(chatPollingInterval);
         chatPollingInterval = null;
@@ -1321,11 +1338,10 @@
       if (tabId === 'users') loadUsers();
       if (tabId === 'chat_control') {
         loadChatControlData();
-        // Live auto-polling every 4 seconds for new incoming player messages
         if (!chatPollingInterval) {
           chatPollingInterval = setInterval(() => {
             fetchChatMessages(false, true);
-          }, 4000);
+          }, 3500);
         }
       }
       if (tabId === 'tutorials') loadTutorialsManager();
@@ -1474,10 +1490,7 @@
       const current = currentChatSettings.is_enabled ?? true;
       const nextState = !current;
 
-      const confirmMsg = nextState 
-        ? "Enable group chat for all players?" 
-        : "Disable group chat completely?";
-      
+      const confirmMsg = nextState ? "Enable group chat for all players?" : "Disable group chat completely?";
       if (!confirm(confirmMsg)) return;
 
       try {
@@ -1499,10 +1512,7 @@
       const current = currentChatSettings.is_locked ?? false;
       const nextState = !current;
 
-      const confirmMsg = nextState 
-        ? "Lock chat input for normal players?" 
-        : "Unlock chat input for normal players?";
-
+      const confirmMsg = nextState ? "Lock chat input for normal players?" : "Unlock chat input for normal players?";
       if (!confirm(confirmMsg)) return;
 
       try {
@@ -1566,7 +1576,7 @@
       }
     }
 
-    // Direct Chat Send (100% Accurate with sender_id and Session Verification)
+    // Direct Admin Chat Send (Ensures Admin Badge & Live sync across website)
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1578,7 +1588,6 @@
       btn.disabled = true;
 
       try {
-        // Direct session verification
         const { data: { session }, error: sErr } = await sbClient.auth.getSession();
         const activeAdminId = session?.user?.id || currentAdmin?.id;
 
@@ -1587,11 +1596,11 @@
           return;
         }
 
+        // Payload constructed to be compliant with group_chat_messages schema
         const payload = {
           sender_id: activeAdminId,
           message: message,
-          message_type: 'text',
-          is_announcement: false,
+          is_announcement: true,
           is_pinned: false,
           is_deleted: false,
           created_at: new Date().toISOString()
@@ -1613,7 +1622,7 @@
       }
     }
 
-    // Chat Messages Stream List (Shows both is_deleted = false AND is_deleted IS NULL)
+    // Chat Messages Stream List (Screenshots 1 & 2 exact recreation)
     async function fetchChatMessages(reset = false, silent = false) {
       const container = document.getElementById('chat-messages-moderation-list');
       const loadMoreBtn = document.getElementById('btn-load-more-chat');
@@ -1628,7 +1637,6 @@
       const to = from + CHAT_PAGE_SIZE - 1;
 
       try {
-        // Safe query: retrieves messages where is_deleted is false OR null
         const { data: messages, error } = await sbClient
           .from('group_chat_messages')
           .select('*')
@@ -1640,14 +1648,24 @@
 
         const newItems = messages || [];
         
-        // Fetch sender profiles from sender_id
+        // Check for pinned announcement
+        const pinnedMsg = newItems.find(m => m.is_pinned === true);
+        const pinBanner = document.getElementById('pinned-announcement-banner');
+        const pinTextEl = document.getElementById('pinned-msg-text');
+        if (pinnedMsg && pinBanner && pinTextEl) {
+          pinTextEl.innerText = pinnedMsg.message || 'Pinned Announcement';
+          pinBanner.classList.remove('hidden');
+        } else if (pinBanner) {
+          pinBanner.classList.add('hidden');
+        }
+
         const senderIds = [...new Set(newItems.map(m => m.sender_id).filter(Boolean))];
         let profMap = {};
 
         if (senderIds.length > 0) {
           const { data: profs } = await sbClient
             .from('profiles')
-            .select('id, free_fire_name, free_fire_uid, avatar_url')
+            .select('id, free_fire_name, free_fire_uid, avatar_url, is_admin')
             .in('id', senderIds);
 
           if (profs) {
@@ -1665,7 +1683,6 @@
         } else if (!silent) {
           globalChatMessagesCache = globalChatMessagesCache.concat(formattedItems);
         } else {
-          // Silent polling update (keep existing pagination view)
           globalChatMessagesCache = formattedItems;
         }
 
@@ -1681,6 +1698,11 @@
       } catch (err) {
         if (container && !silent) container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error loading chat messages: ${escapeHTML(err.message)}</p>`;
       }
+    }
+
+    function dismissPinnedAnnouncementUI() {
+      const pinBanner = document.getElementById('pinned-announcement-banner');
+      if (pinBanner) pinBanner.classList.add('hidden');
     }
 
     function loadMoreChatMessages() {
@@ -1706,6 +1728,27 @@
       renderChatMessagesList(filtered);
     }
 
+    // Helper to render text OR sticker image exactly as in Screenshot 1
+    function renderMessageContentHTML(rawMsg) {
+      if (!rawMsg) return '';
+      const trimmed = String(rawMsg).trim();
+
+      // Check if it's a sticker or image
+      if (trimmed.startsWith('STICKER:') || trimmed.startsWith('sticker:') || trimmed.match(/\.(jpeg|jpg|gif|png|webp)($|\?)/i)) {
+        let imgSrc = trimmed;
+        if (imgSrc.startsWith('STICKER:') || imgSrc.startsWith('sticker:')) {
+          imgSrc = imgSrc.replace(/^[Ss][Tt][Ii][Cc][Kk][Ee][Rr]:/, '').trim();
+        }
+        return `
+          <div class="p-1">
+            <img src="${imgSrc}" alt="Sticker" class="max-w-[130px] max-h-[130px] object-contain rounded-lg drop-shadow" onerror="this.onerror=null; this.parentElement.innerText='${escapeHTML(trimmed)}';" />
+          </div>
+        `;
+      }
+
+      return `<p class="text-xs leading-relaxed break-words whitespace-pre-wrap select-text font-normal">${escapeHTML(trimmed)}</p>`;
+    }
+
     function renderChatMessagesList(list) {
       const container = document.getElementById('chat-messages-moderation-list');
       if (!container) return;
@@ -1715,43 +1758,168 @@
         return;
       }
 
+      const myAdminId = currentAdmin?.id;
+
       container.innerHTML = list.map(m => {
         const p = m.profiles || {};
-        const senderName = p.free_fire_name || 'Gamer';
-        const senderUid = p.free_fire_uid || '--';
-        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        const msgText = m.message || '';
+        const isAdminMsg = (m.sender_id === myAdminId) || p.is_admin || m.is_announcement;
         const msgDate = m.created_at ? new Date(m.created_at) : new Date();
         const timeFormatted = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const senderName = p.free_fire_name || (isAdminMsg ? 'Master Admin' : 'Defeater');
+        const senderUid = p.free_fire_uid || '--';
+        const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+        const isPinned = m.is_pinned === true;
 
-        return `
-          <div class="flex flex-col items-end space-y-1">
-            <!-- Gamer Tag Header (Yellow Name + #UID + Avatar) -->
-            <div class="flex items-center gap-1.5 pr-1">
-              <span class="font-bold text-[12px] text-amber-400 font-gaming">${escapeHTML(senderName)}</span>
-              <span class="bg-[#151922] border border-[#262f40] text-cyan-400 text-[10px] font-mono px-1.5 py-0.5 rounded font-bold">#${escapeHTML(senderUid)}</span>
-              <img src="${avatarUrl}" class="w-6 h-6 rounded-full object-cover border border-[#ff4624]" />
-            </div>
+        if (isAdminMsg) {
+          // ==========================================
+          // ADMIN MESSAGE: RIGHT ALIGNED (SCREENSHOT 1)
+          // ==========================================
+          return `
+            <div class="flex flex-col items-end space-y-1.5 my-2">
+              <!-- Admin Header (Crown + ADMIN Ⓥ badge + Time + Avatar with Ⓥ badge) -->
+              <div class="flex items-center gap-1.5 pr-1">
+                <span class="bg-gradient-to-r from-[#ff4624] to-[#ff8424] text-white text-[10px] font-bold font-gaming px-2 py-0.5 rounded shadow flex items-center gap-1">
+                  <i class="fa-solid fa-crown text-[9px]"></i> ADMIN <span class="bg-white/20 rounded-full px-1 text-[8px]">Ⓥ</span>
+                </span>
+                <span class="text-[10px] text-gray-400 font-mono">${timeFormatted}</span>
+                <div class="relative">
+                  <img src="${avatarUrl}" class="w-7 h-7 rounded-full object-cover admin-glowing-avatar" />
+                  <span class="absolute -bottom-1 -right-1 bg-[#ff4624] text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-[#0b0e14]">Ⓥ</span>
+                </div>
+              </div>
 
-            <!-- Bubble (Dark Green Theme with Border & Delete Option) -->
-            <div class="max-w-[85%] bg-[#0f241a] border border-[#1b4332] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 shadow-md space-y-1.5 relative group">
-              <p class="text-xs leading-relaxed break-words whitespace-pre-wrap select-text font-normal text-emerald-50">${escapeHTML(msgText)}</p>
-              
-              <div class="flex items-center justify-end gap-2 text-[10px] text-emerald-400/80 font-mono pt-0.5">
-                <span>${timeFormatted}</span>
-                <i class="fa-solid fa-check-double text-[9px] text-cyan-400"></i>
-                <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="text-red-400 hover:text-red-300 ml-1.5 p-0.5">
-                  <i class="fa-solid fa-trash-can text-[10px]"></i>
-                </button>
+              <!-- Admin Bubble (Dark Red / Orange Border with Glowing Theme) -->
+              <div class="max-w-[85%] bg-[#1a0f0d] border ${isPinned ? 'border-[#ff4624] ring-1 ring-[#ff4624]' : 'border-[#ff4624]/50'} text-white rounded-2xl rounded-tr-none p-3 shadow-lg space-y-2">
+                ${isPinned ? '<span class="bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase block w-fit mb-1">📌 PINNED</span>' : ''}
+                ${renderMessageContentHTML(m.message)}
+                
+                <!-- 4 Action Buttons Under Message (Screenshot 2) -->
+                <div class="flex items-center justify-end gap-2 pt-1 border-t border-[#ff4624]/20 text-xs">
+                  <button onclick="togglePinMessage('${m.id}', ${isPinned})" title="${isPinned ? 'Unpin' : 'Pin Message'}" class="p-1 text-gray-400 hover:text-yellow-400 transition">
+                    <i class="fa-solid fa-thumbtack ${isPinned ? 'text-yellow-400' : ''}"></i>
+                  </button>
+                  <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="p-1 text-red-400 hover:text-red-300 transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // ==========================================
+          // PLAYER MESSAGE: LEFT ALIGNED (SCREENSHOT 1)
+          // ==========================================
+          return `
+            <div class="flex flex-col items-start space-y-1.5 my-2">
+              <!-- Player Header (Avatar + Free Fire Name + #UID + Time) -->
+              <div class="flex items-center gap-1.5 pl-1">
+                <img src="${avatarUrl}" class="w-7 h-7 rounded-full object-cover border border-[#262f40]" />
+                <span class="font-bold text-[12px] text-white font-gaming">${escapeHTML(senderName)}</span>
+                <span class="bg-[#151922] border border-[#262f40] text-cyan-400 text-[10px] font-mono px-1.5 py-0.5 rounded font-bold">#${escapeHTML(senderUid)}</span>
+                <span class="text-[10px] text-gray-400 font-mono">${timeFormatted}</span>
+              </div>
+
+              <!-- Player Bubble (Dark Navy/Green with Stickers & 4 Buttons) -->
+              <div class="max-w-[85%] bg-[#121620] border ${isPinned ? 'border-amber-400 ring-1 ring-amber-400' : 'border-[#262f40]'} text-white rounded-2xl rounded-tl-none p-3 shadow space-y-2">
+                ${isPinned ? '<span class="bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded uppercase block w-fit mb-1">📌 PINNED</span>' : ''}
+                ${renderMessageContentHTML(m.message)}
+
+                <!-- 4 Action Buttons Under Every Player Message (Screenshot 2) -->
+                <div class="flex items-center justify-end gap-3 pt-1 border-t border-[#262f40]/50 text-xs">
+                  <!-- 1. Pin Button -->
+                  <button onclick="togglePinMessage('${m.id}', ${isPinned})" title="${isPinned ? 'Unpin' : 'Pin'}" class="p-1 text-gray-400 hover:text-yellow-400 transition">
+                    <i class="fa-solid fa-thumbtack ${isPinned ? 'text-yellow-400' : ''}"></i>
+                  </button>
+                  <!-- 2. Mute Button -->
+                  <button onclick="quickMutePlayer('${m.sender_id}', '${escapeHTML(senderName)}')" title="Mute Player" class="p-1 text-gray-400 hover:text-amber-400 transition">
+                    <i class="fa-solid fa-volume-xmark"></i>
+                  </button>
+                  <!-- 3. Ban Button -->
+                  <button onclick="quickBanPlayer('${m.sender_id}', '${escapeHTML(senderName)}')" title="Ban Player" class="p-1 text-gray-400 hover:text-red-400 transition">
+                    <i class="fa-solid fa-ban"></i>
+                  </button>
+                  <!-- 4. Delete Button -->
+                  <button onclick="deleteSingleChatMessage('${m.id}')" title="Delete Message" class="p-1 text-red-500 hover:text-red-400 transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
       }).join('');
     }
 
+    // Toggle Pin / Unpin on any message
+    async function togglePinMessage(msgId, currentPinned) {
+      const nextState = !currentPinned;
+      try {
+        const { error } = await sbClient
+          .from('group_chat_messages')
+          .update({ 
+            is_pinned: nextState,
+            pinned_at: nextState ? new Date().toISOString() : null,
+            pinned_by: nextState ? currentAdmin?.id : null
+          })
+          .eq('id', msgId);
+
+        if (error) throw error;
+        alert(`Message ${nextState ? 'PINNED' : 'UNPINNED'} successfully!`);
+        fetchChatMessages(true);
+      } catch (err) {
+        alert("Failed to pin message: " + err.message);
+      }
+    }
+
+    // Quick Mute Player (24 hours default)
+    async function quickMutePlayer(userId, userName) {
+      if (!userId || userId === 'undefined') {
+        alert("User ID not found.");
+        return;
+      }
+      if (!confirm(`Are you sure you want to MUTE ${userName} for 24 Hours?`)) return;
+
+      const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      try {
+        const { error } = await sbClient.from('chat_restrictions').insert([{
+          user_id: userId,
+          restriction_type: 'mute',
+          reason: 'Muted from chat feed',
+          expires_at: expiry,
+          is_active: true,
+          created_by: currentAdmin?.id,
+          created_at: new Date().toISOString()
+        }]);
+
+        if (error) throw error;
+        alert(`Player ${userName} has been MUTED for 24 hours!`);
+        fetchMutedPlayers();
+      } catch (err) {
+        alert("Failed to mute player: " + err.message);
+      }
+    }
+
+    // Quick Ban Player
+    async function quickBanPlayer(userId, userName) {
+      if (!userId || userId === 'undefined') {
+        alert("User ID not found.");
+        return;
+      }
+      if (!confirm(`Are you sure you want to BAN player ${userName} from the platform?`)) return;
+
+      try {
+        const { error } = await sbClient.from('profiles').update({ is_banned: true }).eq('id', userId);
+        if (error) throw error;
+        alert(`Player ${userName} has been BANNED successfully!`);
+        loadBannedUsers();
+      } catch (err) {
+        alert("Failed to ban player: " + err.message);
+      }
+    }
+
+    // Delete Single Message
     async function deleteSingleChatMessage(msgId) {
-      if (!confirm(`Delete message #${msgId}?`)) return;
+      if (!confirm(`Delete message permanently?`)) return;
 
       try {
         const { error } = await sbClient
@@ -3231,7 +3399,7 @@
               <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${userBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 transition">
                 <i class="fa-solid fa-wallet"></i> Edit Balance
               </button>
-              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition flex items-center justify-center gap-1.5">
+              <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition">
                 History
               </button>
             </div>
