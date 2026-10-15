@@ -43,10 +43,26 @@
       z-index: 100;
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
     .back-btn { background: #1f2937; color: #fff; border: 0; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 13px; }
     .room-title { font-size: 15px; font-weight: bold; color: #fff; display: flex; flex-direction: column; }
     .room-title span.ff-tag { color: #ef4444; }
     .online-tag { font-size: 11px; color: #10b981; font-weight: normal; }
+    .refresh-btn {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #38bdf8;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .refresh-btn:active { transform: rotate(180deg) scale(0.9); }
     .menu-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px; }
 
     /* Messages Scroll Area */
@@ -145,12 +161,8 @@
     }
 
     @keyframes frame-spin-glow {
-      0% {
-        filter: drop-shadow(0 0 3px #ff4624);
-      }
-      100% {
-        filter: drop-shadow(0 0 9px #ffd700) drop-shadow(0 0 14px #e63946);
-      }
+      0% { filter: drop-shadow(0 0 3px #ff4624); }
+      100% { filter: drop-shadow(0 0 9px #ffd700) drop-shadow(0 0 14px #e63946); }
     }
 
     .header-name {
@@ -342,7 +354,10 @@
         <div class="online-tag">● Online: <span id="onlineCount">1</span></div>
       </div>
     </div>
-    <button class="menu-btn" onclick="toggleHeaderMenu()"><i class="fas fa-ellipsis-v"></i></button>
+    <div class="header-actions">
+      <button class="refresh-btn" id="btnManualRefresh" onclick="manualRefreshChat()" title="Refresh Chat"><i class="fas fa-rotate"></i></button>
+      <button class="menu-btn" onclick="toggleHeaderMenu()"><i class="fas fa-ellipsis-v"></i></button>
+    </div>
   </header>
 
   <div class="dropdown-menu" id="headerMenu">
@@ -421,19 +436,11 @@
       avatar: ""
     };
 
-    let adminIdsSet = new Set();
-
-    // Cache admin IDs to guarantee 100% accurate admin badge
-    async function cacheAdminIds() {
-      try {
-        const { data } = await supabaseClient.from('profiles').select('id').eq('is_admin', true);
-        if (data) {
-          data.forEach(p => adminIdsSet.add(String(p.id)));
-        }
-      } catch (e) {
-        console.warn("Could not cache admin list:", e);
-      }
-    }
+    let activeSelectedMsg = null;
+    let activeReply = null;
+    let hiddenMessages = JSON.parse(localStorage.getItem("chat_hidden_msgs") || "[]");
+    let lastRenderedMsgId = 0;
+    let autoPollingInterval = null;
 
     async function syncPlayerProfile() {
       try {
@@ -500,21 +507,24 @@
       "stickers/giphy.gif"
     ];
 
-    let activeSelectedMsg = null;
-    let activeReply = null;
-    let hiddenMessages = JSON.parse(localStorage.getItem("chat_hidden_msgs") || "[]");
-
     async function initChat() {
       applyStoredTheme();
-      await Promise.all([syncPlayerProfile(), cacheAdminIds()]);
+      await syncPlayerProfile();
       loadStickerDrawer();
       await loadMessages();
 
       // Realtime listener for chat_messages
+      setupChatRealtime();
+
+      // 3-second auto-sync background timer
+      startAutoSyncPolling();
+    }
+
+    function setupChatRealtime() {
       supabaseClient
-        .channel('public:chat_messages')
+        .channel('multani_chat_feed')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
-          renderSingleMessage(payload.new);
+          renderSingleMessage(payload.new, true);
         })
         .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'chat_messages' }, payload => {
           const el = document.getElementById(`msg-${payload.old.id}`);
@@ -527,6 +537,36 @@
           }
         })
         .subscribe();
+    }
+
+    // Auto-sync polling every 3 seconds
+    function startAutoSyncPolling() {
+      if (autoPollingInterval) clearInterval(autoPollingInterval);
+      autoPollingInterval = setInterval(async () => {
+        try {
+          if (!lastRenderedMsgId) return;
+          const { data } = await supabaseClient
+            .from('chat_messages')
+            .select('*')
+            .gt('id', lastRenderedMsgId)
+            .or('is_deleted.is.null,is_deleted.eq.false')
+            .order('id', { ascending: true });
+
+          if (data && data.length > 0) {
+            data.forEach(m => renderSingleMessage(m, true));
+          }
+        } catch (e) {
+          // silent sync
+        }
+      }, 3000);
+    }
+
+    // Manual Refresh button handler
+    async function manualRefreshChat() {
+      const btn = document.getElementById('btnManualRefresh');
+      if (btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+      await loadMessages();
+      if (btn) btn.innerHTML = `<i class="fas fa-rotate"></i>`;
     }
 
     function loadStickerDrawer() {
@@ -542,9 +582,6 @@
     }
 
     async function loadMessages(limit = 100) {
-      const todayMidnight = new Date();
-      todayMidnight.setHours(0, 0, 0, 0);
-
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
@@ -560,30 +597,27 @@
       const box = document.getElementById('chatBox');
       box.querySelectorAll('.msg-row').forEach(e => e.remove());
       if (data) {
-        data.forEach(m => renderSingleMessage(m));
+        data.forEach(m => renderSingleMessage(m, false));
       }
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Royal Crown Frame with Lighting Neon ADMIN Core
-    function renderSingleMessage(msg) {
+    // Message Render: Only official Admin Panel messages get VIP Crown Frame & Glow
+    function renderSingleMessage(msg, shouldScroll = false) {
       if (msg.is_deleted) return;
       if (hiddenMessages.includes(msg.id)) return;
       if (document.getElementById(`msg-${msg.id}`)) return;
 
       const box = document.getElementById('chatBox');
-      
       const senderUserId = String(msg.user_id || msg.sender_id || '');
       
-      // Strict Admin Detection
-      const isAdminMsg = (
-        msg.is_admin === true || 
-        msg.is_announcement === true || 
-        msg.name === "ADMIN" || 
-        msg.name === "Master Admin" || 
-        msg.uid === "OFFICIAL" || 
-        (senderUserId && adminIdsSet.has(senderUserId))
-      );
+      // Update highest message ID tracked
+      if (Number(msg.id) > lastRenderedMsgId) {
+        lastRenderedMsgId = Number(msg.id);
+      }
+
+      // STRICT CHECK: Only messages sent via Master Admin Panel get VIP Crown & Badge
+      const isAdminMsg = (msg.is_announcement === true);
 
       let isMe = false;
       if (!isAdminMsg) {
@@ -624,17 +658,13 @@
           <div class="admin-crown-frame-wrapper">
             <div class="admin-neon-core">ADMIN</div>
             <svg class="admin-frame-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Golden Floral Circular Wreath -->
               <circle cx="50" cy="54" r="32" stroke="#d4af37" stroke-width="2.5" />
               <circle cx="50" cy="54" r="28" stroke="#ff4624" stroke-width="1.2" stroke-dasharray="3 2" />
-              <!-- Top Royal Crown -->
               <path d="M36 30 L40 40 L50 33 L60 40 L64 30 L66 45 L34 45 Z" fill="#ffd700" stroke="#b8860b" stroke-width="1" />
               <circle cx="50" cy="29" r="2.5" fill="#e63946" stroke="#fff" stroke-width="0.5" />
               <circle cx="36" cy="27" r="1.8" fill="#e63946" />
               <circle cx="64" cy="27" r="1.8" fill="#e63946" />
-              <!-- Bottom Ruby Jewel -->
               <circle cx="50" cy="85" r="4.5" fill="#e63946" stroke="#ffd700" stroke-width="1.5" />
-              <!-- Wreath Wings -->
               <path d="M22 45 Q16 62 26 76 Q30 65 32 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
               <path d="M78 45 Q84 62 74 76 Q70 65 68 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
             </svg>
@@ -647,6 +677,7 @@
           </div>
         `;
       } else {
+        // Normal Player Message
         const senderName = msg.name || "Player";
         const senderUid = msg.uid || "0000";
         const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
@@ -677,7 +708,10 @@
         </div>
       `;
       box.appendChild(row);
-      box.scrollTop = box.scrollHeight;
+
+      if (shouldScroll || isMe) {
+        box.scrollTop = box.scrollHeight;
+      }
     }
 
     async function sendTextMessage() {
@@ -706,6 +740,7 @@
         content: content,
         message: content,
         is_admin: false,
+        is_announcement: false,
         is_deleted: false,
         reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
         created_at: new Date().toISOString()
@@ -713,9 +748,11 @@
 
       cancelReply();
 
-      const { error } = await supabaseClient.from('chat_messages').insert([payload]);
+      const { data, error } = await supabaseClient.from('chat_messages').insert([payload]).select();
       if (error) {
         alert("Message bhejne mein masla hua: " + error.message);
+      } else if (data && data[0]) {
+        renderSingleMessage(data[0], true);
       }
     }
 
@@ -810,7 +847,7 @@
       if (!error && data) {
         const box = document.getElementById('chatBox');
         box.querySelectorAll('.msg-row').forEach(e => e.remove());
-        data.forEach(m => renderSingleMessage(m));
+        data.forEach(m => renderSingleMessage(m, false));
       }
     }
 
