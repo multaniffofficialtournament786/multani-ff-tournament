@@ -68,7 +68,7 @@
     .load-more-btn { align-self: center; background: rgba(31, 41, 55, 0.85); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; backdrop-filter: blur(4px); }
 
     /* Message Item */
-    .msg-row { display: flex; flex-direction: column; max-width: 82%; position: relative; user-select: none; }
+    .msg-row { display: flex; flex-direction: column; max-width: 85%; position: relative; user-select: none; }
     .msg-me { align-self: flex-end; align-items: flex-end; }
     .msg-other { align-self: flex-start; align-items: flex-start; }
 
@@ -76,7 +76,7 @@
     .msg-user-header {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       margin-bottom: 4px;
       padding: 0 4px;
     }
@@ -90,27 +90,67 @@
       background: #111827;
     }
 
-    /* Lighting Neon Glow Admin DP Badge */
-    .admin-lighting-dp {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ff4624 0%, #150a08 100%);
-      border: 2px solid #ffbe00;
-      box-shadow: 0 0 10px #ff4624, inset 0 0 6px #ffbe00;
-      animation: neon-pulse 1.8s infinite alternate;
+    /* VIP Royal Crown Frame Container for Admin */
+    .admin-crown-frame-wrapper {
+      position: relative;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
       flex-shrink: 0;
     }
-    @keyframes neon-pulse {
-      0% { box-shadow: 0 0 8px #ff4624, inset 0 0 4px #ffbe00; }
-      100% { box-shadow: 0 0 16px #ff8424, inset 0 0 8px #ffea00; }
+    
+    /* Neon Glowing Center Circle with 'ADMIN' */
+    .admin-neon-core {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e63946 0%, #1a0404 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffd700;
+      font-size: 7.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 5px #ff4624, 0 0 10px #ffbe00;
+      box-shadow: 0 0 10px #ff4624, inset 0 0 5px #ffbe00;
+      animation: core-neon-glow 1.5s infinite alternate ease-in-out;
+      z-index: 1;
+    }
+
+    /* SVG Royal Crown Overlay matching the uploaded image */
+    .admin-frame-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      filter: drop-shadow(0 0 4px rgba(255, 70, 36, 0.8));
+      animation: frame-spin-glow 2.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes core-neon-glow {
+      0% {
+        box-shadow: 0 0 6px #ff4624, inset 0 0 4px #ffbe00;
+        transform: scale(0.96);
+      }
+      100% {
+        box-shadow: 0 0 16px #ff7b00, 0 0 24px #e63946, inset 0 0 8px #fffb00;
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes frame-spin-glow {
+      0% {
+        filter: drop-shadow(0 0 3px #ff4624);
+      }
+      100% {
+        filter: drop-shadow(0 0 9px #ffd700) drop-shadow(0 0 14px #e63946);
+      }
     }
 
     .header-name {
@@ -122,18 +162,20 @@
       gap: 6px;
       text-shadow: 0 1px 4px rgba(0,0,0,0.9);
     }
+    
     .admin-name-tag {
-      color: #ffbe00 !important;
-      background: linear-gradient(135deg, #ff4624, #ff8424);
+      background: linear-gradient(135deg, #ffd700 0%, #ff4624 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-weight: 900;
       font-size: 13px;
       display: flex;
       align-items: center;
-      gap: 4px;
-      text-shadow: 0 0 8px rgba(255, 70, 36, 0.6);
+      gap: 5px;
+      filter: drop-shadow(0 0 6px rgba(255, 70, 36, 0.65));
+      letter-spacing: 0.5px;
     }
+
     .header-uid {
       font-size: 11px;
       color: #ffffff;
@@ -145,12 +187,14 @@
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
+
     .admin-uid-tag {
-      background: linear-gradient(135deg, #ff4624, #f59e0b) !important;
-      color: #000 !important;
-      border: none !important;
+      background: linear-gradient(135deg, #ffd700, #ff4624) !important;
+      color: #0b0e14 !important;
+      border: 1px solid #ffd700 !important;
       font-weight: 900 !important;
-      box-shadow: 0 0 6px rgba(255, 70, 36, 0.5);
+      box-shadow: 0 0 8px rgba(255, 70, 36, 0.6) !important;
+      text-shadow: none !important;
     }
 
     /* Message Bubble */
@@ -179,11 +223,14 @@
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
     }
 
-    /* Admin Bubble: Neon Gold/Orange Glowing Border */
+    /* Admin VIP Bubble: Royal Golden & Crimson Border with Glow */
     .msg-admin .msg-bubble {
-      border: 2px solid #ff8424 !important;
-      box-shadow: 0 0 12px rgba(255, 70, 36, 0.6) !important;
-      background: rgba(255, 70, 36, 0.08) !important;
+      background: linear-gradient(135deg, rgba(35, 10, 10, 0.85) 0%, rgba(20, 5, 5, 0.95) 100%) !important;
+      border: 2px solid #ffd700 !important;
+      border-top-left-radius: 2px;
+      box-shadow: 0 0 15px rgba(255, 70, 36, 0.65), inset 0 0 10px rgba(255, 215, 0, 0.25) !important;
+      color: #fff8f0 !important;
+      position: relative;
     }
 
     /* Time & Double Blue Tick */
@@ -374,7 +421,20 @@
       avatar: ""
     };
 
-    // Har device par login user ki apni asli Profile pakadna
+    let adminIdsSet = new Set();
+
+    // Cache admin IDs to guarantee 100% accurate admin badge
+    async function cacheAdminIds() {
+      try {
+        const { data } = await supabaseClient.from('profiles').select('id').eq('is_admin', true);
+        if (data) {
+          data.forEach(p => adminIdsSet.add(String(p.id)));
+        }
+      } catch (e) {
+        console.warn("Could not cache admin list:", e);
+      }
+    }
+
     async function syncPlayerProfile() {
       try {
         const { data: authData } = await supabaseClient.auth.getUser();
@@ -446,11 +506,11 @@
 
     async function initChat() {
       applyStoredTheme();
-      await syncPlayerProfile();
+      await Promise.all([syncPlayerProfile(), cacheAdminIds()]);
       loadStickerDrawer();
       await loadMessages();
 
-      // Realtime listener
+      // Realtime listener for chat_messages
       supabaseClient
         .channel('public:chat_messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
@@ -488,8 +548,7 @@
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
-        .eq('is_deleted', false)
-        .gte('created_at', todayMidnight.toISOString())
+        .or('is_deleted.is.null,is_deleted.eq.false')
         .order('id', { ascending: true })
         .limit(limit);
 
@@ -506,7 +565,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Message Render: Lighting Admin DP & VIP Badge Fix
+    // Message Render: Royal Crown Frame with Lighting Neon ADMIN Core
     function renderSingleMessage(msg) {
       if (msg.is_deleted) return;
       if (hiddenMessages.includes(msg.id)) return;
@@ -514,13 +573,22 @@
 
       const box = document.getElementById('chatBox');
       
-      // Admin message verification check
-      const isAdminMsg = (msg.is_admin === true || msg.is_announcement === true || msg.name === "ADMIN" || msg.uid === "OFFICIAL");
+      const senderUserId = String(msg.user_id || msg.sender_id || '');
+      
+      // Strict Admin Detection
+      const isAdminMsg = (
+        msg.is_admin === true || 
+        msg.is_announcement === true || 
+        msg.name === "ADMIN" || 
+        msg.name === "Master Admin" || 
+        msg.uid === "OFFICIAL" || 
+        (senderUserId && adminIdsSet.has(senderUserId))
+      );
 
       let isMe = false;
       if (!isAdminMsg) {
-        if (currentUser.user_id && msg.user_id) {
-          isMe = (String(msg.user_id) === String(currentUser.user_id));
+        if (currentUser.user_id && senderUserId) {
+          isMe = (senderUserId === String(currentUser.user_id));
         } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000") {
           isMe = (String(msg.uid) === String(currentUser.uid));
         }
@@ -551,11 +619,30 @@
       let nameHtml = '';
 
       if (isAdminMsg) {
-        // Glowing Lighting Admin DP & VIP Verified Tag
-        avatarHtml = `<div class="admin-lighting-dp">ADMIN</div>`;
+        // High-definition Royal Crown DP Frame with Blinking Neon Core
+        avatarHtml = `
+          <div class="admin-crown-frame-wrapper">
+            <div class="admin-neon-core">ADMIN</div>
+            <svg class="admin-frame-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Golden Floral Circular Wreath -->
+              <circle cx="50" cy="54" r="32" stroke="#d4af37" stroke-width="2.5" />
+              <circle cx="50" cy="54" r="28" stroke="#ff4624" stroke-width="1.2" stroke-dasharray="3 2" />
+              <!-- Top Royal Crown -->
+              <path d="M36 30 L40 40 L50 33 L60 40 L64 30 L66 45 L34 45 Z" fill="#ffd700" stroke="#b8860b" stroke-width="1" />
+              <circle cx="50" cy="29" r="2.5" fill="#e63946" stroke="#fff" stroke-width="0.5" />
+              <circle cx="36" cy="27" r="1.8" fill="#e63946" />
+              <circle cx="64" cy="27" r="1.8" fill="#e63946" />
+              <!-- Bottom Ruby Jewel -->
+              <circle cx="50" cy="85" r="4.5" fill="#e63946" stroke="#ffd700" stroke-width="1.5" />
+              <!-- Wreath Wings -->
+              <path d="M22 45 Q16 62 26 76 Q30 65 32 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
+              <path d="M78 45 Q84 62 74 76 Q70 65 68 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
+            </svg>
+          </div>
+        `;
         nameHtml = `
           <div class="header-name admin-name-tag">
-            <i class="fa-solid fa-crown text-[10px]"></i> ADMIN Ⓥ
+            <i class="fa-solid fa-crown" style="color:#ffd700; font-size:11px;"></i> VIP ADMIN Ⓥ
             <span class="header-uid admin-uid-tag">#OFFICIAL</span>
           </div>
         `;
@@ -716,7 +803,7 @@
       const { data, error } = await supabaseClient
         .from('chat_messages')
         .select('*')
-        .eq('is_deleted', false)
+        .or('is_deleted.is.null,is_deleted.eq.false')
         .order('id', { ascending: true })
         .limit(100);
 
