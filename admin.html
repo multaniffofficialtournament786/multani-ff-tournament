@@ -75,7 +75,7 @@
     .sidebar-scroll::-webkit-scrollbar { width: 3px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
     
-    /* Horizontal side-scroll without ugly scrollbars */
+    /* Horizontal side-scroll without scrollbar */
     .horizontal-filter-scroll {
       display: flex;
       overflow-x: auto;
@@ -351,7 +351,7 @@
         </div>
       </section>
 
-      <!-- CHAT CONTROL SECTION (UPDATED TO SCREENSHOT GAMER CHAT LOOK & SIDE-SCROLL FILTERS) -->
+      <!-- CHAT CONTROL SECTION (PERFECT MATCH WITH GAMER CHAT + SIDE-SCROLL FILTERS) -->
       <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
         <!-- 1. Horizontal Scrollable Action Filters Row -->
         <div class="horizontal-filter-scroll">
@@ -396,7 +396,7 @@
             <p class="text-gray-500 text-xs text-center py-8">Loading chat messages...</p>
           </div>
 
-          <!-- Modern Chat Input Box (Like the Screenshot) -->
+          <!-- Modern Chat Input Box (Like Gamer Screen) -->
           <form id="admin-chat-form" onsubmit="handleAdminSendMessage(event)" class="p-2 bg-[#0e1118] border-t border-[#262f40] flex items-center gap-2">
             <button type="button" onclick="insertAdminEmoji()" class="w-9 h-9 rounded-full bg-[#151922] text-yellow-400 hover:bg-[#1f242d] flex items-center justify-center shrink-0 text-base transition" title="Insert Emoji">
               😊
@@ -1522,23 +1522,19 @@
     }
 
     async function clearAllChatMessages() {
-      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will delete group chat messages.\n\nType 'DELETE ALL' to confirm:");
+      const warningPrompt = prompt("⚠️ PERMANENT ACTION WARNING!\n\nThis will soft-delete or clear group chat messages.\n\nType 'DELETE ALL' to confirm:");
       if (warningPrompt !== 'DELETE ALL') {
         alert("Operation cancelled.");
         return;
       }
 
       try {
-        const { error: rpcErr } = await sbClient.rpc('admin_delete_chat_messages', { p_delete_all: true });
+        const { error } = await sbClient
+          .from('group_chat_messages')
+          .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+          .eq('is_deleted', false);
 
-        if (rpcErr) {
-          const { error: delErr } = await sbClient
-            .from('group_chat_messages')
-            .delete()
-            .neq('id', '00000000-0000-0000-0000-000000000000');
-
-          if (delErr) throw delErr;
-        }
+        if (error) throw error;
 
         alert("All group chat messages have been cleared successfully.");
         fetchChatMessages(true);
@@ -1555,7 +1551,7 @@
       }
     }
 
-    // Direct Chat Send (Admin Message / Broadcast)
+    // Direct Chat Send (Uses sender_id & message_type accurately)
     async function handleAdminSendMessage(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('admin-chat-send-input');
@@ -1567,10 +1563,13 @@
       btn.disabled = true;
 
       try {
-        // Safe payload matching existing tables without breaking on missing columns
         const payload = {
-          user_id: currentAdmin?.id,
+          sender_id: currentAdmin?.id,
           message: message,
+          message_type: 'text',
+          is_announcement: false,
+          is_pinned: false,
+          is_deleted: false,
           created_at: new Date().toISOString()
         };
 
@@ -1580,7 +1579,6 @@
         input.value = '';
         await fetchChatMessages(true);
 
-        // Scroll to bottom
         const container = document.getElementById('chat-messages-moderation-list');
         if (container) container.scrollTop = container.scrollHeight;
 
@@ -1591,7 +1589,7 @@
       }
     }
 
-    // Chat Messages Stream List (Rendered Like Gamer Chat from Screenshot)
+    // Chat Messages Stream List (Mapped using sender_id from Database)
     async function fetchChatMessages(reset = false) {
       const container = document.getElementById('chat-messages-moderation-list');
       const loadMoreBtn = document.getElementById('btn-load-more-chat');
@@ -1606,19 +1604,41 @@
       const to = from + CHAT_PAGE_SIZE - 1;
 
       try {
-        const { data, error } = await sbClient
+        const { data: messages, error } = await sbClient
           .from('group_chat_messages')
-          .select('*, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+          .select('*')
+          .eq('is_deleted', false)
           .order('created_at', { ascending: false })
           .range(from, to);
 
         if (error) throw error;
 
-        const newItems = data || [];
+        const newItems = messages || [];
+        
+        // Fetch Sender Profiles via sender_id
+        const senderIds = [...new Set(newItems.map(m => m.sender_id).filter(Boolean))];
+        let profMap = {};
+
+        if (senderIds.length > 0) {
+          const { data: profs } = await sbClient
+            .from('profiles')
+            .select('id, free_fire_name, free_fire_uid, avatar_url')
+            .in('id', senderIds);
+
+          if (profs) {
+            profs.forEach(p => { profMap[p.id] = p; });
+          }
+        }
+
+        const formattedItems = newItems.map(m => ({
+          ...m,
+          profiles: profMap[m.sender_id] || {}
+        }));
+
         if (reset) {
-          globalChatMessagesCache = newItems;
+          globalChatMessagesCache = formattedItems;
         } else {
-          globalChatMessagesCache = globalChatMessagesCache.concat(newItems);
+          globalChatMessagesCache = globalChatMessagesCache.concat(formattedItems);
         }
 
         renderChatMessagesList(globalChatMessagesCache);
@@ -1651,7 +1671,7 @@
         const p = m.profiles || {};
         const name = (p.free_fire_name || '').toLowerCase();
         const uid = (p.free_fire_uid || '').toLowerCase();
-        const text = (m.message || m.text || '').toLowerCase();
+        const text = (m.message || '').toLowerCase();
         return name.includes(q) || uid.includes(q) || text.includes(q);
       });
 
@@ -1667,13 +1687,12 @@
         return;
       }
 
-      // Display in reverse chronological flow or regular stream
       container.innerHTML = list.map(m => {
         const p = m.profiles || {};
         const senderName = p.free_fire_name || 'Gamer';
         const senderUid = p.free_fire_uid || '--';
         const avatarUrl = p.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-        const msgText = m.message || m.text || '';
+        const msgText = m.message || '';
         const msgDate = m.created_at ? new Date(m.created_at) : new Date();
         const timeFormatted = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -1709,7 +1728,7 @@
       try {
         const { error } = await sbClient
           .from('group_chat_messages')
-          .delete()
+          .update({ is_deleted: true, deleted_at: new Date().toISOString() })
           .eq('id', msgId);
 
         if (error) throw error;
@@ -1789,26 +1808,17 @@
       submitBtn.disabled = true;
 
       try {
-        const { error: rpcErr } = await sbClient.rpc('admin_apply_chat_restriction', {
-          p_user_id: userId,
-          p_restriction_type: restrictionType,
-          p_reason: reason,
-          p_expires_at: expiryDate
-        });
+        const { error } = await sbClient.from('chat_restrictions').insert([{
+          user_id: userId,
+          restriction_type: restrictionType,
+          reason: reason,
+          expires_at: expiryDate,
+          is_active: true,
+          created_by: currentAdmin?.id,
+          created_at: new Date().toISOString()
+        }]);
 
-        if (rpcErr) {
-          const { error: tabErr } = await sbClient.from('chat_restrictions').insert([{
-            user_id: userId,
-            restriction_type: restrictionType,
-            reason: reason,
-            expires_at: expiryDate,
-            is_active: true,
-            created_by: currentAdmin?.id,
-            created_at: new Date().toISOString()
-          }]);
-
-          if (tabErr) throw tabErr;
-        }
+        if (error) throw error;
 
         alert("Player restricted successfully!");
         closeMutePlayerModal();
@@ -1861,7 +1871,6 @@
 
       if (!tournamentId) return;
 
-      // Auto-fill prizes from tournament row
       const t = tournamentsCacheMap[String(tournamentId)];
       if (t) {
         if (t.prize_pool) document.getElementById('win-amt1').value = t.prize_pool;
@@ -1870,7 +1879,6 @@
         if (t.prize_4) document.getElementById('win-amt4').value = t.prize_4;
       }
 
-      // Load joined players
       const { data, error } = await sbClient
         .from('tournament_entries')
         .select('user_id, profiles(id, free_fire_name, free_fire_uid)')
