@@ -787,7 +787,7 @@
         </div>
 
         <div>
-          <label class="block text-gray-400 uppercase font-bold mb-1">Duration (Auto Unban/Unmute)</label>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Duration</label>
           <select id="mute-duration-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
             <option value="15m">15 Minutes</option>
             <option value="30m">30 Minutes</option>
@@ -1138,7 +1138,7 @@
     let globalSpinHistoryCache = [];
     let tournamentsCacheMap = {};
 
-    // Chat Control Cache Variables (Using public.chat_messages)
+    // Chat Control Variables (Using public.chat_messages)
     let currentChatSettings = null;
     let globalChatMessagesCache = [];
     let chatMessagesPage = 0;
@@ -1893,7 +1893,7 @@
       document.getElementById('modal-mute-player').classList.add('hidden');
     }
 
-    // Confirm & Apply Timed Mute / Ban
+    // Confirm & Apply Timed Mute / Ban (Fixed to only touch existing is_banned column)
     async function confirmApplyChatRestriction() {
       const userId = document.getElementById('mute-player-id').value;
       const userName = document.getElementById('mute-player-name-display').value;
@@ -1920,14 +1920,14 @@
 
       try {
         if (restrictionType === 'ban') {
-          // Update profile ban status
-          const { error: banErr } = await sbClient.from('profiles').update({ 
-            is_banned: true,
-            banned_until: expiryDate
-          }).eq('id', userId);
+          // Updates only the existing is_banned column
+          const { error: banErr } = await sbClient
+            .from('profiles')
+            .update({ is_banned: true })
+            .eq('id', userId);
 
           if (banErr) throw banErr;
-          alert(`Player ${userName} has been BANNED (${durationVal}) successfully!`);
+          alert(`Player ${userName} has been BANNED successfully!`);
           loadBannedUsers();
         } else {
           // Insert chat mute record
@@ -1956,12 +1956,16 @@
       }
     }
 
-    // Direct Unban Player
+    // Direct Unban Player (Fixed to only touch existing is_banned column)
     async function unbanPlayerDirect(userId, userName) {
       if (!confirm(`Are you sure you want to UNBAN player ${userName}?`)) return;
 
       try {
-        const { error } = await sbClient.from('profiles').update({ is_banned: false, banned_until: null }).eq('id', userId);
+        const { error } = await sbClient
+          .from('profiles')
+          .update({ is_banned: false })
+          .eq('id', userId);
+
         if (error) throw error;
         alert(`Player ${userName} has been UNBANNED!`);
         loadBannedUsers();
@@ -1986,7 +1990,7 @@
       }
     }
 
-    // Missing Banned Users List Handler (Fixes undefined function error)
+    // Missing Banned Users List Handler (Defined and safe)
     async function loadBannedUsers() {
       const container = document.getElementById('banned-cards-container');
       if (!container) return;
@@ -3422,7 +3426,7 @@
               </div>
               <div class="shrink-0 text-right">
                 <span class="font-gaming font-bold text-yellow-400 text-sm block">PKR ${userBalance}</span>
-                <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}">
+                <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'}">
                   ${u.is_banned ? 'BANNED' : 'ACTIVE'}
                 </span>
               </div>
@@ -3440,7 +3444,7 @@
 
             <div class="flex items-center gap-2 pt-0.5 flex-wrap">
               ${waNumber ? `
-                <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#1ebe57] text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 shadow transition">
+                <a href="${waLink}" target="_blank" class="flex-1 bg-[#25D366] hover:bg-[#1ebe57] text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
                   <i class="fa-brands fa-whatsapp text-sm"></i> WA
                 </a>
               ` : ''}
