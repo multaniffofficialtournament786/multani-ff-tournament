@@ -382,10 +382,10 @@
         </div>
         <button id="btn-close-drawer" class="icon-btn" onclick="Drawer.close()"><i class="fa-solid fa-xmark"></i></button>
       </div>
-<nav class="drawer-nav">
-<nav class="drawer-nav">
-  <a href="chat.html" class="drawer-link text-gold" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
-  <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
+
+      <nav class="drawer-nav">
+        <a href="chat.html" class="drawer-link text-gold" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
+        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
         <button onclick="Router.navigate('spin')" class="drawer-link text-gold"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
         <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
         <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
@@ -1274,7 +1274,7 @@
               <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="social-icon-btn whatsapp">
                 <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
               </a>
-              <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="social-icon-btn tiktok">
+              <a href="https://www.tiktok.com/@multani.ff.gaming" target="_blank" class="social-icon-btn tiktok">
                 <i class="fa-brands fa-tiktok text-sm"></i> TikTok
               </a>
               <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="social-icon-btn youtube">
@@ -1641,194 +1641,200 @@
       }
     }
 
+    // UPDATED BUG-FREE LEADERBOARD FUNCTION (RPC get_leaderboard)
+    async function renderLeaderboard() {
+      const view = document.getElementById('app-view');
 
-async function renderLeaderboard() {
-  let profiles = [];
-  let deposits = [];
+      const defaultAvatar =
+        'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
 
-  const view = document.getElementById('app-view');
+      view.innerHTML = '<div class="view-container"><div class="empty-state"><p>Leaderboard loading...</p></div></div>';
 
-  const defaultAvatar =
-    'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+      try {
+        const [leaderboardRes, depositsRes] = await Promise.all([
+          sbClient.rpc('get_leaderboard'),
+          sbClient
+            .from('deposit_requests')
+            .select('user_id, amount')
+            .eq('status', 'approved')
+        ]);
 
-  try {
-    const [winnersRes, depositsRes] = await Promise.all([
-     
-sbClient
-.from('profiles')
-.select('id, free_fire_name, free_fire_uid, avatar_url, total_won')
-.order('total_won', { ascending: false })
-.order('free_fire_name', { ascending: true }),
-      sbClient
-        .from('deposit_requests')
-        .select('user_id, amount')
-        .eq('status', 'approved')
-    ]);
+        if (leaderboardRes.error) throw leaderboardRes.error;
+        if (depositsRes.error) throw depositsRes.error;
 
-    if (winnersRes.error) throw winnersRes.error;
-    if (depositsRes.error) throw depositsRes.error;
+        const profiles = (leaderboardRes.data || [])
+          .filter(player => player.id)
+          .sort((a, b) => Number(a.rank_position) - Number(b.rank_position));
 
-    deposits = depositsRes.data || [];
+        const deposits = depositsRes.data || [];
 
-    // Group actual declared tournament winners by player
-    const winnerMap = {};
+        const depositMap = {};
 
-    (winnersRes.data || []).forEach(row => {
-      const player = Array.isArray(row.profiles)
-        ? row.profiles[0]
-        : row.profiles;
+        deposits.forEach(d => {
+          depositMap[d.user_id] =
+            (depositMap[d.user_id] || 0) + Number(d.amount || 0);
+        });
 
-      if (!player || !player.id) return;
-
-      if (!winnerMap[player.id]) {
-        winnerMap[player.id] = {
-          ...player,
-          total_won: 0
-        };
-      }
-
-      winnerMap[player.id].total_won += Number(row.prize_amount || 0);
-    });
-
-    profiles = Object.values(winnerMap)
-      .filter(player => player.total_won > 0)
-      .sort((a, b) => b.total_won - a.total_won)
-      .slice(0, 20);
-
-  } catch (e) {
-    console.error('Leaderboard loading error:', e);
-
-    view.innerHTML = `
-      <div class="view-container empty-state">
-        <p>Leaderboard load nahi ho saka. Please try again.</p>
-      </div>
-    `;
-    return;
-  }
-
-  // Calculate each player's approved deposits separately
-  const depositMap = {};
-
-  deposits.forEach(d => {
-    if (!depositMap[d.user_id]) {
-      depositMap[d.user_id] = 0;
-    }
-
-    depositMap[d.user_id] += Number(d.amount || 0);
-  });
-
-  if (!profiles.length) {
-    view.innerHTML = `
-      <div class="view-container">
-        <div class="section-title">
-          <span>
-            <i class="fa-solid fa-ranking-star text-gold"></i>
-            Hall of Fame Leaderboard
-          </span>
-        </div>
-        <div class="empty-state">
-          <p>No tournament winners yet.</p>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  const top1 = profiles[0] || null;
-  const top2 = profiles[1] || null;
-  const top3 = profiles[2] || null;
-  const remaining = profiles.slice(3);
-
-  view.innerHTML = `
-    <div class="view-container">
-
-      <div class="section-title">
-        <span>
-          <i class="fa-solid fa-ranking-star text-gold"></i>
-          Hall of Fame Leaderboard
-        </span>
-      </div>
-
-      <!-- TOP 3 PODIUM -->
-      <div style="background:linear-gradient(145deg,#181d29,#0f131a);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 10px;margin-bottom:20px;display:flex;justify-content:space-around;align-items:flex-end;text-align:center;">
-
-        <!-- SECOND PLACE -->
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(10px);">
-          ${
-            top2 ? `
-              <div style="position:relative;width:56px;height:56px;margin-bottom:6px;">
-                <img src="${top2.avatar_url || defaultAvatar}" class="vip-frame-2" style="width:100%;height:100%;object-fit:cover;" />
-                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#00f0ff;color:#000;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;">#2</span>
+        if (!profiles.length) {
+          view.innerHTML = `
+            <div class="view-container">
+              <div class="section-title">
+                <span>
+                  <i class="fa-solid fa-ranking-star text-gold"></i>
+                  Hall of Fame Leaderboard
+                </span>
               </div>
-              <h4 style="font-size:12px;font-weight:700;color:#fff;width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top2.free_fire_name || 'Player')}</h4>
-              <span style="font-family:var(--font-gaming);font-size:13px;font-weight:700;color:var(--success);">PKR ${top2.total_won}</span>
-            ` : '<span style="color:var(--text-muted);font-size:12px;">No #2 yet</span>'
-          }
-        </div>
-
-        <!-- FIRST PLACE -->
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(-10px);">
-          <div style="position:relative;width:72px;height:72px;margin-bottom:6px;">
-            <img src="${top1.avatar_url || defaultAvatar}" class="vip-frame-1" style="width:100%;height:100%;object-fit:cover;" />
-            <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);color:var(--accent-gold);font-size:16px;"><i class="fa-solid fa-crown"></i></span>
-            <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--accent-gold);color:#000;font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px;">#1</span>
-          </div>
-          <h4 style="font-size:13px;font-weight:700;color:var(--accent-gold);width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top1.free_fire_name || 'Player')}</h4>
-          <span style="font-family:var(--font-gaming);font-size:15px;font-weight:800;color:var(--accent-gold);">PKR ${top1.total_won}</span>
-        </div>
-
-        <!-- THIRD PLACE -->
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(15px);">
-          ${
-            top3 ? `
-              <div style="position:relative;width:50px;height:50px;margin-bottom:6px;">
-                <img src="${top3.avatar_url || defaultAvatar}" class="vip-frame-3" style="width:100%;height:100%;object-fit:cover;" />
-                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#ff7700;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;">#3</span>
+              <div class="empty-state">
+                <p>No leaderboard records found.</p>
               </div>
-              <h4 style="font-size:12px;font-weight:700;color:#fff;width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top3.free_fire_name || 'Player')}</h4>
-              <span style="font-family:var(--font-gaming);font-size:13px;font-weight:700;color:var(--success);">PKR ${top3.total_won}</span>
-            ` : '<span style="color:var(--text-muted);font-size:12px;">No #3 yet</span>'
-          }
-        </div>
+            </div>
+          `;
+          return;
+        }
 
-      </div>
+        const top1 = profiles[0] || null;
+        const top2 = profiles[1] || null;
+        const top3 = profiles[2] || null;
 
-      <!-- RANKINGS #4 ONWARDS -->
-      ${
-        remaining.length ? `
-          <div class="section-title">
-            <span>Rankings #4 onwards</span>
-          </div>
+        const money = amount =>
+          Number(amount || 0).toLocaleString('en-PK', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          });
 
-          ${remaining.map((player, index) => {
-            const rankNum = index + 4;
-            const userTotalDeposit = depositMap[player.id] || 0;
-            const avatar = player.avatar_url || defaultAvatar;
+        const playerName = player =>
+          escapeHTML(player.free_fire_name || 'Player');
 
+        const avatarHTML = (player, className, size) => `
+          <img
+            src="${escapeHTML(player.avatar_url || defaultAvatar)}"
+            class="${className || ''}"
+            onerror="this.onerror=null;this.src='${defaultAvatar}'"
+            style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;"
+            alt="Player avatar"
+          />
+        `;
+
+        const podiumPlayer = (player, rank) => {
+          if (!player) {
             return `
-              <div class="tx-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-                  <span style="font-family:var(--font-gaming);font-size:16px;font-weight:800;color:var(--text-muted);min-width:24px;">#${rankNum}</span>
-                  <img src="${avatar}" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--border-color);object-fit:cover;" />
-                  <div style="min-width:0;">
-                    <h4 style="font-size:14px;font-weight:700;">${escapeHTML(player.free_fire_name || 'Player')}</h4>
-                    <span style="font-size:11px;color:var(--accent-cyan);">UID: ${escapeHTML(player.free_fire_uid || '--')}</span>
-                  </div>
-                </div>
-
-                <div style="text-align:right;flex-shrink:0;">
-                  <div style="font-family:var(--font-gaming);font-size:15px;font-weight:700;color:var(--success);">Won: PKR ${player.total_won}</div>
-                  <div style="font-size:11px;color:var(--accent-gold);font-weight:600;">Deposit: PKR ${userTotalDeposit}</div>
-                </div>
+              <div style="flex:1;text-align:center;color:var(--text-muted);">
+                <span>Waiting for player</span>
               </div>
             `;
-          }).join('')}
-        ` : ''
-      }
+          }
 
-    </div>
-  `;
-}
+          const isFirst = rank === 1;
+          const isSecond = rank === 2;
+
+          const badgeColor = isFirst
+            ? 'var(--accent-gold)'
+            : isSecond
+              ? '#00f0ff'
+              : '#ff7700';
+
+          const size = isFirst ? 72 : isSecond ? 56 : 50;
+
+          return `
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;${isFirst ? 'transform:translateY(-10px);' : isSecond ? 'transform:translateY(10px);' : 'transform:translateY(15px);'}">
+              <div style="position:relative;width:${size}px;height:${size}px;margin-bottom:8px;">
+                ${avatarHTML(
+                  player,
+                  isFirst ? 'vip-frame-1' : isSecond ? 'vip-frame-2' : 'vip-frame-3',
+                  size
+                )}
+                ${
+                  isFirst
+                    ? '<span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);color:var(--accent-gold);font-size:16px;"><i class="fa-solid fa-crown"></i></span>'
+                    : ''
+                }
+                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:${badgeColor};color:#000;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;">
+                  #${rank}
+                </span>
+              </div>
+
+              <h4 style="font-size:${isFirst ? 13 : 12}px;font-weight:700;color:${isFirst ? 'var(--accent-gold)' : '#fff'};width:100%;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${playerName(player)}
+              </h4>
+
+              <span style="font-family:var(--font-gaming);font-size:${isFirst ? 15 : 13}px;font-weight:800;color:${isFirst ? 'var(--accent-gold)' : 'var(--success)'};">
+                PKR ${money(player.total_won)}
+              </span>
+            </div>
+          `;
+        };
+
+        view.innerHTML = `
+          <div class="view-container">
+
+            <div class="section-title">
+              <span>
+                <i class="fa-solid fa-ranking-star text-gold"></i>
+                Hall of Fame Leaderboard
+              </span>
+            </div>
+
+            <div style="background:linear-gradient(145deg,#181d29,#0f131a);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 10px;margin-bottom:20px;display:flex;justify-content:space-around;align-items:flex-end;text-align:center;min-height:155px;">
+              ${podiumPlayer(top2, 2)}
+              ${podiumPlayer(top1, 1)}
+              ${podiumPlayer(top3, 3)}
+            </div>
+
+            <div class="section-title">
+              <span>All Player Rankings (${profiles.length})</span>
+            </div>
+
+            ${
+              profiles.map((player, index) => {
+                const rankNum = index + 1;
+                const deposit = depositMap[player.id] || 0;
+
+                return `
+                  <div class="tx-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                      <span style="font-family:var(--font-gaming);font-size:16px;font-weight:800;color:${rankNum <= 3 ? 'var(--accent-gold)' : 'var(--text-muted)'};min-width:27px;">
+                        #${rankNum}
+                      </span>
+
+                      ${avatarHTML(player, '', 40)}
+
+                      <div style="min-width:0;">
+                        <h4 style="font-size:14px;font-weight:700;overflow-wrap:anywhere;">
+                          ${playerName(player)}
+                        </h4>
+                        <span style="font-size:11px;color:var(--accent-cyan);">
+                          UID: ${escapeHTML(player.free_fire_uid || '--')}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style="text-align:right;flex-shrink:0;">
+                      <div style="font-family:var(--font-gaming);font-size:14px;font-weight:700;color:var(--success);">
+                        Won: PKR ${money(player.total_won)}
+                      </div>
+                      <div style="font-size:11px;color:var(--accent-gold);font-weight:600;">
+                        Deposit: PKR ${money(deposit)}
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')
+            }
+
+          </div>
+        `;
+
+      } catch (e) {
+        console.error('Leaderboard loading error:', e);
+
+        view.innerHTML = `
+          <div class="view-container empty-state">
+            <p>Leaderboard load nahi ho saka.</p>
+            <p style="font-size:12px;">${escapeHTML(e.message || 'Unknown error')}</p>
+          </div>
+        `;
+      }
+    }
 
     async function renderTournamentDetail(id) {
       await syncAuthAndProfile();
@@ -1957,7 +1963,7 @@ sbClient
 
           ${winnerInfoHTML}
 
-          <!-- VIP WITHDRAW & ROOM NOTES (ADDED PER REQUEST) -->
+          <!-- VIP WITHDRAW & ROOM NOTES -->
           <div style="background:linear-gradient(135deg, rgba(0,240,255,0.12), rgba(255,190,0,0.1)); border:1.5px solid var(--accent-cyan); border-radius:var(--radius); padding:14px; margin-bottom:12px; box-shadow:0 4px 15px rgba(0,240,255,0.2);">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
               <i class="fa-solid fa-circle-info" style="color:var(--accent-cyan); font-size:16px;"></i>
