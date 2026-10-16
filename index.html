@@ -1653,11 +1653,12 @@ async function renderLeaderboard() {
 
   try {
     const [winnersRes, depositsRes] = await Promise.all([
-      sbClient
-        .from('tournament_winners')
-        .select('user_id, prize_amount, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
-        .gt('prize_amount', 0),
-
+     
+sbClient
+.from('profiles')
+.select('id, free_fire_name, free_fire_uid, avatar_url, total_won')
+.order('total_won', { ascending: false })
+.order('free_fire_name', { ascending: true }),
       sbClient
         .from('deposit_requests')
         .select('user_id, amount')
