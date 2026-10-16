@@ -1641,106 +1641,193 @@
       }
     }
 
-    async function renderLeaderboard() {
-      let profiles = [];
-      let deposits = [];
-      try {
-        const [profilesRes, depositsRes] = await Promise.all([
-          sbClient.from('profiles').select('id, free_fire_name, free_fire_uid, avatar_url, total_won').order('total_won', { ascending: false }).limit(20),
-          sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
-        ]);
-        profiles = profilesRes.data || [];
-        deposits = depositsRes.data || [];
-      } catch (e) {
-        console.error(e);
+
+async function renderLeaderboard() {
+  let profiles = [];
+  let deposits = [];
+
+  const view = document.getElementById('app-view');
+
+  const defaultAvatar =
+    'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
+  try {
+    const [winnersRes, depositsRes] = await Promise.all([
+      sbClient
+        .from('tournament_winners')
+        .select('user_id, prize_amount, profiles(id, free_fire_name, free_fire_uid, avatar_url)')
+        .gt('prize_amount', 0),
+
+      sbClient
+        .from('deposit_requests')
+        .select('user_id, amount')
+        .eq('status', 'approved')
+    ]);
+
+    if (winnersRes.error) throw winnersRes.error;
+    if (depositsRes.error) throw depositsRes.error;
+
+    deposits = depositsRes.data || [];
+
+    // Group actual declared tournament winners by player
+    const winnerMap = {};
+
+    (winnersRes.data || []).forEach(row => {
+      const player = Array.isArray(row.profiles)
+        ? row.profiles[0]
+        : row.profiles;
+
+      if (!player || !player.id) return;
+
+      if (!winnerMap[player.id]) {
+        winnerMap[player.id] = {
+          ...player,
+          total_won: 0
+        };
       }
 
-      const depositMap = {};
-      deposits.forEach(d => {
-        if (!depositMap[d.user_id]) depositMap[d.user_id] = 0;
-        depositMap[d.user_id] += Number(d.amount || 0);
-      });
+      winnerMap[player.id].total_won += Number(row.prize_amount || 0);
+    });
 
-      const view = document.getElementById('app-view');
-      if (!profiles.length) {
-        view.innerHTML = `<div class="view-container empty-state"><p>No leaderboard records.</p></div>`;
-        return;
-      }
+    profiles = Object.values(winnerMap)
+      .filter(player => player.total_won > 0)
+      .sort((a, b) => b.total_won - a.total_won)
+      .slice(0, 20);
 
-      const top1 = profiles[0] || null;
-      const top2 = profiles[1] || null;
-      const top3 = profiles[2] || null;
-      const remaining = profiles.slice(3);
+  } catch (e) {
+    console.error('Leaderboard loading error:', e);
 
-      const defaultAvatar = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+    view.innerHTML = `
+      <div class="view-container empty-state">
+        <p>Leaderboard load nahi ho saka. Please try again.</p>
+      </div>
+    `;
+    return;
+  }
 
-      view.innerHTML = `
-        <div class="view-container">
-          <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame Leaderboard</span></div>
+  // Calculate each player's approved deposits separately
+  const depositMap = {};
 
-          <!-- PODIUM TOP 3 HIGHLIGHT SECTION -->
-          <div style="background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 10px; margin-bottom: 20px; display: flex; justify-content: space-around; align-items: flex-end; text-align: center;">
-            
-            <!-- 2ND PLACE -->
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(10px);">
-              <div style="position: relative; width: 56px; height: 56px; margin-bottom: 6px;">
-                <img src="${top2?.avatar_url || defaultAvatar}" class="vip-frame-2" style="width: 100%; height: 100%; object-fit: cover;" />
-                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #00f0ff; color: #000; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">#2</span>
+  deposits.forEach(d => {
+    if (!depositMap[d.user_id]) {
+      depositMap[d.user_id] = 0;
+    }
+
+    depositMap[d.user_id] += Number(d.amount || 0);
+  });
+
+  if (!profiles.length) {
+    view.innerHTML = `
+      <div class="view-container">
+        <div class="section-title">
+          <span>
+            <i class="fa-solid fa-ranking-star text-gold"></i>
+            Hall of Fame Leaderboard
+          </span>
+        </div>
+        <div class="empty-state">
+          <p>No tournament winners yet.</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const top1 = profiles[0] || null;
+  const top2 = profiles[1] || null;
+  const top3 = profiles[2] || null;
+  const remaining = profiles.slice(3);
+
+  view.innerHTML = `
+    <div class="view-container">
+
+      <div class="section-title">
+        <span>
+          <i class="fa-solid fa-ranking-star text-gold"></i>
+          Hall of Fame Leaderboard
+        </span>
+      </div>
+
+      <!-- TOP 3 PODIUM -->
+      <div style="background:linear-gradient(145deg,#181d29,#0f131a);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 10px;margin-bottom:20px;display:flex;justify-content:space-around;align-items:flex-end;text-align:center;">
+
+        <!-- SECOND PLACE -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(10px);">
+          ${
+            top2 ? `
+              <div style="position:relative;width:56px;height:56px;margin-bottom:6px;">
+                <img src="${top2.avatar_url || defaultAvatar}" class="vip-frame-2" style="width:100%;height:100%;object-fit:cover;" />
+                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#00f0ff;color:#000;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;">#2</span>
               </div>
-              <h4 style="font-size: 12px; font-weight: 700; color: #fff; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top2?.free_fire_name || 'N/A')}</h4>
-              <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top2?.total_won || 0}</span>
-            </div>
+              <h4 style="font-size:12px;font-weight:700;color:#fff;width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top2.free_fire_name || 'Player')}</h4>
+              <span style="font-family:var(--font-gaming);font-size:13px;font-weight:700;color:var(--success);">PKR ${top2.total_won}</span>
+            ` : '<span style="color:var(--text-muted);font-size:12px;">No #2 yet</span>'
+          }
+        </div>
 
-            <!-- 1ST PLACE -->
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(-10px);">
-              <div style="position: relative; width: 72px; height: 72px; margin-bottom: 6px;">
-                <img src="${top1?.avatar_url || defaultAvatar}" class="vip-frame-1" style="width: 100%; height: 100%; object-fit: cover;" />
-                <span style="position: absolute; -top: 10px; left: 50%; transform: translateX(-50%); color: var(--accent-gold); font-size: 16px;"><i class="fa-solid fa-crown"></i></span>
-                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: #000; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 10px;">#1</span>
+        <!-- FIRST PLACE -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(-10px);">
+          <div style="position:relative;width:72px;height:72px;margin-bottom:6px;">
+            <img src="${top1.avatar_url || defaultAvatar}" class="vip-frame-1" style="width:100%;height:100%;object-fit:cover;" />
+            <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);color:var(--accent-gold);font-size:16px;"><i class="fa-solid fa-crown"></i></span>
+            <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--accent-gold);color:#000;font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px;">#1</span>
+          </div>
+          <h4 style="font-size:13px;font-weight:700;color:var(--accent-gold);width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top1.free_fire_name || 'Player')}</h4>
+          <span style="font-family:var(--font-gaming);font-size:15px;font-weight:800;color:var(--accent-gold);">PKR ${top1.total_won}</span>
+        </div>
+
+        <!-- THIRD PLACE -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;transform:translateY(15px);">
+          ${
+            top3 ? `
+              <div style="position:relative;width:50px;height:50px;margin-bottom:6px;">
+                <img src="${top3.avatar_url || defaultAvatar}" class="vip-frame-3" style="width:100%;height:100%;object-fit:cover;" />
+                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#ff7700;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;">#3</span>
               </div>
-              <h4 style="font-size: 13px; font-weight: 700; color: var(--accent-gold); width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top1?.free_fire_name || 'N/A')}</h4>
-              <span style="font-family: var(--font-gaming); font-size: 15px; font-weight: 800; color: var(--accent-gold);">PKR ${top1?.total_won || 0}</span>
-            </div>
+              <h4 style="font-size:12px;font-weight:700;color:#fff;width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(top3.free_fire_name || 'Player')}</h4>
+              <span style="font-family:var(--font-gaming);font-size:13px;font-weight:700;color:var(--success);">PKR ${top3.total_won}</span>
+            ` : '<span style="color:var(--text-muted);font-size:12px;">No #3 yet</span>'
+          }
+        </div>
 
-            <!-- 3RD PLACE -->
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; transform: translateY(15px);">
-              <div style="position: relative; width: 50px; height: 50px; margin-bottom: 6px;">
-                <img src="${top3?.avatar_url || defaultAvatar}" class="vip-frame-3" style="width: 100%; height: 100%; object-fit: cover;" />
-                <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #ff7700; color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">#3</span>
-              </div>
-              <h4 style="font-size: 12px; font-weight: 700; color: #fff; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(top3?.free_fire_name || 'N/A')}</h4>
-              <span style="font-family: var(--font-gaming); font-size: 13px; font-weight: 700; color: var(--success);">PKR ${top3?.total_won || 0}</span>
-            </div>
+      </div>
 
+      <!-- RANKINGS #4 ONWARDS -->
+      ${
+        remaining.length ? `
+          <div class="section-title">
+            <span>Rankings #4 onwards</span>
           </div>
 
-          <!-- REMAINING PLAYERS LIST -->
-          <div class="section-title"><span>Rankings #4 onwards</span></div>
-          ${remaining.map((l, index) => {
+          ${remaining.map((player, index) => {
             const rankNum = index + 4;
-            const userTotalDeposit = depositMap[l.id] || 0;
-            const dpUrl = l.avatar_url || defaultAvatar;
-            
+            const userTotalDeposit = depositMap[player.id] || 0;
+            const avatar = player.avatar_url || defaultAvatar;
+
             return `
-              <div class="tx-item" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <span style="font-family:var(--font-gaming); font-size:16px; font-weight:800; color:var(--text-muted); min-width:24px;">#${rankNum}</span>
-                  <img src="${dpUrl}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--border-color); object-fit:cover;" />
-                  <div>
-                    <h4 style="font-size:14px; font-weight:700;">${escapeHTML(l.free_fire_name || 'Player')}</h4>
-                    <span style="font-size:11px; color:var(--accent-cyan);">UID: ${escapeHTML(l.free_fire_uid || '--')}</span>
+              <div class="tx-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                  <span style="font-family:var(--font-gaming);font-size:16px;font-weight:800;color:var(--text-muted);min-width:24px;">#${rankNum}</span>
+                  <img src="${avatar}" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--border-color);object-fit:cover;" />
+                  <div style="min-width:0;">
+                    <h4 style="font-size:14px;font-weight:700;">${escapeHTML(player.free_fire_name || 'Player')}</h4>
+                    <span style="font-size:11px;color:var(--accent-cyan);">UID: ${escapeHTML(player.free_fire_uid || '--')}</span>
                   </div>
                 </div>
-                <div style="text-align:right;">
-                  <div style="font-family:var(--font-gaming); font-size:15px; font-weight:700; color:var(--success);">Won: PKR ${l.total_won || 0}</div>
-                  <div style="font-size:11px; color:var(--accent-gold); font-weight:600;">Deposit: PKR ${userTotalDeposit}</div>
+
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-family:var(--font-gaming);font-size:15px;font-weight:700;color:var(--success);">Won: PKR ${player.total_won}</div>
+                  <div style="font-size:11px;color:var(--accent-gold);font-weight:600;">Deposit: PKR ${userTotalDeposit}</div>
                 </div>
               </div>
             `;
           }).join('')}
-        </div>
-      `;
-    }
+        ` : ''
+      }
+
+    </div>
+  `;
+}
 
     async function renderTournamentDetail(id) {
       await syncAuthAndProfile();
