@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI SNAKE RUSH</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+body {
+  background: #06070a;
+  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+#game-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #0b0f19;
+  background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(14, 17, 24, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid #ff542d44;
+  z-index: 10;
+}
+.title-tag { font-size: 16px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.stats-badge { font-weight: bold; font-size: 15px; color: #00f0ff; }
+.music-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #00f0ff;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#stage-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8px;
+}
+
+canvas {
+  display: block;
+  background: rgba(8, 12, 22, 0.85);
+  border-radius: 14px;
+  border: 2px solid #ffbe0055;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+}
+
+.controls-area {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(2, 48px);
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: center;
+  z-index: 5;
+}
+.ctrl-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid #00f0ff;
+  color: #00f0ff;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+.ctrl-btn:active {
+  background: #00f0ff;
+  color: #000;
+  transform: scale(0.92);
+}
+.ctrl-up { grid-column: 2; grid-row: 1; }
+.ctrl-left { grid-column: 1; grid-row: 2; }
+.ctrl-down { grid-column: 2; grid-row: 2; }
+.ctrl-right { grid-column: 3; grid-row: 2; }
+
+#game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 20;
+}
+#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
+#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+.play-btn {
+  padding: 13px 34px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  background: linear-gradient(135deg, #00f0ff, #00e676);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="game-wrap">
+  <div class="header-bar">
+    <div class="title-tag">🐍 MULTANI SNAKE RUSH</div>
+    <div class="header-actions">
+      <button class="music-toggle" id="musicBtn">🎵 MUSIC ON</button>
+      <div class="stats-badge">⭐ <span id="scoreText">0</span></div>
+    </div>
+  </div>
+
+  <div id="stage-box">
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="controls-area">
+      <div class="ctrl-btn ctrl-up" data-dir="UP">▲</div>
+      <div class="ctrl-btn ctrl-left" data-dir="LEFT">◀</div>
+      <div class="ctrl-btn ctrl-down" data-dir="DOWN">▼</div>
+      <div class="ctrl-btn ctrl-right" data-dir="RIGHT">▶</div>
+    </div>
+
+    <div id="game-overlay">
+      <h1 id="screenTitle">SNAKE RUSH</h1>
+      <p id="screenDesc">
+        Screen par swipe karein ya Arrow Buttons dabayein!<br>
+        💎 Diamonds aur Airdrops kha kar lambe banein.<br>
+        🚫 Deewar ya apni dum se mat takrayein!
+      </p>
+      <button class="play-btn" id="startBtn">▶ START GAME</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreText = document.getElementById("scoreText");
+  const overlay = document.getElementById("game-overlay");
+  const screenTitle = document.getElementById("screenTitle");
+  const screenDesc = document.getElementById("screenDesc");
+  const startBtn = document.getElementById("startBtn");
+  const musicBtn = document.getElementById("musicBtn");
+  const ctrlBtns = document.querySelectorAll(".ctrl-btn");
+
+  const GRID_SIZE = 18;
+  let CELL_SIZE = 18;
+  let canvasDim = 324;
+
+  let snake = [];
+  let food = { x: 5, y: 5, type: 'diamond' };
+  let dir = { x: 1, y: 0 };
+  let nextDir = { x: 1, y: 0 };
+  let score = 0;
+  let running = false;
+  let gameInterval = null;
+
+  let audioCtx = null;
+  let musicOn = true;
+
+  // Background Audio Element (Chita Chola Karaoke)
+  const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/Chita_Chola_Karaoke___Low_Scale___Omer_Pervaiz___Urdu_Hindi_Punjabi___Ahmad_Nawaz_Cheena.(256k).mp3");
+  bgMusic.loop = true;
+  bgMusic.volume = 0.18; // Music volume kam rakha hai
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }
+
+  // TEZ (LOUD) SOUND EFFECTS
+  function playEatSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1300, audioCtx.currentTime + 0.09);
+    gain.gain.setValueAtTime(0.32, audioCtx.currentTime); // Volume tez
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.09);
+  }
+
+  function playTurnSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(360, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playCrashSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.40, audioCtx.currentTime); // Boing / Crash loud
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.4);
+  }
+
+  function startMusic() {
+    if (!musicOn) return;
+    bgMusic.play().catch(() => {});
+  }
+
+  function stopMusic() {
+    bgMusic.pause();
+  }
+
+  function toggleMusic() {
+    initAudio();
+    musicOn = !musicOn;
+    musicBtn.innerText = musicOn ? "🎵 MUSIC ON" : "🔇 MUSIC OFF";
+    if (musicOn && running) startMusic();
+    else stopMusic();
+  }
+
+  musicBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMusic();
+  });
+
+  function resizeCanvas() {
+    const stageWidth = Math.min(window.innerWidth - 30, 420);
+    canvasDim = Math.floor(stageWidth / GRID_SIZE) * GRID_SIZE;
+    CELL_SIZE = canvasDim / GRID_SIZE;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = canvasDim * dpr;
+    canvas.height = canvasDim * dpr;
+    canvas.style.width = canvasDim + "px";
+    canvas.style.height = canvasDim + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function spawnFood() {
+    let valid = false;
+    let newX, newY;
+    while (!valid) {
+      newX = Math.floor(Math.random() * GRID_SIZE);
+      newY = Math.floor(Math.random() * GRID_SIZE);
+      valid = !snake.some(segment => segment.x === newX && segment.y === newY);
+    }
+    food = {
+      x: newX,
+      y: newY,
+      type: Math.random() < 0.3 ? 'airdrop' : 'diamond'
+    };
+  }
+
+  function changeDirection(newDir) {
+    initAudio();
+    if (newDir === 'UP' && dir.y === 0) { nextDir = { x: 0, y: -1 }; playTurnSound(); }
+    if (newDir === 'DOWN' && dir.y === 0) { nextDir = { x: 0, y: 1 }; playTurnSound(); }
+    if (newDir === 'LEFT' && dir.x === 0) { nextDir = { x: -1, y: 0 }; playTurnSound(); }
+    if (newDir === 'RIGHT' && dir.x === 0) { nextDir = { x: 1, y: 0 }; playTurnSound(); }
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" || e.key === "w") changeDirection('UP');
+    if (e.key === "ArrowDown" || e.key === "s") changeDirection('DOWN');
+    if (e.key === "ArrowLeft" || e.key === "a") changeDirection('LEFT');
+    if (e.key === "ArrowRight" || e.key === "d") changeDirection('RIGHT');
+  });
+
+  ctrlBtns.forEach(btn => {
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      changeDirection(btn.dataset.dir);
+    });
+  });
+
+  let touchStartX = 0, touchStartY = 0;
+  canvas.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  });
+  canvas.addEventListener("touchend", (e) => {
+    const diffX = e.changedTouches[0].clientX - touchStartX;
+    const diffY = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 25) changeDirection('RIGHT');
+      else if (diffX < -25) changeDirection('LEFT');
+    } else {
+      if (diffY > 25) changeDirection('DOWN');
+      else if (diffY < -25) changeDirection('UP');
+    }
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, canvasDim, canvasDim);
+
+    // Food
+    ctx.font = `${CELL_SIZE * 0.85}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(
+      food.type === 'airdrop' ? '🎁' : '💎',
+      food.x * CELL_SIZE + CELL_SIZE / 2,
+      food.y * CELL_SIZE + CELL_SIZE / 2
+    );
+
+    // Snake
+    snake.forEach((seg, index) => {
+      if (index === 0) {
+        ctx.fillStyle = "#ff542d";
+        ctx.beginPath();
+        ctx.roundRect(seg.x * CELL_SIZE + 1, seg.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2, 6);
+        ctx.fill();
+
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(seg.x * CELL_SIZE + 4, seg.y * CELL_SIZE + 4, 3, 3);
+        ctx.fillRect(seg.x * CELL_SIZE + CELL_SIZE - 7, seg.y * CELL_SIZE + 4, 3, 3);
+      } else {
+        ctx.fillStyle = index % 2 === 0 ? "#00f0ff" : "#00b4d8";
+        ctx.beginPath();
+        ctx.roundRect(seg.x * CELL_SIZE + 1.5, seg.y * CELL_SIZE + 1.5, CELL_SIZE - 3, CELL_SIZE - 3, 4);
+        ctx.fill();
+      }
+    });
+  }
+
+  function update() {
+    dir = nextDir;
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+      gameOver();
+      return;
+    }
+
+    if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      gameOver();
+      return;
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      playEatSound();
+      score += (food.type === 'airdrop' ? 5 : 1);
+      scoreText.innerText = score;
+      spawnFood();
+    } else {
+      snake.pop();
+    }
+
+    draw();
+  }
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    dir = { x: 1, y: 0 };
+    nextDir = { x: 1, y: 0 };
+    snake = [
+      { x: 5, y: 8 },
+      { x: 4, y: 8 },
+      { x: 3, y: 8 }
+    ];
+    scoreText.innerText = "0";
+    running = true;
+    overlay.classList.add("hidden");
+    spawnFood();
+    startMusic();
+
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(update, 140);
+  }
+
+  function gameOver() {
+    running = false;
+    clearInterval(gameInterval);
+    stopMusic();
+    playCrashSound();
+    screenTitle.innerText = "💥 CRASHED!";
+    screenDesc.innerHTML = `Takkar ho gayi!<br>Aapka Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
+    startBtn.innerText = "↻ PLAY AGAIN";
+    overlay.classList.remove("hidden");
+  }
+
+  startBtn.addEventListener("click", startGame);
+})();
+</script>
+</body>
+</html>
