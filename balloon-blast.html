@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI BALLOON BLAST</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  background: #06070a;
+  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+}
+#game {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: radial-gradient(circle at top, #1a2238 0%, #080a10 100%);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(14, 17, 24, 0.9);
+  border-bottom: 1px solid #262f40;
+  z-index: 10;
+}
+.logo { font-size: 17px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.stats { display: flex; gap: 15px; font-weight: bold; font-size: 15px; }
+.stats .score { color: #00f0ff; }
+.stats .lives { color: #ff1744; }
+
+#stage { flex: 1; position: relative; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 5, 8, 0.88);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 20;
+}
+#overlay h1 { font-size: 32px; color: #ffbe00; margin: 0 0 10px; text-shadow: 0 0 15px #ff7700; }
+#overlay p { font-size: 14px; color: #cbd5e1; line-height: 1.6; max-width: 300px; margin-bottom: 20px; }
+.btn {
+  padding: 14px 32px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #000;
+  background: linear-gradient(135deg, #00f0ff, #00e676);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="header">
+    <div class="logo">🎈 MULTANI BALLOON BLAST</div>
+    <div class="stats">
+      <span class="score">⭐ <span id="scoreVal">0</span></span>
+      <span class="lives">❤️ <span id="livesVal">3</span></span>
+    </div>
+  </div>
+
+  <div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="overlay">
+      <h1 id="titleText">BALLOON BLAST</h1>
+      <p id="descText">Balloons aur Diamonds ko tap karke pop karo!<br>💣 <b>Bomb se bacho</b> warna game over!</p>
+      <button class="btn" id="startBtn">▶ PLAY NOW</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const stage = document.getElementById("stage");
+  const scoreVal = document.getElementById("scoreVal");
+  const livesVal = document.getElementById("livesVal");
+  const overlay = document.getElementById("overlay");
+  const titleText = document.getElementById("titleText");
+  const descText = document.getElementById("descText");
+  const startBtn = document.getElementById("startBtn");
+
+  let W, H;
+  let running = false;
+  let score = 0;
+  let lives = 3;
+  let items = [];
+  let particles = [];
+  let spawnInterval = 0;
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }
+
+  function playPopSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.08);
+  }
+
+  function playBombSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.35);
+  }
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  const COLORS = ['#ff4624', '#00f0ff', '#ffbe00', '#00e676', '#ff007f', '#9d00ff'];
+
+  class Item {
+    constructor() {
+      this.radius = 28 + Math.random() * 12;
+      this.x = Math.random() * (W - this.radius * 2) + this.radius;
+      this.y = H + this.radius;
+      this.vy = -(3.5 + Math.random() * 3.5);
+      this.vx = (Math.random() - 0.5) * 1.5;
+      
+      const rand = Math.random();
+      if (rand < 0.15) {
+        this.type = 'bomb';
+        this.color = '#1f242d';
+      } else if (rand < 0.3) {
+        this.type = 'diamond';
+        this.color = '#00f0ff';
+      } else {
+        this.type = 'balloon';
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      }
+    }
+    update() {
+      this.y += this.vy;
+      this.x += this.vx;
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      if (this.type === 'bomb') {
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ff1744';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.fillStyle = '#ffbe00';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💣', 0, 0);
+      } else if (this.type === 'diamond') {
+        ctx.fillStyle = '#00f0ff';
+        ctx.beginPath();
+        ctx.moveTo(0, -this.radius);
+        ctx.lineTo(this.radius * 0.8, 0);
+        ctx.lineTo(0, this.radius);
+        ctx.lineTo(-this.radius * 0.8, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💎', 0, 0);
+      } else {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.radius * 0.75, this.radius, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Shiny reflection
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.beginPath();
+        ctx.ellipse(-this.radius * 0.25, -this.radius * 0.4, this.radius * 0.18, this.radius * 0.35, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        // Tail
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(-4, this.radius);
+        ctx.lineTo(4, this.radius);
+        ctx.lineTo(0, this.radius + 6);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  function createParticles(x, y, color, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 5 + 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 4 + 3,
+        color: color,
+        alpha: 1
+      });
+    }
+  }
+
+  function hitTest(x, y) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      const dist = Math.hypot(it.x - x, it.y - y);
+      if (dist < it.radius + 15) {
+        if (it.type === 'bomb') {
+          playBombSound();
+          createParticles(it.x, it.y, '#ff1744', 20);
+          items.splice(i, 1);
+          lives--;
+          livesVal.innerText = lives;
+          if (lives <= 0) gameOver();
+        } else {
+          playPopSound();
+          createParticles(it.x, it.y, it.color, 15);
+          score += (it.type === 'diamond' ? 5 : 1);
+          scoreVal.innerText = score;
+          items.splice(i, 1);
+        }
+        break;
+      }
+    }
+  }
+
+  const handlePointer = (e) => {
+    if (!running) return;
+    const rect = canvas.getBoundingClientRect();
+    hitTest(e.clientX - rect.left, e.clientY - rect.top);
+  };
+  canvas.addEventListener('pointerdown', handlePointer);
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.buttons === 1) handlePointer(e);
+  });
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    lives = 3;
+    items = [];
+    particles = [];
+    spawnInterval = 0;
+    scoreVal.innerText = "0";
+    livesVal.innerText = "3";
+    running = true;
+    overlay.classList.add("hidden");
+    loop();
+  }
+
+  function gameOver() {
+    running = false;
+    titleText.innerText = "GAME OVER!";
+    descText.innerHTML = `Shandaar Khel!<br>Aapka Score: <b style="color:#00f0ff; font-size:20px;">${score}</b>`;
+    startBtn.innerText = "↻ PLAY AGAIN";
+    overlay.classList.remove("hidden");
+  }
+
+  startBtn.addEventListener("click", startGame);
+
+  function loop() {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+
+    spawnInterval++;
+    if (spawnInterval > 28) {
+      items.push(new Item());
+      spawnInterval = 0;
+    }
+
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      it.update();
+      it.draw();
+
+      if (it.y < -it.radius * 2) {
+        if (it.type === 'balloon') {
+          lives--;
+          livesVal.innerText = lives;
+          if (lives <= 0) {
+            gameOver();
+            return;
+          }
+        }
+        items.splice(i, 1);
+      }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15;
+      p.alpha -= 0.03;
+
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+      } else {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>
