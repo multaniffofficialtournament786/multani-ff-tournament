@@ -564,7 +564,6 @@
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
-    // 10 COMPLETE MINI GAMES LIST: TOP PAR BAHAR WALI, CENTER MEIN 8 GAMES, END MEIN FOLDER WALI
     const AVAILABLE_GAMES = [
       {
         id: 1,
@@ -638,7 +637,6 @@
       }
     ];
 
-    // REAL VERIFIED UNIQUE 10 GAMES & 1 HOUR TRACKING
     let userMissionState = {
       login: false,
       playedGamesList: [],
@@ -666,16 +664,20 @@
       return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" })).toDateString();
     }
 
-    // CHECK IF TOURNAMENT WAS JOINED TODAY ONLY (No free coins for yesterday's matches)
+    // CHECK IF TOURNAMENT WAS JOINED TODAY ONLY (Timeout protected)
     async function checkTodayTournamentJoined() {
       if (!currentUser) return false;
       try {
         const todayStr = new Date().toISOString().split('T')[0];
-        const { data, error } = await sbClient
+        
+        const fetchPromise = sbClient
           .from('tournament_entries')
           .select('created_at')
           .eq('user_id', currentUser.id)
           .gte('created_at', `${todayStr}T00:00:00Z`);
+
+        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve({ data: null, error: null }), 2500));
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
         if (!error && data && data.length > 0) {
           return true;
@@ -686,7 +688,7 @@
       return false;
     }
 
-    async function loadUserMissionState() {
+    async function loadUserMissionState(skipNetworkCheck = false) {
       const todayKey = getTodayKey();
       const storageKey = `ff_missions_verified_${currentUser ? currentUser.id : 'guest'}`;
       const localData = localStorage.getItem(storageKey);
@@ -711,9 +713,12 @@
 
       userMissionState.login = true;
       
-      // REAL TODAY MATCH CHECK
-      const hasTodayMatch = await checkTodayTournamentJoined();
-      userMissionState.joinedTournament = hasTodayMatch;
+      if (!skipNetworkCheck && currentUser) {
+        const hasTodayMatch = await checkTodayTournamentJoined();
+        if (hasTodayMatch) {
+          userMissionState.joinedTournament = true;
+        }
+      }
 
       saveUserMissionState();
     }
@@ -742,7 +747,7 @@
 
     async function openDailyMissionsModal() {
       Loader.show("Checking missions...");
-      await loadUserMissionState();
+      await loadUserMissionState(false);
       Loader.hide();
       renderMissionsUI();
       document.getElementById('daily-missions-modal-overlay').classList.remove('hidden');
@@ -845,7 +850,6 @@
         `;
       }).join('');
 
-      // 5th Extra Bonus Mission (+2 Coins)
       let allBonusBtn = '';
       if (userMissionState.claimed.allBonus) {
         allBonusBtn = `<button class="btn btn-secondary btn-sm" style="background:#1b2434; color:var(--success); border-color:#00e67655; cursor:default;" disabled><i class="fa-solid fa-check"></i> وصول ہو گیا</button>`;
@@ -871,7 +875,6 @@
       wrap.innerHTML = html;
     }
 
-    // REAL COIN TRANSFER TO USER WALLET VIA SUPABASE
     async function claimMissionReward(missionId, coinAmount, desc) {
       if (!currentUser) {
         Toast.show("Pehle apna account login karein!", "info");
@@ -915,9 +918,8 @@
       }
     }
 
-    // MINI GAMES LIST SCREEN (AIK TOP PR, AIK NECHE - 2-COLUMN GRID)
     function renderGamesList() {
-      loadUserMissionState();
+      loadUserMissionState(true);
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
@@ -965,7 +967,7 @@
         if (titleEl) titleEl.innerText = title;
         modal.classList.remove('hidden');
 
-        loadUserMissionState();
+        loadUserMissionState(true);
         currentGameSessionStart = Date.now();
         currentGamePlayingUrl = gameUrl;
 
@@ -1014,7 +1016,260 @@
       saveUserMissionState();
     }
 
-    // DAILY SPIN WHEEL WITH FORCE REFLOW SMOOTH ANIMATION
+    const Toast = {
+      show(msg, type = 'info') {
+        const c = document.getElementById('toast-container');
+        if (!c) return;
+        const t = document.createElement('div');
+        t.className = `toast-msg toast-${type}`;
+        t.innerText = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+      }
+    };
+
+    const Loader = {
+      show(text = "Loading...") {
+        const el = document.getElementById('global-loader');
+        const txt = document.getElementById('global-loader-text');
+        if (txt) txt.innerText = text;
+        if (el) el.classList.remove('hidden');
+        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
+        window._loaderTimeout = setTimeout(() => {
+          this.hide();
+        }, 4000);
+      },
+      hide() {
+        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
+        const el = document.getElementById('global-loader');
+        if (el) el.classList.add('hidden');
+      }
+    };
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function closeCommunityPopup() {
+      const p = document.getElementById('community-popup-overlay');
+      if (p) p.classList.add('hidden');
+    }
+
+    function startAnnouncementTicker() {
+      setTimeout(() => {
+        const content = document.querySelector('.ticker-content');
+        if (content) {
+          const textLength = content.innerText.length;
+          const duration = Math.max(15, textLength * 0.18);
+          content.style.animationDuration = duration + 's';
+          content.classList.add('active');
+        }
+      }, 3000);
+    }
+
+    let autoScrollInterval = null;
+    function setupTutorialsAutoScroll() {
+      if (autoScrollInterval) clearInterval(autoScrollInterval);
+      const container = document.getElementById('tutorials-scroll-box');
+      if (!container) return;
+
+      autoScrollInterval = setInterval(() => {
+        if (!document.body.contains(container)) {
+          clearInterval(autoScrollInterval);
+          return;
+        }
+        const cardWidth = container.querySelector('.screenshot-card')?.offsetWidth || 320;
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        
+        if (container.scrollLeft >= maxScrollLeft - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: cardWidth + 12, behavior: 'smooth' });
+        }
+      }, 4500);
+    }
+
+    function openShareModal() {
+      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
+
+      document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}`;
+      document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=${encodeURIComponent(shareText)}`;
+
+      document.getElementById('share-modal-overlay').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal-overlay').classList.add('hidden');
+    }
+
+    function copyShareText() {
+      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
+      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: ${myUid} when registering!`;
+      navigator.clipboard.writeText(shareText);
+      Toast.show("App link & referral code copied!", "success");
+      closeShareModal();
+    }
+
+    async function syncAuthAndProfile() {
+      try {
+        const { data: { user } } = await sbClient.auth.getUser();
+        currentUser = user;
+        if (user) {
+          const [profRes, entryRes, notifRes, chatRes] = await Promise.all([
+            sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+            sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
+            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin').eq('is_read', false)
+          ]);
+          currentProfile = profRes.data;
+          userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
+          unreadNotifCount = notifRes.count || 0;
+          unreadChatCount = chatRes.count || 0;
+        } else {
+          currentProfile = null;
+          userJoinedTournamentIds.clear();
+          unreadNotifCount = 0;
+          unreadChatCount = 0;
+        }
+        updateDrawerUI();
+        updateNotificationBadges();
+      } catch (e) {
+        console.error("Auth sync error:", e);
+      }
+    }
+
+    function updateNotificationBadges() {
+      const bellBadge = document.getElementById('header-notif-badge');
+      const drawerBadge = document.getElementById('drawer-notif-badge');
+      const floatChatBadge = document.getElementById('float-chat-badge');
+
+      if (bellBadge) bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
+      if (drawerBadge) {
+        drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
+        drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
+      }
+      if (floatChatBadge) {
+        floatChatBadge.classList.toggle('hidden', unreadChatCount === 0);
+        floatChatBadge.innerText = unreadChatCount;
+      }
+    }
+
+    function updateDrawerUI() {
+      const dName = document.getElementById('drawer-name');
+      const dUid = document.getElementById('drawer-uid');
+      const hAvatar = document.getElementById('header-avatar-img');
+      const dAvatar = document.getElementById('drawer-avatar');
+      const avatarUrl = currentProfile?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+
+      if (hAvatar) hAvatar.src = avatarUrl;
+      if (dAvatar) dAvatar.src = avatarUrl;
+
+      if (currentUser && currentProfile) {
+        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.full_name || 'Soldier';
+        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
+      } else {
+        if (dName) dName.innerText = 'Guest Gamer';
+        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-user"></i> Login / Register`;
+      }
+    }
+
+    const Router = {
+      history: [],
+      async navigate(page, id = null, pushHistory = true) {
+        Drawer.close();
+        Loader.show("Loading...");
+        await syncAuthAndProfile();
+
+        if (!currentUser && page !== 'login' && page !== 'register') {
+          page = 'login';
+        }
+
+        if (pushHistory && (this.history.length === 0 || this.history[this.history.length - 1] !== page)) {
+          this.history.push(page);
+          history.pushState({ page, id }, '', '#' + page);
+        }
+
+        const isAuthView = (page === 'login' || page === 'register');
+        const masterHeader = document.getElementById('master-header-bar');
+        const subHeader = document.getElementById('sub-header-bar');
+        const bottomNav = document.getElementById('bottom-nav');
+
+        if (isAuthView) {
+          if (masterHeader) masterHeader.classList.add('hidden');
+          if (subHeader) subHeader.classList.add('hidden');
+          if (bottomNav) bottomNav.classList.add('hidden');
+        } else {
+          const isSub = (page !== 'home');
+          if (isSub) {
+            if (masterHeader) masterHeader.classList.add('hidden');
+            if (subHeader) subHeader.classList.remove('hidden');
+            const subTitle = document.getElementById('sub-header-title');
+            if (subTitle) subTitle.innerText = page.toUpperCase().replace('_', ' ');
+          } else {
+            if (masterHeader) masterHeader.classList.remove('hidden');
+            if (subHeader) subHeader.classList.add('hidden');
+          }
+          if (bottomNav) bottomNav.classList.remove('hidden');
+        }
+
+        document.querySelectorAll('.nav-item').forEach(el => {
+          el.classList.toggle('active', el.getAttribute('data-page') === page);
+        });
+
+        try {
+          if (page === 'home') await renderHome();
+          else if (page === 'games') renderGamesList();
+          else if (page === 'spin') await renderDailySpin();
+          else if (page === 'tournaments') await renderTournaments();
+          else if (page === 'tournament_detail') await renderTournamentDetail(id);
+          else if (page === 'wallet') await renderWallet();
+          else if (page === 'withdrawal') await renderWithdrawal();
+          else if (page === 'deposit') renderDeposit();
+          else if (page === 'diamonds') await renderDiamondsShop();
+          else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
+          else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
+          else if (page === 'invite') await renderInvite();
+          else if (page === 'login' || page === 'register') renderAuth(page);
+          else if (page === 'profile') renderProfile();
+          else if (page === 'winners') await renderWinners();
+          else if (page === 'leaderboard') await renderLeaderboard();
+          else if (page === 'notifications') await renderNotifications();
+          else if (page === 'rules') renderRules();
+          else if (page === 'about') renderAbout();
+        } catch (navErr) {
+          console.error("Navigation error:", navErr);
+        }
+
+        Loader.hide();
+      },
+      async back() {
+        if (this.history.length > 1) {
+          this.history.pop();
+          const prev = this.history[this.history.length - 1];
+          await this.navigate(prev, null, false);
+        } else {
+          const defaultPage = currentUser ? 'home' : 'login';
+          await this.navigate(defaultPage, null, false);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', (e) => {
+      if (Router.history.length > 1) {
+        Router.history.pop();
+        const prev = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
+        Router.navigate(prev, null, false);
+      }
+    });
+
+    // DAILY SPIN WHEEL
     async function renderDailySpin() {
       if (!currentUser) { Router.navigate('login'); return; }
       
@@ -1588,7 +1843,6 @@
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <!-- VIP IMPORTANT NOTICE -->
           <div style="background:linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,70,36,0.1)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:14px; margin-bottom:16px; box-shadow:0 4px 15px rgba(255,190,0,0.2);">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
               <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold); font-size:16px;"></i>
@@ -1604,7 +1858,6 @@
             ${packagesGridHtml}
           </div>
 
-          <!-- CATEGORY QUICK ACTION BUTTONS FOR DIAMOND HISTORY -->
           <div class="section-title"><span>📜 Diamond History Center</span></div>
           <div style="display:flex; gap:16px; justify-content:center; margin-top:10px;">
             <div id="action-btn-my" class="cat-item" onclick="Router.navigate('diamond_history')">
@@ -1734,7 +1987,7 @@
           if (refUsers.length > 0) {
             totalRegisters = refUsers.length;
             validReferrals = refUsers.filter(u => u.ref_claimed).length;
-            totalIncome = validReferrals * 3; // UPDATED 3 COINS PER REFERRAL
+            totalIncome = validReferrals * 3;
             
             invitedListHTML = refUsers.map(u => {
               const isClaimed = u.ref_claimed;
@@ -1821,7 +2074,6 @@
             </div>
           </div>
 
-          <!-- INVITED LIST WITH TOGGLE FILTER BUTTON -->
           <div class="section-title" onclick="toggleInvitedList()" style="cursor:pointer; background:var(--bg-card); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
             <span style="font-size:13px; color:var(--accent-gold);"><i class="fa-solid fa-users"></i> Invited List (${totalRegisters})</span>
             <i id="invited-list-arrow" class="fa-solid fa-chevron-down" style="color:var(--accent-gold); transition:transform 0.3s ease;"></i>
@@ -1832,7 +2084,6 @@
             </div>
           </div>
 
-          <!-- REFERRAL MILESTONE REWARDS SECTION EMBEDDED AT THE BOTTOM OF INVITE PAGE -->
           <div class="section-title"><span><i class="fa-solid fa-gift text-gold"></i> Referral Milestone Rewards</span></div>
           <div class="player-hero-card" style="padding: 12px; margin-bottom: 14px;">
             ${milestonesHtml}
@@ -1908,22 +2159,16 @@
       }
     }
 
-    // UPDATED BUG-FREE LEADERBOARD FUNCTION (RPC get_leaderboard)
     async function renderLeaderboard() {
       const view = document.getElementById('app-view');
-
-      const defaultAvatar =
-        'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+      const defaultAvatar = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
 
       view.innerHTML = '<div class="view-container"><div class="empty-state"><p>Leaderboard loading...</p></div></div>';
 
       try {
         const [leaderboardRes, depositsRes] = await Promise.all([
           sbClient.rpc('get_leaderboard'),
-          sbClient
-            .from('deposit_requests')
-            .select('user_id, amount')
-            .eq('status', 'approved')
+          sbClient.from('deposit_requests').select('user_id, amount').eq('status', 'approved')
         ]);
 
         if (leaderboardRes.error) throw leaderboardRes.error;
@@ -1934,26 +2179,17 @@
           .sort((a, b) => Number(a.rank_position) - Number(b.rank_position));
 
         const deposits = depositsRes.data || [];
-
         const depositMap = {};
 
         deposits.forEach(d => {
-          depositMap[d.user_id] =
-            (depositMap[d.user_id] || 0) + Number(d.amount || 0);
+          depositMap[d.user_id] = (depositMap[d.user_id] || 0) + Number(d.amount || 0);
         });
 
         if (!profiles.length) {
           view.innerHTML = `
             <div class="view-container">
-              <div class="section-title">
-                <span>
-                  <i class="fa-solid fa-ranking-star text-gold"></i>
-                  Hall of Fame Leaderboard
-                </span>
-              </div>
-              <div class="empty-state">
-                <p>No leaderboard records found.</p>
-              </div>
+              <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame Leaderboard</span></div>
+              <div class="empty-state"><p>No leaderboard records found.</p></div>
             </div>
           `;
           return;
@@ -1963,143 +2199,68 @@
         const top2 = profiles[1] || null;
         const top3 = profiles[2] || null;
 
-        const money = amount =>
-          Number(amount || 0).toLocaleString('en-PK', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
-          });
-
-        const playerName = player =>
-          escapeHTML(player.free_fire_name || 'Player');
+        const money = amount => Number(amount || 0).toLocaleString('en-PK', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        const playerName = player => escapeHTML(player.free_fire_name || 'Player');
 
         const avatarHTML = (player, className, size) => `
-          <img
-            src="${escapeHTML(player.avatar_url || defaultAvatar)}"
-            class="${className || ''}"
-            onerror="this.onerror=null;this.src='${defaultAvatar}'"
-            style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;"
-            alt="Player avatar"
-          />
+          <img src="${escapeHTML(player.avatar_url || defaultAvatar)}" class="${className || ''}" onerror="this.onerror=null;this.src='${defaultAvatar}'" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;" alt="Player avatar" />
         `;
 
         const podiumPlayer = (player, rank) => {
-          if (!player) {
-            return `
-              <div style="flex:1;text-align:center;color:var(--text-muted);">
-                <span>Waiting for player</span>
-              </div>
-            `;
-          }
+          if (!player) return `<div style="flex:1;text-align:center;color:var(--text-muted);"><span>Waiting for player</span></div>`;
 
           const isFirst = rank === 1;
           const isSecond = rank === 2;
-
-          const badgeColor = isFirst
-            ? 'var(--accent-gold)'
-            : isSecond
-              ? '#00f0ff'
-              : '#ff7700';
-
+          const badgeColor = isFirst ? 'var(--accent-gold)' : isSecond ? '#00f0ff' : '#ff7700';
           const size = isFirst ? 72 : isSecond ? 56 : 50;
 
           return `
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;${isFirst ? 'transform:translateY(-10px);' : isSecond ? 'transform:translateY(10px);' : 'transform:translateY(15px);'}">
               <div style="position:relative;width:${size}px;height:${size}px;margin-bottom:8px;">
-                ${avatarHTML(
-                  player,
-                  isFirst ? 'vip-frame-1' : isSecond ? 'vip-frame-2' : 'vip-frame-3',
-                  size
-                )}
-                ${
-                  isFirst
-                    ? '<span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);color:var(--accent-gold);font-size:16px;"><i class="fa-solid fa-crown"></i></span>'
-                    : ''
-                }
-                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:${badgeColor};color:#000;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;">
-                  #${rank}
-                </span>
+                ${avatarHTML(player, isFirst ? 'vip-frame-1' : isSecond ? 'vip-frame-2' : 'vip-frame-3', size)}
+                ${isFirst ? '<span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);color:var(--accent-gold);font-size:16px;"><i class="fa-solid fa-crown"></i></span>' : ''}
+                <span style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:${badgeColor};color:#000;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;">#${rank}</span>
               </div>
-
-              <h4 style="font-size:${isFirst ? 13 : 12}px;font-weight:700;color:${isFirst ? 'var(--accent-gold)' : '#fff'};width:100%;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                ${playerName(player)}
-              </h4>
-
-              <span style="font-family:var(--font-gaming);font-size:${isFirst ? 15 : 13}px;font-weight:800;color:${isFirst ? 'var(--accent-gold)' : 'var(--success)'};">
-                PKR ${money(player.total_won)}
-              </span>
+              <h4 style="font-size:${isFirst ? 13 : 12}px;font-weight:700;color:${isFirst ? 'var(--accent-gold)' : '#fff'};width:100%;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${playerName(player)}</h4>
+              <span style="font-family:var(--font-gaming);font-size:${isFirst ? 15 : 13}px;font-weight:800;color:${isFirst ? 'var(--accent-gold)' : 'var(--success)'};">PKR ${money(player.total_won)}</span>
             </div>
           `;
         };
 
         view.innerHTML = `
           <div class="view-container">
-
-            <div class="section-title">
-              <span>
-                <i class="fa-solid fa-ranking-star text-gold"></i>
-                Hall of Fame Leaderboard
-              </span>
-            </div>
-
+            <div class="section-title"><span><i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame Leaderboard</span></div>
             <div style="background:linear-gradient(145deg,#181d29,#0f131a);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 10px;margin-bottom:20px;display:flex;justify-content:space-around;align-items:flex-end;text-align:center;min-height:155px;">
               ${podiumPlayer(top2, 2)}
               ${podiumPlayer(top1, 1)}
               ${podiumPlayer(top3, 3)}
             </div>
-
-            <div class="section-title">
-              <span>All Player Rankings (${profiles.length})</span>
-            </div>
-
-            ${
-              profiles.map((player, index) => {
-                const rankNum = index + 1;
-                const deposit = depositMap[player.id] || 0;
-
-                return `
-                  <div class="tx-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                      <span style="font-family:var(--font-gaming);font-size:16px;font-weight:800;color:${rankNum <= 3 ? 'var(--accent-gold)' : 'var(--text-muted)'};min-width:27px;">
-                        #${rankNum}
-                      </span>
-
-                      ${avatarHTML(player, '', 40)}
-
-                      <div style="min-width:0;">
-                        <h4 style="font-size:14px;font-weight:700;overflow-wrap:anywhere;">
-                          ${playerName(player)}
-                        </h4>
-                        <span style="font-size:11px;color:var(--accent-cyan);">
-                          UID: ${escapeHTML(player.free_fire_uid || '--')}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style="text-align:right;flex-shrink:0;">
-                      <div style="font-family:var(--font-gaming);font-size:14px;font-weight:700;color:var(--success);">
-                        Won: PKR ${money(player.total_won)}
-                      </div>
-                      <div style="font-size:11px;color:var(--accent-gold);font-weight:600;">
-                        Deposit: PKR ${money(deposit)}
-                      </div>
+            <div class="section-title"><span>All Player Rankings (${profiles.length})</span></div>
+            ${profiles.map((player, index) => {
+              const rankNum = index + 1;
+              const deposit = depositMap[player.id] || 0;
+              return `
+                <div class="tx-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <span style="font-family:var(--font-gaming);font-size:16px;font-weight:800;color:${rankNum <= 3 ? 'var(--accent-gold)' : 'var(--text-muted)'};min-width:27px;">#${rankNum}</span>
+                    ${avatarHTML(player, '', 40)}
+                    <div style="min-width:0;">
+                      <h4 style="font-size:14px;font-weight:700;overflow-wrap:anywhere;">${playerName(player)}</h4>
+                      <span style="font-size:11px;color:var(--accent-cyan);">UID: ${escapeHTML(player.free_fire_uid || '--')}</span>
                     </div>
                   </div>
-                `;
-              }).join('')
-            }
-
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-family:var(--font-gaming);font-size:14px;font-weight:700;color:var(--success);">Won: PKR ${money(player.total_won)}</div>
+                    <div style="font-size:11px;color:var(--accent-gold);font-weight:600;">Deposit: PKR ${money(deposit)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         `;
-
       } catch (e) {
-        console.error('Leaderboard loading error:', e);
-
-        view.innerHTML = `
-          <div class="view-container empty-state">
-            <p>Leaderboard load nahi ho saka.</p>
-            <p style="font-size:12px;">${escapeHTML(e.message || 'Unknown error')}</p>
-          </div>
-        `;
+        console.error('Leaderboard error:', e);
+        view.innerHTML = `<div class="view-container empty-state"><p>Leaderboard load nahi ho saka.</p></div>`;
       }
     }
 
@@ -2191,7 +2352,6 @@
             </div>
           </div>
 
-          <!-- MATCH & MATCH JOINING RULES DROPDOWN -->
           <div class="rules-dropdown-container">
             <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
               <div style="display:flex; align-items:center; gap:8px;">
@@ -2203,50 +2363,19 @@
             <div class="rules-dropdown-content">
               <div style="color:var(--accent-gold); font-weight:bold; margin:10px 0 6px 0;">🎮 1. MATCH JOINING RULES</div>
               <p><strong>1. 💰 Entry Fee:</strong> The required entry fee must be available in the player's tournament wallet before joining a match.</p>
-              <p><strong>2. ✅ Match Joining:</strong> Players must carefully check the match name, entry fee, date, time, mode, and other match details before joining.</p>
-              <p><strong>3. ⏰ Be On Time:</strong> After joining a match, the player must be present in the room at the scheduled match time or before.</p>
-              <p><strong>4. 🚫 No Show = No Refund:</strong> If a player joins a match but does not enter the room on time or misses the match, the entry fee/payment will NOT be refunded.</p>
-              <p><strong>5. 🔐 Room ID & Password:</strong> Room ID and Password should only be used for the assigned match. Players must not share room details with unauthorized persons.</p>
-              <p><strong>6. 🚫 Wrong Room:</strong> Players are responsible for joining the correct room for their registered match.</p>
-              <p><strong>7. 🔄 Duplicate Joining:</strong> A player cannot take multiple entries in the same match unless allowed.</p>
-              <p><strong>8. 💳 Entry Fee Deduction:</strong> Fee will be deducted upon joining.</p>
-              <p><strong>9. 📸 Technical Issues:</strong> Contact support with screenshots if any issue occurs.</p>
-
-              <div style="color:var(--accent-gold); font-weight:bold; margin:16px 0 6px 0;">🎯 2. MATCH RULES</div>
-              <p><strong>10. 🎮 Fair Play Required:</strong> Every player must participate fairly.</p>
-              <p><strong>11. 🚫 Hacks & Cheats Prohibited:</strong> Hacks, scripts, and injectors are strictly prohibited.</p>
-              <p><strong>12. 🚫 Bug & Glitch Abuse:</strong> Exploiting bugs is strictly prohibited.</p>
-              <p><strong>13. 👤 Account Sharing:</strong> Account sharing is not allowed.</p>
-              <p><strong>14. 📱 Supported Game Version:</strong> Use the official latest game version.</p>
-              <p><strong>15. 📶 Internet:</strong> Players are responsible for their own internet connectivity.</p>
-              <p><strong>16. 🏆 Match Result:</strong> Finalized after admin verification.</p>
-
-              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:12px 0; border-radius:4px; color:#ff8b8b;">
-                🔴 <strong>IMPORTANT NOTICE:</strong><br>
-                ❌ <strong>NO SHOW = NO REFUND</strong>
-              </div>
+              <p><strong>2. ✅ Match Joining:</strong> Players must check match details carefully before joining.</p>
+              <p><strong>3. ⏰ Be On Time:</strong> Present in room before match start.</p>
+              <p><strong>4. 🚫 No Show = No Refund:</strong> Missing the match means no refund.</p>
             </div>
           </div>
 
           ${winnerInfoHTML}
-
-          <!-- VIP WITHDRAW & ROOM NOTES -->
-          <div style="background:linear-gradient(135deg, rgba(0,240,255,0.12), rgba(255,190,0,0.1)); border:1.5px solid var(--accent-cyan); border-radius:var(--radius); padding:14px; margin-bottom:12px; box-shadow:0 4px 15px rgba(0,240,255,0.2);">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-              <i class="fa-solid fa-circle-info" style="color:var(--accent-cyan); font-size:16px;"></i>
-              <span style="font-family:var(--font-gaming); font-size:13px; font-weight:800; color:var(--accent-cyan); text-transform:uppercase;">VIP Player Room & Withdraw Notes</span>
-            </div>
-            <p style="font-size:11px; color:#fff; line-height:1.5;">
-              Dear Player! Room ID aur Password match start hone se 10-15 minutes pehle app mein update kar diye jate hain. Withdrawals 24 hours ke andar process kiye jate hain. Agar koi bhi masla ho toh admin support chat use karein.
-            </p>
-          </div>
 
           ${isJoined && !isCompleted ? `
             <div style="background:#0c1017; border:1px solid var(--accent-gold); border-radius: var(--radius-sm); padding:12px; margin-bottom: 12px;">
               <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); font-weight:700; margin-bottom: 8px;">
                 Custom Room Credentials ${mySlotNumber ? '(SLOT #' + mySlotNumber + ')' : ''}
               </div>
-              
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
                 <div style="background: #131722; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
                   <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Room ID</div>
@@ -2261,12 +2390,6 @@
                   </div>
                 </div>
               </div>
-
-              <div style="border-top: 1px solid var(--accent-cyan); padding-top: 8px; text-align: center;">
-                <p style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
-                  Room id aur pw match se 10.15 mint pehle yaha bhj diya jaega
-                </p>
-              </div>
             </div>
           ` : ''}
 
@@ -2278,11 +2401,6 @@
               <span style="font-size:10px; color:var(--text-dim);">Map: ${escapeHTML(t.map)}</span>
             </div>
             <div class="room-slots-grid">${slotsHTML}</div>
-          </div>
-
-          <div class="player-hero-card" style="margin-bottom: 10px; padding:10px 12px;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-gold); font-weight:bold;">Prize Distribution</div>
-            <div style="font-size: 12px; font-weight: 600; color: #fff; margin-top:2px;">🏆 1st: PKR ${t.prize_pool || 0} | 2nd: PKR ${t.prize_2 || 0} | 3rd: PKR ${t.prize_3 || 0} | 4th: PKR ${t.prize_4 || 0}</div>
           </div>
 
           <div style="position: sticky; bottom: 10px;">
@@ -2425,7 +2543,6 @@
       }));
 
       const combinedHistory = [...formattedDeposits, ...formattedTxs].sort((a, b) => b.sortDate - a.sortDate);
-
       window._allWalletHistory = combinedHistory;
 
       const view = document.getElementById('app-view');
@@ -2440,7 +2557,6 @@
             </div>
           </div>
 
-          <!-- TRANSACTION HISTORY FILTER & COLLAPSIBLE TOGGLE -->
           <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
             <span>Transaction History Filter</span>
             <button onclick="toggleTransactionHistory()" id="tx-toggle-btn" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 8px; width:auto;">
@@ -2487,13 +2603,9 @@
 
       const history = window._allWalletHistory || [];
       const filtered = history.filter(item => {
-        if (filterType === 'deposit') {
-          return item.isDeposit;
-        } else if (filterType === 'rejected') {
-          return item.statusLower === 'rejected' || (item.description && item.description.toLowerCase().includes('refund'));
-        } else {
-          return true;
-        }
+        if (filterType === 'deposit') return item.isDeposit;
+        if (filterType === 'rejected') return item.statusLower === 'rejected' || (item.description && item.description.toLowerCase().includes('refund'));
+        return true;
       });
 
       if (!filtered.length) {
@@ -2561,12 +2673,10 @@
                     Fee (2%): PKR ${w.fee || (w.amount * 0.02)} | <strong>Net: PKR ${w.net_amount || (w.amount * 0.98)}</strong><br>
                     Account: ${escapeHTML(maskedAcc)} (${escapeHTML(w.account_name || 'N/A')})<br>
                     Date: ${new Date(w.created_at).toLocaleString()}
-                    ${w.admin_note ? `<br><strong style="color:var(--accent-cyan);">Admin Note:</strong> ${escapeHTML(w.admin_note)}` : ''}
                   </span>
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
                   <span style="font-size:10px; padding:3px 8px; border-radius:6px; font-weight:bold; text-transform:uppercase; ${statusBadgeStyle}">${escapeHTML(w.status)}</span>
-                  ${w.payment_screenshot_url ? `<br><a href="${w.payment_screenshot_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:9px; padding:3px 6px; margin-top:6px; color:var(--accent-cyan); display:inline-block;">View Proof</a>` : ''}
                 </div>
               </div>
             `;
@@ -2663,11 +2773,6 @@
         return;
       }
 
-      if (!accName || !accNum) {
-        Toast.show("Please fill in account holder name and number.", "error");
-        return;
-      }
-
       const fee = amount * 0.02;
       const net = amount - fee;
 
@@ -2676,10 +2781,10 @@
 
       const submitBtn = document.getElementById('btn-submit-withdrawal');
       if (submitBtn) submitBtn.disabled = true;
-      Loader.show("Submitting withdrawal request securely...");
+      Loader.show("Submitting withdrawal request...");
 
       try {
-        const { data, error } = await sbClient.rpc('request_withdrawal', {
+        const { error } = await sbClient.rpc('request_withdrawal', {
           p_amount: amount,
           p_method: method,
           p_acc_num: accNum,
@@ -2714,26 +2819,6 @@
               <button onclick="navigator.clipboard.writeText(document.getElementById('dep-box-number').innerText); Toast.show('Number copied to clipboard!', 'success');" class="btn btn-primary btn-sm" style="padding:8px 12px; font-size:12px; flex-shrink:0;">
                 <i class="fa-solid fa-copy"></i> COPY
               </button>
-            </div>
-          </div>
-
-          <!-- PAYMENT RULES EXPANDABLE DROPDOWN -->
-          <div class="rules-dropdown-container">
-            <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:14px;">💳</span>
-                <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">PAYMENT & DEPOSIT RULES</span>
-              </div>
-              <span class="rules-arrow">&#9660;</span>
-            </div>
-            <div class="rules-dropdown-content">
-              <p><strong>1. 💰 Minimum Deposit:</strong> Wallet mein deposit karne ke liye minimum amount app mein diye gaye payment method ke mutabiq hoga.</p>
-              <p><strong>2. 📸 Payment Screenshot لازمی:</strong> Payment complete karne ke baad transaction ka clear screenshot upload karna zaroori hai.</p>
-              <p><strong>3. 🧾 Correct Transaction Details:</strong> Transaction ID / Reference Number bilkul sahi enter karein.</p>
-              <div style="background:rgba(255,23,68,0.1); border-left:3px solid var(--danger); padding:8px; margin:10px 0; border-radius:4px; color:#ff8b8b;">
-                🔴 <strong>IMPORTANT WARNING:</strong><br>
-                Screenshot mein jitni payment hai, sirf utni hi amount enter karein.
-              </div>
             </div>
           </div>
 
@@ -2792,9 +2877,7 @@
             .from('deposit-screenshots')
             .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-          if (uploadError) {
-            throw new Error("Storage Upload Failed: " + uploadError.message);
-          }
+          if (uploadError) throw new Error("Storage Upload Failed: " + uploadError.message);
 
           const { data: publicUrlData } = sbClient.storage
             .from('deposit-screenshots')
@@ -2812,15 +2895,13 @@
             status: 'pending'
           }]);
 
-          if (dbError) {
-            throw new Error("Database Insert Failed: " + dbError.message);
-          }
+          if (dbError) throw new Error("Database Insert Failed: " + dbError.message);
 
           Toast.show("Slip submitted successfully! Check Wallet for status.", "success");
           Router.navigate('wallet');
         } catch (err) {
           console.error("Deposit submission error:", err);
-          Toast.show(err.message || "Failed to submit deposit. Check your internet connection.", "error");
+          Toast.show(err.message || "Failed to submit deposit.", "error");
         } finally {
           Loader.hide();
           if (submitBtn) submitBtn.disabled = false;
@@ -2862,60 +2943,31 @@
                   <i class="fa-solid fa-envelope"></i>
                   <input type="email" id="log-email" class="arena-field" placeholder="you@example.com" required />
                 </div>
-
                 <div class="arena-input-box">
                   <i class="fa-solid fa-lock"></i>
                   <input type="password" id="log-pass" class="arena-field" placeholder="••••••••" required />
                   <i class="fa-solid fa-eye" style="cursor:pointer;" onclick="const p=document.getElementById('log-pass'); p.type=p.type==='password'?'text':'password';"></i>
                 </div>
-
                 <div style="text-align:right; margin-bottom:14px;">
                   <span onclick="renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
                 </div>
-
                 <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
               </form>
             ` : `
               <form id="signup-form">
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-user"></i>
-                  <input type="text" id="reg-name" class="arena-field" placeholder="Full Name" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-gamepad"></i>
-                  <input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MULTANI・HAMZA★)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-id-card"></i>
-                  <input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-phone"></i>
-                  <input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-envelope"></i>
-                  <input type="email" id="reg-email" class="arena-field" placeholder="you@example.com" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-lock"></i>
-                  <input type="password" id="reg-pass" class="arena-field" placeholder="Password (min 6 chars)" minlength="6" required />
-                </div>
-                <div class="arena-input-box">
-                  <i class="fa-solid fa-users"></i>
-                  <input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" />
-                </div>
-
+                <div class="arena-input-box"><i class="fa-solid fa-user"></i><input type="text" id="reg-name" class="arena-field" placeholder="Full Name" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-gamepad"></i><input type="text" id="reg-ign" class="arena-field" placeholder="Free Fire IGN (e.g. MULTANI・HAMZA★)" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-id-card"></i><input type="text" id="reg-uid" class="arena-field" placeholder="Free Fire UID (Permanent)" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-phone"></i><input type="text" id="reg-phone" class="arena-field" placeholder="WhatsApp Mobile # (03001234567)" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="reg-email" class="arena-field" placeholder="you@example.com" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-lock"></i><input type="password" id="reg-pass" class="arena-field" placeholder="Password (min 6 chars)" minlength="6" required /></div>
+                <div class="arena-input-box"><i class="fa-solid fa-users"></i><input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" /></div>
                 <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">REGISTER</button>
               </form>
             `}
 
             <div style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:16px;">
-              ${isLogin ? `
-                Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>
-              ` : `
-                Already have an account? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>
-              `}
+              ${isLogin ? `Don't have an account? <span onclick="Router.navigate('register')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Sign Up</span>` : `Already have an account? <span onclick="Router.navigate('login')" style="color:var(--primary); font-weight:bold; cursor:pointer;">Login</span>`}
             </div>
           </div>
         </div>
@@ -2959,15 +3011,9 @@
             if (existingProfiles && existingProfiles.length > 0) {
               Loader.hide();
               const match = existingProfiles[0];
-              if (match.free_fire_uid === uid) {
-                Toast.show("Error: This Free Fire UID is already registered!", "error");
-              } else if (match.email === email) {
-                Toast.show("Error: This Email address is already registered!", "error");
-              } else if (match.phone === phone) {
-                Toast.show("Error: This WhatsApp number is already registered!", "error");
-              } else {
-                Toast.show("Error: Duplicate credentials found!", "error");
-              }
+              if (match.free_fire_uid === uid) Toast.show("Error: UID already registered!", "error");
+              else if (match.email === email) Toast.show("Error: Email already registered!", "error");
+              else Toast.show("Error: Phone already registered!", "error");
               return;
             }
 
@@ -2975,28 +3021,19 @@
             if (refInput) {
               if (refInput === uid) {
                 Loader.hide();
-                Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
+                Toast.show("Khud ki UID referral code mein use nahi kar sakte!", "error");
                 return;
               }
               const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', refInput).maybeSingle();
-              if (!refCheck) {
-                Loader.hide();
-                Toast.show("Yeh referral code available nahi hai!", "error");
-                return;
-              }
-              validReferrerUid = refCheck.free_fire_uid;
+              if (refCheck) validReferrerUid = refCheck.free_fire_uid;
             }
 
             Loader.show("Registering account...");
             const { data, error } = await sbClient.auth.signUp({ email, password });
-            if (error) {
-              Loader.hide();
-              Toast.show(error.message, "error");
-              return;
-            }
+            if (error) throw error;
 
             if (data.user) {
-              const { error: profileError } = await sbClient.from('profiles').upsert([{
+              await sbClient.from('profiles').upsert([{
                 id: data.user.id,
                 email,
                 full_name: name,
@@ -3010,16 +3047,14 @@
                 is_admin: false
               }]);
 
-              if (profileError) throw profileError;
-
               Loader.hide();
-              Toast.show("Account registered and logged in successfully!", "success");
+              Toast.show("Account registered successfully!", "success");
               await syncAuthAndProfile();
               Router.navigate('home');
             }
           } catch (err) {
             Loader.hide();
-            Toast.show(err.message || "Registration validation failed.", "error");
+            Toast.show(err.message || "Registration failed.", "error");
           }
         };
       }
@@ -3047,24 +3082,11 @@
 
           <form id="forgot-verify-form" class="hidden">
             <div class="player-hero-card" style="margin-bottom:14px; padding:14px;">
-              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent successfully to your Gmail! Enter OTP and your new password below.</p>
-              
-              <div class="form-group">
-                <label class="form-label">Enter OTP Code</label>
-                <input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP code" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 characters" minlength="8" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter new password" minlength="8" required />
-              </div>
-
-              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">COMPLETE THE CREATE / SUBMIT</button>
+              <p style="font-size:12px; color:var(--success); margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> OTP sent to Gmail!</p>
+              <div class="form-group"><label class="form-label">OTP Code</label><input type="text" id="fg-otp" class="form-input" placeholder="Enter 6-digit OTP" required /></div>
+              <div class="form-group"><label class="form-label">New Password</label><input type="password" id="fg-newpass" class="form-input" placeholder="At least 8 chars" minlength="8" required /></div>
+              <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="fg-confpass" class="form-input" placeholder="Re-enter password" minlength="8" required /></div>
+              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #00e676, #00b0ff); color:#000;">UPDATE PASSWORD</button>
             </div>
           </form>
         </div>
@@ -3073,22 +3095,18 @@
       document.getElementById('forgot-email-form').onsubmit = async (e) => {
         e.preventDefault();
         const email = document.getElementById('fg-email').value.trim();
-        if (!email) { Toast.show("Please enter your Gmail address.", "error"); return; }
-        Loader.show("Sending secure OTP to Gmail...");
-
+        Loader.show("Sending OTP...");
         try {
           const { data, error } = await sbClient.functions.invoke("send-reset-otp", { body: { email: email } });
           Loader.hide();
-          if (error) throw new Error(error.message || "Failed to send OTP.");
-          if (!data || data.success !== true) throw new Error(data?.message || data?.error || "Failed to send OTP.");
-
+          if (error || !data || data.success !== true) throw new Error(data?.message || "Failed to send OTP.");
           window.resetEmailTarget = email;
-          Toast.show("6-digit OTP sent to your Gmail!", "success");
+          Toast.show("OTP sent to your Gmail!", "success");
           document.getElementById('forgot-email-form').classList.add('hidden');
           document.getElementById('forgot-verify-form').classList.remove('hidden');
         } catch (err) {
           Loader.hide();
-          Toast.show(err.message || "Unable to send OTP. Please try again.", "error");
+          Toast.show(err.message || "Failed to send OTP.", "error");
         }
       };
 
@@ -3098,24 +3116,17 @@
         const newPassword = document.getElementById('fg-newpass').value;
         const confPassword = document.getElementById('fg-confpass').value;
 
-        if (!/^\d{6}$/.test(token)) { Toast.show("Please enter the 6-digit OTP.", "error"); return; }
-        if (newPassword.length < 8) { Toast.show("Password must be at least 8 characters.", "error"); return; }
-        if (newPassword !== confPassword) { Toast.show("New password and confirm password do not match!", "error"); return; }
-        if (!window.resetEmailTarget) { Toast.show("Please request a new OTP first.", "error"); return; }
-
-        Loader.show("Verifying OTP & Updating password...");
+        if (newPassword !== confPassword) { Toast.show("Passwords do not match!", "error"); return; }
+        Loader.show("Updating password...");
         try {
           const { data, error } = await sbClient.functions.invoke("verify-reset-otp", { body: { email: window.resetEmailTarget, otp: token, new_password: newPassword } });
           Loader.hide();
-          if (error) throw new Error(error.message || "OTP verification failed.");
-          if (!data || data.success !== true) throw new Error(data?.message || "Invalid or expired OTP.");
-
-          Toast.show("Password changed successfully! Please login.", "success");
-          window.resetEmailTarget = null;
+          if (error || !data || data.success !== true) throw new Error(data?.message || "Invalid OTP.");
+          Toast.show("Password changed! Please login.", "success");
           Router.navigate("login");
         } catch (err) {
           Loader.hide();
-          Toast.show(err.message || "Invalid OTP or failed to update password.", "error");
+          Toast.show(err.message || "Invalid OTP.", "error");
         }
       };
     }
@@ -3128,19 +3139,10 @@
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <div style="background:linear-gradient(135deg, rgba(255,190,0,0.12), rgba(0,240,255,0.08)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; box-shadow:0 4px 20px rgba(255,190,0,0.15);">
-            <div style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); text-transform:uppercase; margin-bottom:4px;">
-              <i class="fa-solid fa-shield-halved"></i> VIP Security & Protocol Active
-            </div>
-            <p style="font-size:11px; color:#fff; line-height:1.4;">
-              Aapka account Multani FF VIP Protocol ke tehatfully secure hai. Kisi bhi fraudulent activity ya fake deposit par account permanent ban ho sakta hai.
-            </p>
-          </div>
-
           <div class="player-hero-card" style="text-align:center; position:relative;">
             <div style="position:relative; width:84px; height:84px; margin:0 auto 12px auto;">
-              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover; box-shadow:0 0 15px var(--primary-glow);" />
-              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.6); border:2px solid #0e1118;">
+              <img id="profile-display-avatar" src="${avatarSrc}" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--primary); object-fit:cover;" />
+              <label for="avatar-file-input" style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
                 <i class="fa-solid fa-camera" style="font-size:12px;"></i>
               </label>
               <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="uploadAvatarPhoto(this)" />
@@ -3150,45 +3152,21 @@
           </div>
 
           <div class="player-hero-card">
-            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold); text-transform:uppercase; margin-bottom:14px;">
               <i class="fa-solid fa-user-pen"></i> Edit Profile Details
             </h3>
 
             <form id="edit-profile-form">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" placeholder="Enter full name" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire In-Game Name (IGN)</label>
-                <input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" placeholder="e.g. MULTANI・HAMZA★" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Free Fire UID (Editable)</label>
-                <input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" placeholder="Enter Free Fire UID" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">WhatsApp Mobile #</label>
-                <input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" placeholder="e.g. 03001234567" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Email (Editable)</label>
-                <input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || currentUser.email)}" placeholder="yourname@gmail.com" required />
-              </div>
-
+              <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" required /></div>
+              <div class="form-group"><label class="form-label">Free Fire IGN</label><input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" required /></div>
+              <div class="form-group"><label class="form-label">Free Fire UID</label><input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" required /></div>
+              <div class="form-group"><label class="form-label">WhatsApp Mobile #</label><input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" required /></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || currentUser.email)}" required /></div>
               <div class="form-group">
                 <label class="form-label">Referral Code (UID)</label>
-                <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
-                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (3 coins reward)</span>'}
+                <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID"'} />
               </div>
-
-              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
-                <i class="fa-solid fa-check"></i> SAVE CHANGES
-              </button>
+              <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;"><i class="fa-solid fa-check"></i> SAVE CHANGES</button>
             </form>
           </div>
         </div>
@@ -3205,20 +3183,17 @@
       try {
         const fileExt = file.name.split('.').pop();
         const filePath = `avatars/${currentUser.id}_${Date.now()}.${fileExt}`;
-
         const { error: uploadError } = await sbClient.storage.from('deposit-screenshots').upload(filePath, file, { upsert: true });
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = sbClient.storage.from('deposit-screenshots').getPublicUrl(filePath);
-
-        const { error: updateError } = await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-        if (updateError) throw updateError;
+        await sbClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
 
         document.getElementById('profile-display-avatar').src = publicUrl;
-        Toast.show("Profile photo updated successfully!", "success");
+        Toast.show("Photo updated!", "success");
         await syncAuthAndProfile();
       } catch (err) {
-        Toast.show(err.message || "Failed to upload photo.", "error");
+        Toast.show("Failed to upload photo.", "error");
       } finally {
         Loader.hide();
       }
@@ -3235,48 +3210,13 @@
       const phone = document.getElementById('prof-phone').value.trim();
       const refInputEl = document.getElementById('prof-ref');
       const newRef = refInputEl ? refInputEl.value.trim() : '';
-      const btn = document.getElementById('btn-save-profile');
 
-      if (btn) btn.disabled = true;
-      Loader.show("Validating and saving profile...");
-
+      Loader.show("Saving profile...");
       try {
-        const { data: dupCheck } = await sbClient
-          .from('profiles')
-          .select('id, free_fire_uid, email')
-          .or(`free_fire_uid.eq.${newUid},email.eq.${newEmail}`);
-
-        if (dupCheck && dupCheck.length > 0) {
-          const conflict = dupCheck.find(x => x.id !== currentUser.id);
-          if (conflict) {
-            Loader.hide();
-            if (conflict.free_fire_uid === newUid) {
-              Toast.show("Error: This Free Fire UID is already used by another account!", "error");
-            } else {
-              Toast.show("Error: This Email is already used by another account!", "error");
-            }
-            if (btn) btn.disabled = false;
-            return;
-          }
-        }
-
         let verifiedReferredBy = currentProfile?.referred_by || null;
-
         if (!currentProfile?.referred_by && newRef) {
-          if (newRef === newUid) {
-            Loader.hide();
-            Toast.show("Aap apni khud ki UID referral code mein use nahi kar sakte!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
           const { data: refCheck } = await sbClient.from('profiles').select('id, free_fire_uid').eq('free_fire_uid', newRef).maybeSingle();
-          if (!refCheck) {
-            Loader.hide();
-            Toast.show("Yeh referral code available nahi hai!", "error");
-            if (btn) btn.disabled = false;
-            return;
-          }
-          verifiedReferredBy = refCheck.free_fire_uid;
+          if (refCheck) verifiedReferredBy = refCheck.free_fire_uid;
         }
 
         const { error } = await sbClient.from('profiles').upsert([{
@@ -3296,16 +3236,14 @@
         await syncAuthAndProfile();
         renderProfile();
       } catch (err) {
-        Toast.show(err.message || "Failed to update profile.", "error");
+        Toast.show("Failed to update profile.", "error");
       } finally {
-        if (btn) btn.disabled = false;
         Loader.hide();
       }
     }
 
     async function renderNotifications() {
       if (!currentUser) { Router.navigate('login'); return; }
-      
       let data = [];
       try {
         const [notifRes] = await Promise.all([
@@ -3347,20 +3285,11 @@
             <h3 style="color:var(--accent-gold); font-family:var(--font-gaming); margin-bottom:10px; font-size:18px; text-transform:uppercase;">
               <i class="fa-solid fa-book-skull"></i> Multani FF Complete Rules (A to Z)
             </h3>
-            <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;">
-              Yeh app ke tamam a se lekar z tak rules hain. Tamam players ko in rules ki pabandi karni hogi:
-            </p>
-
             <div style="font-size:12px; color:#fff; line-height:1.7; display:flex; flex-direction:column; gap:8px;">
-              <div><strong>A - Account Security:</strong> Apna account password aur details kisi ke sath share mat karein. Account sharing par permanent ban ho sakta hai.</div>
-              <div><strong>B - Bug & Glitch Abuse:</strong> Game ya app ke kisi bhi bug ya glitch ka unauthorized faida uthana sakht mana hai.</div>
-              <div><strong>C - Cashout & Payouts:</strong> Withdrawals 24 hours ke andar process hote hain. Details bilkul drust honi chahiye.</div>
-              <div><strong>D - Deposit Verification:</strong> Fake deposit slip ya ghalat transaction ID submit karne par account block kar diya jayega.</div>
-              <div><strong>F - Fair Play:</strong> Har match mein fair play mandatory hai. Teaming ya unfair means allowed nahi hain.</div>
-              <div><strong>H - Hacks & Cheats:</strong> 🚫 No Hack! Kisi bhi kisam ka script, injector, ya hack use karne par zero tolerance hai aur instant permanent ban milega.</div>
-              <div><strong>N - No Show Policy:</strong> Match join karne ke baad agar player time par room mein nahi aaya, toh entry fee refund nahi hogi (No Show = No Refund).</div>
-              <div><strong>R - Room ID Password:</strong> Room details sirf registered players ke liye hain. Bahar share karne par disqualification ho sakti hai.</div>
-              <div><strong>V - Verification:</strong> Winners ki prizes distribute karne se pehle admin team ki taraf se complete verification ki jati hai.</div>
+              <div><strong>A - Account Security:</strong> Details kisi ke sath share na karein.</div>
+              <div><strong>C - Cashout:</strong> Withdrawals 24 hours mein process hote hain.</div>
+              <div><strong>F - Fair Play:</strong> Teaming ya unfair means allowed nahi hain.</div>
+              <div><strong>H - Hacks & Cheats:</strong> Hacks use karne par permanent ban milega.</div>
             </div>
           </div>
         </div>
@@ -3405,12 +3334,9 @@
         }
         document.getElementById('chat-modal-overlay').classList.remove('hidden');
         this.isOpen = true;
-        
         await sbClient.from('support_messages').update({ is_read: true }).eq('user_id', currentUser.id).eq('sender_role', 'admin').eq('is_read', false);
-
         await this.loadMessages();
         await syncAuthAndProfile();
-
         this.interval = setInterval(() => this.loadMessages(), 3500);
       },
       close() {
@@ -3422,32 +3348,18 @@
       async loadMessages() {
         if (!currentUser) return;
         const { data } = await sbClient.from('support_messages').select('*').or(`sender_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at', { ascending: true });
-
         const container = document.getElementById('chat-modal-messages');
         if (!data || data.length === 0) {
-          container.innerHTML = `
-            <div class="chat-row theirs">
-              <div class="chat-bubble theirs">
-                Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-              </div>
-              <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
-            </div>
-          `;
+          container.innerHTML = `<div class="chat-row theirs"><div class="chat-bubble theirs">Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID ya kisi bhi problem k liye yahan message karein.</div></div>`;
           return;
         }
-
         container.innerHTML = data.map(m => {
           const isMe = (m.sender_role === 'player') || (m.sender_id === currentUser.id && m.sender_role !== 'admin');
           const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
           return `
             <div class="chat-row ${isMe ? 'mine' : 'theirs'}">
-              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">
-                ${escapeHTML(m.message)}
-              </div>
-              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'}; color:${isMe ? '#ff8a73' : '#6b7280'}; padding:0 4px;">
-                ${isMe ? 'You' : 'Admin Support'} • ${time}
-              </div>
+              <div class="chat-bubble ${isMe ? 'mine' : 'theirs'}">${escapeHTML(m.message)}</div>
+              <div class="chat-time-tag" style="text-align:${isMe ? 'right' : 'left'};">${isMe ? 'You' : 'Admin'} • ${time}</div>
             </div>
           `;
         }).join('');
@@ -3461,7 +3373,6 @@
       const text = input.value.trim();
       if (!text || !currentUser) return;
       input.value = "";
-
       const { error } = await sbClient.from('support_messages').insert([{
         user_id: currentUser.id,
         sender_id: currentUser.id,
@@ -3469,9 +3380,7 @@
         message: text,
         is_read: false
       }]);
-
-      if (error) Toast.show(error.message, "error");
-      else ChatModal.loadMessages();
+      if (!error) ChatModal.loadMessages();
     };
 
     function setupPullToRefresh() {
@@ -3493,7 +3402,6 @@
         if (!pulling) return;
         const currentY = e.touches[0].clientY;
         const diff = currentY - startY;
-
         if (diff > 70) {
           indicator.style.display = 'block';
         }
@@ -3506,9 +3414,9 @@
         if (endY - startY > 90) {
           indicator.innerText = "🔄 Refreshing data...";
           await hardRefreshApp();
-        } else {
-          indicator.style.display = 'none';
         }
+        indicator.style.display = 'none';
+        indicator.innerText = "🔄 Pull down to refresh...";
       });
     }
 
@@ -3517,10 +3425,13 @@
       await syncAuthAndProfile();
       const currentPage = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
       await Router.navigate(currentPage, null, false);
+      const indicator = document.getElementById('pull-refresh-indicator');
+      if (indicator) {
+        indicator.style.display = 'none';
+        indicator.innerText = "🔄 Pull down to refresh...";
+      }
       Loader.hide();
       Toast.show("App refreshed successfully!", "success");
-      const indicator = document.getElementById('pull-refresh-indicator');
-      if (indicator) indicator.style.display = 'none';
     }
 
     function setupDraggableBot() {
@@ -3536,7 +3447,6 @@
         const touch = e.touches ? e.touches[0] : e;
         startX = touch.clientX;
         startY = touch.clientY;
-
         const rect = widget.getBoundingClientRect();
         origX = rect.left;
         origY = rect.top;
@@ -3574,10 +3484,8 @@
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
-      mainBtn.addEventListener('click', (e) => {
-        if (!hasMoved) {
-          toggleSupportMenu();
-        }
+      mainBtn.addEventListener('click', () => {
+        if (!hasMoved) toggleSupportMenu();
       });
     }
 
