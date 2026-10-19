@@ -367,22 +367,26 @@
 
         <div id="daily-missions-cards-wrap" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
 
-        <div class="rules-dropdown-container" style="margin-bottom:8px; border-color:#ffbe0055;">
-          <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)" style="background:#151922;">
+        <!-- ACCORDION RULES & INSTRUCTIONS -->
+        <div id="missions-rules-container" class="rules-dropdown-container" style="margin-bottom:12px; border-color:#ffbe0088; background:#121620;">
+          <div class="rules-dropdown-header" onclick="toggleMissionsRulesDropdown()" style="background:#181e2b; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; cursor:pointer;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:16px;">🎁</span>
-              <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">انعام کلیم کرنے کا طریقہ اور قوانین (Rules)</span>
+              <span style="font-size:18px;">🎁</span>
+              <span style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); letter-spacing:0.5px;">انعام کلیم کرنے کا طریقہ اور مکمل قوانین (Rules)</span>
             </div>
-            <span class="rules-arrow">&#9660;</span>
+            <span id="missions-rules-arrow" style="color:var(--accent-gold); font-size:13px; transition:transform 0.3s ease;">&#9660;</span>
           </div>
-          <div class="rules-dropdown-content" style="text-align:right; direction:rtl; font-size:13px; line-height:1.8; color:#e0e6ed;">
-            <div style="color:var(--accent-gold); font-weight:bold; margin-bottom:6px;">🎯 ڈیلی مشنز اور انعامات کی معلومات:</div>
-            <p>• <strong>ہر مشن کے ساتھ الگ CLAIM بٹن ہے:</strong> مشن کی حقیقی شرط مکمل ہوتے ہی بٹن ایکٹو ہو جائے گا۔</p>
-            <p>• <strong>10 الگ الگ گیمز:</strong> 10 مختلف گیمز کو کم سے کم 30 سیکنڈز تک کھیلنا ضروری ہے (ایک ہی گیم کو بار بار کلک کرنا شمار نہیں ہوگا)۔</p>
-            <p>• <strong>1 گھنٹہ گیم پلے:</strong> پورا 1 گھنٹہ (60 منٹ) سکرین پر ایکٹو کھیلنے پر ہی 5 کوائنز کلیم ہوں گے۔</p>
-            <p>• <strong>کوائنز کھلاڑی کے والیٹ میں جمع ہوں گے:</strong> کلیم کرتے ہی کوائنز فوری آپ کے اکاؤنٹ بیلنس میں ٹرانسفر ہو جائیں گے۔</p>
-            <p>• <strong>اضافی بونس:</strong> 4 مشنز مکمل کلیم کرنے پر 2 اضافی کوائنز والا بونس خود بخود کھل جائے گا۔</p>
-            <p>• <strong>مشنز ری سیٹ:</strong> تمام ڈیلی مشنز روزانہ رات 12:00 بجے (پاکستان ٹائم) ری سیٹ ہو جاتے ہیں۔</p>
+
+          <div id="missions-rules-content" style="display:none; text-align:right; direction:rtl; padding:14px; font-size:13px; line-height:2; color:#e0e6ed; border-top:1px solid #262f40;">
+            <div style="color:var(--accent-gold); font-weight:bold; font-size:14px; margin-bottom:8px;">🎯 ڈیلی مشنز اور انعامات کی تمام شرائط و ضوابط:</div>
+            <p>1. <strong>روزانہ لاگ اِن (1 کوائن):</strong> ایپ میں لاگ اِن ہوتے ہی یہ مشن مکمل ہو جائے گا اور کھلاڑی 1 کوائن کلیم کر سکے گا۔</p>
+            <p>2. <strong>10 الگ الگ گیمز (1 کوائن):</strong> کھلاڑی کو لسٹ میں موجود 10 مختلف گیمز کھیلنی ہوں گی۔ ایک ہی گیم کو بار بار کھولنے یا ریفریش کرنے سے مشن شمار نہیں ہوگا، اور ہر گیم کو کم از کم 30 سیکنڈز تک ایکٹو کھیلنا لازمی ہے۔</p>
+            <p>3. <strong>1 گھنٹہ گیمز کھیلنا (5 کوائنز):</strong> پورا 1 گھنٹہ (60 منٹ یعنی 3600 سیکنڈز) گیمز کھیلنا لازمی ہے۔ اگر آپ سکرین بند کریں گے یا ایپ سے باہر جائیں گے تو ٹائمر خودبخود رک جائے گا۔</p>
+            <p>4. <strong>ایک ٹورنامنٹ کھیلنا (1 کوائن):</strong> کھلاڑی کو <u>آج کی تاریخ میں</u> کم از کم ایک نیا ٹورنامنٹ یا کسٹم روم میچ جوائن کرنا ہوگا۔ پرانے جوائن شدہ میچز پر اگلے دن کوائن نہیں ملے گا۔</p>
+            <p>5. <strong>اضافی بونس (2 کوائنز):</strong> جب اوپر دیے گئے چاروں مشنز مکمل کلیم ہو جائیں گے تو 2 اضافی کوائنز کا بونس بٹن فوری ان لاک ہو جائے گا۔</p>
+            <p>6. <strong>فوری والیٹ ٹرانسفر:</strong> کلیم بٹن دباتے ہی کوائنز خودبخود آپ کے مین والیٹ بیلنس میں جمع ہو جائیں گے جنہیں آپ ڈائمنڈز یا ٹورنامنٹ انٹری کے لیے استعمال کر سکتے ہیں۔</p>
+            <p>7. <strong>روزانہ ری سیٹ:</strong> تمام ڈیلی مشنز روزانہ رات 12:00 بجے (پاکستان ٹائم) ری سیٹ ہو جائیں گے اور اگلے دن کھلاڑی کو دوبارہ مشنز مکمل کرنے ہوں گے۔</p>
+            <p>8. <strong>سخت فیئر پلے پالیسی:</strong> کسی بھی قسم کی چیٹنگ، ہیک یا آٹو کلکر کا استعمال کرنے پر اکاؤنٹ مستقل بلاک کر دیا جائے گا۔</p>
           </div>
         </div>
       </div>
@@ -432,7 +436,6 @@
       </div>
 
       <nav class="drawer-nav">
-        <!-- CHAT ROOM KE UPER GAMES KA BUTTON -->
         <button onclick="Router.navigate('games')" class="drawer-link text-gold" style="font-weight:700;"><i class="fa-solid fa-gamepad" style="color:var(--accent-gold);"></i> Mini Games</button>
         <a href="chat.html" class="drawer-link text-gold" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
         <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
@@ -663,7 +666,27 @@
       return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" })).toDateString();
     }
 
-    function loadUserMissionState() {
+    // CHECK IF TOURNAMENT WAS JOINED TODAY ONLY (No free coins for yesterday's matches)
+    async function checkTodayTournamentJoined() {
+      if (!currentUser) return false;
+      try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const { data, error } = await sbClient
+          .from('tournament_entries')
+          .select('created_at')
+          .eq('user_id', currentUser.id)
+          .gte('created_at', `${todayStr}T00:00:00Z`);
+
+        if (!error && data && data.length > 0) {
+          return true;
+        }
+      } catch (err) {
+        console.error("Tournament check error:", err);
+      }
+      return false;
+    }
+
+    async function loadUserMissionState() {
       const todayKey = getTodayKey();
       const storageKey = `ff_missions_verified_${currentUser ? currentUser.id : 'guest'}`;
       const localData = localStorage.getItem(storageKey);
@@ -687,9 +710,11 @@
       }
 
       userMissionState.login = true;
-      if (userJoinedTournamentIds && userJoinedTournamentIds.size > 0) {
-        userMissionState.joinedTournament = true;
-      }
+      
+      // REAL TODAY MATCH CHECK
+      const hasTodayMatch = await checkTodayTournamentJoined();
+      userMissionState.joinedTournament = hasTodayMatch;
+
       saveUserMissionState();
     }
 
@@ -715,14 +740,30 @@
       localStorage.setItem(storageKey, JSON.stringify(userMissionState));
     }
 
-    function openDailyMissionsModal() {
-      loadUserMissionState();
+    async function openDailyMissionsModal() {
+      Loader.show("Checking missions...");
+      await loadUserMissionState();
+      Loader.hide();
       renderMissionsUI();
       document.getElementById('daily-missions-modal-overlay').classList.remove('hidden');
     }
 
     function closeDailyMissionsModal() {
       document.getElementById('daily-missions-modal-overlay').classList.add('hidden');
+    }
+
+    function toggleMissionsRulesDropdown() {
+      const content = document.getElementById('missions-rules-content');
+      const arrow = document.getElementById('missions-rules-arrow');
+      if (content && arrow) {
+        if (content.style.display === 'none' || content.style.display === '') {
+          content.style.display = 'block';
+          arrow.style.transform = 'rotate(180deg)';
+        } else {
+          content.style.display = 'none';
+          arrow.style.transform = 'rotate(0deg)';
+        }
+      }
     }
 
     function renderMissionsUI() {
@@ -847,7 +888,6 @@
         });
 
         if (error) {
-          // Direct fallback agar custom rpc setup na ho
           const currentBal = Number(currentProfile?.wallet_balance || 0);
           const newBal = currentBal + Number(coinAmount);
           const [pErr, tErr] = await Promise.all([
@@ -875,262 +915,12 @@
       }
     }
 
-    const Toast = {
-      show(msg, type = 'info') {
-        const c = document.getElementById('toast-container');
-        if (!c) return;
-        const t = document.createElement('div');
-        t.className = `toast-msg toast-${type}`;
-        t.innerText = msg;
-        c.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-      }
-    };
-
-    const Loader = {
-      show(text = "Loading...") {
-        const el = document.getElementById('global-loader');
-        const txt = document.getElementById('global-loader-text');
-        if (txt) txt.innerText = text;
-        if (el) el.classList.remove('hidden');
-        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
-        window._loaderTimeout = setTimeout(() => {
-          this.hide();
-        }, 5000);
-      },
-      hide() {
-        if (window._loaderTimeout) clearTimeout(window._loaderTimeout);
-        const el = document.getElementById('global-loader');
-        if (el) el.classList.add('hidden');
-      }
-    };
-
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    function closeCommunityPopup() {
-      const p = document.getElementById('community-popup-overlay');
-      if (p) p.classList.add('hidden');
-    }
-
-    function startAnnouncementTicker() {
-      setTimeout(() => {
-        const content = document.querySelector('.ticker-content');
-        if (content) {
-          const textLength = content.innerText.length;
-          const duration = Math.max(15, textLength * 0.18);
-          content.style.animationDuration = duration + 's';
-          content.classList.add('active');
-        }
-      }, 3000);
-    }
-
-    let autoScrollInterval = null;
-    function setupTutorialsAutoScroll() {
-      if (autoScrollInterval) clearInterval(autoScrollInterval);
-      const container = document.getElementById('tutorials-scroll-box');
-      if (!container) return;
-
-      autoScrollInterval = setInterval(() => {
-        if (!document.body.contains(container)) {
-          clearInterval(autoScrollInterval);
-          return;
-        }
-        const cardWidth = container.querySelector('.screenshot-card')?.offsetWidth || 320;
-        const maxScrollLeft = container.scrollWidth - container.clientWidth;
-        
-        if (container.scrollLeft >= maxScrollLeft - 10) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          container.scrollBy({ left: cardWidth + 12, behavior: 'smooth' });
-        }
-      }, 4500);
-    }
-
-    function openShareModal() {
-      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: *${myUid}* when registering!`;
-
-      document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_LINK)}`;
-      document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_LINK)}&text=${encodeURIComponent(shareText)}`;
-
-      document.getElementById('share-modal-overlay').classList.remove('hidden');
-    }
-
-    function closeShareModal() {
-      document.getElementById('share-modal-overlay').classList.add('hidden');
-    }
-
-    function copyShareText() {
-      const myUid = currentProfile?.free_fire_uid || currentUser?.id?.slice(0, 8) || '5775457654';
-      const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_LINK}\n\nUse my Referral UID: ${myUid} when registering!`;
-      navigator.clipboard.writeText(shareText);
-      Toast.show("App link & referral code copied!", "success");
-      closeShareModal();
-    }
-
-    async function syncAuthAndProfile() {
-      try {
-        const { data: { user } } = await sbClient.auth.getUser();
-        currentUser = user;
-        if (user) {
-          const [profRes, entryRes, notifRes, chatRes] = await Promise.all([
-            sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-            sbClient.from('tournament_entries').select('tournament_id').eq('user_id', user.id),
-            sbClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-            sbClient.from('support_messages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('sender_role', 'admin').eq('is_read', false)
-          ]);
-          currentProfile = profRes.data;
-          userJoinedTournamentIds = new Set((entryRes.data || []).map(e => e.tournament_id));
-          unreadNotifCount = notifRes.count || 0;
-          unreadChatCount = chatRes.count || 0;
-        } else {
-          currentProfile = null;
-          userJoinedTournamentIds.clear();
-          unreadNotifCount = 0;
-          unreadChatCount = 0;
-        }
-        updateDrawerUI();
-        updateNotificationBadges();
-      } catch (e) {
-        console.error("Auth sync error:", e);
-      }
-    }
-
-    function updateNotificationBadges() {
-      const bellBadge = document.getElementById('header-notif-badge');
-      const drawerBadge = document.getElementById('drawer-notif-badge');
-      const floatChatBadge = document.getElementById('float-chat-badge');
-
-      if (bellBadge) bellBadge.classList.toggle('hidden', unreadNotifCount === 0);
-      if (drawerBadge) {
-        drawerBadge.classList.toggle('hidden', unreadNotifCount === 0);
-        drawerBadge.innerText = unreadNotifCount > 0 ? unreadNotifCount : '';
-      }
-      if (floatChatBadge) {
-        floatChatBadge.classList.toggle('hidden', unreadChatCount === 0);
-        floatChatBadge.innerText = unreadChatCount;
-      }
-    }
-
-    function updateDrawerUI() {
-      const dName = document.getElementById('drawer-name');
-      const dUid = document.getElementById('drawer-uid');
-      const hAvatar = document.getElementById('header-avatar-img');
-      const dAvatar = document.getElementById('drawer-avatar');
-      const avatarUrl = currentProfile?.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
-
-      if (hAvatar) hAvatar.src = avatarUrl;
-      if (dAvatar) dAvatar.src = avatarUrl;
-
-      if (currentUser && currentProfile) {
-        if (dName) dName.innerText = currentProfile.free_fire_name || currentProfile.full_name || 'Soldier';
-        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-gamepad"></i> UID: ${currentProfile.free_fire_uid || '--'}`;
-      } else {
-        if (dName) dName.innerText = 'Guest Gamer';
-        if (dUid) dUid.innerHTML = `<i class="fa-solid fa-user"></i> Login / Register`;
-      }
-    }
-
-    const Router = {
-      history: [],
-      async navigate(page, id = null, pushHistory = true) {
-        Drawer.close();
-        Loader.show("Loading...");
-        await syncAuthAndProfile();
-
-        if (!currentUser && page !== 'login' && page !== 'register') {
-          page = 'login';
-        }
-
-        if (pushHistory && (this.history.length === 0 || this.history[this.history.length - 1] !== page)) {
-          this.history.push(page);
-          history.pushState({ page, id }, '', '#' + page);
-        }
-
-        const isAuthView = (page === 'login' || page === 'register');
-        const masterHeader = document.getElementById('master-header-bar');
-        const subHeader = document.getElementById('sub-header-bar');
-        const bottomNav = document.getElementById('bottom-nav');
-
-        if (isAuthView) {
-          if (masterHeader) masterHeader.classList.add('hidden');
-          if (subHeader) subHeader.classList.add('hidden');
-          if (bottomNav) bottomNav.classList.add('hidden');
-        } else {
-          const isSub = (page !== 'home');
-          if (isSub) {
-            if (masterHeader) masterHeader.classList.add('hidden');
-            if (subHeader) subHeader.classList.remove('hidden');
-            const subTitle = document.getElementById('sub-header-title');
-            if (subTitle) subTitle.innerText = page.toUpperCase().replace('_', ' ');
-          } else {
-            if (masterHeader) masterHeader.classList.remove('hidden');
-            if (subHeader) subHeader.classList.add('hidden');
-          }
-          if (bottomNav) bottomNav.classList.remove('hidden');
-        }
-
-        document.querySelectorAll('.nav-item').forEach(el => {
-          el.classList.toggle('active', el.getAttribute('data-page') === page);
-        });
-
-        if (page === 'home') await renderHome();
-        else if (page === 'games') renderGamesList();
-        else if (page === 'spin') await renderDailySpin();
-        else if (page === 'tournaments') await renderTournaments();
-        else if (page === 'tournament_detail') await renderTournamentDetail(id);
-        else if (page === 'wallet') await renderWallet();
-        else if (page === 'withdrawal') await renderWithdrawal();
-        else if (page === 'deposit') renderDeposit();
-        else if (page === 'diamonds') await renderDiamondsShop();
-        else if (page === 'diamond_history') await renderDiamondHistoryPage('my');
-        else if (page === 'diamond_public_deliveries') await renderDiamondHistoryPage('public');
-        else if (page === 'invite') await renderInvite();
-        else if (page === 'login' || page === 'register') renderAuth(page);
-        else if (page === 'profile') renderProfile();
-        else if (page === 'winners') await renderWinners();
-        else if (page === 'leaderboard') await renderLeaderboard();
-        else if (page === 'notifications') await renderNotifications();
-        else if (page === 'rules') renderRules();
-        else if (page === 'about') renderAbout();
-
-        Loader.hide();
-      },
-      async back() {
-        if (this.history.length > 1) {
-          this.history.pop();
-          const prev = this.history[this.history.length - 1];
-          await this.navigate(prev, null, false);
-        } else {
-          const defaultPage = currentUser ? 'home' : 'login';
-          await this.navigate(defaultPage, null, false);
-        }
-      }
-    };
-
-    window.addEventListener('popstate', (e) => {
-      if (Router.history.length > 1) {
-        Router.history.pop();
-        const prev = Router.history[Router.history.length - 1] || (currentUser ? 'home' : 'login');
-        Router.navigate(prev, null, false);
-      }
-    });
-
     // MINI GAMES LIST SCREEN (AIK TOP PR, AIK NECHE - 2-COLUMN GRID)
     function renderGamesList() {
       loadUserMissionState();
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
-          <!-- 1. TOP PAR SHINY DAILY MISSIONS BUTTON -->
           <div style="margin-bottom:14px;">
             <button onclick="openDailyMissionsModal()" class="btn btn-primary" style="background:linear-gradient(135deg, #ff9800, #ff5722); color:#fff; font-size:15px; font-weight:800; border:1.5px solid #ffbe00; box-shadow:0 0 16px rgba(255,152,0,0.5); padding:12px; display:flex; justify-content:space-between; align-items:center;">
               <span style="display:flex; align-items:center; gap:8px;">
@@ -1146,7 +936,6 @@
           </div>
           <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Bina download kiye direct web par play karein!</p>
 
-          <!-- 2. AIK TOP PAR, AIK NECHE (2-COLUMN GRID) -->
           <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
             ${AVAILABLE_GAMES.map(g => `
               <div class="player-hero-card" style="margin-bottom:0; padding:12px; display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:space-between; gap:10px;">
@@ -1180,7 +969,6 @@
         currentGameSessionStart = Date.now();
         currentGamePlayingUrl = gameUrl;
 
-        // 1 Ghanta (3600 seconds) live track: Sirf tabhi count hoga jab game samne open ho
         if (activeGamePlayTimer) clearInterval(activeGamePlayTimer);
         activeGamePlayTimer = setInterval(() => {
           if (isWindowActive && document.visibilityState === 'visible') {
@@ -1206,7 +994,6 @@
         activeGamePlayTimer = null;
       }
 
-      // Real gameplay check: Kam se kam 30 seconds kheli ho aur alag nayi game ho
       if (currentGameSessionStart && currentGamePlayingUrl) {
         const sessionDurationSeconds = (Date.now() - currentGameSessionStart) / 1000;
         
@@ -1947,7 +1734,7 @@
           if (refUsers.length > 0) {
             totalRegisters = refUsers.length;
             validReferrals = refUsers.filter(u => u.ref_claimed).length;
-            totalIncome = validReferrals * 3; // 3 COINS PER REFERRAL
+            totalIncome = validReferrals * 3; // UPDATED 3 COINS PER REFERRAL
             
             invitedListHTML = refUsers.map(u => {
               const isClaimed = u.ref_claimed;
@@ -2076,7 +1863,6 @@
       try {
         const { error } = await sbClient.rpc('claim_referral_bonus', { p_referred_user_id: referredUserId });
         if (error) {
-          // Fallback direct transfer
           const newBal = (currentProfile?.wallet_balance || 0) + amount;
           await Promise.all([
             sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', currentUser.id),
@@ -3342,7 +3128,6 @@
 
       document.getElementById('app-view').innerHTML = `
         <div class="view-container">
-          <!-- VIP PROTOCOL & PROFILE CARD -->
           <div style="background:linear-gradient(135deg, rgba(255,190,0,0.12), rgba(0,240,255,0.08)); border:1.5px solid var(--accent-gold); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; box-shadow:0 4px 20px rgba(255,190,0,0.15);">
             <div style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); text-transform:uppercase; margin-bottom:4px;">
               <i class="fa-solid fa-shield-halved"></i> VIP Security & Protocol Active
