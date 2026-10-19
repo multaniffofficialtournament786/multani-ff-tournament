@@ -76,7 +76,7 @@ canvas { display: block; width: 100%; height: 100%; }
     <div class="logo">🎈 MULTANI BALLOON BLAST</div>
     <div class="stats">
       <span class="score">⭐ <span id="scoreVal">0</span></span>
-      <span class="lives">❤️ <span id="livesVal">3</span></span>
+      <span class="lives">💣 <span id="livesVal">❤️❤️❤️</span></span>
     </div>
   </div>
 
@@ -84,7 +84,7 @@ canvas { display: block; width: 100%; height: 100%; }
     <canvas id="canvas"></canvas>
     <div id="overlay">
       <h1 id="titleText">BALLOON BLAST</h1>
-      <p id="descText">Balloons aur Diamonds ko tap karke pop karo!<br>💣 <b>Bomb se bacho</b> warna game over!</p>
+      <p id="descText">Balloons aur Diamonds ko tap karke pop karo!<br>Balloons upar jaane par koi out nahi hoga.<br>💣 <b>3 Baar Bomb lagne par Game Over hoga!</b></p>
       <button class="btn" id="startBtn">▶ PLAY NOW</button>
     </div>
   </div>
@@ -136,14 +136,21 @@ canvas { display: block; width: 100%; height: 100%; }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(160, audioCtx.currentTime);
     osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.35);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
     gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + 0.35);
+  }
+
+  function updateLivesDisplay() {
+    if (lives === 3) livesVal.innerText = "❤️❤️❤️";
+    else if (lives === 2) livesVal.innerText = "❤️❤️🖤";
+    else if (lives === 1) livesVal.innerText = "❤️🖤🖤";
+    else livesVal.innerText = "🖤🖤🖤";
   }
 
   function resize() {
@@ -165,14 +172,14 @@ canvas { display: block; width: 100%; height: 100%; }
       this.radius = 28 + Math.random() * 12;
       this.x = Math.random() * (W - this.radius * 2) + this.radius;
       this.y = H + this.radius;
-      this.vy = -(3.5 + Math.random() * 3.5);
+      this.vy = -(3.2 + Math.random() * 3.2);
       this.vx = (Math.random() - 0.5) * 1.5;
       
       const rand = Math.random();
-      if (rand < 0.15) {
+      if (rand < 0.16) {
         this.type = 'bomb';
         this.color = '#1f242d';
-      } else if (rand < 0.3) {
+      } else if (rand < 0.32) {
         this.type = 'diamond';
         this.color = '#00f0ff';
       } else {
@@ -196,7 +203,7 @@ canvas { display: block; width: 100%; height: 100%; }
         ctx.lineWidth = 2.5;
         ctx.stroke();
         ctx.fillStyle = '#ffbe00';
-        ctx.font = 'bold 16px sans-serif';
+        ctx.font = 'bold 18px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('💣', 0, 0);
@@ -262,11 +269,13 @@ canvas { display: block; width: 100%; height: 100%; }
       if (dist < it.radius + 15) {
         if (it.type === 'bomb') {
           playBombSound();
-          createParticles(it.x, it.y, '#ff1744', 20);
+          createParticles(it.x, it.y, '#ff1744', 22);
           items.splice(i, 1);
           lives--;
-          livesVal.innerText = lives;
-          if (lives <= 0) gameOver();
+          updateLivesDisplay();
+          if (lives <= 0) {
+            gameOver();
+          }
         } else {
           playPopSound();
           createParticles(it.x, it.y, it.color, 15);
@@ -297,7 +306,7 @@ canvas { display: block; width: 100%; height: 100%; }
     particles = [];
     spawnInterval = 0;
     scoreVal.innerText = "0";
-    livesVal.innerText = "3";
+    updateLivesDisplay();
     running = true;
     overlay.classList.add("hidden");
     loop();
@@ -305,8 +314,8 @@ canvas { display: block; width: 100%; height: 100%; }
 
   function gameOver() {
     running = false;
-    titleText.innerText = "GAME OVER!";
-    descText.innerHTML = `Shandaar Khel!<br>Aapka Score: <b style="color:#00f0ff; font-size:20px;">${score}</b>`;
+    titleText.innerText = "💥 GAME OVER!";
+    descText.innerHTML = `Bomb 3 baar hit ho gaya!<br>Aapka Final Score: <b style="color:#00f0ff; font-size:22px;">${score}</b>`;
     startBtn.innerText = "↻ PLAY AGAIN";
     overlay.classList.remove("hidden");
   }
@@ -328,15 +337,8 @@ canvas { display: block; width: 100%; height: 100%; }
       it.update();
       it.draw();
 
+      // Upar nikalne par sirf screen se hatega, GAME OVER NAHI HOGA
       if (it.y < -it.radius * 2) {
-        if (it.type === 'balloon') {
-          lives--;
-          livesVal.innerText = lives;
-          if (lives <= 0) {
-            gameOver();
-            return;
-          }
-        }
         items.splice(i, 1);
       }
     }
