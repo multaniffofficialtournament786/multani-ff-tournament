@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI DIAMOND MATCH</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+body {
+  background: #06070a;
+  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+}
+#game-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #0b0f19;
+  background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(14, 17, 24, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid #ff542d44;
+  z-index: 10;
+}
+.title-tag { font-size: 16px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.stats-badge { font-weight: bold; font-size: 14px; color: #00f0ff; }
+.timer-badge { font-weight: bold; font-size: 14px; color: #ff1744; }
+.music-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #00f0ff;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#board-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.grid-board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 6px;
+  width: min(92vw, 420px);
+  height: min(92vw, 420px);
+  background: rgba(10, 14, 24, 0.82);
+  padding: 10px;
+  border-radius: 16px;
+  border: 2px solid #ffbe0055;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+
+.gem-cell {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(24px, 7vw, 34px);
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+}
+
+.gem-cell.selected {
+  background: rgba(0, 240, 255, 0.35);
+  transform: scale(1.12);
+  box-shadow: 0 0 14px #00f0ff;
+  border: 1.5px solid #00f0ff;
+}
+
+.gem-cell.blast {
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.22s ease-out, opacity 0.22s ease-out;
+}
+
+#game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 20;
+}
+#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
+#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+.play-btn {
+  padding: 13px 34px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  background: linear-gradient(135deg, #00f0ff, #00e676);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="game-wrap">
+  <div class="header-bar">
+    <div class="title-tag">💎 DIAMOND MATCH</div>
+    <div class="header-actions">
+      <button class="music-toggle" id="musicBtn">🎵 MUSIC ON</button>
+      <div class="stats-badge">⭐ <span id="scoreText">0</span></div>
+      <div class="timer-badge">⏳ <span id="timerText">60</span>s</div>
+    </div>
+  </div>
+
+  <div id="board-container">
+    <div class="grid-board" id="board"></div>
+  </div>
+
+  <div id="game-overlay">
+    <h1 id="screenTitle">DIAMOND MATCH</h1>
+    <p id="screenDesc">
+      Candy Match style game!<br>
+      💎 Ek jaise 3 ya zyada Diamonds match karein.<br>
+      ⚡ 60 Seconds mein zyada se zyada score banayein!
+    </p>
+    <button class="play-btn" id="startBtn">▶ START GAME</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const boardEl = document.getElementById("board");
+  const scoreText = document.getElementById("scoreText");
+  const timerText = document.getElementById("timerText");
+  const overlay = document.getElementById("game-overlay");
+  const screenTitle = document.getElementById("screenTitle");
+  const screenDesc = document.getElementById("screenDesc");
+  const startBtn = document.getElementById("startBtn");
+  const musicBtn = document.getElementById("musicBtn");
+
+  const ROWS = 6;
+  const COLS = 6;
+  const GEMS = ['💎', '🎁', '🔥', '👑', '⭐'];
+
+  let board = [];
+  let score = 0;
+  let timeLeft = 60;
+  let timerInterval = null;
+  let running = false;
+  let selected = null;
+  let isSwapping = false;
+
+  let audioCtx = null;
+  let musicOn = true;
+  let musicInterval = null;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }
+
+  // FUNNY SOUND EFFECTS
+  function playSwapSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(750, audioCtx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.06);
+  }
+
+  function playMatchSound(count = 3) {
+    if (!audioCtx) return;
+    const baseFreq = 523.25;
+    for (let i = 0; i < Math.min(count, 5); i++) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(baseFreq * (1 + i * 0.22), audioCtx.currentTime + i * 0.05);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.05 + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + i * 0.05);
+      osc.stop(audioCtx.currentTime + i * 0.05 + 0.15);
+    }
+  }
+
+  function playTimeUpSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(70, audioCtx.currentTime + 0.45);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.45);
+  }
+
+  // PLAYFUL BACKGROUND MELODY
+  const melody = [330, 370, 415, 494, 440, 370, 330, 247];
+  let melIdx = 0;
+
+  function startMusic() {
+    if (musicInterval) clearInterval(musicInterval);
+    if (!musicOn) return;
+
+    musicInterval = setInterval(() => {
+      if (!running || !musicOn || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = melody[melIdx % melody.length];
+      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+      melIdx++;
+    }, 220);
+  }
+
+  function toggleMusic() {
+    initAudio();
+    musicOn = !musicOn;
+    musicBtn.innerText = musicOn ? "🎵 MUSIC ON" : "🔇 MUSIC OFF";
+    if (musicOn && running) startMusic();
+    else if (musicInterval) {
+      clearInterval(musicInterval);
+      musicInterval = null;
+    }
+  }
+
+  musicBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMusic();
+  });
+
+  function getRandomGem() {
+    return GEMS[Math.floor(Math.random() * GEMS.length)];
+  }
+
+  function initBoard() {
+    board = [];
+    boardEl.innerHTML = "";
+    for (let r = 0; r < ROWS; r++) {
+      board[r] = [];
+      for (let c = 0; c < COLS; c++) {
+        let gem;
+        do {
+          gem = getRandomGem();
+        } while (
+          (r >= 2 && board[r-1][c] === gem && board[r-2][c] === gem) ||
+          (c >= 2 && board[r][c-1] === gem && board[r][c-2] === gem)
+        );
+        board[r][c] = gem;
+
+        const cell = document.createElement("div");
+        cell.className = "gem-cell";
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        cell.innerText = gem;
+        cell.addEventListener("pointerdown", () => handleCellClick(r, c));
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function getCellEl(r, c) {
+    return boardEl.children[r * COLS + c];
+  }
+
+  function renderBoard() {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const el = getCellEl(r, c);
+        el.className = "gem-cell";
+        el.innerText = board[r][c];
+      }
+    }
+  }
+
+  function handleCellClick(r, c) {
+    if (!running || isSwapping) return;
+    initAudio();
+
+    if (!selected) {
+      selected = { r, c };
+      getCellEl(r, c).classList.add("selected");
+      playSwapSound();
+      return;
+    }
+
+    const prevR = selected.r;
+    const prevC = selected.c;
+
+    // Check if clicked the same cell
+    if (prevR === r && prevC === c) {
+      getCellEl(prevR, prevC).classList.remove("selected");
+      selected = null;
+      return;
+    }
+
+    // Check adjacency (horizontal or vertical only)
+    const isAdjacent = (Math.abs(prevR - r) + Math.abs(prevC - c)) === 1;
+
+    getCellEl(prevR, prevC).classList.remove("selected");
+
+    if (isAdjacent) {
+      swapAndCheck(prevR, prevC, r, c);
+      selected = null;
+    } else {
+      selected = { r, c };
+      getCellEl(r, c).classList.add("selected");
+      playSwapSound();
+    }
+  }
+
+  function checkMatches() {
+    let matches = [];
+
+    // Horizontal
+    for (let r = 0; r < ROWS; r++) {
+      let count = 1;
+      for (let c = 0; c < COLS; c++) {
+        if (c < COLS - 1 && board[r][c] === board[r][c+1]) {
+          count++;
+        } else {
+          if (count >= 3) {
+            for (let i = 0; i < count; i++) matches.push({ r, c: c - i });
+          }
+          count = 1;
+        }
+      }
+    }
+
+    // Vertical
+    for (let c = 0; c < COLS; c++) {
+      let count = 1;
+      for (let r = 0; r < ROWS; r++) {
+        if (r < ROWS - 1 && board[r][c] === board[r+1][c]) {
+          count++;
+        } else {
+          if (count >= 3) {
+            for (let i = 0; i < count; i++) matches.push({ r: r - i, c });
+          }
+          count = 1;
+        }
+      }
+    }
+
+    // Remove duplicates
+    const unique = [];
+    const seen = new Set();
+    for (const m of matches) {
+      const key = `${m.r},${m.c}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(m);
+      }
+    }
+    return unique;
+  }
+
+  async function swapAndCheck(r1, c1, r2, c2) {
+    isSwapping = true;
+    playSwapSound();
+
+    // Swap values
+    const temp = board[r1][c1];
+    board[r1][c1] = board[r2][c2];
+    board[r2][c2] = temp;
+    renderBoard();
+
+    let matches = checkMatches();
+
+    if (matches.length > 0) {
+      await processMatches(matches);
+    } else {
+      // Revert swap if no match
+      await new Promise(res => setTimeout(res, 220));
+      board[r2][c2] = board[r1][c1];
+      board[r1][c1] = temp;
+      renderBoard();
+    }
+    isSwapping = false;
+  }
+
+  async function processMatches(matches) {
+    while (matches.length > 0) {
+      playMatchSound(matches.length);
+      score += matches.length * 10;
+      scoreText.innerText = score;
+
+      // Blast animation
+      for (const m of matches) {
+        getCellEl(m.r, m.c).classList.add("blast");
+      }
+      await new Promise(res => setTimeout(res, 220));
+
+      // Clear matched gems
+      for (const m of matches) {
+        board[m.r][m.c] = null;
+      }
+
+      // Drop down gems
+      for (let c = 0; c < COLS; c++) {
+        let emptyRow = ROWS - 1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (board[r][c] !== null) {
+            board[emptyRow][c] = board[r][c];
+            if (emptyRow !== r) board[r][c] = null;
+            emptyRow--;
+          }
+        }
+        // Fill top empty with new random gems
+        for (let r = emptyRow; r >= 0; r--) {
+          board[r][c] = getRandomGem();
+        }
+      }
+
+      renderBoard();
+      await new Promise(res => setTimeout(res, 200));
+
+      // Chain combo check
+      matches = checkMatches();
+    }
+  }
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    timeLeft = 60;
+    scoreText.innerText = "0";
+    timerText.innerText = timeLeft;
+    selected = null;
+    isSwapping = false;
+    running = true;
+    overlay.classList.add("hidden");
+
+    initBoard();
+    startMusic();
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerText.innerText = timeLeft;
+      if (timeLeft <= 0) {
+        gameOver();
+      }
+    }, 1000);
+  }
+
+  function gameOver() {
+    running = false;
+    clearInterval(timerInterval);
+    if (musicInterval) {
+      clearInterval(musicInterval);
+      musicInterval = null;
+    }
+    playTimeUpSound();
+    screenTitle.innerText = "⌛ TIME'S UP!";
+    screenDesc.innerHTML = `Booyah! Waqt khatam ho gaya.<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
+    startBtn.innerText = "↻ PLAY AGAIN";
+    overlay.classList.remove("hidden");
+  }
+
+  startBtn.addEventListener("click", startGame);
+})();
+</script>
+</body>
+</html>
