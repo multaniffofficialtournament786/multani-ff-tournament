@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI BRICK BREAKER</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+body {
+  background: #06070a;
+  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+#game-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #0b0f19;
+  background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(14, 17, 24, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid #ff542d44;
+  z-index: 10;
+}
+.back-btn {
+  background: #ff542d;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,84,45,0.4);
+}
+.title-tag { font-size: 15px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.stats-badge { font-weight: bold; font-size: 14px; color: #00f0ff; }
+.lives-badge { font-weight: bold; font-size: 14px; color: #ff1744; }
+.music-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #00f0ff;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#stage-box { flex: 1; position: relative; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+
+#game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 20;
+}
+#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
+#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+.play-btn {
+  padding: 13px 34px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  background: linear-gradient(135deg, #00f0ff, #00e676);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="game-wrap">
+  <div class="header-bar">
+    <button class="back-btn" id="backNavBtn">⬅ BACK</button>
+    <div class="title-tag">🧱 BRICK BREAKER</div>
+    <div class="header-actions">
+      <button class="music-toggle" id="musicBtn">🎵 MUSIC</button>
+      <div class="stats-badge">⭐ <span id="scoreText">0</span></div>
+      <div class="lives-badge">❤️ <span id="livesText">3</span></div>
+    </div>
+  </div>
+
+  <div id="stage-box">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="game-overlay">
+      <h1 id="screenTitle">BRICK BREAKER PRO</h1>
+      <p id="screenDesc">
+        Paddle ko ungli se Drag karke ghumayein!<br>
+        Ball ko girne na dein aur saari Bricks torein.<br>
+        Girne wale chamakdar Diamonds catch karein!
+      </p>
+      <button class="play-btn" id="startBtn">▶ PLAY NOW</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const stage = document.getElementById("stage-box");
+  const scoreText = document.getElementById("scoreText");
+  const livesText = document.getElementById("livesText");
+  const overlay = document.getElementById("game-overlay");
+  const screenTitle = document.getElementById("screenTitle");
+  const screenDesc = document.getElementById("screenDesc");
+  const startBtn = document.getElementById("startBtn");
+  const musicBtn = document.getElementById("musicBtn");
+  const backNavBtn = document.getElementById("backNavBtn");
+
+  backNavBtn.addEventListener("click", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "../index.html";
+    }
+  });
+
+  let W, H;
+  let running = false;
+  let score = 0;
+  let lives = 3;
+  let audioCtx = null;
+  let musicOn = true;
+
+  // New Saraiki Karaoke Track
+  const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/saraiki_karaoke_music._original_karaoke_music(256k).mp3");
+  bgMusic.loop = true;
+  bgMusic.volume = 0.18;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }
+
+  function playHitSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(480, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1150, audioCtx.currentTime + 0.07);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.07);
+  }
+
+  function playPaddleSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(620, audioCtx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.20, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.06);
+  }
+
+  function playLoseLifeSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(260, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.35);
+  }
+
+  function toggleMusic() {
+    initAudio();
+    musicOn = !musicOn;
+    musicBtn.innerText = musicOn ? "🎵 MUSIC" : "🔇 MUTED";
+    if (musicOn && running) bgMusic.play().catch(()=>{});
+    else bgMusic.pause();
+  }
+  musicBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMusic();
+  });
+
+  const paddle = {
+    w: 92,
+    h: 14,
+    x: 0,
+    y: 0
+  };
+
+  const ball = {
+    x: 0,
+    y: 0,
+    r: 8,
+    vx: 0,
+    vy: 0,
+    speed: 5.5
+  };
+
+  const BRICK_ROWS = 5;
+  const BRICK_COLS = 6;
+  const BRICK_COLORS = ["#ff1744", "#ff9100", "#ffd600", "#00e676", "#00f0ff"];
+  let bricks = [];
+  let particles = [];
+  let drops = [];
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    paddle.y = H - 55;
+    if (paddle.x === 0) paddle.x = (W - paddle.w) / 2;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function initBricks() {
+    bricks = [];
+    const pad = 8;
+    const totalPadX = (BRICK_COLS + 1) * pad;
+    const brickW = (W - totalPadX) / BRICK_COLS;
+    const brickH = 22;
+    const topOffset = 30;
+
+    for (let r = 0; r < BRICK_ROWS; r++) {
+      for (let c = 0; c < BRICK_COLS; c++) {
+        bricks.push({
+          x: pad + c * (brickW + pad),
+          y: topOffset + r * (brickH + pad),
+          w: brickW,
+          h: brickH,
+          color: BRICK_COLORS[r % BRICK_COLORS.length],
+          status: 1
+        });
+      }
+    }
+  }
+
+  function resetBall() {
+    ball.x = paddle.x + paddle.w / 2;
+    ball.y = paddle.y - ball.r - 2;
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+    ball.vx = Math.cos(angle) * ball.speed;
+    ball.vy = Math.sin(angle) * ball.speed;
+  }
+
+  function movePaddle(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    const touchX = clientX - rect.left;
+    paddle.x = Math.max(0, Math.min(W - paddle.w, touchX - paddle.w / 2));
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    initAudio();
+    movePaddle(e.clientX);
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (e.buttons === 1) movePaddle(e.clientX);
+  });
+
+  function spawnParticles(x, y, color) {
+    for (let i = 0; i < 12; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const spd = Math.random() * 4 + 1.5;
+      particles.push({
+        x, y,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        color,
+        alpha: 1
+      });
+    }
+  }
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    lives = 3;
+    scoreText.innerText = "0";
+    livesText.innerText = "3";
+    particles = [];
+    drops = [];
+    paddle.w = 92;
+    paddle.x = (W - paddle.w) / 2;
+    initBricks();
+    resetBall();
+    running = true;
+    overlay.classList.add("hidden");
+    if (musicOn) bgMusic.play().catch(()=>{});
+    loop();
+  }
+
+  function gameOver(win = false) {
+    running = false;
+    bgMusic.pause();
+    screenTitle.innerText = win ? "🎉 BOOYAH! YOU WON!" : "💥 GAME OVER!";
+    screenDesc.innerHTML = win 
+      ? `Aapne saari Bricks tor dein!<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`
+      : `Ball zameen par lag gayi!<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
+    startBtn.innerText = "↻ PLAY AGAIN";
+    overlay.classList.remove("hidden");
+  }
+
+  startBtn.addEventListener("click", startGame);
+
+  function loop() {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    if (ball.x - ball.r <= 0) {
+      ball.x = ball.r;
+      ball.vx *= -1;
+      playPaddleSound();
+    } else if (ball.x + ball.r >= W) {
+      ball.x = W - ball.r;
+      ball.vx *= -1;
+      playPaddleSound();
+    }
+    if (ball.y - ball.r <= 0) {
+      ball.y = ball.r;
+      ball.vy *= -1;
+      playPaddleSound();
+    }
+
+    if (
+      ball.y + ball.r >= paddle.y &&
+      ball.y - ball.r <= paddle.y + paddle.h &&
+      ball.x >= paddle.x &&
+      ball.x <= paddle.x + paddle.w
+    ) {
+      playPaddleSound();
+      ball.y = paddle.y - ball.r;
+      const hitOffset = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
+      const angle = hitOffset * (Math.PI / 3);
+      ball.vx = ball.speed * Math.sin(angle);
+      ball.vy = -ball.speed * Math.cos(angle);
+    }
+
+    if (ball.y > H + 20) {
+      playLoseLifeSound();
+      lives--;
+      livesText.innerText = lives;
+      if (lives <= 0) {
+        gameOver(false);
+        return;
+      } else {
+        resetBall();
+      }
+    }
+
+    let remainingBricks = 0;
+    for (const b of bricks) {
+      if (b.status === 1) {
+        remainingBricks++;
+        if (
+          ball.x + ball.r > b.x &&
+          ball.x - ball.r < b.x + b.w &&
+          ball.y + ball.r > b.y &&
+          ball.y - ball.r < b.y + b.h
+        ) {
+          b.status = 0;
+          ball.vy *= -1;
+          score += 20;
+          scoreText.innerText = score;
+          playHitSound();
+          spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.color);
+
+          if (Math.random() < 0.25) {
+            drops.push({
+              x: b.x + b.w / 2,
+              y: b.y + b.h / 2,
+              vy: 2.2
+            });
+          }
+          break;
+        }
+      }
+    }
+
+    if (remainingBricks === 0) {
+      gameOver(true);
+      return;
+    }
+
+    for (const b of bricks) {
+      if (b.status === 1) {
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.roundRect(b.x, b.y, b.w, b.h, 6);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.4)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+    }
+
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const d = drops[i];
+      d.y += d.vy;
+
+      ctx.fillStyle = "#00f0ff";
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.stroke();
+
+      if (
+        d.y >= paddle.y &&
+        d.y <= paddle.y + paddle.h &&
+        d.x >= paddle.x &&
+        d.x <= paddle.x + paddle.w
+      ) {
+        score += 50;
+        scoreText.innerText = score;
+        playHitSound();
+        drops.splice(i, 1);
+        continue;
+      }
+
+      if (d.y > H + 20) drops.splice(i, 1);
+    }
+
+    ctx.fillStyle = "#ff542d";
+    ctx.beginPath();
+    ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
+    ctx.fill();
+    ctx.fillStyle = "#ffbe00";
+    ctx.fillRect(paddle.x + 8, paddle.y + 3, paddle.w - 16, 4);
+
+    ctx.fillStyle = "#00f0ff";
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= 0.04;
+      if (p.alpha <= 0) particles.splice(i, 1);
+      else {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>
