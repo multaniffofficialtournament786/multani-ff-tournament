@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MULTANI 3D HORSE RUNNER</title>
-<!-- Three.js 3D Engine -->
+<!-- Three.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -26,8 +26,8 @@ body {
   position: relative;
   background-color: #0b0f19;
   background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
-  background-size: cover;
-  background-position: center bottom;
+  background-size: 100% 100%;
+  background-position: center;
 }
 .header-bar {
   display: flex;
@@ -67,11 +67,10 @@ body {
 #stage-box { flex: 1; position: relative; overflow: hidden; }
 canvas { display: block; width: 100%; height: 100%; }
 
-/* BRAKE BUTTON */
 .brake-control {
   position: absolute;
-  bottom: 22px;
-  right: 22px;
+  bottom: 24px;
+  right: 20px;
   width: 72px;
   height: 72px;
   border-radius: 50%;
@@ -137,7 +136,6 @@ canvas { display: block; width: 100%; height: 100%; }
   </div>
 
   <div id="stage-box">
-    <!-- BRAKE BUTTON -->
     <div class="brake-control" id="brakeBtn">
       <span>🛑</span>
       BRAKE
@@ -146,9 +144,9 @@ canvas { display: block; width: 100%; height: 100%; }
     <div id="game-overlay">
       <h1 id="screenTitle">3D HORSE RUNNER</h1>
       <p id="screenDesc">
-        🐎 Ungli se Ghoray ko Left/Right ghumayein.<br>
-        🛑 Rukawat aane par <b>BRAKE</b> daba kar slow karein.<br>
-        ⭐ Chamakdar Coins collect karke aasan score banayein!
+        🐎 Screen par Left / Right drag karke chalaein.<br>
+        🛑 <b>BRAKE</b> daba kar ghoray ko slow karein.<br>
+        ⭐ Coins pakrein aur asaan maze se khelein!
       </p>
       <button class="play-btn" id="startBtn">▶ START RUN</button>
     </div>
@@ -167,7 +165,6 @@ canvas { display: block; width: 100%; height: 100%; }
   const backNavBtn = document.getElementById("backNavBtn");
   const brakeBtn = document.getElementById("brakeBtn");
 
-  // Back Navigation
   backNavBtn.addEventListener("click", () => {
     if (window.history.length > 1) {
       window.history.back();
@@ -186,16 +183,14 @@ canvas { display: block; width: 100%; height: 100%; }
   let score = 0;
   let animTime = 0;
 
-  // Bilkul easy aur aahista speed
-  const NORMAL_SPEED = 0.22;
-  const BRAKE_SPEED = 0.08;
+  const NORMAL_SPEED = 0.20;
+  const BRAKE_SPEED = 0.07;
   let speed = NORMAL_SPEED;
   let targetX = 0;
 
   let audioCtx = null;
   let musicOn = true;
 
-  // Background Audio (Sanwal Track)
   const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/SANWAL___Karaoke_with_URDU_Lyrics___Shafaullah_Khan_Rokhri___Saraiki___Love_Song___Rokhri_Production(256k).mp3");
   bgMusic.loop = true;
   bgMusic.volume = 0.18;
@@ -247,7 +242,6 @@ canvas { display: block; width: 100%; height: 100%; }
     toggleMusic();
   });
 
-  // BRAKE HANDLERS
   const startBrake = (e) => {
     e.preventDefault();
     speed = BRAKE_SPEED;
@@ -260,172 +254,215 @@ canvas { display: block; width: 100%; height: 100%; }
   window.addEventListener("pointerup", endBrake);
   window.addEventListener("pointercancel", endBrake);
 
-  // BUILD REALISTIC 3D ANIMATED HORSE
+  // NATURAL LOOKING 3D HORSE
   function create3DHorse() {
     const horse = new THREE.Group();
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.6 });
-    const darkMat = new THREE.MeshStandardMaterial({ color: 0x221510, roughness: 0.4 });
-    const saddleMat = new THREE.MeshStandardMaterial({ color: 0xff542d });
+    const coatMat = new THREE.MeshStandardMaterial({ color: 0x6e473b, roughness: 0.5 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x1d1411, roughness: 0.4 });
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.4 });
+    const saddleMat = new THREE.MeshStandardMaterial({ color: 0xff3d00, roughness: 0.3 });
 
-    // Torso
-    const bodyGeo = new THREE.BoxGeometry(0.65, 0.7, 1.4);
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.y = 0.95;
+    // Body (Rounder Barrel)
+    const bodyGeo = new THREE.CylinderGeometry(0.38, 0.42, 1.35, 12);
+    bodyGeo.rotateX(Math.PI / 2);
+    const body = new THREE.Mesh(bodyGeo, coatMat);
+    body.position.y = 1.0;
     horse.add(body);
 
-    // Saddle
-    const saddleGeo = new THREE.BoxGeometry(0.7, 0.2, 0.55);
+    // Saddle & Blanket
+    const saddleGeo = new THREE.CylinderGeometry(0.41, 0.44, 0.55, 12, 1, false, 0, Math.PI);
+    saddleGeo.rotateX(Math.PI / 2);
+    saddleGeo.rotateZ(Math.PI);
     const saddle = new THREE.Mesh(saddleGeo, saddleMat);
-    saddle.position.set(0, 1.25, 0);
+    saddle.position.set(0, 1.05, 0.05);
     horse.add(saddle);
 
-    // Neck & Head
+    // Neck
     horseNeck = new THREE.Group();
     horseNeck.position.set(0, 1.15, -0.6);
 
-    const neckGeo = new THREE.BoxGeometry(0.32, 0.8, 0.4);
-    neckGeo.rotateX(Math.PI / 6);
-    const neckMesh = new THREE.Mesh(neckGeo, bodyMat);
-    neckMesh.position.set(0, 0.38, -0.18);
+    const neckGeo = new THREE.CylinderGeometry(0.18, 0.28, 0.85, 10);
+    neckGeo.rotateX(Math.PI / 4.5);
+    const neckMesh = new THREE.Mesh(neckGeo, coatMat);
+    neckMesh.position.set(0, 0.35, -0.22);
     horseNeck.add(neckMesh);
 
-    const headGeo = new THREE.BoxGeometry(0.35, 0.38, 0.65);
-    const headMesh = new THREE.Mesh(headGeo, bodyMat);
-    headMesh.position.set(0, 0.72, -0.42);
+    // Mane
+    const maneGeo = new THREE.BoxGeometry(0.08, 0.75, 0.25);
+    const maneMesh = new THREE.Mesh(maneGeo, darkMat);
+    maneMesh.position.set(0, 0.45, -0.15);
+    horseNeck.add(maneMesh);
+
+    // Head
+    const headGeo = new THREE.ConeGeometry(0.22, 0.65, 8);
+    headGeo.rotateX(-Math.PI / 3);
+    const headMesh = new THREE.Mesh(headGeo, coatMat);
+    headMesh.position.set(0, 0.7, -0.55);
     horseNeck.add(headMesh);
 
-    const maneGeo = new THREE.BoxGeometry(0.1, 0.7, 0.3);
-    const maneMesh = new THREE.Mesh(maneGeo, darkMat);
-    maneMesh.position.set(0, 0.52, -0.05);
-    horseNeck.add(maneMesh);
+    // Blaze (White stripe on face)
+    const blazeGeo = new THREE.PlaneGeometry(0.08, 0.45);
+    const blaze = new THREE.Mesh(blazeGeo, whiteMat);
+    blaze.position.set(0, 0.72, -0.56);
+    blaze.rotation.x = -Math.PI / 3;
+    horseNeck.add(blaze);
+
+    // Ears
+    const earGeo = new THREE.ConeGeometry(0.06, 0.16, 4);
+    const earL = new THREE.Mesh(earGeo, coatMat);
+    earL.position.set(-0.1, 0.88, -0.42);
+    const earR = new THREE.Mesh(earGeo, coatMat);
+    earR.position.set(0.1, 0.88, -0.42);
+    horseNeck.add(earL);
+    horseNeck.add(earR);
 
     horse.add(horseNeck);
 
-    // Tail
+    // Tail (Flowing hair)
     horseTail = new THREE.Group();
-    horseTail.position.set(0, 1.15, 0.7);
-    const tailGeo = new THREE.BoxGeometry(0.14, 0.75, 0.14);
-    tailGeo.rotateX(-Math.PI / 8);
+    horseTail.position.set(0, 1.15, 0.68);
+    const tailGeo = new THREE.CylinderGeometry(0.06, 0.18, 0.9, 8);
+    tailGeo.rotateX(-Math.PI / 6);
     const tailMesh = new THREE.Mesh(tailGeo, darkMat);
-    tailMesh.position.set(0, -0.32, 0.12);
+    tailMesh.position.set(0, -0.38, 0.18);
     horseTail.add(tailMesh);
     horse.add(horseTail);
 
-    // Legs
+    // Tapered Legs
     function makeLeg(x, z) {
       const legPivot = new THREE.Group();
-      legPivot.position.set(x, 0.9, z);
+      legPivot.position.set(x, 0.95, z);
 
-      const legGeo = new THREE.BoxGeometry(0.18, 0.85, 0.18);
-      const legMesh = new THREE.Mesh(legGeo, bodyMat);
-      legMesh.position.set(0, -0.42, 0);
-      legPivot.add(legMesh);
+      const upperLegGeo = new THREE.CylinderGeometry(0.12, 0.08, 0.5, 8);
+      const upperLeg = new THREE.Mesh(upperLegGeo, coatMat);
+      upperLeg.position.y = -0.25;
+      legPivot.add(upperLeg);
 
-      const hoofGeo = new THREE.BoxGeometry(0.2, 0.14, 0.2);
-      const hoofMesh = new THREE.Mesh(hoofGeo, darkMat);
-      hoofMesh.position.set(0, -0.8, 0);
-      legPivot.add(hoofMesh);
+      const lowerLegGeo = new THREE.CylinderGeometry(0.08, 0.06, 0.45, 8);
+      const lowerLeg = new THREE.Mesh(lowerLegGeo, coatMat);
+      lowerLeg.position.y = -0.65;
+      legPivot.add(lowerLeg);
+
+      // Hoof
+      const hoofGeo = new THREE.CylinderGeometry(0.08, 0.1, 0.12, 8);
+      const hoof = new THREE.Mesh(hoofGeo, darkMat);
+      hoof.position.y = -0.9;
+      legPivot.add(hoof);
 
       horse.add(legPivot);
       return legPivot;
     }
 
-    legFL = makeLeg(-0.22, -0.45);
-    legFR = makeLeg(0.22, -0.45);
-    legBL = makeLeg(-0.22, 0.45);
-    legBR = makeLeg(0.22, 0.45);
+    legFL = makeLeg(-0.20, -0.42);
+    legFR = makeLeg(0.20, -0.42);
+    legBL = makeLeg(-0.20, 0.42);
+    legBR = makeLeg(0.20, 0.42);
 
     return horse;
   }
 
-  // INITIALIZE 3D WORLD WITH FLAT GROUND PERSPECTIVE
+  // 3D WORLD SETUP - ROAD GROUND LEVEL ALIGNED TO GATE ENTRANCE
   function init3D() {
     const W = stage.clientWidth;
     const H = stage.clientHeight;
 
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0a0e1a, 0.015);
+    scene.fog = new THREE.FogExp2(0x1a151b, 0.012);
 
-    // Camera angle seedha zameen par gate ki taraf
-    camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 100);
-    camera.position.set(0, 1.5, 6.0);
-    camera.lookAt(0, 0.1, -12);
+    // CAMERA: Low-angle, looking down-level toward gate horizon
+    camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
+    camera.position.set(0, 1.1, 5.8);
+    camera.lookAt(0, 0.35, -20);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     stage.appendChild(renderer.domElement);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambient = new THREE.AmbientLight(0xfff3e0, 0.95);
     scene.add(ambient);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    dirLight.position.set(5, 10, 5);
+    const dirLight = new THREE.DirectionalLight(0xffedd5, 1.1);
+    dirLight.position.set(4, 10, 6);
     scene.add(dirLight);
 
-    // ZAMEEN PAR FLAT ROAD (GATE KI TARAF SEEDHI)
-    const roadWidth = 6.5;
-    const roadGeo = new THREE.PlaneGeometry(roadWidth, 120);
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x181e28, roughness: 0.9 });
+    // ROAD: Kept right on the ground plane pointing flat into gate
+    const roadWidth = 5.2;
+    const roadGeo = new THREE.PlaneGeometry(roadWidth, 140);
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x1a2130, roughness: 0.95 });
     const road = new THREE.Mesh(roadGeo, roadMat);
     road.rotation.x = -Math.PI / 2;
-    road.position.set(0, -0.85, -50);
+    road.position.set(0, -0.9, -60);
     scene.add(road);
 
-    // Yellow Center Strips
-    for (let i = 0; i < 15; i++) {
-      const lineGeo = new THREE.PlaneGeometry(0.18, 2.2);
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0xffbe00 });
+    // Golden road curbs (Edges)
+    const curbMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.5 });
+    const curbL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 140), curbMat);
+    curbL.position.set(-roadWidth / 2, -0.85, -60);
+    scene.add(curbL);
+
+    const curbR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 140), curbMat);
+    curbR.position.set(roadWidth / 2, -0.85, -60);
+    scene.add(curbR);
+
+    // Center Dashes
+    for (let i = 0; i < 18; i++) {
+      const lineGeo = new THREE.PlaneGeometry(0.16, 2.4);
+      const lineMat = new THREE.MeshBasicMaterial({ color: 0xffd54f });
       const line = new THREE.Mesh(lineGeo, lineMat);
       line.rotation.x = -Math.PI / 2;
-      line.position.set(0, -0.83, -i * 8);
+      line.position.set(0, -0.89, -i * 7.5);
       scene.add(line);
       roadLines.push(line);
     }
 
-    // Horse
+    // Horse placement
     horseGroup = create3DHorse();
-    horseGroup.position.set(0, -0.85, 0);
+    horseGroup.position.set(0, -0.9, 0);
     scene.add(horseGroup);
   }
 
-  // LANES (Bohat chaudi aur safe lanes)
-  const LANES = [-2.0, 0, 2.0];
+  const LANES = [-1.6, 0, 1.6];
 
   function spawnObjects() {
-    // Traffic / Obstacle (Frequency bohat kam kar di hai taaki aasaani se bachein)
-    if (Math.random() < 0.016) {
-      const obsGroup = new THREE.Group();
-      const obsMat = new THREE.MeshStandardMaterial({ color: 0xd32f2f });
-      const box = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.65, 0.35), obsMat);
-      box.position.y = 0.32;
-      obsGroup.add(box);
+    // Single Low Wooden Hurdle (Very easy to dodge)
+    if (Math.random() < 0.015) {
+      const barGroup = new THREE.Group();
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0x8d281e });
+      const hurdle = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.35, 0.25), woodMat);
+      hurdle.position.y = 0.18;
+      barGroup.add(hurdle);
+
+      // Warning stripes
+      const stripeMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.36, 0.26), stripeMat);
+      stripe.position.y = 0.18;
+      barGroup.add(stripe);
 
       const laneX = LANES[Math.floor(Math.random() * LANES.length)];
-      obsGroup.position.set(laneX, -0.85, -55);
-      scene.add(obsGroup);
-      obstacles.push(obsGroup);
+      barGroup.position.set(laneX, -0.9, -60);
+      scene.add(barGroup);
+      obstacles.push(barGroup);
     }
 
     // Gold Coins
-    if (Math.random() < 0.035) {
-      const coinGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.08, 12);
-      const coinMat = new THREE.MeshStandardMaterial({ color: 0xffbe00, metalness: 0.9, roughness: 0.1 });
+    if (Math.random() < 0.038) {
+      const coinGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.06, 12);
+      const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2 });
       const coin = new THREE.Mesh(coinGeo, coinMat);
       coin.rotation.x = Math.PI / 2;
       const laneX = LANES[Math.floor(Math.random() * LANES.length)];
-      coin.position.set(laneX, -0.35, -55);
+      coin.position.set(laneX, -0.5, -60);
       scene.add(coin);
       coins.push(coin);
     }
   }
 
-  // CONTROLS (Swipe / Drag Left Right)
   function handleMove(clientX) {
     if (!running) return;
     const rect = stage.getBoundingClientRect();
     const normX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    targetX = normX * 2.2;
+    targetX = normX * 1.8;
   }
 
   stage.addEventListener("pointerdown", (e) => {
@@ -451,7 +488,7 @@ canvas { display: block; width: 100%; height: 100%; }
     speed = NORMAL_SPEED;
     targetX = 0;
     animTime = 0;
-    horseGroup.position.set(0, -0.85, 0);
+    horseGroup.position.set(0, -0.9, 0);
 
     obstacles.forEach(o => scene.remove(o));
     coins.forEach(c => scene.remove(c));
@@ -484,22 +521,23 @@ canvas { display: block; width: 100%; height: 100%; }
 
     // Horse Steer
     horseGroup.position.x += (targetX - horseGroup.position.x) * 0.12;
-    horseGroup.rotation.y = -(targetX - horseGroup.position.x) * 0.25;
+    horseGroup.rotation.y = -(targetX - horseGroup.position.x) * 0.2;
+    horseGroup.rotation.z = -(targetX - horseGroup.position.x) * 0.08;
 
-    // Road Lines Flow
+    // Road Flow
     roadLines.forEach(line => {
       line.position.z += speed;
       if (line.position.z > 6) {
-        line.position.z -= 120;
+        line.position.z -= 135;
       }
     });
 
-    // Horse Gallop Animation
-    animTime += speed * 0.8;
-    const gallop = Math.sin(animTime * 10);
-    const gallopCos = Math.cos(animTime * 10);
+    // Realistic Gallop Cycle
+    animTime += speed * 0.85;
+    const gallop = Math.sin(animTime * 11);
+    const gallopCos = Math.cos(animTime * 11);
 
-    horseGroup.position.y = -0.85 + Math.abs(gallop) * 0.12;
+    horseGroup.position.y = -0.9 + Math.abs(gallop) * 0.14;
 
     legFL.rotation.x = gallop * 0.65;
     legBR.rotation.x = -gallop * 0.65;
@@ -507,7 +545,7 @@ canvas { display: block; width: 100%; height: 100%; }
     legBL.rotation.x = gallop * 0.65;
 
     horseNeck.rotation.x = gallopCos * 0.08;
-    horseTail.rotation.x = -gallop * 0.2;
+    horseTail.rotation.x = -gallop * 0.25;
 
     spawnObjects();
 
@@ -517,7 +555,7 @@ canvas { display: block; width: 100%; height: 100%; }
       o.position.z += speed;
 
       const dist = horseGroup.position.distanceTo(o.position);
-      if (dist < 0.95) {
+      if (dist < 0.9) {
         gameOver();
         return;
       }
@@ -534,7 +572,7 @@ canvas { display: block; width: 100%; height: 100%; }
     for (let i = coins.length - 1; i >= 0; i--) {
       const c = coins[i];
       c.position.z += speed;
-      c.rotation.z += 0.05;
+      c.rotation.z += 0.06;
 
       const dist = horseGroup.position.distanceTo(c.position);
       if (dist < 1.05) {
