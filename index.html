@@ -192,7 +192,7 @@
     
     .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
     .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
-    .chat-bubble.theirs { background: #1c2230; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .chat-bubble.theirs { background: #1c2233; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
     .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
     .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
 
@@ -345,7 +345,7 @@
       <div style="background:#0e1118; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); height:50px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-gamepad" style="color:var(--accent-gold);"></i>
-          <span id="active-game-title" style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:#fff;">Multani Runner</span>
+          <span id="active-game-title" style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:#fff;">Game</span>
         </div>
         <button onclick="closeGamePlayer()" class="btn btn-secondary btn-sm" style="padding:6px 12px; font-size:11px; background:#ff1744; border:none; color:#fff; border-radius:6px; cursor:pointer;">
           <i class="fa-solid fa-xmark"></i> EXIT
@@ -527,21 +527,63 @@
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
-    // REPO KI FILES SE CONNECTED MINI GAMES LIST
+    // REPO KI GAMES/ FOLDER SE CONNECTED MINI GAMES LIST
     const AVAILABLE_GAMES = [
       {
         id: 1,
-        title: "Multani Runner 2D",
-        category: "Endless Runner",
-        thumb: "multani-runner/1792389240189.jpg",
-        url: "multani-runner.html"
+        title: "Airdrop Catcher",
+        category: "Arcade & Catch",
+        thumb: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=300&auto=format&fit=crop&q=80",
+        url: "games/airdrop-catcher.html"
       },
       {
         id: 2,
-        title: "Multani Runner (Folder Version)",
-        category: "Action Runner",
-        thumb: "multani-runner/1792389240189.jpg",
-        url: "multani-runner/index.html"
+        title: "Ball Stunt",
+        category: "Action & Skill",
+        thumb: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&auto=format&fit=crop&q=80",
+        url: "games/ball-stunt.html"
+      },
+      {
+        id: 3,
+        title: "Bubble Shooter",
+        category: "Shooting Puzzle",
+        thumb: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=300&auto=format&fit=crop&q=80",
+        url: "games/bubble-shooter.html"
+      },
+      {
+        id: 4,
+        title: "Diamond Match",
+        category: "Match 3 Puzzle",
+        thumb: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&auto=format&fit=crop&q=80",
+        url: "games/diamond-match.html"
+      },
+      {
+        id: 5,
+        title: "Flappy Airdrop",
+        category: "Tap & Fly",
+        thumb: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&auto=format&fit=crop&q=80",
+        url: "games/flappy-airdrop.html"
+      },
+      {
+        id: 6,
+        title: "Memory Match",
+        category: "Brain & Puzzle",
+        thumb: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=300&auto=format&fit=crop&q=80",
+        url: "games/memory-match.html"
+      },
+      {
+        id: 7,
+        title: "Snake Rush",
+        category: "Classic Arcade",
+        thumb: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=300&auto=format&fit=crop&q=80",
+        url: "games/snake-rush.html"
+      },
+      {
+        id: 8,
+        title: "Whack A Monster",
+        category: "Reflex & Tap",
+        thumb: "https://images.unsplash.com/photo-1563089145-599997674d42?w=300&auto=format&fit=crop&q=80",
+        url: "games/whack-monster.html"
       }
     ];
 
@@ -1671,7 +1713,7 @@
           </div>
 
           <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
-            <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
+            <i class="fa-solid faaward text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
             <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Invite Reward</h3>
             <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for every friend you invite!</p>
           </div>
