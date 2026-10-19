@@ -1,487 +1,608 @@
-// ============================================
-// MULTANI RUNNER - FIXED GAME
-// HOME PHOTO + GAME BACKGROUND + SOUNDS
-// ============================================
-
-const oldCanvas = document.getElementById("gameCanvas");
-if (oldCanvas) oldCanvas.remove();
+// ======================================
+// MULTANI RUNNER - COMPLETE GAME
+// ======================================
 
 document.body.innerHTML = `
-<main id="runnerApp">
-  <h1>MULTANI RUNNER</h1>
-  <p>RUN • JUMP • SURVIVE</p>
+<style>
+* {
+  box-sizing: border-box;
+}
 
-  <div id="runnerStats">
-    <span>SCORE: <b id="score">0</b></span>
-    <span>BEST: <b id="best">0</b></span>
+body {
+  margin: 0;
+  padding: 12px;
+  background: #080b12;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+#gameBox {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+#gameTitle {
+  color: #ff4624;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 8px 0 12px;
+  text-shadow: 0 0 12px #ff4624;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin: 0 auto;
+  border: 2px solid #ff4624;
+  border-radius: 12px;
+  background: #101722;
+  touch-action: manipulation;
+}
+
+#gameInfo {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  margin: 12px auto;
+  font-weight: bold;
+  color: #ffb347;
+}
+
+.gameButton {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 17px;
+  margin: 5px;
+  font-size: 15px;
+  font-weight: 900;
+  background: #ff4624;
+  color: white;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.gameButton:active {
+  transform: scale(0.96);
+}
+
+#jumpBtn {
+  background: #00a9c7;
+}
+
+#musicBtn {
+  background: #303744;
+}
+
+#gameMessage {
+  color: #b9c3d5;
+  font-size: 12px;
+  margin: 8px;
+  overflow-wrap: anywhere;
+}
+</style>
+
+<div id="gameBox">
+  <div id="gameTitle">MULTANI RUNNER</div>
+
+  <div id="gameInfo">
+    <div>SCORE: <span id="score">0</span></div>
+    <div>BEST: <span id="best">0</span></div>
   </div>
 
-  <canvas id="gameCanvas" width="400" height="600"
-    style="width:100%;max-width:400px;display:block;margin:auto;border-radius:12px">
-  </canvas>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
 
-  <div id="runnerControls">
-    <button id="startBtn">▶ PLAY</button>
-    <button id="jumpBtn">⬆ JUMP</button>
-    <button id="musicBtn">🎵 MUSIC: ON</button>
-    <button id="homeBtn">🏠 HOME</button>
+  <div>
+    <button id="playBtn" class="gameButton">PLAY GAME</button>
+    <button id="jumpBtn" class="gameButton">JUMP</button>
   </div>
 
-  <p id="runnerMessage">PLAY dabao aur game shuru karo!</p>
-  <p id="fileStatus" style="font-size:12px;overflow-wrap:anywhere"></p>
-</main>
+  <div>
+    <button id="homeBtn" class="gameButton">HOME</button>
+    <button id="musicBtn" class="gameButton">MUSIC: ON</button>
+  </div>
+
+  <div id="gameMessage">Loading game assets...</div>
+</div>
 `;
+
+// ======================================
+// ASSET LINKS
+// ======================================
+
+const HOME_IMAGE_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/1792389240189.jpg";
+
+const BACKGROUND_IMAGE_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg";
+
+const MUSIC_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/Background_Music___Saraiki_Song_2024___No_Copyright_Song___Mushtaq_Khanukhel(256k).mp3";
+
+const RUN_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/Goofy_Running_Sound_Effect(48k).mp3";
+
+const JUMP_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/Jumping___Sound_Effect__Copyright_Free_(48k).mp3";
+
+const CRASH_URL =
+"https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/Sparrow_Ouch_Meme_Effect(48k).mp3";
+
+// ======================================
+// ELEMENTS
+// ======================================
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const W = canvas.width;
-const H = canvas.height;
-const ground = 500;
 
-// Agar game.js pehle multani-runner folder mein hai,
-// to yeh path nested folder tak jayega.
-const ASSET_DIR =
-  "./multani-runner/multani-runner/multani-runner/sounds/";
+const scoreElement = document.getElementById("score");
+const bestElement = document.getElementById("best");
+const messageElement = document.getElementById("gameMessage");
 
-const homePhoto = new Image();
-homePhoto.src = "./1792389240189.jpg";
+const playBtn = document.getElementById("playBtn");
+const jumpBtn = document.getElementById("jumpBtn");
+const homeBtn = document.getElementById("homeBtn");
+const musicBtn = document.getElementById("musicBtn");
 
-const background = new Image();
-background.src = ASSET_DIR + "1792388836123.jpg";
+// ======================================
+// IMAGES
+// ======================================
 
-const sounds = {
-  run: new Audio(ASSET_DIR + "Goofy_Running_Sound_Effect(48k).mp3"),
-  jump: new Audio(ASSET_DIR + "Jumping___Sound_Effect__Copyright_Free_(48k).mp3"),
-  crash: new Audio(ASSET_DIR + "Sparrow_Ouch_Meme_Effect(48k).mp3"),
-  music: new Audio(ASSET_DIR + "Background_Music___Saraiki_Song_2024___No_Copyright_Song___Mushtaq_Khanukhel(256k).mp3")
+const homeImage = new Image();
+homeImage.src = HOME_IMAGE_URL;
+
+const backgroundImage = new Image();
+backgroundImage.src = BACKGROUND_IMAGE_URL;
+
+homeImage.onload = () => {
+  if (screen === "home" || screen === "over") drawScreen();
 };
 
-sounds.run.loop = true;
-sounds.music.loop = true;
-sounds.run.volume = 0.65;
-sounds.music.volume = 0.35;
+homeImage.onerror = () => {
+  messageElement.textContent =
+    "HOME photo load nahi hui. Image link check karein.";
+};
 
-let score = 0;
-let best = Number(localStorage.getItem("multaniRunnerBest") || 0);
-let speed = 4;
-let frame = 0;
-let running = false;
-let gameOver = false;
-let screen = "home";
-let musicOn = true;
-let animationId = 0;
-let lastTime = 0;
-let obstacleTimer = 0;
-let obstacles = [];
+backgroundImage.onerror = () => {
+  messageElement.textContent =
+    "Background photo load nahi hui. Link check karein.";
+};
 
-document.getElementById("best").textContent = best;
+backgroundImage.onload = () => {
+  messageElement.textContent = "Background photo loaded.";
+  if (screen === "game") drawScreen();
+};
 
-function showStatus(message) {
-  document.getElementById("fileStatus").textContent = message;
+// ======================================
+// SOUNDS
+// ======================================
+
+const music = new Audio(MUSIC_URL);
+music.loop = true;
+music.volume = 0.35;
+
+const runSound = new Audio(RUN_URL);
+runSound.loop = true;
+runSound.volume = 0.55;
+
+const jumpSound = new Audio(JUMP_URL);
+jumpSound.volume = 0.8;
+
+const crashSound = new Audio(CRASH_URL);
+crashSound.volume = 1;
+
+let musicEnabled = true;
+
+function playSound(audio, restart = true) {
+  try {
+    if (restart) audio.currentTime = 0;
+
+    const promise = audio.play();
+
+    if (promise && promise.catch) {
+      promise.catch(() => {
+        messageElement.textContent =
+          "Sound start nahi hua. PLAY button dobara dabayein.";
+      });
+    }
+  } catch (error) {
+    console.log("Audio error:", error);
+  }
 }
 
-function drawCover(img) {
-  if (!img.complete || !img.naturalWidth) return false;
+function stopSound(audio) {
+  audio.pause();
+  try {
+    audio.currentTime = 0;
+  } catch (error) {}
+}
 
-  const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-  const sw = W / scale;
-  const sh = H / scale;
+function startMusic() {
+  if (musicEnabled) {
+    playSound(music, false);
+  }
+}
 
-  ctx.drawImage(
-    img,
-    (img.naturalWidth - sw) / 2,
-    (img.naturalHeight - sh) / 2,
-    sw, sh, 0, 0, W, H
-  );
+function stopGameSounds() {
+  stopSound(runSound);
+}
+
+// ======================================
+// GAME VARIABLES
+// ======================================
+
+const ground = 510;
+
+let screen = "home";
+let running = false;
+let gameOver = false;
+let frame = 0;
+let score = 0;
+let speed = 4;
+let obstacles = [];
+let lastTime = 0;
+let animationId = 0;
+
+let best = 0;
+
+try {
+  best = Number(localStorage.getItem("multaniRunnerBest") || 0);
+} catch (error) {}
+
+bestElement.textContent = best;
+
+const player = {
+  x: 62,
+  y: ground - 65,
+  w: 42,
+  h: 65,
+  vy: 0,
+  jumping: false
+};
+
+// ======================================
+// DRAW BACKGROUND IMAGE
+// ======================================
+
+function drawCover(image) {
+  if (!image.complete || !image.naturalWidth) return false;
+
+  const imageRatio = image.naturalWidth / image.naturalHeight;
+  const canvasRatio = canvas.width / canvas.height;
+
+  let width, height, x, y;
+
+  if (imageRatio > canvasRatio) {
+    height = canvas.height;
+    width = height * imageRatio;
+    x = (canvas.width - width) / 2;
+    y = 0;
+  } else {
+    width = canvas.width;
+    height = width / imageRatio;
+    x = 0;
+    y = (canvas.height - height) / 2;
+  }
+
+  ctx.drawImage(image, x, y, width, height);
   return true;
 }
 
-homePhoto.onerror = () => showStatus("HOME photo load nahi hui: " + homePhoto.src);
-background.onerror = () => showStatus("Background file nahi mili: " + background.src);
+// ======================================
+// CARTOON PLAYER
+// ======================================
 
-for (const [name, audio] of Object.entries(sounds)) {
-  audio.addEventListener("error", () => {
-    showStatus("Sound file nahi mili: " + name + " — " + audio.src);
-  });
-}
+function drawPlayer() {
+  const x = player.x;
+  const y = player.y;
 
-function stopAudio(name) {
-  const audio = sounds[name];
-  audio.pause();
-  audio.currentTime = 0;
-}
+  // Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(
+    x + player.w / 2,
+    ground + 2,
+    28,
+    7,
+    0,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
 
-function playAudio(name) {
-  const audio = sounds[name];
-  audio.currentTime = 0;
-  audio.play().catch(() => {
-    showStatus("Sound chalane ke liye PLAY ya MUSIC button dobara dabao.");
-  });
-}
+  // Legs
+  ctx.fillStyle = "#151515";
 
-const player = {
-  x: 55, y: ground - 84, w: 58, h: 84,
-  vy: 0, jumping: false, state: "run", anim: 0
-};
+  const legMove = running && !player.jumping
+    ? Math.sin(frame * 0.35) * 7
+    : 0;
 
-function drawBackground() {
-  if (!drawCover(background)) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, H);
-    gradient.addColorStop(0, "#182a43");
-    gradient.addColorStop(1, "#75815c");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, W, H);
-  }
+  ctx.fillRect(x + 5, y + 48, 13, 17 + legMove);
+  ctx.fillRect(x + 25, y + 48, 13, 17 - legMove);
 
-  ctx.fillStyle = "#292e36";
-  ctx.fillRect(0, ground, W, H - ground);
+  // Shoes
+  ctx.fillStyle = "#ffb347";
+  ctx.fillRect(x + 1, y + 59 + legMove, 20, 6);
+  ctx.fillRect(x + 22, y + 59 - legMove, 20, 6);
+
+  // Body
   ctx.fillStyle = "#ff4624";
-  ctx.fillRect(0, ground, W, 4);
+  ctx.fillRect(x + 3, y + 21, 36, 31);
+
+  // Shirt details
+  ctx.fillStyle = "#00e5ff";
+  ctx.fillRect(x + 18, y + 24, 6, 25);
+
+  // Arms
+  ctx.fillStyle = "#ffb36b";
+
+  ctx.save();
+  ctx.translate(x + 5, y + 25);
+  ctx.rotate(Math.sin(frame * 0.3) * 0.35);
+  ctx.fillRect(-4, 0, 9, 25);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(x + 35, y + 25);
+  ctx.rotate(-Math.sin(frame * 0.3) * 0.35);
+  ctx.fillRect(-2, 0, 9, 25);
+  ctx.restore();
+
+  // Head
+  ctx.fillStyle = "#ffb36b";
+  ctx.fillRect(x + 8, y, 28, 25);
+
+  // Hair
+  ctx.fillStyle = "#171717";
+  ctx.fillRect(x + 6, y - 4, 32, 9);
+  ctx.fillRect(x + 6, y, 7, 12);
+
+  // Eyes
+  ctx.fillStyle = "#111";
+  ctx.fillRect(x + 27, y + 9, 4, 4);
+}
+
+// ======================================
+// BOX OBSTACLE
+// ======================================
+
+function drawObstacle(ob) {
+  ctx.fillStyle = "#ff4624";
+  ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+
+  ctx.strokeStyle = "#ffb347";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(ob.x, ob.y, ob.w, ob.h);
 
   ctx.fillStyle = "#ffb347";
-  for (let x = -((frame * speed * 0.5) % 70); x < W; x += 70) {
-    ctx.fillRect(x, ground + 30, 32, 4);
-  }
+  ctx.fillRect(ob.x + 5, ob.y + 7, ob.w - 10, 5);
 
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 15px Arial";
-  ctx.fillText("MULTANI RUNNER", 12, 27);
+  ctx.fillStyle = "#9c2414";
+  ctx.fillRect(ob.x + 6, ob.y + 18, ob.w - 12, 4);
 }
 
-function drawHome() {
-  if (!drawCover(homePhoto)) {
-    ctx.fillStyle = "#101725";
-    ctx.fillRect(0, 0, W, H);
+// ======================================
+// DRAW GAME SCREEN
+// ======================================
+
+function drawGame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!drawCover(backgroundImage)) {
+    ctx.fillStyle = "#101722";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  ctx.fillStyle = "rgba(0,0,0,.48)";
-  ctx.fillRect(0, 0, W, H);
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 34px Arial";
-  ctx.fillText("MULTANI", W / 2, 110);
+  // Ground
   ctx.fillStyle = "#ff4624";
-  ctx.font = "bold 38px Arial";
-  ctx.fillText("RUNNER", W / 2, 155);
+  ctx.fillRect(0, ground, canvas.width, 4);
+
+  ctx.fillStyle = "#303744";
+  ctx.fillRect(0, ground + 4, canvas.width, canvas.height - ground);
+
+  // Moving road markings
+  ctx.fillStyle = "#ffb347";
+
+  for (
+    let x = -(frame * speed % 70);
+    x < canvas.width;
+    x += 70
+  ) {
+    ctx.fillRect(x, ground + 25, 35, 3);
+  }
+
+  // Game title
   ctx.fillStyle = "#fff";
-  ctx.font = "17px Arial";
-  ctx.fillText("RUN • JUMP • SURVIVE", W / 2, 190);
+  ctx.font = "bold 16px Arial";
+  ctx.fillText("MULTANI RUNNER", 12, 25);
+
+  // Obstacles
+  obstacles.forEach(drawObstacle);
+
+  // Character
+  drawPlayer();
+}
+
+// ======================================
+// HOME SCREEN
+// ======================================
+
+function drawHome() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!drawCover(homeImage)) {
+    ctx.fillStyle = "#101722";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = "center";
+
+  ctx.fillStyle = "#ff4624";
+  ctx.font = "bold 35px Arial";
+  ctx.fillText("MULTANI", 200, 190);
+  ctx.fillText("RUNNER", 200, 235);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 17px Arial";
+  ctx.fillText("TAP PLAY TO RUN", 200, 285);
+
+  ctx.fillStyle = "#ff4624";
+  ctx.fillRect(105, 325, 190, 58);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 23px Arial";
+  ctx.fillText("PLAY", 200, 362);
+
   ctx.textAlign = "left";
 }
 
-function drawFace() {
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.ellipse(-7, 5, 5, 6, 0, 0, Math.PI * 2);
-  ctx.ellipse(7, 5, 5, 6, 0, 0, Math.PI * 2);
-  ctx.fill();
+// ======================================
+// GAME OVER SCREEN
+// ======================================
 
-  ctx.fillStyle = "#18202c";
-  ctx.beginPath();
-  ctx.arc(-5, 6, 2.5, 0, Math.PI * 2);
-  ctx.arc(9, 6, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+function drawOver() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = "#713c2a";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(0, 10, 7, 0.15, Math.PI - 0.15);
-  ctx.stroke();
-}
-
-function drawCartoon() {
-  const swing = Math.sin(player.anim * 0.45);
-  const legSwing = swing * 12;
-  const armSwing = swing * 13;
-
-  ctx.save();
-  ctx.translate(player.x + player.w / 2, player.y + (player.jumping ? 0 : Math.abs(swing) * 2));
-
-  ctx.fillStyle = "rgba(0,0,0,.3)";
-  ctx.beginPath();
-  ctx.ellipse(0, player.h - 1, 25, 5, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  if (player.state === "fall") {
-    ctx.rotate(0.8);
-    ctx.fillStyle = "#ff4624";
-    ctx.fillRect(-19, 23, 38, 30);
-    ctx.fillStyle = "#ffbf91";
-    ctx.beginPath();
-    ctx.arc(0, 12, 18, 0, Math.PI * 2);
-    ctx.fill();
-    drawFace();
-    ctx.restore();
-    return;
+  if (!drawCover(homeImage)) {
+    ctx.fillStyle = "#101722";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  ctx.strokeStyle = "#172238";
-  ctx.lineWidth = 10;
-  ctx.lineCap = "round";
+  ctx.fillStyle = "rgba(0,0,0,0.72)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.beginPath();
-  ctx.moveTo(-7, 55);
-  ctx.lineTo(-10 + (player.jumping ? -4 : legSwing), 72);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(7, 55);
-  ctx.lineTo(10 - (player.jumping ? -4 : legSwing), 72);
-  ctx.stroke();
-
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.ellipse(-13 + legSwing, 74, 12, 6, 0, 0, Math.PI * 2);
-  ctx.ellipse(13 - legSwing, 74, 12, 6, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#ffbf91";
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  ctx.moveTo(-15, 32);
-  ctx.lineTo(-25 - armSwing * 0.4, 45 + armSwing * 0.3);
-  ctx.moveTo(15, 32);
-  ctx.lineTo(25 + armSwing * 0.4, 45 - armSwing * 0.3);
-  ctx.stroke();
+  ctx.textAlign = "center";
 
   ctx.fillStyle = "#ff4624";
-  ctx.beginPath();
-  ctx.roundRect(-17, 24, 34, 36, 8);
-  ctx.fill();
-  ctx.fillStyle = "#00e5ff";
-  ctx.fillRect(-16, 39, 32, 5);
+  ctx.font = "bold 34px Arial";
+  ctx.fillText("GAME OVER", 200, 220);
 
-  ctx.fillStyle = "#ffbf91";
-  ctx.fillRect(-6, 17, 12, 10);
-  ctx.beginPath();
-  ctx.arc(0, 5, 20, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 23px Arial";
+  ctx.fillText("SCORE: " + score, 200, 270);
 
-  ctx.fillStyle = "#18202c";
-  ctx.beginPath();
-  ctx.arc(0, -1, 20, Math.PI, Math.PI * 2);
-  ctx.lineTo(18, 5);
-  ctx.lineTo(-18, 5);
-  ctx.closePath();
-  ctx.fill();
-
-  drawFace();
-  ctx.restore();
-}
-
-function createObstacle() {
-  const h = 35 + Math.random() * 25;
-  obstacles.push({ x: W + 10, y: ground - h, w: 32, h, passed: false });
-}
-
-function drawObstacle(ob) {
-  ctx.fillStyle = "#a85a28";
-  ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
   ctx.fillStyle = "#ffb347";
-  ctx.fillRect(ob.x + 3, ob.y + 5, ob.w - 6, 5);
-  ctx.strokeStyle = "#ffe0a3";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(ob.x, ob.y, ob.w, ob.h);
+  ctx.font = "bold 18px Arial";
+  ctx.fillText("BEST: " + best, 200, 310);
+
+  ctx.fillStyle = "#ff4624";
+  ctx.fillRect(75, 355, 250, 52);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 20px Arial";
+  ctx.fillText("PLAY AGAIN", 200, 388);
+
+  ctx.fillStyle = "#303744";
+  ctx.fillRect(120, 425, 160, 48);
+
+  ctx.fillStyle = "#fff";
+  ctx.fillText("HOME", 200, 456);
+
+  ctx.textAlign = "left";
 }
 
-function collision(a, b) {
-  return a.x + 12 < b.x + b.w &&
-    a.x + a.w - 12 > b.x &&
-    a.y + 10 < b.y + b.h &&
-    a.y + a.h > b.y;
+// ======================================
+// DRAW CURRENT SCREEN
+// ======================================
+
+function drawScreen() {
+  if (screen === "home") {
+    drawHome();
+  } else if (screen === "over") {
+    drawOver();
+  } else if (screen === "game") {
+    drawGame();
+  }
 }
 
-function jump() {
-  if (!running || gameOver || player.jumping) return;
-  player.vy = -13.5;
-  player.jumping = true;
-  player.state = "jump";
-  playAudio("jump");
-}
-
-document.getElementById("jumpBtn").addEventListener("click", jump);
-canvas.addEventListener("pointerdown", () => {
-  if (screen === "playing") jump();
-});
+// ======================================
+// START GAME
+// ======================================
 
 function startGame() {
   cancelAnimationFrame(animationId);
-  stopAudio("run");
-  stopAudio("music");
-  stopAudio("crash");
 
   score = 0;
   speed = 4;
   frame = 0;
-  obstacleTimer = 0;
   obstacles = [];
 
   player.y = ground - player.h;
   player.vy = 0;
   player.jumping = false;
-  player.state = "run";
-  player.anim = 0;
 
-  running = true;
   gameOver = false;
-  screen = "playing";
+  running = true;
+  screen = "game";
   lastTime = 0;
 
-  document.getElementById("score").textContent = "0";
-  document.getElementById("runnerMessage").textContent = "Jump karo aur boxes se bacho!";
-  document.getElementById("startBtn").textContent = "↻ RESTART";
+  scoreElement.textContent = "0";
+  playBtn.textContent = "RESTART";
 
-  playAudio("run");
-  if (musicOn) playAudio("music");
+  stopSound(runSound);
+  stopSound(crashSound);
+
+  // Music starts after player taps PLAY.
+  startMusic();
+
+  messageElement.textContent = "Jump over the boxes!";
+
+  drawScreen();
 
   animationId = requestAnimationFrame(loop);
 }
 
-document.getElementById("startBtn").addEventListener("click", startGame);
+// ======================================
+// JUMP
+// ======================================
+
+function jump() {
+  if (screen !== "game" || !running || gameOver) return;
+
+  if (!player.jumping) {
+    player.vy = -13;
+    player.jumping = true;
+
+    playSound(jumpSound);
+  }
+}
+
+// ======================================
+// GAME OVER
+// ======================================
 
 function endGame() {
   if (gameOver) return;
 
-  running = false;
   gameOver = true;
+  running = false;
   screen = "over";
-  player.state = "fall";
 
-  stopAudio("run");
-  stopAudio("music");
-  playAudio("crash");
+  stopSound(runSound);
+  stopSound(music);
+
+  playSound(crashSound);
 
   if (score > best) {
     best = score;
-    localStorage.setItem("multaniRunnerBest", String(best));
-    document.getElementById("best").textContent = best;
+    bestElement.textContent = best;
+
+    try {
+      localStorage.setItem("multaniRunnerBest", String(best));
+    } catch (error) {}
   }
 
-  document.getElementById("runnerMessage").textContent = "GAME OVER!";
-  document.getElementById("startBtn").textContent = "↻ PLAY AGAIN";
-  drawGameOver();
+  playBtn.textContent = "PLAY AGAIN";
+  messageElement.textContent = "Game over! Try again.";
+
+  drawScreen();
 }
 
-function drawGameOver() {
-  if (!drawCover(homePhoto)) {
-    ctx.fillStyle = "#101725";
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  ctx.fillStyle = "rgba(0,0,0,.72)";
-  ctx.fillRect(20, 180, 360, 230);
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#ff4624";
-  ctx.font = "bold 34px Arial";
-  ctx.fillText("GAME OVER", 200, 230);
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 22px Arial";
-  ctx.fillText("Score: " + score, 200, 280);
-  ctx.fillText("Best: " + best, 200, 320);
-  ctx.font = "16px Arial";
-  ctx.fillText("PLAY AGAIN ya HOME dabao", 200, 365);
-  ctx.textAlign = "left";
-}
-
-function goHome() {
-  cancelAnimationFrame(animationId);
-  running = false;
-  gameOver = false;
-  screen = "home";
-
-  for (const name of Object.keys(sounds)) stopAudio(name);
-
-  obstacles = [];
-  score = 0;
-  speed = 4;
-  frame = 0;
-  player.y = ground - player.h;
-  player.vy = 0;
-  player.jumping = false;
-  player.state = "run";
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("startBtn").textContent = "▶ PLAY";
-  document.getElementById("runnerMessage").textContent = "PLAY dabao aur game shuru karo!";
-  drawHome();
-}
-
-document.getElementById("homeBtn").addEventListener("click", goHome);
-
-function loop(time = 0) {
-  if (!running) return;
-
-  const delta = lastTime ? Math.min((time - lastTime) / 16.67, 2) : 1;
-  lastTime = time;
-  frame += delta;
-  player.anim += delta;
-
-  drawBackground();
-
-  if (player.jumping) {
-    player.vy += 0.62 * delta;
-    player.y += player.vy * delta;
-
-    if (player.y >= ground - player.h) {
-      player.y = ground - player.h;
-      player.vy = 0;
-      player.jumping = false;
-      player.state = "land";
-      player.anim = 0;
-    }
-  } else if (player.state === "land") {
-    if (player.anim > 10) player.state = "run";
-  } else {
-    player.state = "run";
-  }
-
-  obstacleTimer += delta;
-  if (obstacleTimer > 95) {
-    createObstacle();
-    obstacleTimer = 0;
-  }
-
-  for (let i = obstacles.length - 1; i >= 0; i--) {
-    const ob = obstacles[i];
-    ob.x -= speed * delta;
-    drawObstacle(ob);
-
-    if (collision(player, ob)) {
-      endGame();
-      return;
-    }
-
-    if (!ob.passed && ob.x + ob.w < player.x) {
-      ob.passed = true;
-      score++;
-      speed = Math.min(8, 4 + score * 0.08);
-      document.getElementById("score").textContent = score;
-    }
-
-    if (ob.x + ob.w < 0) obstacles.splice(i, 1);
-  }
-
-  drawCartoon();
-  animationId = requestAnimationFrame(loop);
-}
-
-document.getElementById("musicBtn").addEventListener("click", () => {
-  musicOn = !musicOn;
-  document.getElementById("musicBtn").textContent = "🎵 MUSIC: " + (musicOn ? "ON" : "OFF");
-
-  if (musicOn && running) playAudio("music");
-  else stopAudio("music");
-});
-
-document.getElementById("homeBtn").style.display = "inline-block";
-
-homePhoto.onload = () => {
-  if (screen === "home") drawHome();
-  if (screen === "over") drawGameOver();
-};
-
-background.onload = () => {
-  if (screen === "playing") drawBackground();
-};
-
-drawHome();
+// ======================================
+// MAIN GAME LOOP
