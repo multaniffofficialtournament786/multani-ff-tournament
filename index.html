@@ -527,63 +527,77 @@
 
     const APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
-    // REPO KI GAMES/ FOLDER SE CONNECTED MINI GAMES LIST
+    // 10 COMPLETE MINI GAMES LIST: TOP PAR BAHAR WALI, CENTER MEIN 8 GAMES, END MEIN FOLDER WALI
     const AVAILABLE_GAMES = [
       {
         id: 1,
+        title: "Multani Runner 2D",
+        category: "Endless Runner",
+        thumb: "multani-runner/1792389240189.jpg",
+        url: "multani-runner.html"
+      },
+      {
+        id: 2,
         title: "Airdrop Catcher",
         category: "Arcade & Catch",
         thumb: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=300&auto=format&fit=crop&q=80",
         url: "games/airdrop-catcher.html"
       },
       {
-        id: 2,
+        id: 3,
         title: "Ball Stunt",
         category: "Action & Skill",
         thumb: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&auto=format&fit=crop&q=80",
         url: "games/ball-stunt.html"
       },
       {
-        id: 3,
+        id: 4,
         title: "Bubble Shooter",
         category: "Shooting Puzzle",
         thumb: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=300&auto=format&fit=crop&q=80",
         url: "games/bubble-shooter.html"
       },
       {
-        id: 4,
+        id: 5,
         title: "Diamond Match",
         category: "Match 3 Puzzle",
         thumb: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&auto=format&fit=crop&q=80",
         url: "games/diamond-match.html"
       },
       {
-        id: 5,
+        id: 6,
         title: "Flappy Airdrop",
         category: "Tap & Fly",
         thumb: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&auto=format&fit=crop&q=80",
         url: "games/flappy-airdrop.html"
       },
       {
-        id: 6,
+        id: 7,
         title: "Memory Match",
         category: "Brain & Puzzle",
         thumb: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=300&auto=format&fit=crop&q=80",
         url: "games/memory-match.html"
       },
       {
-        id: 7,
+        id: 8,
         title: "Snake Rush",
         category: "Classic Arcade",
         thumb: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=300&auto=format&fit=crop&q=80",
         url: "games/snake-rush.html"
       },
       {
-        id: 8,
+        id: 9,
         title: "Whack A Monster",
         category: "Reflex & Tap",
         thumb: "https://images.unsplash.com/photo-1563089145-599997674d42?w=300&auto=format&fit=crop&q=80",
         url: "games/whack-monster.html"
+      },
+      {
+        id: 10,
+        title: "Multani Runner (Folder Version)",
+        category: "Action Runner",
+        thumb: "multani-runner/1792389240189.jpg",
+        url: "multani-runner/index.html"
       }
     ];
 
@@ -836,7 +850,7 @@
       }
     });
 
-    // MINI GAMES LIST SCREEN
+    // MINI GAMES LIST SCREEN (AIK TOP PR, AIK NECHE - 2-COLUMN GRID)
     function renderGamesList() {
       const view = document.getElementById('app-view');
       view.innerHTML = `
@@ -846,19 +860,17 @@
           </div>
           <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Bina download kiye direct web par play karein!</p>
 
-          <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
             ${AVAILABLE_GAMES.map(g => `
-              <div class="player-hero-card" style="margin-bottom:0; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-                  <img src="${g.thumb}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&auto=format&fit=crop&q=80'" style="width:54px; height:54px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border-color); flex-shrink:0;" />
-                  <div style="min-width:0;">
-                    <h4 style="font-size:15px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(g.title)}</h4>
-                    <span style="font-size:11px; color:var(--accent-cyan); display:block; margin-top:2px;">${escapeHTML(g.category)}</span>
-                  </div>
+              <div class="player-hero-card" style="margin-bottom:0; padding:12px; display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:space-between; gap:10px;">
+                <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                  <img src="${g.thumb}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&auto=format&fit=crop&q=80'" style="width:72px; height:72px; border-radius:12px; object-fit:cover; border:1.5px solid var(--border-color); margin-bottom:8px;" />
+                  <h4 style="font-size:13px; font-weight:700; color:#fff; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(g.title)}</h4>
+                  <span style="font-size:10px; color:var(--accent-cyan); display:block; margin-top:2px;">${escapeHTML(g.category)}</span>
                 </div>
 
-                <button onclick="launchGame('${g.url}', '${escapeHTML(g.title)}')" class="btn btn-primary btn-sm" style="flex-shrink:0; padding:8px 14px; font-size:12px; background:linear-gradient(135deg, #00f0ff, #0077ff); color:#000; font-weight:800;">
-                  <i class="fa-solid fa-play"></i> PLAY GAME
+                <button onclick="launchGame('${g.url}', '${escapeHTML(g.title)}')" class="btn btn-primary btn-sm" style="width:100%; padding:8px 6px; font-size:11px; background:linear-gradient(135deg, #00f0ff, #0077ff); color:#000; font-weight:800; border-radius:6px;">
+                  <i class="fa-solid fa-play"></i> PLAY
                 </button>
               </div>
             `).join('')}
@@ -1713,7 +1725,7 @@
           </div>
 
           <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
-            <i class="fa-solid faaward text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
+            <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
             <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Invite Reward</h3>
             <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for every friend you invite!</p>
           </div>
