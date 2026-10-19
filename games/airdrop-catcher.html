@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,16 +31,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(14, 17, 24, 0.88);
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(10, 13, 20, 0.95), rgba(10, 13, 20, 0.75));
   backdrop-filter: blur(8px);
-  border-bottom: 1.5px solid #ff542d44;
+  border-bottom: 1.5px solid rgba(255, 174, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
   z-index: 10;
 }
-.title-tag { font-size: 16px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.title-tag { 
+  font-size: 15px; 
+  font-weight: 900; 
+  letter-spacing: 1px;
+  color: #ffbe00; 
+  text-shadow: 0 0 12px rgba(255,190,0,0.5), 0 2px 4px #000; 
+}
 .score-box { display: flex; gap: 14px; font-weight: bold; font-size: 15px; }
-.score-box .score { color: #00f0ff; }
-.score-box .lives { color: #ff1744; }
+.score-box .score { color: #00f0ff; text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+.score-box .lives { color: #ff1744; text-shadow: 0 0 8px rgba(255,23,68,0.4); }
 
 #stage-box { flex: 1; position: relative; overflow: hidden; }
 canvas { display: block; width: 100%; height: 100%; }
@@ -49,8 +55,8 @@ canvas { display: block; width: 100%; height: 100%; }
 #game-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(4, 6, 12, 0.88);
-  backdrop-filter: blur(5px);
+  background: radial-gradient(circle, rgba(14, 18, 28, 0.88) 0%, rgba(5, 7, 12, 0.96) 100%);
+  backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -59,19 +65,39 @@ canvas { display: block; width: 100%; height: 100%; }
   padding: 24px;
   z-index: 20;
 }
-#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
-#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+#game-overlay h1 { 
+  font-size: 28px; 
+  font-weight: 900;
+  color: #ffbe00; 
+  margin-bottom: 12px; 
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 14px rgba(255,84,45,0.8), 0 0 30px rgba(255,190,0,0.4); 
+}
+#game-overlay p { 
+  font-size: 13.5px; 
+  color: #d1d5db; 
+  line-height: 1.7; 
+  max-width: 310px; 
+  margin-bottom: 24px; 
+  background: rgba(0,0,0,0.3);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
 .play-btn {
-  padding: 13px 34px;
-  font-size: 16px;
-  font-weight: 800;
-  color: #000;
-  background: linear-gradient(135deg, #00f0ff, #00e676);
+  padding: 14px 38px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #0b0f19;
+  background: linear-gradient(135deg, #ffbe00, #ff8c00);
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+  transition: transform 0.1s ease;
 }
+.play-btn:active { transform: scale(0.96); }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -92,10 +118,10 @@ canvas { display: block; width: 100%; height: 100%; }
     <div id="game-overlay">
       <h1 id="screenTitle">AIRDROP CATCHER</h1>
       <p id="screenDesc">
-        Basket ko ungli se Drag karke ghumayein!<br>
-        🎁 Airdrop = <b>+1 Point</b><br>
-        💎 Diamond = <b>+5 Points</b><br>
-        💣 <b>3 Baar Bomb pakadne par Game Over!</b>
+        Screen par neeche ungli drag karke box ghumayein!<br>
+        📦 Real Airdrop = <b>+1 Point</b><br>
+        💎 Diamond Crate = <b>+5 Points</b><br>
+        💣 <b>3 Baar Bomb aane par Game Over!</b>
       </p>
       <button class="play-btn" id="startActionBtn">▶ START GAME</button>
     </div>
@@ -122,12 +148,15 @@ canvas { display: block; width: 100%; height: 100%; }
   let particles = [];
   let spawnClock = 0;
   let audioContext = null;
+  let gameTicks = 0;
 
+  // Box dimensions & thumb clearance height
   const basket = {
     x: 0,
     y: 0,
-    w: 84,
-    h: 34
+    w: 92,
+    h: 56,
+    bottomOffset: 125 // Screen bottom se uncha taaki angutha box ko na chupaye
   };
 
   function initSound() {
@@ -139,15 +168,15 @@ canvas { display: block; width: 100%; height: 100%; }
     if (!audioContext) return;
     const osc = audioContext.createOscillator();
     const gain = audioContext.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(540, audioContext.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1050, audioContext.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.12, audioContext.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(480, audioContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(920, audioContext.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.18, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
     osc.connect(gain);
     gain.connect(audioContext.destination);
     osc.start();
-    osc.stop(audioContext.currentTime + 0.08);
+    osc.stop(audioContext.currentTime + 0.1);
   }
 
   function playBombSound() {
@@ -155,14 +184,14 @@ canvas { display: block; width: 100%; height: 100%; }
     const osc = audioContext.createOscillator();
     const gain = audioContext.createGain();
     osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(160, audioContext.currentTime);
-    osc.frequency.linearRampToValueAtTime(45, audioContext.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    osc.frequency.setValueAtTime(140, audioContext.currentTime);
+    osc.frequency.linearRampToValueAtTime(35, audioContext.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.28, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
     osc.connect(gain);
     gain.connect(audioContext.destination);
     osc.start();
-    osc.stop(audioContext.currentTime + 0.3);
+    osc.stop(audioContext.currentTime + 0.35);
   }
 
   function resize() {
@@ -174,7 +203,7 @@ canvas { display: block; width: 100%; height: 100%; }
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    basket.y = H - 54;
+    basket.y = H - basket.h - basket.bottomOffset;
     basket.x = (W - basket.w) / 2;
   }
   window.addEventListener("resize", resize);
@@ -187,89 +216,241 @@ canvas { display: block; width: 100%; height: 100%; }
     else livesText.innerText = "🖤🖤🖤";
   }
 
+  // Realistic Draw Helpers
+  function drawRealisticParachute(x, y, radius, colorTheme, swayAngle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(swayAngle * 0.4);
+
+    // Suspension cords (Ropes)
+    ctx.strokeStyle = "rgba(220, 215, 200, 0.65)";
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    [-radius + 4, -radius * 0.45, 0, radius * 0.45, radius - 4].forEach(pt => {
+      ctx.moveTo(pt, -radius * 0.2);
+      ctx.lineTo(0, radius * 1.05);
+    });
+    ctx.stroke();
+
+    // Canopy Body
+    const grad = ctx.createRadialGradient(0, -radius * 0.8, radius * 0.2, 0, -radius * 0.2, radius);
+    if (colorTheme === 'camo') {
+      grad.addColorStop(0, '#d4a359');
+      grad.addColorStop(0.6, '#996e36');
+      grad.addColorStop(1, '#573d18');
+    } else if (colorTheme === 'blue') {
+      grad.addColorStop(0, '#60a5fa');
+      grad.addColorStop(0.5, '#2563eb');
+      grad.addColorStop(1, '#1e3a8a');
+    } else {
+      grad.addColorStop(0, '#f87171');
+      grad.addColorStop(0.6, '#dc2626');
+      grad.addColorStop(1, '#7f1d1d');
+    }
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, -radius * 0.25, radius, Math.PI, 0, false);
+    ctx.quadraticCurveTo(0, -radius * 0.05, -radius, -radius * 0.25);
+    ctx.closePath();
+    ctx.fill();
+
+    // Canopy Gore/Stitch Ribs
+    ctx.strokeStyle = "rgba(0,0,0,0.3)";
+    ctx.lineWidth = 1;
+    [-0.6, -0.2, 0.2, 0.6].forEach(offset => {
+      ctx.beginPath();
+      ctx.moveTo(radius * offset, -radius * 0.25);
+      ctx.quadraticCurveTo(radius * offset * 0.7, -radius * 0.9, 0, -radius * 1.25);
+      ctx.stroke();
+    });
+
+    // Highlights
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(0, -radius * 0.25, radius - 1.5, Math.PI + 0.3, -0.3, false);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   class DropItem {
     constructor() {
-      this.w = 32;
-      this.h = 32;
-      this.x = Math.random() * (W - this.w - 20) + 10;
-      this.y = -60;
-      this.vy = 2.2 + Math.random() * 2;
+      this.w = 38;
+      this.h = 42;
+      this.x = Math.random() * (W - this.w - 30) + 15;
+      this.y = -70;
+      this.vy = 1.9 + Math.random() * 1.4;
       this.sway = Math.random() * Math.PI * 2;
+      this.swaySpeed = 0.04 + Math.random() * 0.02;
 
       const r = Math.random();
-      if (r < 0.2) this.type = 'bomb';
-      else if (r < 0.38) this.type = 'diamond';
+      if (r < 0.22) this.type = 'bomb';
+      else if (r < 0.42) this.type = 'diamond';
       else this.type = 'airdrop';
     }
     update() {
       this.y += this.vy;
-      this.sway += 0.05;
-      this.x += Math.sin(this.sway) * 0.8;
+      this.sway += this.swaySpeed;
+      this.x += Math.sin(this.sway) * 0.9;
     }
     draw() {
       ctx.save();
-      ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+      const centerX = this.x + this.w / 2;
+      const centerY = this.y + this.h / 2;
+      const swayVal = Math.sin(this.sway) * 0.12;
 
-      // Parachute
-      ctx.strokeStyle = "rgba(255,255,255,0.7)";
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(-16, -18);
-      ctx.lineTo(0, 0);
-      ctx.moveTo(16, -18);
-      ctx.lineTo(0, 0);
-      ctx.stroke();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(swayVal);
 
-      ctx.fillStyle = this.type === 'bomb' ? '#ff1744' : (this.type === 'diamond' ? '#00f0ff' : '#ffbe00');
-      ctx.beginPath();
-      ctx.arc(0, -20, 18, Math.PI, 0);
-      ctx.closePath();
-      ctx.fill();
+      if (this.type === 'airdrop') {
+        drawRealisticParachute(0, -22, 24, 'camo', swayVal);
 
-      // Item
-      if (this.type === 'bomb') {
-        ctx.fillStyle = '#111';
-        ctx.beginPath();
-        ctx.arc(0, 8, 13, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffbe00';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('💣', 0, 8);
+        // Ground shadow effect under item
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(-15, 14, 30, 4);
+
+        // Heavy Wooden/Metal Cargo Airdrop Crate
+        const boxGrad = ctx.createLinearGradient(-14, -6, 14, 18);
+        boxGrad.addColorStop(0, '#e53935');
+        boxGrad.addColorStop(0.5, '#b71c1c');
+        boxGrad.addColorStop(1, '#5f0909');
+        ctx.fillStyle = boxGrad;
+        ctx.fillRect(-15, -6, 30, 24);
+
+        // Metal Corner Braces
+        ctx.fillStyle = '#424242';
+        ctx.fillRect(-15, -6, 5, 5);
+        ctx.fillRect(10, -6, 5, 5);
+        ctx.fillRect(-15, 13, 5, 5);
+        ctx.fillRect(10, 13, 5, 5);
+
+        // High-tension Blue Straps
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(-15, 4, 30, 4.5);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(-15, 4, 30, 1);
+
+        // Center Lock Buckle
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(-3, 3, 6, 6);
+
       } else if (this.type === 'diamond') {
-        ctx.fillStyle = '#00f0ff';
+        drawRealisticParachute(0, -24, 25, 'blue', swayVal);
+
+        // Real Diamond Chest / Vault Box
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(-16, -6, 32, 22);
+
+        // Reinforced Metallic Edges
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.8;
+        ctx.strokeRect(-16, -6, 32, 22);
+
+        // Inner Velvet Diamond Bed
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(-13, -3, 26, 10);
+
+        // Realistic Diamond Cluster with Facets & Sparkle
+        ctx.save();
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 10;
+
+        // Diamond 1
+        ctx.fillStyle = '#f0f9ff';
         ctx.beginPath();
-        ctx.moveTo(0, -2);
-        ctx.lineTo(12, 8);
-        ctx.lineTo(0, 18);
-        ctx.lineTo(-12, 8);
+        ctx.moveTo(0, -5);
+        ctx.lineTo(7, 0);
+        ctx.lineTo(0, 7);
+        ctx.lineTo(-7, 0);
         ctx.closePath();
         ctx.fill();
-        ctx.strokeStyle = '#fff';
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.moveTo(0, -5);
+        ctx.lineTo(3, 0);
+        ctx.lineTo(0, 7);
+        ctx.closePath();
+        ctx.fill();
+
+        // Diamond 2 (side jewel)
+        ctx.fillStyle = '#bae6fd';
+        ctx.beginPath();
+        ctx.moveTo(-6, -2);
+        ctx.lineTo(-1, 2);
+        ctx.lineTo(-6, 6);
+        ctx.lineTo(-10, 2);
+        ctx.closePath();
+        ctx.fill();
+
+        // Shimmer glint
+        if (Math.sin(gameTicks * 0.15 + this.x) > 0.6) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(2, -2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+      } else if (this.type === 'bomb') {
+        drawRealisticParachute(0, -22, 23, 'red', swayVal);
+
+        // Cast Iron Heavy Bomb Sphere
+        const bombGrad = ctx.createRadialGradient(-3, 2, 2, 0, 6, 15);
+        bombGrad.addColorStop(0, '#52525b');
+        bombGrad.addColorStop(0.4, '#27272a');
+        bombGrad.addColorStop(1, '#09090b');
+        ctx.fillStyle = bombGrad;
+        ctx.beginPath();
+        ctx.arc(0, 7, 13, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bomb Collar Rim
+        ctx.fillStyle = '#18181b';
+        ctx.fillRect(-4, -8, 8, 4);
+
+        // Burning Fuse Rope
+        ctx.strokeStyle = '#a16207';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, -8);
+        ctx.quadraticCurveTo(6, -13, 2, -18);
         ctx.stroke();
-      } else {
-        // Red Airdrop Box
-        ctx.fillStyle = '#d32f2f';
-        ctx.fillRect(-12, -2, 24, 20);
-        ctx.fillStyle = '#00f0ff';
-        ctx.fillRect(-12, 6, 24, 4);
+
+        // Animated Realistic Fire Spark at Fuse Tip
+        const sparkSize = 2.5 + Math.random() * 2.5;
+        const fireGrad = ctx.createRadialGradient(2, -18, 0, 2, -18, sparkSize);
+        fireGrad.addColorStop(0, '#ffffff');
+        fireGrad.addColorStop(0.3, '#fde047');
+        fireGrad.addColorStop(0.8, '#ea580c');
+        fireGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = fireGrad;
+        ctx.beginPath();
+        ctx.arc(2, -18, sparkSize, 0, Math.PI * 2);
+        ctx.fill();
       }
+
       ctx.restore();
     }
   }
 
-  function createSparks(x, y, color) {
-    for (let i = 0; i < 12; i++) {
+  function createRealisticSparks(x, y, type) {
+    const count = type === 'bomb' ? 24 : 14;
+    for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 4 + 1.5;
+      const speed = Math.random() * 5 + 1.5;
       particles.push({
         x, y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        size: Math.random() * 3 + 2,
-        color: color,
-        alpha: 1
+        vy: Math.sin(angle) * speed - 1,
+        size: Math.random() * 3.5 + 1.5,
+        color: type === 'bomb' 
+          ? (Math.random() > 0.5 ? '#f97316' : '#ef4444') 
+          : (type === 'diamond' ? '#38bdf8' : '#fbbf24'),
+        alpha: 1,
+        gravity: 0.15
       });
     }
   }
@@ -280,9 +461,15 @@ canvas { display: block; width: 100%; height: 100%; }
     basket.x = Math.max(0, Math.min(W - basket.w, touchX - basket.w / 2));
   }
 
-  canvas.addEventListener('pointerdown', (e) => moveBasket(e.clientX));
+  // Smooth touch & drag controls across the entire screen
+  canvas.addEventListener('pointerdown', (e) => {
+    initSound();
+    moveBasket(e.clientX);
+  });
   canvas.addEventListener('pointermove', (e) => {
-    if (e.buttons === 1) moveBasket(e.clientX);
+    if (e.buttons === 1 || e.pressure > 0 || e.pointerType === 'touch') {
+      moveBasket(e.clientX);
+    }
   });
 
   function startGame() {
@@ -292,6 +479,7 @@ canvas { display: block; width: 100%; height: 100%; }
     items = [];
     particles = [];
     spawnClock = 0;
+    gameTicks = 0;
     scoreText.innerText = "0";
     updateLives();
     running = true;
@@ -302,51 +490,111 @@ canvas { display: block; width: 100%; height: 100%; }
   function gameOver() {
     running = false;
     screenTitle.innerText = "💥 GAME OVER!";
-    screenDesc.innerHTML = `Bomb 3 baar lag gaya!<br>Final Score: <b style="color:#00f0ff; font-size:22px;">${score}</b>`;
+    screenDesc.innerHTML = `3 Baar Bomb se takra gaye!<br>Final Score: <b style="color:#00f0ff; font-size:22px;">${score}</b>`;
     startBtn.innerText = "↻ PLAY AGAIN";
     overlay.classList.remove("hidden");
   }
 
   startBtn.addEventListener("click", startGame);
 
-  function drawBasket() {
+  // Realistic 2.5D Multani Wooden & Iron Cargo Box
+  function drawRealisticBasket() {
     ctx.save();
     ctx.translate(basket.x, basket.y);
 
-    // Glow
-    ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 12;
+    const bw = basket.w;
+    const bh = basket.h;
 
-    // Cart base
-    ctx.fillStyle = '#ff542d';
+    // Ground Drop-Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
     ctx.beginPath();
-    ctx.roundRect(0, 6, basket.w, basket.h - 6, 8);
+    ctx.ellipse(bw / 2, bh + 10, bw * 0.55, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rim
-    ctx.fillStyle = '#ffbe00';
-    ctx.fillRect(4, 0, basket.w - 8, 7);
+    // Box Top Rim / Opening Bevel
+    const topGrad = ctx.createLinearGradient(0, 0, 0, 8);
+    topGrad.addColorStop(0, '#5c3a21');
+    topGrad.addColorStop(1, '#3b2211');
+    ctx.fillStyle = topGrad;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, bw, 9, 3);
+    ctx.fill();
 
-    // Title on cart
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 10px sans-serif';
+    // Main Wooden Planks Body
+    const bodyGrad = ctx.createLinearGradient(0, 9, 0, bh);
+    bodyGrad.addColorStop(0, '#a26a3e');
+    bodyGrad.addColorStop(0.3, '#82512a');
+    bodyGrad.addColorStop(0.7, '#673e1c');
+    bodyGrad.addColorStop(1, '#43260d');
+    ctx.fillStyle = bodyGrad;
+    ctx.fillRect(2, 9, bw - 4, bh - 9);
+
+    // Horizontal Planks Grooves
+    ctx.strokeStyle = '#281507';
+    ctx.lineWidth = 1.2;
+    [24, 38].forEach(py => {
+      ctx.beginPath();
+      ctx.moveTo(4, py);
+      ctx.lineTo(bw - 4, py);
+      ctx.stroke();
+    });
+
+    // Heavy Metal Iron Brackets on Corners
+    ctx.fillStyle = '#475569';
+    // Top-left
+    ctx.fillRect(0, 5, 12, 11);
+    // Top-right
+    ctx.fillRect(bw - 12, 5, 12, 11);
+    // Bottom-left
+    ctx.fillRect(0, bh - 12, 12, 12);
+    // Bottom-right
+    ctx.fillRect(bw - 12, bh - 12, 12, 12);
+
+    // Diagonal Reinforcement Bars
+    ctx.strokeStyle = 'rgba(40, 21, 7, 0.7)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(14, 12);
+    ctx.lineTo(bw - 14, bh - 6);
+    ctx.moveTo(bw - 14, 12);
+    ctx.lineTo(14, bh - 6);
+    ctx.stroke();
+
+    // Rivets / Bolts on Metal Brackets
+    ctx.fillStyle = '#cbd5e1';
+    [[4, 9], [bw - 8, 9], [4, bh - 6], [bw - 8, bh - 6]].forEach(([bx, by]) => {
+      ctx.beginPath();
+      ctx.arc(bx + 2, by, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Realistic Stencil Typography: "MULTANI FF"
+    ctx.save();
+    // Engraved Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.font = '900 12px "Arial Black", Impact, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('MULTANI FF', basket.w / 2, 22);
+    ctx.fillText('MULTANI FF', bw / 2, 33);
+
+    // Weathered White Stencil Face
+    ctx.fillStyle = 'rgba(248, 250, 252, 0.88)';
+    ctx.fillText('MULTANI FF', bw / 2, 32);
+    ctx.restore();
 
     ctx.restore();
   }
 
   function loop() {
     if (!running) return;
+    gameTicks++;
     ctx.clearRect(0, 0, W, H);
 
     // Draw basket
-    drawBasket();
+    drawRealisticBasket();
 
     // Spawn items
     spawnClock++;
-    if (spawnClock > 32) {
+    if (spawnClock > 34) {
       items.push(new DropItem());
       spawnClock = 0;
     }
@@ -357,16 +605,17 @@ canvas { display: block; width: 100%; height: 100%; }
       it.update();
       it.draw();
 
-      // Catch check
+      // Catch check (with calibrated box hit boundary)
+      const hitBoxY = basket.y - 6;
       if (
-        it.y + it.h >= basket.y &&
+        it.y + it.h >= hitBoxY &&
         it.y <= basket.y + basket.h &&
-        it.x + it.w >= basket.x &&
-        it.x <= basket.x + basket.w
+        it.x + it.w >= basket.x - 4 &&
+        it.x <= basket.x + basket.w + 4
       ) {
         if (it.type === 'bomb') {
           playBombSound();
-          createSparks(it.x, it.y, '#ff1744');
+          createRealisticSparks(it.x + it.w / 2, it.y + it.h / 2, 'bomb');
           items.splice(i, 1);
           lives--;
           updateLives();
@@ -376,7 +625,7 @@ canvas { display: block; width: 100%; height: 100%; }
           }
         } else {
           playCatchSound();
-          createSparks(it.x, it.y, it.type === 'diamond' ? '#00f0ff' : '#ffbe00');
+          createRealisticSparks(it.x + it.w / 2, it.y + it.h / 2, it.type);
           score += (it.type === 'diamond' ? 5 : 1);
           scoreText.innerText = score;
           items.splice(i, 1);
@@ -384,24 +633,27 @@ canvas { display: block; width: 100%; height: 100%; }
         continue;
       }
 
-      // Niche nikalne par remove
-      if (it.y > H + 40) {
+      // Screen se bahar nikalne par remove
+      if (it.y > H + 60) {
         items.splice(i, 1);
       }
     }
 
-    // Particles
+    // Realistic Particles Update
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.alpha -= 0.035;
+      p.vy += p.gravity;
+      p.alpha -= 0.03;
       if (p.alpha <= 0) {
         particles.splice(i, 1);
       } else {
         ctx.save();
-        ctx.globalAlpha = p.alpha;
+        ctx.globalAlpha = Math.max(0, p.alpha);
         ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
