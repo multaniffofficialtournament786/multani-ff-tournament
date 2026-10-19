@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MULTANI BRICK BREAKER</title>
+<title>MULTANI BRICK BREAKER VIP</title>
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 body {
@@ -66,6 +66,35 @@ body {
 #stage-box { flex: 1; position: relative; overflow: hidden; }
 canvas { display: block; width: 100%; height: 100%; }
 
+/* DEDICATED THUMB SLIDER ZONE AT BOTTOM */
+.thumb-slider-zone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 85px;
+  background: linear-gradient(to top, rgba(6, 9, 16, 0.88), rgba(6, 9, 16, 0.45));
+  border-top: 1.5px solid rgba(0, 240, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #00f0ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 8px rgba(0,240,255,0.6);
+  z-index: 5;
+  pointer-events: none;
+}
+.thumb-indicator {
+  width: 50px;
+  height: 6px;
+  background: linear-gradient(90deg, #ff542d, #ffbe00);
+  border-radius: 3px;
+  box-shadow: 0 0 10px #ffbe00;
+}
+
 #game-overlay {
   position: absolute;
   inset: 0;
@@ -100,7 +129,7 @@ canvas { display: block; width: 100%; height: 100%; }
 <div id="game-wrap">
   <div class="header-bar">
     <button class="back-btn" id="backNavBtn">⬅ BACK</button>
-    <div class="title-tag">🧱 BRICK BREAKER</div>
+    <div class="title-tag">💎 VIP BRICK BREAKER</div>
     <div class="header-actions">
       <button class="music-toggle" id="musicBtn">🎵 MUSIC</button>
       <div class="stats-badge">⭐ <span id="scoreText">0</span></div>
@@ -111,12 +140,19 @@ canvas { display: block; width: 100%; height: 100%; }
   <div id="stage-box">
     <canvas id="gameCanvas"></canvas>
 
+    <!-- THUMB CONTROL ZONE GUIDE -->
+    <div class="thumb-slider-zone">
+      <span>◄ SLIDE</span>
+      <div class="thumb-indicator"></div>
+      <span>SLIDE ►</span>
+    </div>
+
     <div id="game-overlay">
-      <h1 id="screenTitle">BRICK BREAKER PRO</h1>
+      <h1 id="screenTitle">VIP BRICK BREAKER</h1>
       <p id="screenDesc">
-        Paddle ko ungli se Drag karke ghumayein!<br>
-        Ball ko girne na dein aur saari Bricks torein.<br>
-        Girne wale chamakdar Diamonds catch karein!
+        🎮 <b>Neeche Angootha (Thumb)</b> rakh kar slide karein!<br>
+        💎 VIP Crystal plates ko energy ball se torein.<br>
+        ⭐ Girne wale bonus diamonds pakrein!
       </p>
       <button class="play-btn" id="startBtn">▶ PLAY NOW</button>
     </div>
@@ -152,7 +188,7 @@ canvas { display: block; width: 100%; height: 100%; }
   let audioCtx = null;
   let musicOn = true;
 
-  // New Saraiki Karaoke Track
+  // Saraiki Karaoke Audio
   const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/saraiki_karaoke_music._original_karaoke_music(256k).mp3");
   bgMusic.loop = true;
   bgMusic.volume = 0.18;
@@ -167,14 +203,14 @@ canvas { display: block; width: 100%; height: 100%; }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(480, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1150, audioCtx.currentTime + 0.07);
-    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+    osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1250, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.07);
+    osc.stop(audioCtx.currentTime + 0.08);
   }
 
   function playPaddleSound() {
@@ -182,9 +218,9 @@ canvas { display: block; width: 100%; height: 100%; }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(620, audioCtx.currentTime + 0.06);
-    gain.gain.setValueAtTime(0.20, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(340, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(680, audioCtx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
     gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -198,13 +234,13 @@ canvas { display: block; width: 100%; height: 100%; }
     const gain = audioCtx.createGain();
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(260, audioCtx.currentTime);
-    osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 0.35);
-    gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.frequency.linearRampToValueAtTime(55, audioCtx.currentTime + 0.38);
+    gain.gain.setValueAtTime(0.38, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.38);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.35);
+    osc.stop(audioCtx.currentTime + 0.38);
   }
 
   function toggleMusic() {
@@ -219,9 +255,10 @@ canvas { display: block; width: 100%; height: 100%; }
     toggleMusic();
   });
 
+  // PADDLE & BALL SETUP (PADDLE IS ELEVATED SO THUMB SITS UNDER IT)
   const paddle = {
-    w: 92,
-    h: 14,
+    w: 96,
+    h: 16,
     x: 0,
     y: 0
   };
@@ -229,15 +266,22 @@ canvas { display: block; width: 100%; height: 100%; }
   const ball = {
     x: 0,
     y: 0,
-    r: 8,
+    r: 9,
     vx: 0,
     vy: 0,
-    speed: 5.5
+    speed: 5.4
   };
 
   const BRICK_ROWS = 5;
   const BRICK_COLS = 6;
-  const BRICK_COLORS = ["#ff1744", "#ff9100", "#ffd600", "#00e676", "#00f0ff"];
+  const VIP_PALETTES = [
+    { top: "#ff3366", mid: "#c2185b", glow: "#ff1744", border: "#ff80ab" },
+    { top: "#ff9100", mid: "#e65100", glow: "#ff6d00", border: "#ffcc80" },
+    { top: "#ffd600", mid: "#f57f17", glow: "#ffab00", border: "#fff59d" },
+    { top: "#00e676", mid: "#1b5e20", glow: "#00c853", border: "#b9f6ca" },
+    { top: "#00f0ff", mid: "#006064", glow: "#00b4d8", border: "#80deea" }
+  ];
+
   let bricks = [];
   let particles = [];
   let drops = [];
@@ -251,7 +295,8 @@ canvas { display: block; width: 100%; height: 100%; }
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    paddle.y = H - 55;
+    // Paddle sits 130px from bottom (giving 85px thumb zone below it)
+    paddle.y = H - 130;
     if (paddle.x === 0) paddle.x = (W - paddle.w) / 2;
   }
   window.addEventListener("resize", resize);
@@ -262,8 +307,8 @@ canvas { display: block; width: 100%; height: 100%; }
     const pad = 8;
     const totalPadX = (BRICK_COLS + 1) * pad;
     const brickW = (W - totalPadX) / BRICK_COLS;
-    const brickH = 22;
-    const topOffset = 30;
+    const brickH = 24;
+    const topOffset = 25;
 
     for (let r = 0; r < BRICK_ROWS; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
@@ -272,7 +317,7 @@ canvas { display: block; width: 100%; height: 100%; }
           y: topOffset + r * (brickH + pad),
           w: brickW,
           h: brickH,
-          color: BRICK_COLORS[r % BRICK_COLORS.length],
+          style: VIP_PALETTES[r % VIP_PALETTES.length],
           status: 1
         });
       }
@@ -281,12 +326,13 @@ canvas { display: block; width: 100%; height: 100%; }
 
   function resetBall() {
     ball.x = paddle.x + paddle.w / 2;
-    ball.y = paddle.y - ball.r - 2;
-    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+    ball.y = paddle.y - ball.r - 3;
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.65;
     ball.vx = Math.cos(angle) * ball.speed;
     ball.vy = Math.sin(angle) * ball.speed;
   }
 
+  // CONTROLS - USERS CAN DRAG ANYWHERE (SPECIALLY AT THE THUMB ZONE AT BOTTOM)
   function movePaddle(clientX) {
     const rect = canvas.getBoundingClientRect();
     const touchX = clientX - rect.left;
@@ -302,9 +348,9 @@ canvas { display: block; width: 100%; height: 100%; }
   });
 
   function spawnParticles(x, y, color) {
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       const a = Math.random() * Math.PI * 2;
-      const spd = Math.random() * 4 + 1.5;
+      const spd = Math.random() * 4.5 + 2;
       particles.push({
         x, y,
         vx: Math.cos(a) * spd,
@@ -315,6 +361,109 @@ canvas { display: block; width: 100%; height: 100%; }
     }
   }
 
+  // DRAW VIP STYLISH BRICK
+  function drawVipBrick(b) {
+    const { x, y, w, h, style } = b;
+    ctx.save();
+
+    // Outer Glow / Bevel
+    ctx.shadowColor = style.glow;
+    ctx.shadowBlur = 8;
+
+    // Body Gradient (Glossy Glass finish)
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0, style.top);
+    grad.addColorStop(0.5, style.mid);
+    grad.addColorStop(1, "rgba(10, 15, 25, 0.95)");
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 6);
+    ctx.fill();
+
+    // Metallic Rim / Border
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = style.border;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Top Specular Shine Glass Bar
+    ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+    ctx.beginPath();
+    ctx.roundRect(x + 3, y + 2, w - 6, h * 0.35, 3);
+    ctx.fill();
+
+    // VIP Center Crystal Diamond
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 4);
+    ctx.lineTo(cx + 5, cy);
+    ctx.lineTo(cx, cy + 4);
+    ctx.lineTo(cx - 5, cy);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // DRAW VIP CYBER PADDLE
+  function drawVipPaddle() {
+    ctx.save();
+    const { x, y, w, h } = paddle;
+
+    // Paddle Shadow & Glow
+    ctx.shadowColor = "#00f0ff";
+    ctx.shadowBlur = 10;
+
+    // Main Body
+    const pGrad = ctx.createLinearGradient(x, y, x, y + h);
+    pGrad.addColorStop(0, "#00f0ff");
+    pGrad.addColorStop(0.6, "#ff542d");
+    pGrad.addColorStop(1, "#b71c1c");
+
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 8);
+    ctx.fill();
+
+    // Gold Center Core
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#ffbe00";
+    ctx.beginPath();
+    ctx.roundRect(x + w * 0.2, y + 3, w * 0.6, 4, 2);
+    ctx.fill();
+
+    // Left & Right Neon Thrusters
+    ctx.fillStyle = "#00f0ff";
+    ctx.fillRect(x + 4, y + h - 2, 8, 3);
+    ctx.fillRect(x + w - 12, y + h - 2, 8, 3);
+
+    ctx.restore();
+  }
+
+  // DRAW ENERGY BALL
+  function drawEnergyBall() {
+    ctx.save();
+    ctx.shadowColor = "#00f0ff";
+    ctx.shadowBlur = 12;
+
+    const bGrad = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, ball.r);
+    bGrad.addColorStop(0, "#ffffff");
+    bGrad.addColorStop(0.4, "#00f0ff");
+    bGrad.addColorStop(1, "#0077ff");
+
+    ctx.fillStyle = bGrad;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function startGame() {
     initAudio();
     score = 0;
@@ -323,7 +472,7 @@ canvas { display: block; width: 100%; height: 100%; }
     livesText.innerText = "3";
     particles = [];
     drops = [];
-    paddle.w = 92;
+    paddle.w = 96;
     paddle.x = (W - paddle.w) / 2;
     initBricks();
     resetBall();
@@ -338,7 +487,7 @@ canvas { display: block; width: 100%; height: 100%; }
     bgMusic.pause();
     screenTitle.innerText = win ? "🎉 BOOYAH! YOU WON!" : "💥 GAME OVER!";
     screenDesc.innerHTML = win 
-      ? `Aapne saari Bricks tor dein!<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`
+      ? `Aapne saari VIP plates tor dein!<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`
       : `Ball zameen par lag gayi!<br>Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
     startBtn.innerText = "↻ PLAY AGAIN";
     overlay.classList.remove("hidden");
@@ -350,9 +499,11 @@ canvas { display: block; width: 100%; height: 100%; }
     if (!running) return;
     ctx.clearRect(0, 0, W, H);
 
+    // Ball Physics
     ball.x += ball.vx;
     ball.y += ball.vy;
 
+    // Side & Top Wall Collision
     if (ball.x - ball.r <= 0) {
       ball.x = ball.r;
       ball.vx *= -1;
@@ -368,6 +519,7 @@ canvas { display: block; width: 100%; height: 100%; }
       playPaddleSound();
     }
 
+    // Paddle Collision (Paddle is elevated)
     if (
       ball.y + ball.r >= paddle.y &&
       ball.y - ball.r <= paddle.y + paddle.h &&
@@ -382,7 +534,8 @@ canvas { display: block; width: 100%; height: 100%; }
       ball.vy = -ball.speed * Math.cos(angle);
     }
 
-    if (ball.y > H + 20) {
+    // Below paddle drop check (Ball passes paddle into bottom zone)
+    if (ball.y > paddle.y + 40) {
       playLoseLifeSound();
       lives--;
       livesText.innerText = lives;
@@ -394,6 +547,7 @@ canvas { display: block; width: 100%; height: 100%; }
       }
     }
 
+    // Brick Collision
     let remainingBricks = 0;
     for (const b of bricks) {
       if (b.status === 1) {
@@ -406,12 +560,12 @@ canvas { display: block; width: 100%; height: 100%; }
         ) {
           b.status = 0;
           ball.vy *= -1;
-          score += 20;
+          score += 25;
           scoreText.innerText = score;
           playHitSound();
-          spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.color);
+          spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.style.glow);
 
-          if (Math.random() < 0.25) {
+          if (Math.random() < 0.28) {
             drops.push({
               x: b.x + b.w / 2,
               y: b.y + b.h / 2,
@@ -428,29 +582,30 @@ canvas { display: block; width: 100%; height: 100%; }
       return;
     }
 
+    // Draw VIP Bricks
     for (const b of bricks) {
       if (b.status === 1) {
-        ctx.fillStyle = b.color;
-        ctx.beginPath();
-        ctx.roundRect(b.x, b.y, b.w, b.h, 6);
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.4)";
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
+        drawVipBrick(b);
       }
     }
 
+    // Bonus Falling Diamonds
     for (let i = drops.length - 1; i >= 0; i--) {
       const d = drops[i];
       d.y += d.vy;
 
+      ctx.save();
       ctx.fillStyle = "#00f0ff";
+      ctx.shadowColor = "#00f0ff";
+      ctx.shadowBlur = 8;
       ctx.beginPath();
       ctx.arc(d.x, d.y, 8, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = "#fff";
       ctx.stroke();
+      ctx.restore();
 
+      // Catch check with paddle
       if (
         d.y >= paddle.y &&
         d.y <= paddle.y + paddle.h &&
@@ -464,24 +619,14 @@ canvas { display: block; width: 100%; height: 100%; }
         continue;
       }
 
-      if (d.y > H + 20) drops.splice(i, 1);
+      if (d.y > H) drops.splice(i, 1);
     }
 
-    ctx.fillStyle = "#ff542d";
-    ctx.beginPath();
-    ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
-    ctx.fill();
-    ctx.fillStyle = "#ffbe00";
-    ctx.fillRect(paddle.x + 8, paddle.y + 3, paddle.w - 16, 4);
+    // Draw VIP Paddle & Energy Ball
+    drawVipPaddle();
+    drawEnergyBall();
 
-    ctx.fillStyle = "#00f0ff";
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
+    // Draw Particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.x += p.vx;
