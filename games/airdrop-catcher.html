@@ -1,1 +1,417 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI AIRDROP CATCHER</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+body {
+  background: #06070a;
+  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+#game-wrap {
+  width: 100%;
+  max-width: 550px;
+  margin: auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #0b0f19;
+  background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(14, 17, 24, 0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid #ff542d44;
+  z-index: 10;
+}
+.title-tag { font-size: 16px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
+.score-box { display: flex; gap: 14px; font-weight: bold; font-size: 15px; }
+.score-box .score { color: #00f0ff; }
+.score-box .lives { color: #ff1744; }
+
+#stage-box { flex: 1; position: relative; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+
+#game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 20;
+}
+#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
+#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+.play-btn {
+  padding: 13px 34px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  background: linear-gradient(135deg, #00f0ff, #00e676);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="game-wrap">
+  <div class="header-bar">
+    <div class="title-tag">🪂 AIRDROP CATCHER</div>
+    <div class="score-box">
+      <span class="score">⭐ <span id="scoreText">0</span></span>
+      <span class="lives">❤️ <span id="livesText">❤️❤️❤️</span></span>
+    </div>
+  </div>
+
+  <div id="stage-box">
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="game-overlay">
+      <h1 id="screenTitle">AIRDROP CATCHER</h1>
+      <p id="screenDesc">
+        Basket ko ungli se Drag karke ghumayein!<br>
+        🎁 Airdrop = <b>+1 Point</b><br>
+        💎 Diamond = <b>+5 Points</b><br>
+        💣 <b>3 Baar Bomb pakadne par Game Over!</b>
+      </p>
+      <button class="play-btn" id="startActionBtn">▶ START GAME</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const stage = document.getElementById("stage-box");
+  const scoreText = document.getElementById("scoreText");
+  const livesText = document.getElementById("livesText");
+  const overlay = document.getElementById("game-overlay");
+  const screenTitle = document.getElementById("screenTitle");
+  const screenDesc = document.getElementById("screenDesc");
+  const startBtn = document.getElementById("startActionBtn");
+
+  let W, H;
+  let running = false;
+  let score = 0;
+  let lives = 3;
+  let items = [];
+  let particles = [];
+  let spawnClock = 0;
+  let audioContext = null;
+
+  const basket = {
+    x: 0,
+    y: 0,
+    w: 84,
+    h: 34
+  };
+
+  function initSound() {
+    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === "suspended") audioContext.resume();
+  }
+
+  function playCatchSound() {
+    if (!audioContext) return;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(540, audioContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1050, audioContext.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start();
+    osc.stop(audioContext.currentTime + 0.08);
+  }
+
+  function playBombSound() {
+    if (!audioContext) return;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(160, audioContext.currentTime);
+    osc.frequency.linearRampToValueAtTime(45, audioContext.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start();
+    osc.stop(audioContext.currentTime + 0.3);
+  }
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    basket.y = H - 54;
+    basket.x = (W - basket.w) / 2;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function updateLives() {
+    if (lives === 3) livesText.innerText = "❤️❤️❤️";
+    else if (lives === 2) livesText.innerText = "❤️❤️🖤";
+    else if (lives === 1) livesText.innerText = "❤️🖤🖤";
+    else livesText.innerText = "🖤🖤🖤";
+  }
+
+  class DropItem {
+    constructor() {
+      this.w = 32;
+      this.h = 32;
+      this.x = Math.random() * (W - this.w - 20) + 10;
+      this.y = -60;
+      this.vy = 2.2 + Math.random() * 2;
+      this.sway = Math.random() * Math.PI * 2;
+
+      const r = Math.random();
+      if (r < 0.2) this.type = 'bomb';
+      else if (r < 0.38) this.type = 'diamond';
+      else this.type = 'airdrop';
+    }
+    update() {
+      this.y += this.vy;
+      this.sway += 0.05;
+      this.x += Math.sin(this.sway) * 0.8;
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+
+      // Parachute
+      ctx.strokeStyle = "rgba(255,255,255,0.7)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-16, -18);
+      ctx.lineTo(0, 0);
+      ctx.moveTo(16, -18);
+      ctx.lineTo(0, 0);
+      ctx.stroke();
+
+      ctx.fillStyle = this.type === 'bomb' ? '#ff1744' : (this.type === 'diamond' ? '#00f0ff' : '#ffbe00');
+      ctx.beginPath();
+      ctx.arc(0, -20, 18, Math.PI, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Item
+      if (this.type === 'bomb') {
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        ctx.arc(0, 8, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffbe00';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💣', 0, 8);
+      } else if (this.type === 'diamond') {
+        ctx.fillStyle = '#00f0ff';
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.lineTo(12, 8);
+        ctx.lineTo(0, 18);
+        ctx.lineTo(-12, 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+      } else {
+        // Red Airdrop Box
+        ctx.fillStyle = '#d32f2f';
+        ctx.fillRect(-12, -2, 24, 20);
+        ctx.fillStyle = '#00f0ff';
+        ctx.fillRect(-12, 6, 24, 4);
+      }
+      ctx.restore();
+    }
+  }
+
+  function createSparks(x, y, color) {
+    for (let i = 0; i < 12; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 4 + 1.5;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 3 + 2,
+        color: color,
+        alpha: 1
+      });
+    }
+  }
+
+  function moveBasket(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    const touchX = clientX - rect.left;
+    basket.x = Math.max(0, Math.min(W - basket.w, touchX - basket.w / 2));
+  }
+
+  canvas.addEventListener('pointerdown', (e) => moveBasket(e.clientX));
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.buttons === 1) moveBasket(e.clientX);
+  });
+
+  function startGame() {
+    initSound();
+    score = 0;
+    lives = 3;
+    items = [];
+    particles = [];
+    spawnClock = 0;
+    scoreText.innerText = "0";
+    updateLives();
+    running = true;
+    overlay.classList.add("hidden");
+    loop();
+  }
+
+  function gameOver() {
+    running = false;
+    screenTitle.innerText = "💥 GAME OVER!";
+    screenDesc.innerHTML = `Bomb 3 baar lag gaya!<br>Final Score: <b style="color:#00f0ff; font-size:22px;">${score}</b>`;
+    startBtn.innerText = "↻ PLAY AGAIN";
+    overlay.classList.remove("hidden");
+  }
+
+  startBtn.addEventListener("click", startGame);
+
+  function drawBasket() {
+    ctx.save();
+    ctx.translate(basket.x, basket.y);
+
+    // Glow
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 12;
+
+    // Cart base
+    ctx.fillStyle = '#ff542d';
+    ctx.beginPath();
+    ctx.roundRect(0, 6, basket.w, basket.h - 6, 8);
+    ctx.fill();
+
+    // Rim
+    ctx.fillStyle = '#ffbe00';
+    ctx.fillRect(4, 0, basket.w - 8, 7);
+
+    // Title on cart
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MULTANI FF', basket.w / 2, 22);
+
+    ctx.restore();
+  }
+
+  function loop() {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw basket
+    drawBasket();
+
+    // Spawn items
+    spawnClock++;
+    if (spawnClock > 32) {
+      items.push(new DropItem());
+      spawnClock = 0;
+    }
+
+    // Update items
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      it.update();
+      it.draw();
+
+      // Catch check
+      if (
+        it.y + it.h >= basket.y &&
+        it.y <= basket.y + basket.h &&
+        it.x + it.w >= basket.x &&
+        it.x <= basket.x + basket.w
+      ) {
+        if (it.type === 'bomb') {
+          playBombSound();
+          createSparks(it.x, it.y, '#ff1744');
+          items.splice(i, 1);
+          lives--;
+          updateLives();
+          if (lives <= 0) {
+            gameOver();
+            return;
+          }
+        } else {
+          playCatchSound();
+          createSparks(it.x, it.y, it.type === 'diamond' ? '#00f0ff' : '#ffbe00');
+          score += (it.type === 'diamond' ? 5 : 1);
+          scoreText.innerText = score;
+          items.splice(i, 1);
+        }
+        continue;
+      }
+
+      // Niche nikalne par remove
+      if (it.y > H + 40) {
+        items.splice(i, 1);
+      }
+    }
+
+    // Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= 0.035;
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+      } else {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>
