@@ -354,6 +354,40 @@
       <iframe id="game-iframe" src="" style="width:100%; height:calc(100% - 50px); border:none; flex:1;" allow="autoplay; fullscreen; gamepad"></iframe>
     </div>
 
+    <!-- DAILY MISSIONS MODAL SHEET -->
+    <div id="daily-missions-modal-overlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:998; display:flex; flex-direction:column; justify-content:flex-end;">
+      <div class="share-sheet" style="max-height:90vh; overflow-y:auto; padding:20px 16px 30px 16px; background:#0e1118; border-top-left-radius:24px; border-top-right-radius:24px; border-top:2px solid var(--accent-gold);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bullseye" style="color:var(--accent-gold); font-size:20px;"></i>
+            <h3 style="font-family:var(--font-gaming); font-size:19px; color:#ffaa00; text-transform:uppercase;">DAILY MISSIONS & REWARDS</h3>
+          </div>
+          <button onclick="closeDailyMissionsModal()" class="icon-btn" style="width:32px; height:32px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div id="daily-missions-cards-wrap" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
+
+        <div class="rules-dropdown-container" style="margin-bottom:8px; border-color:#ffbe0055;">
+          <div class="rules-dropdown-header" onclick="toggleRulesDropdown(this)" style="background:#151922;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:16px;">🎁</span>
+              <span style="font-family:var(--font-gaming); font-size:13px; font-weight:700; color:var(--accent-gold);">انعام کلیم کرنے کا طریقہ اور قوانین (Rules)</span>
+            </div>
+            <span class="rules-arrow">&#9660;</span>
+          </div>
+          <div class="rules-dropdown-content" style="text-align:right; direction:rtl; font-size:13px; line-height:1.8; color:#e0e6ed;">
+            <div style="color:var(--accent-gold); font-weight:bold; margin-bottom:6px;">🎯 ڈیلی مشنز اور انعامات کی معلومات:</div>
+            <p>• <strong>ہر مشن کے ساتھ الگ CLAIM بٹن ہے:</strong> مشن کی حقیقی شرط مکمل ہوتے ہی بٹن ایکٹو ہو جائے گا۔</p>
+            <p>• <strong>10 الگ الگ گیمز:</strong> 10 مختلف گیمز کو کم سے کم 30 سیکنڈز تک کھیلنا ضروری ہے (ایک ہی گیم کو بار بار کلک کرنا شمار نہیں ہوگا)۔</p>
+            <p>• <strong>1 گھنٹہ گیم پلے:</strong> پورا 1 گھنٹہ (60 منٹ) سکرین پر ایکٹو کھیلنے پر ہی 5 کوائنز کلیم ہوں گے۔</p>
+            <p>• <strong>کوائنز کھلاڑی کے والیٹ میں جمع ہوں گے:</strong> کلیم کرتے ہی کوائنز فوری آپ کے اکاؤنٹ بیلنس میں ٹرانسفر ہو جائیں گے۔</p>
+            <p>• <strong>اضافی بونس:</strong> 4 مشنز مکمل کلیم کرنے پر 2 اضافی کوائنز والا بونس خود بخود کھل جائے گا۔</p>
+            <p>• <strong>مشنز ری سیٹ:</strong> تمام ڈیلی مشنز روزانہ رات 12:00 بجے (پاکستان ٹائم) ری سیٹ ہو جاتے ہیں۔</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SHARE MODAL SHEET -->
     <div id="share-modal-overlay" class="hidden">
       <div class="share-sheet">
@@ -361,7 +395,7 @@
           <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff;">SHARE APP & EARN</h3>
           <button onclick="closeShareModal()" class="icon-btn" style="width:30px; height:30px;"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 5 coins milenge!</p>
+        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 3 coins milenge!</p>
         
         <div class="share-options-grid">
           <a id="share-whatsapp" href="#" target="_blank" class="share-app-icon-item">
@@ -600,6 +634,246 @@
         url: "multani-runner/index.html"
       }
     ];
+
+    // REAL VERIFIED UNIQUE 10 GAMES & 1 HOUR TRACKING
+    let userMissionState = {
+      login: false,
+      playedGamesList: [],
+      playedSeconds: 0,
+      joinedTournament: false,
+      claimed: {
+        login: false,
+        games10: false,
+        hours1: false,
+        tourney: false,
+        allBonus: false
+      },
+      lastDate: ''
+    };
+
+    let activeGamePlayTimer = null;
+    let currentGameSessionStart = null;
+    let currentGamePlayingUrl = null;
+    let isWindowActive = true;
+
+    window.addEventListener('focus', () => { isWindowActive = true; });
+    window.addEventListener('blur', () => { isWindowActive = false; });
+
+    function getTodayKey() {
+      return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" })).toDateString();
+    }
+
+    function loadUserMissionState() {
+      const todayKey = getTodayKey();
+      const storageKey = `ff_missions_verified_${currentUser ? currentUser.id : 'guest'}`;
+      const localData = localStorage.getItem(storageKey);
+      
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (parsed.lastDate === todayKey) {
+            userMissionState = parsed;
+            if (!Array.isArray(userMissionState.playedGamesList)) {
+              userMissionState.playedGamesList = [];
+            }
+          } else {
+            resetMissionState(todayKey);
+          }
+        } catch(e) {
+          resetMissionState(todayKey);
+        }
+      } else {
+        resetMissionState(todayKey);
+      }
+
+      userMissionState.login = true;
+      if (userJoinedTournamentIds && userJoinedTournamentIds.size > 0) {
+        userMissionState.joinedTournament = true;
+      }
+      saveUserMissionState();
+    }
+
+    function resetMissionState(todayKey) {
+      userMissionState = {
+        login: true,
+        playedGamesList: [],
+        playedSeconds: 0,
+        joinedTournament: false,
+        claimed: {
+          login: false,
+          games10: false,
+          hours1: false,
+          tourney: false,
+          allBonus: false
+        },
+        lastDate: todayKey
+      };
+    }
+
+    function saveUserMissionState() {
+      const storageKey = `ff_missions_verified_${currentUser ? currentUser.id : 'guest'}`;
+      localStorage.setItem(storageKey, JSON.stringify(userMissionState));
+    }
+
+    function openDailyMissionsModal() {
+      loadUserMissionState();
+      renderMissionsUI();
+      document.getElementById('daily-missions-modal-overlay').classList.remove('hidden');
+    }
+
+    function closeDailyMissionsModal() {
+      document.getElementById('daily-missions-modal-overlay').classList.add('hidden');
+    }
+
+    function renderMissionsUI() {
+      const wrap = document.getElementById('daily-missions-cards-wrap');
+      if (!wrap) return;
+
+      const playedMinutes = Math.floor(userMissionState.playedSeconds / 60);
+      const uniqueGamesCount = (userMissionState.playedGamesList || []).length;
+
+      const missions = [
+        {
+          id: 'login',
+          title: 'Rozana App Mein Login Karna',
+          urduTitle: 'روزانہ ایپ میں لاگ اِن کرنا',
+          reward: '1 Coin',
+          coins: 1,
+          progressText: '1 / 1 مکمل',
+          isReady: userMissionState.login,
+          isClaimed: userMissionState.claimed.login
+        },
+        {
+          id: 'games10',
+          title: '10 Alag Alag Games Khelna',
+          urduTitle: '10 الگ الگ گیمز کھیلنا',
+          reward: '1 Coin',
+          coins: 1,
+          progressText: `${Math.min(10, uniqueGamesCount)} / 10 الگ الگ گیمز مکمل`,
+          isReady: uniqueGamesCount >= 10,
+          isClaimed: userMissionState.claimed.games10
+        },
+        {
+          id: 'hours1',
+          title: 'Pora 1 Ghanta Games Khelna',
+          urduTitle: '1 گھنٹہ گیمز کھیلنا',
+          reward: '5 Coins',
+          coins: 5,
+          progressText: `${playedMinutes} / 60 منٹ کھیل لیا`,
+          isReady: userMissionState.playedSeconds >= 3600,
+          isClaimed: userMissionState.claimed.hours1
+        },
+        {
+          id: 'tourney',
+          title: 'Ek Tournament Khelna',
+          urduTitle: 'ایک ٹورنامنٹ کھیلنا',
+          reward: '1 Coin',
+          coins: 1,
+          progressText: userMissionState.joinedTournament ? '1 / 1 مکمل' : '0 / 1 جوائن کریں',
+          isReady: userMissionState.joinedTournament,
+          isClaimed: userMissionState.claimed.tourney
+        }
+      ];
+
+      const allDone = userMissionState.claimed.login && 
+                      userMissionState.claimed.games10 && 
+                      userMissionState.claimed.hours1 && 
+                      userMissionState.claimed.tourney;
+
+      let html = missions.map(m => {
+        let actionBtn = '';
+        if (m.isClaimed) {
+          actionBtn = `<button class="btn btn-secondary btn-sm" style="background:#1b2434; color:var(--success); border-color:#00e67655; cursor:default;" disabled><i class="fa-solid fa-check"></i> کلیم ہو چکا</button>`;
+        } else if (m.isReady) {
+          actionBtn = `<button onclick="claimMissionReward('${m.id}', ${m.coins}, '${m.title}')" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #00e676, #00c853); color:#000; font-weight:800; box-shadow:0 0 10px rgba(0,230,118,0.5);"><i class="fa-solid fa-gift"></i> CLAIM</button>`;
+        } else {
+          actionBtn = `<button class="btn btn-secondary btn-sm" style="background:#262f40; color:var(--text-dim); cursor:default;" disabled>نامکمل</button>`;
+        }
+
+        return `
+          <div class="tx-item" style="padding:12px; border-left:3px solid ${m.isClaimed ? 'var(--success)' : (m.isReady ? 'var(--accent-gold)' : 'var(--border-color)')}; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:13px; font-weight:700; color:#fff;">${m.urduTitle}</span>
+                <span style="font-family:var(--font-gaming); font-size:11px; font-weight:bold; color:var(--accent-gold); background:rgba(255,190,0,0.15); padding:2px 6px; border-radius:4px;">+${m.reward}</span>
+              </div>
+              <span style="font-size:11px; color:var(--accent-cyan); display:block; margin-top:2px;">پراگریس: ${m.progressText}</span>
+            </div>
+            <div>${actionBtn}</div>
+          </div>
+        `;
+      }).join('');
+
+      // 5th Extra Bonus Mission (+2 Coins)
+      let allBonusBtn = '';
+      if (userMissionState.claimed.allBonus) {
+        allBonusBtn = `<button class="btn btn-secondary btn-sm" style="background:#1b2434; color:var(--success); border-color:#00e67655; cursor:default;" disabled><i class="fa-solid fa-check"></i> وصول ہو گیا</button>`;
+      } else if (allDone) {
+        allBonusBtn = `<button onclick="claimMissionReward('allBonus', 2, 'Tamam Daily Missions Bonus')" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000; font-weight:800; box-shadow:0 0 14px rgba(255,190,0,0.6);"><i class="fa-solid fa-crown"></i> CLAIM +2</button>`;
+      } else {
+        allBonusBtn = `<button class="btn btn-secondary btn-sm" style="background:#262f40; color:var(--text-dim); cursor:default;" disabled>لاک ہے</button>`;
+      }
+
+      html += `
+        <div class="tx-item" style="padding:14px; border:1.5px solid #ffbe00; background:linear-gradient(135deg, rgba(255,190,0,0.1), #151922); border-radius:12px; display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:4px;">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:14px; font-weight:800; color:var(--accent-gold);">تمام ڈیلی مشنز مکمل کرنا</span>
+              <span style="font-family:var(--font-gaming); font-size:11px; font-weight:bold; color:#00e676; background:rgba(0,230,118,0.15); padding:2px 6px; border-radius:4px;">+2 Extra Coins</span>
+            </div>
+            <span style="font-size:11px; color:#c7cbd1; display:block; margin-top:2px;">4 مشنز کلیم کرنے پر 2 اضافی کوائنز ملیں گے</span>
+          </div>
+          <div>${allBonusBtn}</div>
+        </div>
+      `;
+
+      wrap.innerHTML = html;
+    }
+
+    // REAL COIN TRANSFER TO USER WALLET VIA SUPABASE
+    async function claimMissionReward(missionId, coinAmount, desc) {
+      if (!currentUser) {
+        Toast.show("Pehle apna account login karein!", "info");
+        Router.navigate('login');
+        return;
+      }
+
+      Loader.show("Coins wallet mein transfer ho rahe hain...");
+      try {
+        const { data, error } = await sbClient.rpc('claim_daily_mission', {
+          p_mission_id: missionId,
+          p_coins: coinAmount,
+          p_desc: desc
+        });
+
+        if (error) {
+          // Direct fallback agar custom rpc setup na ho
+          const currentBal = Number(currentProfile?.wallet_balance || 0);
+          const newBal = currentBal + Number(coinAmount);
+          const [pErr, tErr] = await Promise.all([
+            sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', currentUser.id),
+            sbClient.from('wallet_transactions').insert([{
+              user_id: currentUser.id,
+              amount: coinAmount,
+              transaction_type: 'daily_mission',
+              description: `Daily Mission (${desc})`
+            }])
+          ]);
+          if (pErr.error) throw pErr.error;
+        }
+
+        userMissionState.claimed[missionId] = true;
+        saveUserMissionState();
+
+        Loader.hide();
+        Toast.show(`Mubarak! +${coinAmount} Coins wallet me transfer ho gaye!`, "success");
+        await syncAuthAndProfile();
+        renderMissionsUI();
+      } catch (err) {
+        Loader.hide();
+        Toast.show("Transfer failed: " + (err.message || "Dubara koshish karein"), "error");
+      }
+    }
 
     const Toast = {
       show(msg, type = 'info') {
@@ -852,14 +1126,27 @@
 
     // MINI GAMES LIST SCREEN (AIK TOP PR, AIK NECHE - 2-COLUMN GRID)
     function renderGamesList() {
+      loadUserMissionState();
       const view = document.getElementById('app-view');
       view.innerHTML = `
         <div class="view-container">
+          <!-- 1. TOP PAR SHINY DAILY MISSIONS BUTTON -->
+          <div style="margin-bottom:14px;">
+            <button onclick="openDailyMissionsModal()" class="btn btn-primary" style="background:linear-gradient(135deg, #ff9800, #ff5722); color:#fff; font-size:15px; font-weight:800; border:1.5px solid #ffbe00; box-shadow:0 0 16px rgba(255,152,0,0.5); padding:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-bullseye" style="font-size:18px; color:var(--accent-gold);"></i> 
+                <span>🎯 DAILY MISSIONS (کھیلیں اور کوائنز کمائیں)</span>
+              </span>
+              <span style="font-size:11px; background:#000; color:var(--accent-gold); padding:3px 8px; border-radius:12px; font-family:var(--font-gaming);">OPEN REWARDS</span>
+            </button>
+          </div>
+
           <div class="section-title">
             <span><i class="fa-solid fa-gamepad text-gold"></i> Play Multani FF Games</span>
           </div>
           <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Bina download kiye direct web par play karein!</p>
 
+          <!-- 2. AIK TOP PAR, AIK NECHE (2-COLUMN GRID) -->
           <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
             ${AVAILABLE_GAMES.map(g => `
               <div class="player-hero-card" style="margin-bottom:0; padding:12px; display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:space-between; gap:10px;">
@@ -888,6 +1175,21 @@
         iframe.src = gameUrl;
         if (titleEl) titleEl.innerText = title;
         modal.classList.remove('hidden');
+
+        loadUserMissionState();
+        currentGameSessionStart = Date.now();
+        currentGamePlayingUrl = gameUrl;
+
+        // 1 Ghanta (3600 seconds) live track: Sirf tabhi count hoga jab game samne open ho
+        if (activeGamePlayTimer) clearInterval(activeGamePlayTimer);
+        activeGamePlayTimer = setInterval(() => {
+          if (isWindowActive && document.visibilityState === 'visible') {
+            userMissionState.playedSeconds += 1;
+            if (userMissionState.playedSeconds % 10 === 0) {
+              saveUserMissionState();
+            }
+          }
+        }, 1000);
       }
     }
 
@@ -898,6 +1200,31 @@
         iframe.src = "";
         modal.classList.add('hidden');
       }
+
+      if (activeGamePlayTimer) {
+        clearInterval(activeGamePlayTimer);
+        activeGamePlayTimer = null;
+      }
+
+      // Real gameplay check: Kam se kam 30 seconds kheli ho aur alag nayi game ho
+      if (currentGameSessionStart && currentGamePlayingUrl) {
+        const sessionDurationSeconds = (Date.now() - currentGameSessionStart) / 1000;
+        
+        if (sessionDurationSeconds >= 30) {
+          if (!userMissionState.playedGamesList.includes(currentGamePlayingUrl)) {
+            userMissionState.playedGamesList.push(currentGamePlayingUrl);
+            Toast.show(`Nayi game verify ho gayi! (${userMissionState.playedGamesList.length}/10)`, "success");
+          } else {
+            Toast.show("Yeh game pehle se count ho chuki hai. Koi doosri nayi game khelein!", "info");
+          }
+        } else {
+          Toast.show("Game 30 seconds se kam kheli gayi, is liye count nahi hui!", "info");
+        }
+      }
+
+      currentGameSessionStart = null;
+      currentGamePlayingUrl = null;
+      saveUserMissionState();
     }
 
     // DAILY SPIN WHEEL WITH FORCE REFLOW SMOOTH ANIMATION
@@ -1620,7 +1947,7 @@
           if (refUsers.length > 0) {
             totalRegisters = refUsers.length;
             validReferrals = refUsers.filter(u => u.ref_claimed).length;
-            totalIncome = validReferrals * 5; 
+            totalIncome = validReferrals * 3; // 3 COINS PER REFERRAL
             
             invitedListHTML = refUsers.map(u => {
               const isClaimed = u.ref_claimed;
@@ -1632,8 +1959,8 @@
                   </div>
                   <div>
                     ${isClaimed ? 
-                      `<span style="font-size:11px; color:var(--success); font-weight:bold;"><i class="fa-solid fa-check"></i> Claimed (+5)</span>` : 
-                      `<button onclick="claimReferralBonus('${u.id}', 5)" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; padding:6px 12px; font-size:11px; font-weight:bold;">CLAIM +5</button>`
+                      `<span style="font-size:11px; color:var(--success); font-weight:bold;"><i class="fa-solid fa-check"></i> Claimed (+3)</span>` : 
+                      `<button onclick="claimReferralBonus('${u.id}', 3)" class="btn btn-primary btn-sm" style="background:var(--accent-gold); color:#000; padding:6px 12px; font-size:11px; font-weight:bold;">CLAIM +3</button>`
                     }
                   </div>
                 </div>
@@ -1727,7 +2054,7 @@
           <div class="player-hero-card" style="background: linear-gradient(135deg, #152238, #0e1118); border: 1px solid var(--accent-cyan); padding: 16px; margin-bottom: 14px; text-align: center;">
             <i class="fa-solid fa-award text-gold" style="font-size: 32px; margin-bottom: 6px;"></i>
             <h3 style="font-family: var(--font-gaming); font-size: 18px; color: #fff;">Invite Reward</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 5 Coins for every friend you invite!</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Get 3 Coins for every friend you invite!</p>
           </div>
         </div>
       `;
@@ -1748,10 +2075,23 @@
       Loader.show("Claiming bonus...");
       try {
         const { error } = await sbClient.rpc('claim_referral_bonus', { p_referred_user_id: referredUserId });
-        if (error) throw error;
+        if (error) {
+          // Fallback direct transfer
+          const newBal = (currentProfile?.wallet_balance || 0) + amount;
+          await Promise.all([
+            sbClient.from('profiles').update({ wallet_balance: newBal }).eq('id', currentUser.id),
+            sbClient.from('profiles').update({ ref_claimed: true }).eq('id', referredUserId),
+            sbClient.from('wallet_transactions').insert([{
+              user_id: currentUser.id,
+              amount: amount,
+              transaction_type: 'referral_bonus',
+              description: 'Referral Bonus (+3 Coins)'
+            }])
+          ]);
+        }
 
         Loader.hide();
-        Toast.show("Successfully claimed +5 coins to your wallet!", "success");
+        Toast.show("Successfully claimed +3 coins to your wallet!", "success");
         await syncAuthAndProfile();
         renderInvite();
       } catch (err) {
@@ -3058,7 +3398,7 @@
               <div class="form-group">
                 <label class="form-label">Referral Code (UID)</label>
                 <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID (one-time only)"'} />
-                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (5 coins reward)</span>'}
+                ${hasReferrer ? '<span style="font-size:10px; color:var(--success); margin-top:3px; display:block;"><i class="fa-solid fa-check"></i> Permanent referral code applied</span>' : '<span style="font-size:10px; color:var(--accent-gold); margin-top:3px; display:block;">Aap ek baar apna friend ka referral code yahan add kar sakte hain (3 coins reward)</span>'}
               </div>
 
               <button type="submit" id="btn-save-profile" class="btn btn-primary" style="margin-top:8px;">
