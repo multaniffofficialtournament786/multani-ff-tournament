@@ -32,13 +32,13 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: rgba(14, 17, 24, 0.9);
+  background: rgba(14, 17, 24, 0.95);
   backdrop-filter: blur(8px);
-  border-bottom: 1.5px solid #ff542d44;
+  border-bottom: 2px solid #ffbe0088;
   z-index: 10;
 }
-.title-tag { font-size: 16px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); }
-.header-actions { display: flex; align-items: center; gap: 10px; }
+.title-tag { font-size: 15px; font-weight: 900; color: #ffbe00; text-shadow: 0 0 10px rgba(255,190,0,0.5); display: flex; align-items: center; gap: 4px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
 .stats-badge { font-weight: bold; font-size: 15px; color: #00f0ff; }
 .music-toggle {
   background: rgba(255,255,255,0.1);
@@ -49,6 +49,14 @@ body {
   font-size: 11px;
   cursor: pointer;
   font-weight: 700;
+}
+.menu-btn {
+  background: none;
+  border: none;
+  color: #ffbe00;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 4px;
 }
 
 #stage-box {
@@ -61,11 +69,20 @@ body {
   padding: 8px;
 }
 
+.level-indicator {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffbe00;
+  margin-bottom: 4px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 canvas {
   display: block;
-  background: rgba(8, 12, 22, 0.85);
-  border-radius: 14px;
-  border: 2px solid #ffbe0055;
+  background: rgba(12, 8, 5, 0.9);
+  border-radius: 12px;
+  border: 4px solid #8B4513;
   box-shadow: 0 8px 20px rgba(0,0,0,0.8);
 }
 
@@ -79,8 +96,8 @@ canvas {
   z-index: 5;
 }
 .ctrl-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1.5px solid #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+  border: 2px solid #00f0ff;
   color: #00f0ff;
   border-radius: 12px;
   font-size: 20px;
@@ -90,6 +107,7 @@ canvas {
   justify-content: center;
   cursor: pointer;
   user-select: none;
+  box-shadow: 0 0 8px rgba(0,240,255,0.2);
 }
 .ctrl-btn:active {
   background: #00f0ff;
@@ -101,10 +119,10 @@ canvas {
 .ctrl-down { grid-column: 2; grid-row: 2; }
 .ctrl-right { grid-column: 3; grid-row: 2; }
 
-#game-overlay {
+#game-overlay, #mode-overlay, #levels-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(4, 6, 12, 0.88);
+  background: rgba(4, 6, 12, 0.95);
   backdrop-filter: blur(5px);
   display: flex;
   flex-direction: column;
@@ -114,8 +132,9 @@ canvas {
   padding: 24px;
   z-index: 20;
 }
-#game-overlay h1 { font-size: 30px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
-#game-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+#game-overlay h1, #mode-overlay h1, #levels-overlay h1 { font-size: 28px; color: #ffbe00; margin-bottom: 8px; text-shadow: 0 0 16px #ff542d; }
+#game-overlay p, #mode-overlay p { font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 290px; margin-bottom: 20px; }
+
 .play-btn {
   padding: 13px 34px;
   font-size: 16px;
@@ -126,7 +145,75 @@ canvas {
   border-radius: 12px;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
+  margin-bottom: 12px;
 }
+
+.mode-btn {
+  width: 200px;
+  padding: 14px;
+  margin: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  border: 2px solid #00f0ff;
+  border-radius: 10px;
+  background: rgba(0, 240, 255, 0.1);
+  color: #00f0ff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-btn:active {
+  background: #00f0ff;
+  color: #000;
+}
+
+.levels-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-height: 55dvh;
+  overflow-y: auto;
+  padding: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+.lvl-tile {
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid #ffbe0044;
+  color: #777;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: not-allowed;
+  position: relative;
+}
+.lvl-tile.unlocked {
+  background: linear-gradient(135deg, rgba(255, 190, 0, 0.1), rgba(255, 84, 45, 0.1));
+  border: 1.5px solid #ff542d;
+  color: #ffbe00;
+  cursor: pointer;
+}
+.lvl-tile.completed {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.1), rgba(0, 240, 255, 0.1));
+  border: 1.5px solid #00e676;
+  color: #00e676;
+  cursor: pointer;
+}
+.close-overlay-btn {
+  margin-top: 15px;
+  background: #ff542d;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .hidden { display: none !important; }
 </style>
 </head>
@@ -138,10 +225,12 @@ canvas {
     <div class="header-actions">
       <button class="music-toggle" id="musicBtn">🎵 MUSIC ON</button>
       <div class="stats-badge">⭐ <span id="scoreText">0</span></div>
+      <button class="menu-btn" id="dotsMenuBtn">⋮</button>
     </div>
   </div>
 
   <div id="stage-box">
+    <div class="level-indicator" id="levelName">SNAKE RUSH</div>
     <canvas id="gameCanvas"></canvas>
 
     <div class="controls-area">
@@ -151,14 +240,30 @@ canvas {
       <div class="ctrl-btn ctrl-right" data-dir="RIGHT">▶</div>
     </div>
 
+    <!-- Main Welcome Screen -->
     <div id="game-overlay">
       <h1 id="screenTitle">SNAKE RUSH</h1>
       <p id="screenDesc">
-        Screen par swipe karein ya Arrow Buttons dabayein!<br>
-        💎 Diamonds aur Airdrops kha kar lambe banein.<br>
-        🚫 Deewar ya apni dum se mat takrayein!
+        Screen par swipe karein ya control buttons dabayein!<br>
+        💎 Diamonds kha kar lambe banein.<br>
+        🚫 Deewar se bachkar rasta dhoondhein!
       </p>
-      <button class="play-btn" id="startBtn">▶ START GAME</button>
+      <button class="play-btn" id="startBtn">▶ CHOOSE MODE</button>
+    </div>
+
+    <!-- Mode Selection Overlay -->
+    <div id="mode-overlay" class="hidden">
+      <h1>CHOOSE MODE</h1>
+      <p>Aap kaunsa mode khelna chahte hain?</p>
+      <button class="mode-btn" id="easyModeBtn">🌳 EASY (FULL OPEN)</button>
+      <button class="mode-btn" id="levelsModeBtn">🧱 50 LEVELS (GALIYAN)</button>
+    </div>
+
+    <!-- 50 Levels Selector Overlay -->
+    <div id="levels-overlay" class="hidden">
+      <h1>SELECT LEVEL</h1>
+      <div class="levels-container" id="levelsGrid"></div>
+      <button class="close-overlay-btn" id="closeLevelsBtn">❌ CLOSE</button>
     </div>
   </div>
 </div>
@@ -173,47 +278,66 @@ canvas {
   const screenDesc = document.getElementById("screenDesc");
   const startBtn = document.getElementById("startBtn");
   const musicBtn = document.getElementById("musicBtn");
+  const dotsMenuBtn = document.getElementById("dotsMenuBtn");
   const ctrlBtns = document.querySelectorAll(".ctrl-btn");
+  const levelName = document.getElementById("levelName");
 
-  const GRID_SIZE = 18;
+  const modeOverlay = document.getElementById("mode-overlay");
+  const easyModeBtn = document.getElementById("easyModeBtn");
+  const levelsModeBtn = document.getElementById("levelsModeBtn");
+
+  const levelsOverlay = document.getElementById("levels-overlay");
+  const levelsGrid = document.getElementById("levelsGrid");
+  const closeLevelsBtn = document.getElementById("closeLevelsBtn");
+
+  const GRID_SIZE = 20;
   let CELL_SIZE = 18;
-  let canvasDim = 324;
+  let canvasDim = 360;
 
   let snake = [];
-  let food = { x: 5, y: 5, type: 'diamond' };
+  let food = { x: 5, y: 5 };
   let dir = { x: 1, y: 0 };
   let nextDir = { x: 1, y: 0 };
   let score = 0;
   let running = false;
   let gameInterval = null;
 
+  let gameMode = 'levels';
+  let currentLevel = 1;
+  let maxUnlockedLevel = 1;
+
+  let mazeWallMap = new Set();
+
+  if (localStorage.getItem("maxUnlockedLevel")) {
+    maxUnlockedLevel = parseInt(localStorage.getItem("maxUnlockedLevel"));
+  }
+
   let audioCtx = null;
   let musicOn = true;
 
-  // Background Audio Element (Chita Chola Karaoke)
-  const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/Chita_Chola_Karaoke___Low_Scale___Omer_Pervaiz___Urdu_Hindi_Punjabi___Ahmad_Nawaz_Cheena.(256k).mp3");
+  // Background Audio Element (Saki Saki Karaoke - Low Scale & Soft Volume)
+  const bgMusic = new Audio("https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/Saki_Saki_Karaoke_Song_With_Lyrics____Batla_House____Neha_Kakkar_Hindi_Song____Indian_Karaoke(256k).mp3");
   bgMusic.loop = true;
-  bgMusic.volume = 0.18; // Music volume kam rakha hai
+  bgMusic.volume = 0.12; // Slow / Dheemi awaaz par set kiya hai
 
   function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === "suspended") audioCtx.resume();
   }
 
-  // TEZ (LOUD) SOUND EFFECTS
   function playEatSound() {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(450, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1300, audioCtx.currentTime + 0.09);
-    gain.gain.setValueAtTime(0.32, audioCtx.currentTime); // Volume tez
-    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
+    osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1400, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.09);
+    osc.stop(audioCtx.currentTime + 0.08);
   }
 
   function playTurnSound() {
@@ -221,13 +345,13 @@ canvas {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(360, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.05);
+    osc.stop(audioCtx.currentTime + 0.04);
   }
 
   function playCrashSound() {
@@ -235,24 +359,18 @@ canvas {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(240, audioCtx.currentTime);
-    osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.4);
-    gain.gain.setValueAtTime(0.40, audioCtx.currentTime); // Boing / Crash loud
-    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.40, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.4);
+    osc.stop(audioCtx.currentTime + 0.5);
   }
 
-  function startMusic() {
-    if (!musicOn) return;
-    bgMusic.play().catch(() => {});
-  }
-
-  function stopMusic() {
-    bgMusic.pause();
-  }
+  function startMusic() { if (musicOn) bgMusic.play().catch(() => {}); }
+  function stopMusic() { bgMusic.pause(); }
 
   function toggleMusic() {
     initAudio();
@@ -262,13 +380,10 @@ canvas {
     else stopMusic();
   }
 
-  musicBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMusic();
-  });
+  musicBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleMusic(); });
 
   function resizeCanvas() {
-    const stageWidth = Math.min(window.innerWidth - 30, 420);
+    const stageWidth = Math.min(window.innerWidth - 24, 420);
     canvasDim = Math.floor(stageWidth / GRID_SIZE) * GRID_SIZE;
     CELL_SIZE = canvasDim / GRID_SIZE;
 
@@ -278,9 +393,46 @@ canvas {
     canvas.style.width = canvasDim + "px";
     canvas.style.height = canvasDim + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!running) draw();
   }
   window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+
+  function buildLevelMap(level) {
+    mazeWallMap.clear();
+    if (gameMode === 'easy') return;
+
+    const isHardLevel = (level % 10 === 0 || level % 10 === 5 || level % 10 === 8); 
+
+    const step = 4;
+    for (let x = 1; x < GRID_SIZE - 1; x++) {
+      for (let y = 1; y < GRID_SIZE - 1; y++) {
+        if (level % 2 === 0) {
+          if (x % step === 0 && y > 2 && y < GRID_SIZE - 3 && (isHardLevel || y % 5 !== 0)) {
+            mazeWallMap.add(`${x},${y}`);
+          }
+        } else {
+          if (y % step === 0 && x > 2 && x < GRID_SIZE - 3 && (isHardLevel || x % 5 !== 0)) {
+            mazeWallMap.add(`${x},${y}`);
+          }
+        }
+      }
+    }
+
+    const seed = (level * 23) % 4;
+    if (seed === 1 || isHardLevel) {
+      for (let i = 3; i < GRID_SIZE - 3; i++) {
+        if (i !== 9 && i !== 10 && i !== 11) {
+          mazeWallMap.add(`6,${i}`);
+          mazeWallMap.add(`13,${i}`);
+        }
+      }
+    } else if (seed === 2) {
+      for (let i = 4; i < GRID_SIZE - 4; i++) {
+        mazeWallMap.add(`${i},4`);
+        mazeWallMap.add(`${i},15`);
+      }
+    }
+  }
 
   function spawnFood() {
     let valid = false;
@@ -288,13 +440,11 @@ canvas {
     while (!valid) {
       newX = Math.floor(Math.random() * GRID_SIZE);
       newY = Math.floor(Math.random() * GRID_SIZE);
-      valid = !snake.some(segment => segment.x === newX && segment.y === newY);
+      const isSnake = snake.some(s => s.x === newX && s.y === newY);
+      const isWall = mazeWallMap.has(`${newX},${newY}`);
+      valid = !isSnake && !isWall;
     }
-    food = {
-      x: newX,
-      y: newY,
-      type: Math.random() < 0.3 ? 'airdrop' : 'diamond'
-    };
+    food = { x: newX, y: newY };
   }
 
   function changeDirection(newDir) {
@@ -339,41 +489,124 @@ canvas {
   function draw() {
     ctx.clearRect(0, 0, canvasDim, canvasDim);
 
-    // Food
-    ctx.font = `${CELL_SIZE * 0.85}px sans-serif`;
+    // Floor
+    ctx.fillStyle = "rgba(18, 12, 8, 0.4)";
+    ctx.fillRect(0, 0, canvasDim, canvasDim);
+
+    // Galiyan / Brick Walls
+    mazeWallMap.forEach(posStr => {
+      const [wx, wy] = posStr.split(',').map(Number);
+      ctx.fillStyle = "#8B4513";
+      ctx.strokeStyle = "#ff542d";
+      ctx.lineWidth = 1;
+      ctx.fillRect(wx * CELL_SIZE, wy * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      ctx.strokeRect(wx * CELL_SIZE + 1.5, wy * CELL_SIZE + 1.5, CELL_SIZE - 3, CELL_SIZE - 3);
+    });
+
+    // Diamonds
+    ctx.font = `${CELL_SIZE * 0.85}px Arial`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(
-      food.type === 'airdrop' ? '🎁' : '💎',
-      food.x * CELL_SIZE + CELL_SIZE / 2,
-      food.y * CELL_SIZE + CELL_SIZE / 2
-    );
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#00f0ff";
+    ctx.fillText("💎", food.x * CELL_SIZE + CELL_SIZE/2, food.y * CELL_SIZE + CELL_SIZE/2);
+    ctx.shadowBlur = 0;
 
-    // Snake
+    // Real Coral Snake Render
     snake.forEach((seg, index) => {
+      const naturalAngle = Math.sin(index * 0.8 - (Date.now() / 150)) * 0.12;
+      const x = seg.x * CELL_SIZE + CELL_SIZE/2;
+      const y = seg.y * CELL_SIZE + CELL_SIZE/2;
+      const r = CELL_SIZE / 2;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(naturalAngle);
+
       if (index === 0) {
-        ctx.fillStyle = "#ff542d";
+        // Snake Head
+        ctx.fillStyle = "#ff2d2d";
         ctx.beginPath();
-        ctx.roundRect(seg.x * CELL_SIZE + 1, seg.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2, 6);
+        ctx.arc(0, 0, r * 1.1, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(seg.x * CELL_SIZE + 4, seg.y * CELL_SIZE + 4, 3, 3);
-        ctx.fillRect(seg.x * CELL_SIZE + CELL_SIZE - 7, seg.y * CELL_SIZE + 4, 3, 3);
-      } else {
-        ctx.fillStyle = index % 2 === 0 ? "#00f0ff" : "#00b4d8";
+        ctx.fillStyle = "#111";
         ctx.beginPath();
-        ctx.roundRect(seg.x * CELL_SIZE + 1.5, seg.y * CELL_SIZE + 1.5, CELL_SIZE - 3, CELL_SIZE - 3, 4);
+        ctx.arc(0, -r/4, r * 0.7, 0, Math.PI, true);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffca00";
+        ctx.beginPath();
+        ctx.arc(0, r/4, r * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(-r/3, -r/4, 2.5, 0, Math.PI * 2);
+        ctx.arc(r/3, -r/4, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(-r/3, -r/4, 1.2, 0, Math.PI * 2);
+        ctx.arc(r/3, -r/4, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flicking Tongue
+        if (Math.random() < 0.4) {
+          ctx.strokeStyle = "#ff0000";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.lineTo(0, -r - 5);
+          ctx.moveTo(0, -r - 5);
+          ctx.lineTo(-2, -r - 8);
+          ctx.moveTo(0, -r - 5);
+          ctx.lineTo(2, -r - 8);
+          ctx.stroke();
+        }
+      } else {
+        // Striped Body
+        const patternVal = index % 3;
+        if (patternVal === 0) {
+          ctx.fillStyle = "#ffca00";
+        } else if (patternVal === 1) {
+          ctx.fillStyle = "#1c1c1c";
+        } else {
+          ctx.fillStyle = "#ff2d2d";
+        }
+
+        const scaleFactor = Math.max(0.4, 1 - (index / (snake.length * 1.3)));
+        const segRadius = r * scaleFactor;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, segRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.beginPath();
+        ctx.arc(-segRadius/3, -segRadius/3, segRadius/3, 0, Math.PI * 2);
         ctx.fill();
       }
+      ctx.restore();
     });
   }
 
   function update() {
     dir = nextDir;
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    let newX = snake[0].x + dir.x;
+    let newY = snake[0].y + dir.y;
 
-    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+    // Wrap around boundaries
+    if (newX < 0) newX = GRID_SIZE - 1;
+    if (newX >= GRID_SIZE) newX = 0;
+    if (newY < 0) newY = GRID_SIZE - 1;
+    if (newY >= GRID_SIZE) newY = 0;
+
+    const head = { x: newX, y: newY };
+
+    if (mazeWallMap.has(`${head.x},${head.y}`)) {
       gameOver();
       return;
     }
@@ -387,8 +620,13 @@ canvas {
 
     if (head.x === food.x && head.y === food.y) {
       playEatSound();
-      score += (food.type === 'airdrop' ? 5 : 1);
+      score += 1;
       scoreText.innerText = score;
+
+      if (gameMode === 'levels' && score >= 10) {
+        levelUp();
+        return;
+      }
       spawnFood();
     } else {
       snake.pop();
@@ -397,8 +635,12 @@ canvas {
     draw();
   }
 
-  function startGame() {
+  function startGame(customLvl = null) {
     initAudio();
+    if (customLvl) {
+      currentLevel = customLvl;
+    }
+
     score = 0;
     dir = { x: 1, y: 0 };
     nextDir = { x: 1, y: 0 };
@@ -408,13 +650,45 @@ canvas {
       { x: 3, y: 8 }
     ];
     scoreText.innerText = "0";
+
+    if (gameMode === 'easy') {
+      levelName.innerText = "🌳 EASY OPEN MAP";
+      mazeWallMap.clear();
+    } else {
+      levelName.innerText = `🧱 LEVEL ${currentLevel}`;
+      buildLevelMap(currentLevel);
+    }
+
     running = true;
     overlay.classList.add("hidden");
     spawnFood();
     startMusic();
 
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(update, 140);
+    const baseSpeed = gameMode === 'easy' ? 140 : Math.max(90, 150 - (currentLevel * 1)); 
+    gameInterval = setInterval(update, baseSpeed);
+  }
+
+  function levelUp() {
+    running = false;
+    clearInterval(gameInterval);
+    
+    if (currentLevel < 50) {
+      currentLevel++;
+      if (currentLevel > maxUnlockedLevel) {
+        maxUnlockedLevel = currentLevel;
+        localStorage.setItem("maxUnlockedLevel", maxUnlockedLevel);
+      }
+      screenTitle.innerText = "🎉 LEVEL CLEARED!";
+      screenDesc.innerHTML = `🌟 Bohat khoob!<br>Level ${currentLevel - 1} complete hua.<br>Agla target: Level ${currentLevel}`;
+      startBtn.innerText = "⏭ NEXT LEVEL";
+    } else {
+      screenTitle.innerText = "👑 CONGRATULATIONS!";
+      screenDesc.innerHTML = "🏆 Aapne sabhi 50 Levels fatah kar liye hain!";
+      startBtn.innerText = "↻ START OVER";
+      currentLevel = 1;
+    }
+    overlay.classList.remove("hidden");
   }
 
   function gameOver() {
@@ -423,12 +697,65 @@ canvas {
     stopMusic();
     playCrashSound();
     screenTitle.innerText = "💥 CRASHED!";
-    screenDesc.innerHTML = `Takkar ho gayi!<br>Aapka Final Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
-    startBtn.innerText = "↻ PLAY AGAIN";
+    screenDesc.innerHTML = `Takkar ho gayi!<br>Aapka Score: <b style="color:#00f0ff; font-size:24px;">${score}</b>`;
+    startBtn.innerText = "↻ TRY AGAIN";
     overlay.classList.remove("hidden");
   }
 
-  startBtn.addEventListener("click", startGame);
+  startBtn.addEventListener("click", () => {
+    overlay.classList.add("hidden");
+    modeOverlay.classList.remove("hidden");
+  });
+
+  easyModeBtn.addEventListener("click", () => {
+    gameMode = 'easy';
+    modeOverlay.classList.add("hidden");
+    startGame();
+  });
+
+  levelsModeBtn.addEventListener("click", () => {
+    gameMode = 'levels';
+    modeOverlay.classList.add("hidden");
+    openLevelsList();
+  });
+
+  dotsMenuBtn.addEventListener("click", () => {
+    running = false;
+    clearInterval(gameInterval);
+    stopMusic();
+    openLevelsList();
+  });
+
+  function openLevelsList() {
+    levelsGrid.innerHTML = '';
+    for (let i = 1; i <= 50; i++) {
+      const tile = document.createElement("div");
+      tile.innerText = i;
+      tile.classList.add("lvl-tile");
+
+      if (i <= maxUnlockedLevel) {
+        tile.classList.add("unlocked");
+        if (i < maxUnlockedLevel) tile.classList.add("completed");
+        tile.addEventListener("click", () => {
+          gameMode = 'levels';
+          levelsOverlay.classList.add("hidden");
+          startGame(i);
+        });
+      } else {
+        tile.innerText = `${i} 🔒`;
+      }
+      levelsGrid.appendChild(tile);
+    }
+    levelsOverlay.classList.remove("hidden");
+  }
+
+  closeLevelsBtn.addEventListener("click", () => {
+    levelsOverlay.classList.add("hidden");
+    overlay.classList.remove("hidden");
+  });
+
+  resizeCanvas();
+  draw();
 })();
 </script>
 </body>
