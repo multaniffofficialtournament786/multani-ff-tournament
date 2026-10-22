@@ -285,7 +285,6 @@
       width: 100%;
     }
 
-    /* Levels Modal */
     #levels-modal .modal-card {
       width: 90%;
       max-height: 80vh;
@@ -338,7 +337,6 @@
       font-size: 12px;
     }
 
-    /* Rules & Ranks Modal */
     #rules-modal .modal-card {
       width: 92%;
       max-height: 85vh;
@@ -464,7 +462,7 @@
       </div>
     </div>
 
-    <!-- Levels Selector Modal -->
+    <!-- Levels Modal -->
     <div class="modal" id="levels-modal">
       <div class="modal-card">
         <h2>Select Level</h2>
@@ -474,7 +472,7 @@
       </div>
     </div>
 
-    <!-- Ranks & Rules Modal -->
+    <!-- Rules Modal -->
     <div class="modal" id="rules-modal">
       <div class="modal-card">
         <h2 style="text-align: center; margin-bottom: 4px;">Game Guide</h2>
@@ -505,9 +503,9 @@
 
           <div class="rules-section-title">🎮 Gameplay Rules</div>
           <ul class="rules-list">
-            <li><strong>Arrow Escape:</strong> Arrowhead jis taraf ishara karega, arrow usi direction me bahar niklega.</li>
+            <li><strong>Arrow Escape:</strong> Arrowhead jis taraf point karega, arrow usi direction me bahar niklega.</li>
             <li><strong>Snake Motion:</strong> Turns wale arrows track follow karte huye smooth bahar nikalte hain.</li>
-            <li><strong>Wall Bump:</strong> Blocked arrow tap karne par saamne takra kar wapas aayega.</li>
+            <li><strong>Wall Bump:</strong> Blocked arrow tap karne par saamne takra kar wapas apni jagah aa jata hai.</li>
             <li><strong>Fast Combo Tap:</strong> Aage wale arrow ke peeche turant tap karne par bina life gawaye arrow queue ho jayega.</li>
             <li><strong>3 Hearts:</strong> Har naye level par 3 Hearts reset milenge.</li>
           </ul>
@@ -796,7 +794,6 @@
       }
     }
 
-    // Dense Difficulty Progression
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
@@ -806,10 +803,9 @@
           rows: 18,
           maxLen: 7,
           turnChance: 0.38,
-          minArrows: Math.min(20 + Math.floor(lvl / 6), 34),
-          maxArrows: 42,
+          targetFill: 0.80,
           minDepth: 2,
-          maxInitialFreeRatio: 0.60
+          maxInitialFreeRatio: 0.65
         };
       } else if (lvl <= 500) {
         return {
@@ -819,10 +815,9 @@
           rows: 20,
           maxLen: 8,
           turnChance: 0.42,
-          minArrows: Math.min(30 + Math.floor((lvl - 100) / 20), 45),
-          maxArrows: 52,
+          targetFill: 0.82,
           minDepth: 3,
-          maxInitialFreeRatio: 0.45
+          maxInitialFreeRatio: 0.50
         };
       } else if (lvl <= 1500) {
         return {
@@ -832,10 +827,9 @@
           rows: 22,
           maxLen: 9,
           turnChance: 0.45,
-          minArrows: Math.min(38 + Math.floor((lvl - 500) / 40), 55),
-          maxArrows: 62,
+          targetFill: 0.84,
           minDepth: 4,
-          maxInitialFreeRatio: 0.35
+          maxInitialFreeRatio: 0.40
         };
       } else if (lvl <= 3000) {
         return {
@@ -845,10 +839,9 @@
           rows: 24,
           maxLen: 10,
           turnChance: 0.50,
-          minArrows: Math.min(46 + Math.floor((lvl - 1500) / 50), 65),
-          maxArrows: 72,
+          targetFill: 0.86,
           minDepth: 5,
-          maxInitialFreeRatio: 0.28
+          maxInitialFreeRatio: 0.30
         };
       } else {
         return {
@@ -858,10 +851,9 @@
           rows: 26,
           maxLen: 11,
           turnChance: 0.54,
-          minArrows: Math.min(54 + Math.floor((lvl - 3000) / 60), 75),
-          maxArrows: 85,
+          targetFill: 0.88,
           minDepth: 6,
-          maxInitialFreeRatio: 0.22
+          maxInitialFreeRatio: 0.25
         };
       }
     }
@@ -932,7 +924,7 @@
       };
     }
 
-    // High Density synthesis (fills 85%+ available cells)
+    // Dynamic Fill: Packs the exact shape cells tightly
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -953,17 +945,19 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 }, // UP
-        { dx: 1, dy: 0 },  // RIGHT
-        { dx: 0, dy: 1 },  // DOWN
-        { dx: -1, dy: 0 }  // LEFT
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 }
       ];
 
       const candidates = [];
       let arrowId = 0;
+      let filledCells = 0;
+      const targetCellsToFill = Math.floor(validCells.length * diff.targetFill);
 
       for (let i = 0; i < validCells.length; i++) {
-        if (candidates.length >= diff.maxArrows) break;
+        if (filledCells >= targetCellsToFill) break;
         const start = validCells[i];
         if (grid[start.c][start.r] !== null) continue;
 
@@ -1014,11 +1008,12 @@
             id: arrowId,
             points: path,
             exitDir: exitDir,
-            state: 'idle', // idle, moving, bump, queued, escaped
+            state: 'idle',
             progress: 0,
             bumpProgress: 0,
             shake: 0
           });
+          filledCells += path.length;
           arrowId++;
         } else {
           grid[start.c][start.r] = null;
@@ -1059,13 +1054,12 @@
         const prng = createPRNG(baseSeed + attempt * 101);
         const candidates = buildCandidateArrows(lvl, shapeId, diff, prng);
 
-        if (candidates.length >= diff.minArrows) {
+        if (candidates.length >= 4) {
           const metrics = evaluatePuzzleMetrics(candidates);
           if (
             metrics.isSolvable &&
-            metrics.depth >= diff.minDepth &&
-            metrics.initialFree >= 1 &&
-            metrics.initialRatio <= diff.maxInitialFreeRatio
+            metrics.depth >= Math.min(diff.minDepth, 2) &&
+            metrics.initialFree >= 1
           ) {
             validPuzzleFound = true;
             generatedArrows = candidates;
@@ -1075,11 +1069,12 @@
         attempt++;
       }
 
+      // Safe Fallback: Guarantees no empty boards
       if (!validPuzzleFound) {
         let fallbackAttempt = 0;
         while (!validPuzzleFound && fallbackAttempt < 50) {
           const prng = createPRNG((baseSeed ^ 0xA5A5A5A5) + fallbackAttempt * 13);
-          const candidates = buildCandidateArrows(lvl, 0, diff, prng);
+          const candidates = buildCandidateArrows(lvl, shapeId, diff, prng);
           const metrics = evaluatePuzzleMetrics(candidates);
           if (metrics.isSolvable && metrics.initialFree >= 1) {
             validPuzzleFound = true;
@@ -1088,6 +1083,12 @@
           }
           fallbackAttempt++;
         }
+      }
+
+      // Final Safety Net: If still empty, build on Box mask
+      if (!validPuzzleFound || generatedArrows.length === 0) {
+        const prng = createPRNG(baseSeed ^ 0x1234);
+        generatedArrows = buildCandidateArrows(lvl, 0, diff, prng);
       }
 
       arrows = generatedArrows;
@@ -1129,7 +1130,6 @@
       if (released) triggerAnimation();
     }
 
-    // Snake Follow Path Calculation
     function getSnakePolyline(points, exitDir, progress) {
       const origPts = points.map(pt => ({
         x: originX + (pt.c + 0.5) * cellSize,
@@ -1202,7 +1202,7 @@
         }
       });
 
-      // Cleared Area Dot Matrix
+      // Dot Matrix
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
@@ -1258,10 +1258,8 @@
           arrow.shake -= 0.1;
         }
 
-        // Bump Displacement (Runs forward into obstacle, then bounces back)
         let bumpDist = 0;
         if (arrow.state === 'bump') {
-          // Sine curve: 0 -> peak (cellSize * 0.45) -> 0
           bumpDist = Math.sin(arrow.bumpProgress * Math.PI) * (cellSize * 0.45);
         }
 
@@ -1290,7 +1288,6 @@
           }
           ctx.stroke();
 
-          // Arrowhead strictly at tip
           const tip = poly[poly.length - 1];
           const dx = arrow.exitDir.dx;
           const dy = arrow.exitDir.dy;
@@ -1327,12 +1324,10 @@
       }
     }
 
-    // Ultra-Smooth Animation Loop
     function animate() {
       let active = false;
 
       arrows.forEach(arrow => {
-        // Escape motion (Slow, smooth & crystal clear)
         if (arrow.state === 'moving') {
           arrow.progress += 0.019; // Ultra-smooth slow speed
           active = true;
@@ -1343,13 +1338,12 @@
           }
         }
 
-        // Bump & Rebound collision animation
         if (arrow.state === 'bump') {
           arrow.bumpProgress += 0.085;
           active = true;
           if (arrow.bumpProgress >= 1.0) {
             arrow.bumpProgress = 0;
-            arrow.state = 'queued'; // Settle back to queue
+            arrow.state = 'queued';
           }
         }
 
@@ -1419,12 +1413,10 @@
 
       if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped' && clicked.state !== 'bump') {
         if (!isArrowBlocked(clicked)) {
-          // Free path -> slide out
           playSound('escape');
           clicked.state = 'moving';
           triggerAnimation();
         } else {
-          // Check if blocking arrow is already leaving
           const head = clicked.points[clicked.points.length - 1];
           const d = clicked.exitDir;
           let checkC = head.c + d.dx;
@@ -1447,12 +1439,10 @@
           }
 
           if (isDirectBlockerLeaving) {
-            // Fast combo tap -> queue smoothly without penalty
             clicked.state = 'queued';
             playSound('escape');
             triggerAnimation();
           } else {
-            // Collision Bump & Rebound -> moves forward, hits wall, bounces back!
             playSound('hit');
             clicked.state = 'bump';
             clicked.bumpProgress = 0;
@@ -1500,7 +1490,7 @@
         modalSubtitle.innerText = `Awesome! Level ${currentLevel} fully untangled.`;
         modalActionBtn.onclick = () => {
           currentLevel++;
-          lives = 3; // Har naye level par 3 hearts wapas
+          lives = 3;
           if (currentLevel > maxUnlockedLevel) {
             maxUnlockedLevel = currentLevel;
             localStorage.setItem('max_unlocked_level', maxUnlockedLevel);
@@ -1528,7 +1518,7 @@
       gameModal.style.display = 'flex';
     }
 
-    // Start Game
+    // Launch Level
     generateLevel(currentLevel);
   </script>
 </body>
