@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Maze Untangle - Master Maze</title>
+  <title>Maze Untangle - Master Puzzle</title>
   <style>
     * {
       box-sizing: border-box;
@@ -30,7 +30,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(11, 15, 25, 0.6);
+      background: rgba(11, 15, 25, 0.65);
       backdrop-filter: blur(4px);
       z-index: 0;
     }
@@ -43,19 +43,18 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      border-radius: 24px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+      border-radius: 20px;
       overflow: hidden;
       z-index: 1;
     }
-    /* Header Bar */
     .header {
-      padding: 12px 18px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #ffffff;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 2px solid #f1f5f9;
     }
     .header-left {
       display: flex;
@@ -63,8 +62,8 @@
       gap: 12px;
     }
     .profile-dp {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid #2563eb;
@@ -73,31 +72,31 @@
     .header-info {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
     .level-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .level-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       color: #0f172a;
     }
-    .shape-badge {
+    .diff-badge {
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 8px;
-      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #eff6ff;
       color: #2563eb;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     .lives-box {
       display: flex;
       gap: 4px;
+      margin-top: 2px;
     }
     .heart {
       width: 12px;
@@ -145,7 +144,6 @@
       transform: scale(0.92);
     }
 
-    /* Canvas / Board */
     #canvas-wrap {
       flex: 1;
       display: flex;
@@ -153,7 +151,7 @@
       justify-content: center;
       position: relative;
       background: #ffffff;
-      padding: 10px;
+      padding: 8px;
     }
     canvas {
       touch-action: none;
@@ -172,7 +170,6 @@
       border-top: 1px solid #f1f5f9;
     }
 
-    /* Modal Popup */
     .modal {
       position: absolute;
       inset: 0;
@@ -188,7 +185,7 @@
     .modal-card {
       background: #fff;
       color: #0f172a;
-      padding: 26px 22px;
+      padding: 26px 20px;
       border-radius: 20px;
       text-align: center;
       width: 82%;
@@ -250,7 +247,7 @@
         <div class="header-info">
           <div class="level-row">
             <span class="level-title" id="level-display">Level 1</span>
-            <span class="shape-badge" id="shape-tag">Square</span>
+            <span class="diff-badge" id="diff-tag">Normal</span>
           </div>
           <div class="lives-box" id="lives-container">
             <span class="heart"></span>
@@ -337,8 +334,8 @@
 
       if (type === 'escape') {
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, t);
-        osc.frequency.exponentialRampToValueAtTime(900, t + 0.12);
+        osc.frequency.setValueAtTime(450, t);
+        osc.frequency.exponentialRampToValueAtTime(950, t + 0.12);
         gain.gain.setValueAtTime(0.25, t);
         gain.gain.linearRampToValueAtTime(0.01, t + 0.12);
         osc.start(t);
@@ -380,7 +377,7 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const levelDisplay = document.getElementById('level-display');
-    const shapeTag = document.getElementById('shape-tag');
+    const diffTag = document.getElementById('diff-tag');
     const liveTimeDisplay = document.getElementById('live-time-display');
     const livesContainer = document.getElementById('lives-container');
     const gameModal = document.getElementById('gameModal');
@@ -391,13 +388,11 @@
     const statTimeTaken = document.getElementById('stat-time-taken');
     const statBestTime = document.getElementById('stat-best-time');
 
-    let cols = 16;
-    let rows = 22;
-    let cellSize = 16;
+    let cols = 14;
+    let rows = 20;
+    let cellSize = 20;
     let originX = 0;
     let originY = 0;
-
-    const SHAPES = ['SQUARE', 'TEACUP', 'CROSS', 'DIAMOND', 'TOWER', 'HOURGLASS'];
 
     function resizeCanvas() {
       const wrap = document.getElementById('canvas-wrap');
@@ -425,77 +420,68 @@
       return `${m}:${sec}`;
     }
 
-    // Shape Mask Generator
-    function isInsideShape(c, r, shapeName) {
+    // Procedural Shape Boundary
+    function isShapeActive(c, r, lvl) {
+      const shapeType = lvl % 5;
       const cx = (cols - 1) / 2;
       const cy = (rows - 1) / 2;
       const nx = (c - cx) / cx;
       const ny = (r - cy) / cy;
 
-      switch(shapeName) {
-        case 'TEACUP':
-          if (ny < -0.6) return Math.abs(nx) < 0.35 && Math.floor(c) % 2 === 0; // Steam
-          if (ny >= -0.6 && ny <= 0.7 && Math.abs(nx) <= 0.6) return true; // Cup
-          if (ny >= -0.2 && ny <= 0.4 && nx > 0.6 && nx < 0.95) return true; // Handle
-          return false;
-        case 'CROSS':
-          return (Math.abs(nx) < 0.35 && Math.abs(ny) < 0.85) || (Math.abs(nx) < 0.85 && Math.abs(ny) < 0.35);
-        case 'DIAMOND':
-          return (Math.abs(nx) + Math.abs(ny)) < 0.95;
-        case 'TOWER':
-          if (ny < -0.4) return Math.abs(nx) < 0.35;
-          if (ny < 0.1) return Math.abs(nx) < 0.6;
-          return Math.abs(nx) < 0.85;
-        case 'HOURGLASS':
-          return Math.abs(nx) < (Math.abs(ny) * 0.7 + 0.25);
-        case 'SQUARE':
+      if (lvl <= 3) return Math.abs(nx) < 0.7 && Math.abs(ny) < 0.7;
+
+      switch(shapeType) {
+        case 0: // Dense Full Screen Labyrinth
+          return Math.abs(nx) < 0.94 && Math.abs(ny) < 0.94;
+        case 1: // Mug/Cup Shape
+          return (ny >= -0.5 && ny <= 0.8 && Math.abs(nx) <= 0.68) || (ny >= -0.1 && ny <= 0.4 && nx > 0.68 && nx < 0.95);
+        case 2: // Diamond Maze
+          return (Math.abs(nx) + Math.abs(ny)) < 1.1;
+        case 3: // Cross / Plus
+          return (Math.abs(nx) < 0.42 && Math.abs(ny) < 0.92) || (Math.abs(nx) < 0.92 && Math.abs(ny) < 0.42);
+        case 4: // Stepped Tower
+          if (ny < -0.3) return Math.abs(nx) < 0.45;
+          if (ny < 0.2) return Math.abs(nx) < 0.68;
+          return Math.abs(nx) < 0.92;
         default:
-          return Math.abs(nx) < 0.88 && Math.abs(ny) < 0.88;
+          return true;
       }
     }
 
-    // Procedural Dense Maze Generator
+    // Generator: Pura board arrows se bhara hoga, koi empty isolated line nahi
     function generateLevel(lvl) {
       arrows = [];
       previewArrow = null;
       secondsSpent = 0;
       liveTimeDisplay.innerText = "00:00";
 
-      // Level Scaling
-      if (lvl <= 5) {
-        cols = 12; rows = 16;
-      } else if (lvl <= 15) {
-        cols = 14; rows = 18;
-      } else if (lvl <= 35) {
-        cols = 16; rows = 22;
-      } else {
-        cols = 18; rows = 24;
-      }
+      const isHard = lvl > 10;
+      diffTag.innerText = isHard ? (lvl > 100 ? "Master" : "Super Hard") : "Normal";
+      diffTag.style.color = isHard ? "#ef4444" : "#2563eb";
 
-      const shapeType = SHAPES[(lvl - 1) % SHAPES.length];
-      shapeTag.innerText = shapeType;
+      cols = isHard ? 16 : 12;
+      rows = isHard ? 22 : 16;
 
       resizeCanvas();
 
-      let randCounter = lvl * 269;
+      let randCounter = lvl * 431;
       const getRand = () => seededRandom(randCounter++);
 
-      // Grid graph initialization
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
-      const validCells = [];
+      const cells = [];
 
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
-          if (isInsideShape(c, r, shapeType)) {
-            validCells.push({ c, r });
+          if (isShapeActive(c, r, lvl)) {
+            cells.push({ c, r });
           }
         }
       }
 
-      // Shuffle valid cells
-      for (let i = validCells.length - 1; i > 0; i--) {
+      // Shuffle
+      for (let i = cells.length - 1; i > 0; i--) {
         const j = Math.floor(getRand() * (i + 1));
-        [validCells[i], validCells[j]] = [validCells[j], validCells[i]];
+        [cells[i], cells[j]] = [cells[j], cells[i]];
       }
 
       const dirs = [
@@ -506,26 +492,20 @@
       ];
 
       let arrowId = 0;
-      const minLength = lvl <= 5 ? 2 : (lvl <= 15 ? 3 : 4);
-      const maxLength = lvl <= 5 ? 4 : (lvl <= 15 ? 7 : 10);
 
-      // Carve dense interlocking paths
-      for (const cell of validCells) {
-        if (grid[cell.c][cell.r] !== null) continue;
+      // Pack entire shape with interconnected arrow paths
+      for (const start of cells) {
+        if (grid[start.c][start.r] !== null) continue;
 
-        let curC = cell.c;
-        let curR = cell.r;
+        let curC = start.c;
+        let curR = start.r;
         let path = [{ c: curC, r: curR }];
         grid[curC][curR] = arrowId;
 
-        // Pick random initial direction
-        let dirIdx = Math.floor(getRand() * dirs.length);
-        let curDir = dirs[dirIdx];
+        let curDir = dirs[Math.floor(getRand() * dirs.length)];
+        const maxLen = isHard ? Math.floor(getRand() * 6) + 4 : Math.floor(getRand() * 3) + 2;
 
-        const targetLength = Math.floor(getRand() * (maxLength - minLength + 1)) + minLength;
-
-        for (let step = 1; step < targetLength; step++) {
-          // Chance to turn 90 degrees
+        for (let step = 1; step < maxLen; step++) {
           if (step > 1 && getRand() < 0.45) {
             const turnOptions = (curDir.dx === 0) ? [dirs[1], dirs[3]] : [dirs[0], dirs[2]];
             curDir = turnOptions[Math.floor(getRand() * turnOptions.length)];
@@ -537,7 +517,7 @@
           if (
             nextC >= 0 && nextC < cols &&
             nextR >= 0 && nextR < rows &&
-            isInsideShape(nextC, nextR, shapeType) &&
+            isShapeActive(nextC, nextR, lvl) &&
             grid[nextC][nextR] === null
           ) {
             grid[nextC][nextR] = arrowId;
@@ -550,7 +530,6 @@
         }
 
         if (path.length >= 2) {
-          // Last segment vector determines exit direction
           const tail = path[path.length - 2];
           const head = path[path.length - 1];
           const exitDir = { dx: head.c - tail.c, dy: head.r - tail.r };
@@ -565,8 +544,7 @@
           });
           arrowId++;
         } else {
-          // Free single unconnected cell
-          grid[cell.c][cell.r] = null;
+          grid[start.c][start.r] = null;
         }
       }
 
@@ -593,19 +571,18 @@
       }
     }
 
-    // Raycast Collision Detection along Exit Ray
     function isArrowBlocked(arrow) {
       const head = arrow.points[arrow.points.length - 1];
       const d = arrow.exitDir;
       let checkC = head.c + d.dx;
       let checkR = head.r + d.dy;
 
-      while (checkC >= -2 && checkC <= cols + 2 && checkR >= -2 && checkR <= rows + 2) {
+      while (checkC >= -1 && checkC <= cols && checkR >= -1 && checkR <= rows) {
         for (const other of arrows) {
           if (other.id === arrow.id || other.state === 'escaped') continue;
           for (const p of other.points) {
             if (p.c === checkC && p.r === checkR) {
-              return true; // Another arrow is in front
+              return true;
             }
           }
         }
@@ -615,7 +592,6 @@
       return false;
     }
 
-    // Auto-Release Queued Red Arrows when path becomes free
     function checkQueuedArrows() {
       let released = false;
       arrows.forEach(arrow => {
@@ -631,11 +607,34 @@
       }
     }
 
-    // Render Canvas
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Long press preview exit path
+      // Set of current active coordinates
+      const occupiedCoords = new Set();
+      arrows.forEach(arrow => {
+        if (arrow.state !== 'escaped') {
+          arrow.points.forEach(pt => {
+            occupiedCoords.add(`${pt.c},${pt.r}`);
+          });
+        }
+      });
+
+      // 1. Draw Dots ONLY where arrows have already escaped (Emptied areas)
+      ctx.fillStyle = '#cbd5e1';
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          if (isShapeActive(c, r, currentLevel) && !occupiedCoords.has(`${c},${r}`)) {
+            const dx = originX + (c + 0.5) * cellSize;
+            const dy = originY + (r + 0.5) * cellSize;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // 2. Long Press Path Preview
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -654,18 +653,18 @@
         ctx.restore();
       }
 
-      // Draw all arrows with professional maze styling
+      // 3. Draw All Arrows (Master Labyrinth Style)
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
-        let strokeColor = '#0f172a'; // Deep Navy Maze Color
+        let strokeColor = '#0f172a'; // Navy Blue Corridors
         if (arrow.state === 'queued') strokeColor = '#ef4444'; // Red Waiting
-        if (arrow === previewArrow) strokeColor = '#2563eb';   // Blue Selected
+        if (arrow === previewArrow) strokeColor = '#2563eb';
 
         ctx.save();
         ctx.strokeStyle = strokeColor;
         ctx.fillStyle = strokeColor;
-        ctx.lineWidth = Math.max(3.2, cellSize * 0.28);
+        ctx.lineWidth = Math.max(3.5, cellSize * 0.32);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -682,7 +681,7 @@
 
         ctx.translate(offsetX, offsetY);
 
-        // Draw maze pathway
+        // Continuous maze corridor line
         ctx.beginPath();
         for (let i = 0; i < arrow.points.length; i++) {
           const pt = arrow.points[i];
@@ -693,7 +692,7 @@
         }
         ctx.stroke();
 
-        // Draw crisp solid arrowhead at head
+        // Arrow head at exit point
         const head = arrow.points[arrow.points.length - 1];
         const hx = originX + (head.c + 0.5) * cellSize;
         const hy = originY + (head.r + 0.5) * cellSize;
@@ -702,10 +701,10 @@
         ctx.save();
         ctx.translate(hx, hy);
         ctx.rotate(angle);
-        const arrowHeadLen = Math.max(8, cellSize * 0.45);
+        const arrowHeadLen = Math.max(8, cellSize * 0.48);
         ctx.beginPath();
         ctx.moveTo(-arrowHeadLen, -arrowHeadLen * 0.65);
-        ctx.lineTo(arrowHeadLen * 0.2, 0);
+        ctx.lineTo(arrowHeadLen * 0.25, 0);
         ctx.lineTo(-arrowHeadLen, arrowHeadLen * 0.65);
         ctx.stroke();
         ctx.restore();
@@ -714,7 +713,6 @@
       });
     }
 
-    // Animation loop
     function animate() {
       let active = false;
 
@@ -733,14 +731,10 @@
 
       draw();
 
-      if (active) {
-        requestAnimationFrame(animate);
-      } else {
-        isAnimating = false;
-      }
+      if (active) requestAnimationFrame(animate);
+      else isAnimating = false;
     }
 
-    // Touch and click handling
     function getTouchedArrow(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const px = clientX - rect.left;
@@ -755,7 +749,7 @@
           const ax = originX + (pt.c + 0.5) * cellSize;
           const ay = originY + (pt.r + 0.5) * cellSize;
           const dist = Math.hypot(px - ax, py - ay);
-          if (dist < cellSize * 0.75 && dist < minDistance) {
+          if (dist < cellSize * 0.8 && dist < minDistance) {
             minDistance = dist;
             found = arrow;
           }
@@ -789,14 +783,12 @@
       const cx = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
       const cy = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
 
-      // Check if finger moved too much (avoid false clicks while scrolling)
       if (Math.hypot(cx - pointerDownPos.x, cy - pointerDownPos.y) > 15) return;
 
       const clicked = getTouchedArrow(cx, cy);
 
       if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
         if (isArrowBlocked(clicked)) {
-          // Saamne rukawat hai: Red ho kar wait karega
           playSound('hit');
           clicked.state = 'queued';
           clicked.shake = 1.0;
@@ -804,7 +796,6 @@
           updateUI();
           if (lives <= 0) handleGameOver("Out of Lives!");
         } else {
-          // Free hai: Bahar nikal jayega
           playSound('escape');
           clicked.state = 'moving';
         }
@@ -821,7 +812,6 @@
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e); }, { passive: false });
     canvas.addEventListener('touchend', (e) => { e.preventDefault(); onPointerUp(e); }, { passive: false });
 
-    // Win / Game Over
     function checkWinCondition() {
       const remaining = arrows.filter(a => a.state !== 'escaped');
       if (remaining.length === 0) {
@@ -869,7 +859,6 @@
       generateLevel(currentLevel);
     });
 
-    // Run game
     generateLevel(currentLevel);
   </script>
 </body>
