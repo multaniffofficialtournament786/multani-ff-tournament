@@ -56,6 +56,7 @@
       background: #ffffff;
       border-bottom: 2px solid #f1f5f9;
       position: relative;
+      z-index: 20;
     }
     .header-left {
       display: flex;
@@ -92,6 +93,15 @@
       border-radius: 6px;
       background: #eff6ff;
       color: #2563eb;
+      text-transform: uppercase;
+    }
+    .shape-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: #f1f5f9;
+      color: #64748b;
       text-transform: uppercase;
     }
     .lives-box {
@@ -187,7 +197,8 @@
       justify-content: center;
       position: relative;
       background: #ffffff;
-      padding: 12px;
+      padding: 10px;
+      touch-action: none;
     }
     canvas {
       touch-action: none;
@@ -204,6 +215,7 @@
       text-transform: uppercase;
       background: #ffffff;
       border-top: 1px solid #f1f5f9;
+      z-index: 20;
     }
 
     .modal {
@@ -303,6 +315,10 @@
       color: #2563eb;
       border-color: #bfdbfe;
     }
+    .level-box.unlocked:active {
+      background: #2563eb;
+      color: #fff;
+    }
     .level-box.current {
       background: #2563eb;
       color: #ffffff;
@@ -331,7 +347,8 @@
         <div class="header-info">
           <div class="level-row">
             <span class="level-title" id="level-display">Level 1</span>
-            <span class="diff-badge" id="diff-tag">Normal</span>
+            <span class="diff-badge" id="diff-tag">Easy</span>
+            <span class="shape-badge" id="shape-tag">Square</span>
           </div>
           <div class="lives-box" id="lives-container">
             <span class="heart"></span>
@@ -361,7 +378,7 @@
 
     <div class="footer">Tap Arrow • Untangle The Maze</div>
 
-    <!-- Modals -->
+    <!-- Victory Modal -->
     <div class="modal" id="gameModal">
       <div class="modal-card">
         <h2 id="modal-title">Level Cleared! 🎉</h2>
@@ -380,6 +397,7 @@
       </div>
     </div>
 
+    <!-- Levels Map Modal -->
     <div class="modal" id="levels-modal">
       <div class="modal-card">
         <h2>Select Level</h2>
@@ -391,7 +409,7 @@
   </div>
 
   <script>
-    // Audio FX
+    // --- Audio Engine ---
     const bgm = document.getElementById('bgm');
     const musicBtn = document.getElementById('music-btn');
     let isMusicPlaying = false;
@@ -411,7 +429,7 @@
     }
     musicBtn.addEventListener('click', toggleMusic);
 
-    window.addEventListener('click', () => {
+    window.addEventListener('pointerdown', () => {
       if (!isMusicPlaying && bgm.paused) {
         bgm.play().then(() => {
           isMusicPlaying = true;
@@ -462,7 +480,7 @@
       }
     }
 
-    // Game state
+    // --- State Variables ---
     let currentLevel = parseInt(localStorage.getItem('saved_level')) || 1;
     let maxUnlockedLevel = parseInt(localStorage.getItem('max_unlocked_level')) || 1;
     if (currentLevel > maxUnlockedLevel) maxUnlockedLevel = currentLevel;
@@ -471,7 +489,8 @@
     let secondsSpent = 0;
     let timerInterval = null;
     let arrows = [];
-    let isAnimating = false;
+    let animFrameId = null;
+    let isGameOverOrWon = false;
     let previewArrow = null;
     let longPressTimer = null;
     let pointerDownPos = { x: 0, y: 0 };
@@ -480,6 +499,7 @@
     const ctx = canvas.getContext('2d');
     const levelDisplay = document.getElementById('level-display');
     const diffTag = document.getElementById('diff-tag');
+    const shapeTag = document.getElementById('shape-tag');
     const liveTimeDisplay = document.getElementById('live-time-display');
     const livesContainer = document.getElementById('lives-container');
     const gameModal = document.getElementById('gameModal');
@@ -498,11 +518,19 @@
     const unlockedCountText = document.getElementById('unlocked-count-text');
     const closeLevelsBtn = document.getElementById('close-levels-btn');
 
-    let cols = 18;
-    let rows = 26;
-    let cellSize = 14;
+    let cols = 16;
+    let rows = 22;
+    let cellSize = 16;
     let originX = 0;
     let originY = 0;
+
+    // --- 16 Distinct Base Shapes ---
+    const SHAPE_NAMES = [
+      'Square', 'Diamond', 'Circle', 'Cross', 
+      'Triangle', 'Hexagon', 'Spiral', 'Zigzag', 
+      'Key', 'Shield', 'Bottle', 'Lightning', 
+      'Heart', 'Star', 'Labyrinth', 'Comb'
+    ];
 
     menuDotsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -571,9 +599,16 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    function seededRandom(seed) {
-      let x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
+    // --- Deterministic Mulberry32 PRNG ---
+    function createPRNG(seed) {
+      let s = seed >>> 0;
+      return function() {
+        s |= 0;
+        s = (s + 0x6D2B79F5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
 
     function formatTime(s) {
@@ -582,76 +617,228 @@
       return `${m}:${sec}`;
     }
 
-    // Precise Shape Masks
-    function isShapeActive(c, r, lvl) {
-      const shapeType = lvl % 5;
+    // --- Procedural Shape Masks with Dynamic Proportions ---
+    function isCellInShape(c, r, shapeId, lvl) {
       const cx = (cols - 1) / 2;
       const cy = (rows - 1) / 2;
-      const nx = (c - cx) / cx;
-      const ny = (r - cy) / cy;
+      
+      // Systematic structural modifications based on level
+      const stretchX = 1.0 + (((lvl * 17) % 7) - 3) * 0.035;
+      const stretchY = 1.0 + (((lvl * 29) % 7) - 3) * 0.035;
+      const nx = ((c - cx) / cx) * stretchX;
+      const ny = ((r - cy) / cy) * stretchY;
 
-      switch(shapeType) {
-        case 1: // Key Shape
-          const distTop = Math.hypot(nx, ny + 0.45);
-          if (distTop <= 0.48 && distTop >= 0.22) return true;
+      // Asymmetric boundary perturber
+      const angle = Math.atan2(ny, nx);
+      const wobble = 1.0 + 0.05 * Math.sin(angle * 4 + lvl);
+
+      switch(shapeId) {
+        case 0: // Square with edge modifications
+          return Math.abs(nx) <= (0.86 * wobble) && Math.abs(ny) <= (0.86 * wobble);
+        case 1: // Diamond
+          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.08 * wobble);
+        case 2: // Circle / Ellipse
+          return (nx * nx + ny * ny) <= (0.82 * wobble);
+        case 3: // Cross
+          return (Math.abs(nx) <= 0.38 && Math.abs(ny) <= 0.9) || (Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.38);
+        case 4: // Triangle
+          return ny >= -0.85 && (Math.abs(nx) <= (ny + 0.88) * 0.58 * wobble);
+        case 5: // Hexagon
+          return Math.abs(ny) <= 0.88 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.9 * wobble);
+        case 6: // Spiral
+          const rDist = Math.hypot(nx, ny);
+          return rDist <= 0.9 && (rDist >= 0.22 || Math.abs(nx) <= 0.4);
+        case 7: // Zigzag Channel
+          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.32) <= 0.54;
+        case 8: // Key
+          const keyHead = Math.hypot(nx, ny + 0.45);
+          if (keyHead <= 0.48 && keyHead >= 0.2) return true;
           if (ny >= -0.15 && ny <= 0.85 && Math.abs(nx) <= 0.18) return true;
           if (ny >= 0.45 && ny <= 0.78 && nx > 0.18 && nx <= 0.55) return true;
           return false;
-
-        case 2: // Chess Knight
-          if (ny < -0.7 && nx < 0.2 && nx > -0.4) return true;
-          if (ny >= -0.7 && ny < -0.2 && nx < 0.3 && nx > -0.6) return true;
-          if (ny >= -0.2 && ny < 0.5 && nx < 0.65 && nx > -0.45) return true;
-          if (ny >= 0.6 && ny <= 0.85 && Math.abs(nx) <= 0.8) return true;
-          return false;
-
-        case 3: // Shield
-          if (ny < 0) return Math.abs(nx) <= 0.8;
-          return Math.abs(nx) <= (0.8 - ny * 0.7);
-
-        case 4: // Bottle
-          if (ny < -0.5) return Math.abs(nx) <= 0.25;
-          return Math.abs(nx) <= 0.75 && ny <= 0.85;
-
-        case 0: // Square Spiral
+        case 9: // Shield
+          if (ny < 0) return Math.abs(nx) <= (0.82 * wobble);
+          return Math.abs(nx) <= ((0.82 - ny * 0.75) * wobble);
+        case 10: // Bottle
+          if (ny < -0.45) return Math.abs(nx) <= 0.22;
+          return Math.abs(nx) <= (0.75 * wobble) && ny <= 0.85;
+        case 11: // Lightning Bolt
+          if (ny < 0) return nx >= ny * 0.6 - 0.4 && nx <= ny * 0.6 + 0.4;
+          return nx >= ny * 0.7 - 0.2 && nx <= ny * 0.7 + 0.55;
+        case 12: // Heart
+          const hx = nx * 1.1;
+          const hy = -ny * 1.1 + 0.2;
+          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.05;
+        case 13: // Star
+          const rad = Math.hypot(nx, ny);
+          const starRadius = 0.54 + 0.34 * Math.cos(angle * 5 + (lvl % 3));
+          return rad <= starRadius;
+        case 14: // Labyrinth / Irregular Hollow
+          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88 && (Math.abs(nx) > 0.18 || Math.abs(ny) > 0.18);
+        case 15: // Asymmetric Comb
         default:
-          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88;
+          return (nx >= -0.75 && nx <= 0.75 && Math.abs(ny) <= 0.8) && (r % 2 === 0 || nx <= -0.15);
       }
     }
 
-    // Robust Non-Head-On Generator
-    function generateLevel(lvl) {
-      arrows = [];
-      previewArrow = null;
-      secondsSpent = 0;
-      liveTimeDisplay.innerText = "00:00";
+    // --- Difficulty Tuning Matrix ---
+    function getDifficultyConfig(lvl) {
+      if (lvl <= 100) {
+        return {
+          tier: 'Easy',
+          color: '#22c55e',
+          cols: 12,
+          rows: 16,
+          maxLen: 3,
+          turnChance: 0.25,
+          minArrows: 6,
+          maxArrows: Math.min(8 + Math.floor(lvl / 15), 14),
+          minDepth: 2,
+          maxInitialFreeRatio: 0.60
+        };
+      } else if (lvl <= 500) {
+        return {
+          tier: 'Normal',
+          color: '#2563eb',
+          cols: 14,
+          rows: 18,
+          maxLen: 4,
+          turnChance: 0.35,
+          minArrows: 14,
+          maxArrows: Math.min(15 + Math.floor((lvl - 100) / 40), 22),
+          minDepth: 3,
+          maxInitialFreeRatio: 0.45
+        };
+      } else if (lvl <= 1500) {
+        return {
+          tier: 'Hard',
+          color: '#eab308',
+          cols: 16,
+          rows: 22,
+          maxLen: 5,
+          turnChance: 0.42,
+          minArrows: 20,
+          maxArrows: Math.min(22 + Math.floor((lvl - 500) / 60), 32),
+          minDepth: 4,
+          maxInitialFreeRatio: 0.35
+        };
+      } else if (lvl <= 3000) {
+        return {
+          tier: 'Expert',
+          color: '#f97316',
+          cols: 18,
+          rows: 24,
+          maxLen: 6,
+          turnChance: 0.48,
+          minArrows: 28,
+          maxArrows: Math.min(30 + Math.floor((lvl - 1500) / 75), 42),
+          minDepth: 5,
+          maxInitialFreeRatio: 0.25
+        };
+      } else {
+        return {
+          tier: 'Master',
+          color: '#ef4444',
+          cols: 20,
+          rows: 26,
+          maxLen: 7,
+          turnChance: 0.52,
+          minArrows: 36,
+          maxArrows: Math.min(38 + Math.floor((lvl - 3000) / 90), 52),
+          minDepth: 6,
+          maxInitialFreeRatio: 0.20
+        };
+      }
+    }
 
-      const isHard = lvl > 5;
-      diffTag.innerText = isHard ? (lvl > 50 ? "Master" : "Hard") : "Normal";
-      diffTag.style.color = isHard ? "#ef4444" : "#2563eb";
+    // --- High-Speed Bit-Packed Collision Engine ---
+    function checkRaycastBlocked(arrow, activeArrows) {
+      const head = arrow.points[arrow.points.length - 1];
+      const d = arrow.exitDir;
+      let checkC = head.c + d.dx;
+      let checkR = head.r + d.dy;
 
-      cols = isHard ? 18 : 14;
-      rows = isHard ? 24 : 18;
+      while (checkC >= -1 && checkC <= cols && checkR >= -1 && checkR <= rows) {
+        for (let i = 0; i < activeArrows.length; i++) {
+          const other = activeArrows[i];
+          if (other.id === arrow.id || other.state === 'escaped') continue;
+          for (let p = 0; p < other.points.length; p++) {
+            if (other.points[p].c === checkC && other.points[p].r === checkR) {
+              return true;
+            }
+          }
+        }
+        checkC += d.dx;
+        checkR += d.dy;
+      }
+      return false;
+    }
 
-      resizeCanvas();
+    function isArrowBlocked(arrow) {
+      return checkRaycastBlocked(arrow, arrows);
+    }
 
-      let randCounter = lvl * 719;
-      const getRand = () => seededRandom(randCounter++);
+    // --- Topological Dependency Solver & Metric Profiler ---
+    function evaluatePuzzleMetrics(candidateArrows) {
+      const simList = candidateArrows.map(a => ({
+        id: a.id,
+        points: a.points,
+        exitDir: a.exitDir,
+        state: 'idle'
+      }));
 
+      let depth = 0;
+      let initialFree = 0;
+      let escapedCount = 0;
+
+      while (true) {
+        const canEscape = [];
+        for (let i = 0; i < simList.length; i++) {
+          const a = simList[i];
+          if (a.state === 'idle' && !checkRaycastBlocked(a, simList)) {
+            canEscape.push(a);
+          }
+        }
+
+        if (depth === 0) initialFree = canEscape.length;
+        if (canEscape.length === 0) break;
+
+        for (let i = 0; i < canEscape.length; i++) {
+          canEscape[i].state = 'escaped';
+          escapedCount++;
+        }
+        depth++;
+      }
+
+      const isSolvable = (escapedCount === candidateArrows.length);
+      return {
+        isSolvable,
+        depth,
+        initialFree,
+        total: candidateArrows.length,
+        initialRatio: initialFree / (candidateArrows.length || 1)
+      };
+    }
+
+    // --- Deterministic Grid Synthesis ---
+    function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
-      const cells = [];
+      const validCells = [];
 
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
-          if (isShapeActive(c, r, lvl)) {
-            cells.push({ c, r });
+          if (isCellInShape(c, r, shapeId, lvl)) {
+            validCells.push({ c, r });
           }
         }
       }
 
-      for (let i = cells.length - 1; i > 0; i--) {
-        const j = Math.floor(getRand() * (i + 1));
-        [cells[i], cells[j]] = [cells[j], cells[i]];
+      // Fisher-Yates shuffle
+      for (let i = validCells.length - 1; i > 0; i--) {
+        const j = Math.floor(prng() * (i + 1));
+        const temp = validCells[i];
+        validCells[i] = validCells[j];
+        validCells[j] = temp;
       }
 
       const dirs = [
@@ -661,9 +848,12 @@
         { dx: -1, dy: 0 }  // LEFT
       ];
 
+      const candidates = [];
       let arrowId = 0;
 
-      for (const start of cells) {
+      for (let i = 0; i < validCells.length; i++) {
+        if (candidates.length >= diff.maxArrows) break;
+        const start = validCells[i];
         if (grid[start.c][start.r] !== null) continue;
 
         let curC = start.c;
@@ -671,13 +861,13 @@
         let path = [{ c: curC, r: curR }];
         grid[curC][curR] = arrowId;
 
-        let curDir = dirs[Math.floor(getRand() * dirs.length)];
-        const maxLen = isHard ? Math.floor(getRand() * 5) + 3 : Math.floor(getRand() * 3) + 2;
+        let curDir = dirs[Math.floor(prng() * dirs.length)];
+        const targetLen = Math.floor(prng() * (diff.maxLen - 2)) + 3;
 
-        for (let step = 1; step < maxLen; step++) {
-          if (step > 1 && getRand() < 0.4) {
+        for (let step = 1; step < targetLen; step++) {
+          if (step > 1 && prng() < diff.turnChance) {
             const turnOptions = (curDir.dx === 0) ? [dirs[1], dirs[3]] : [dirs[0], dirs[2]];
-            curDir = turnOptions[Math.floor(getRand() * turnOptions.length)];
+            curDir = turnOptions[Math.floor(prng() * turnOptions.length)];
           }
 
           let nextC = curC + curDir.dx;
@@ -686,7 +876,7 @@
           if (
             nextC >= 0 && nextC < cols &&
             nextR >= 0 && nextR < rows &&
-            isShapeActive(nextC, nextR, lvl) &&
+            isCellInShape(nextC, nextR, shapeId, lvl) &&
             grid[nextC][nextR] === null
           ) {
             grid[nextC][nextR] = arrowId;
@@ -701,13 +891,13 @@
         if (path.length >= 2) {
           const tail = path[path.length - 2];
           const head = path[path.length - 1];
-          // Exit vector MUST be strictly from tail to head (towards outside)
-          let exitDir = {
+          // Exit vector locked strictly to terminal trajectory
+          const exitDir = {
             dx: Math.sign(head.c - tail.c),
             dy: Math.sign(head.r - tail.r)
           };
 
-          arrows.push({
+          candidates.push({
             id: arrowId,
             points: path,
             exitDir: exitDir,
@@ -721,60 +911,90 @@
         }
       }
 
-      // Eliminate Head-on collision (No arrow points directly into another arrow's face)
-      fixOpposingCollisions();
-      ensureBorderExits();
-      resolveDeadlockIfNeeded();
+      return candidates;
+    }
+
+    // --- Pure Deterministic Level Generator ---
+    function generateLevel(lvl) {
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+      isGameOverOrWon = false;
+      previewArrow = null;
+      secondsSpent = 0;
+      liveTimeDisplay.innerText = "00:00";
+
+      const diff = getDifficultyConfig(lvl);
+      cols = diff.cols;
+      rows = diff.rows;
+
+      diffTag.innerText = diff.tier;
+      diffTag.style.color = diff.color;
+
+      const shapeId = (lvl - 1) % SHAPE_NAMES.length;
+      shapeTag.innerText = SHAPE_NAMES[shapeId];
+
+      resizeCanvas();
+
+      let validPuzzleFound = false;
+      let generatedArrows = [];
+      let attempt = 0;
+
+      // Seed uniquely derived from level number
+      let baseSeed = ((lvl * 1234567) ^ 0x5DEECE66) >>> 0;
+
+      while (!validPuzzleFound && attempt < 80) {
+        const prng = createPRNG(baseSeed + attempt * 101);
+        const candidates = buildCandidateArrows(lvl, shapeId, diff, prng);
+
+        if (candidates.length >= diff.minArrows) {
+          const metrics = evaluatePuzzleMetrics(candidates);
+          // Strict Solvability + Strict Depth Validation
+          if (
+            metrics.isSolvable &&
+            metrics.depth >= diff.minDepth &&
+            metrics.initialFree >= 1 &&
+            metrics.initialRatio <= diff.maxInitialFreeRatio
+          ) {
+            validPuzzleFound = true;
+            generatedArrows = candidates;
+            break;
+          }
+        }
+        attempt++;
+      }
+
+      // Tier-Preserving Fallback
+      if (!validPuzzleFound) {
+        let fallbackAttempt = 0;
+        while (!validPuzzleFound && fallbackAttempt < 50) {
+          const prng = createPRNG((baseSeed ^ 0xA5A5A5A5) + fallbackAttempt * 13);
+          const candidates = buildCandidateArrows(lvl, 0, diff, prng);
+          const metrics = evaluatePuzzleMetrics(candidates);
+          if (metrics.isSolvable && metrics.initialFree >= 1) {
+            validPuzzleFound = true;
+            generatedArrows = candidates;
+            break;
+          }
+          fallbackAttempt++;
+        }
+      }
+
+      arrows = generatedArrows;
 
       startTimer();
       updateUI();
       draw();
     }
 
-    // Fix head-on collision
-    function fixOpposingCollisions() {
-      for (let i = 0; i < arrows.length; i++) {
-        for (let j = i + 1; j < arrows.length; j++) {
-          const a1 = arrows[i];
-          const a2 = arrows[j];
-          const h1 = a1.points[a1.points.length - 1];
-          const h2 = a2.points[a2.points.length - 1];
-
-          // Check if they are facing each other in same axis
-          if (a1.exitDir.dx === -a2.exitDir.dx && a1.exitDir.dy === -a2.exitDir.dy) {
-            // Same horizontal line facing each other
-            if (a1.exitDir.dy === 0 && h1.r === h2.r) {
-              if ((a1.exitDir.dx > 0 && h1.c < h2.c) || (a1.exitDir.dx < 0 && h1.c > h2.c)) {
-                // Divert one upwards or downwards
-                a1.exitDir = (h1.r <= rows / 2) ? { dx: 0, dy: -1 } : { dx: 0, dy: 1 };
-              }
-            }
-            // Same vertical line facing each other
-            if (a1.exitDir.dx === 0 && h1.c === h2.c) {
-              if ((a1.exitDir.dy > 0 && h1.r < h2.r) || (a1.exitDir.dy < 0 && h1.r > h2.r)) {
-                a1.exitDir = (h1.c <= cols / 2) ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
-              }
-            }
-          }
-        }
-      }
-    }
-
-    function ensureBorderExits() {
-      arrows.forEach(arrow => {
-        const head = arrow.points[arrow.points.length - 1];
-        if (head.r <= 2) arrow.exitDir = { dx: 0, dy: -1 };
-        else if (head.r >= rows - 3) arrow.exitDir = { dx: 0, dy: 1 };
-        else if (head.c <= 2) arrow.exitDir = { dx: -1, dy: 0 };
-        else if (head.c >= cols - 3) arrow.exitDir = { dx: 1, dy: 0 };
-      });
-    }
-
     function startTimer() {
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        secondsSpent++;
-        liveTimeDisplay.innerText = formatTime(secondsSpent);
+        if (!isGameOverOrWon) {
+          secondsSpent++;
+          liveTimeDisplay.innerText = formatTime(secondsSpent);
+        }
       }, 1000);
     }
 
@@ -788,54 +1008,6 @@
       }
     }
 
-    function isArrowBlocked(arrow) {
-      const head = arrow.points[arrow.points.length - 1];
-      const d = arrow.exitDir;
-      let checkC = head.c + d.dx;
-      let checkR = head.r + d.dy;
-
-      while (checkC >= -1 && checkC <= cols && checkR >= -1 && checkR <= rows) {
-        for (const other of arrows) {
-          if (other.id === arrow.id || other.state === 'escaped') continue;
-          for (const p of other.points) {
-            if (p.c === checkC && p.r === checkR) {
-              return true;
-            }
-          }
-        }
-        checkC += d.dx;
-        checkR += d.dy;
-      }
-      return false;
-    }
-
-    function resolveDeadlockIfNeeded() {
-      const active = arrows.filter(a => a.state !== 'escaped');
-      if (active.length === 0) return;
-
-      const hasMove = active.some(a => !isArrowBlocked(a));
-      if (!hasMove) {
-        let best = active[0];
-        let minDist = 999;
-        active.forEach(a => {
-          const head = a.points[a.points.length - 1];
-          let dTop = head.r;
-          let dBottom = rows - head.r;
-          let dLeft = head.c;
-          let dRight = cols - head.c;
-          let m = Math.min(dTop, dBottom, dLeft, dRight);
-          if (m < minDist) {
-            minDist = m;
-            best = a;
-            if (m === dTop) a.exitDir = { dx: 0, dy: -1 };
-            else if (m === dBottom) a.exitDir = { dx: 0, dy: 1 };
-            else if (m === dLeft) a.exitDir = { dx: -1, dy: 0 };
-            else a.exitDir = { dx: 1, dy: 0 };
-          }
-        });
-      }
-    }
-
     function checkQueuedArrows() {
       let released = false;
       arrows.forEach(arrow => {
@@ -845,15 +1017,14 @@
           released = true;
         }
       });
-      if (released && !isAnimating) {
-        isAnimating = true;
-        requestAnimationFrame(animate);
-      }
+      if (released) triggerAnimation();
     }
 
+    // --- High Fidelity Rendering Engine ---
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const shapeId = (currentLevel - 1) % SHAPE_NAMES.length;
       const occupied = new Set();
       arrows.forEach(arrow => {
         if (arrow.state !== 'escaped') {
@@ -861,21 +1032,21 @@
         }
       });
 
-      // Subtle Dots on cleared channels
+      // Cleared Area Dot Matrix
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
-          if (isShapeActive(c, r, currentLevel) && !occupied.has(`${c},${r}`)) {
+          if (isCellInShape(c, r, shapeId, currentLevel) && !occupied.has(`${c},${r}`)) {
             const dx = originX + (c + 0.5) * cellSize;
             const dy = originY + (r + 0.5) * cellSize;
             ctx.beginPath();
-            ctx.arc(dx, dy, 1.2, 0, Math.PI * 2);
+            ctx.arc(dx, dy, 1.25, 0, Math.PI * 2);
             ctx.fill();
           }
         }
       }
 
-      // Long press preview
+      // Long-Press Preview Ray
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -894,7 +1065,7 @@
         ctx.restore();
       }
 
-      // Draw all arrows with true-direction pointing arrowheads
+      // Render Interlocking Arrows
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
@@ -923,7 +1094,7 @@
 
         ctx.translate(offsetX, offsetY);
 
-        // Corridor Path
+        // Path Corridor
         ctx.beginPath();
         for (let i = 0; i < arrow.points.length; i++) {
           const pt = arrow.points[i];
@@ -934,26 +1105,43 @@
         }
         ctx.stroke();
 
-        // Arrowhead pointing forward
+        // Directionally Aligned Arrowhead
         const head = arrow.points[arrow.points.length - 1];
         const hx = originX + (head.c + 0.5) * cellSize;
         const hy = originY + (head.r + 0.5) * cellSize;
-        const angle = Math.atan2(arrow.exitDir.dy, arrow.exitDir.dx);
 
-        ctx.save();
-        ctx.translate(hx, hy);
-        ctx.rotate(angle);
+        const dx = arrow.exitDir.dx;
+        const dy = arrow.exitDir.dy;
         const sz = 5.2;
+
         ctx.beginPath();
-        ctx.moveTo(-sz, -sz * 0.75);
-        ctx.lineTo(1.5, 0);
-        ctx.lineTo(-sz, sz * 0.75);
-        ctx.lineWidth = 2.2;
+        if (dx === 1) { // Right
+          ctx.moveTo(hx - sz, hy - sz * 0.7);
+          ctx.lineTo(hx + 1, hy);
+          ctx.lineTo(hx - sz, hy + sz * 0.7);
+        } else if (dx === -1) { // Left
+          ctx.moveTo(hx + sz, hy - sz * 0.7);
+          ctx.lineTo(hx - 1, hy);
+          ctx.lineTo(hx + sz, hy + sz * 0.7);
+        } else if (dy === 1) { // Down
+          ctx.moveTo(hx - sz * 0.7, hy - sz);
+          ctx.lineTo(hx, hy + 1);
+          ctx.lineTo(hx + sz * 0.7, hy - sz);
+        } else if (dy === -1) { // Up
+          ctx.moveTo(hx - sz * 0.7, hy + sz);
+          ctx.lineTo(hx, hy - 1);
+          ctx.lineTo(hx + sz * 0.7, hy + sz);
+        }
         ctx.stroke();
-        ctx.restore();
 
         ctx.restore();
       });
+    }
+
+    function triggerAnimation() {
+      if (!animFrameId) {
+        animFrameId = requestAnimationFrame(animate);
+      }
     }
 
     function animate() {
@@ -965,7 +1153,6 @@
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
-            resolveDeadlockIfNeeded();
             checkQueuedArrows();
             checkWinCondition();
           }
@@ -975,10 +1162,14 @@
 
       draw();
 
-      if (active) requestAnimationFrame(animate);
-      else isAnimating = false;
+      if (active) {
+        animFrameId = requestAnimationFrame(animate);
+      } else {
+        animFrameId = null;
+      }
     }
 
+    // --- Unified Pointer Input Handling ---
     function getTouchedArrow(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const px = clientX - rect.left;
@@ -987,9 +1178,11 @@
       let found = null;
       let minDistance = 9999;
 
-      for (const arrow of arrows) {
+      for (let i = 0; i < arrows.length; i++) {
+        const arrow = arrows[i];
         if (arrow.state === 'escaped') continue;
-        for (const pt of arrow.points) {
+        for (let p = 0; p < arrow.points.length; p++) {
+          const pt = arrow.points[p];
           const ax = originX + (pt.c + 0.5) * cellSize;
           const ay = originY + (pt.r + 0.5) * cellSize;
           const dist = Math.hypot(px - ax, py - ay);
@@ -1003,11 +1196,10 @@
     }
 
     function onPointerDown(e) {
-      const cx = e.clientX || (e.touches && e.touches[0].clientX);
-      const cy = e.clientY || (e.touches && e.touches[0].clientY);
-      pointerDownPos = { x: cx, y: cy };
+      if (isGameOverOrWon) return;
+      pointerDownPos = { x: e.clientX, y: e.clientY };
 
-      const clicked = getTouchedArrow(cx, cy);
+      const clicked = getTouchedArrow(e.clientX, e.clientY);
       if (clicked) {
         longPressTimer = setTimeout(() => {
           previewArrow = clicked;
@@ -1018,18 +1210,17 @@
 
     function onPointerUp(e) {
       clearTimeout(longPressTimer);
+      if (isGameOverOrWon) return;
+
       if (previewArrow) {
         previewArrow = null;
         draw();
         return;
       }
 
-      const cx = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
-      const cy = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+      if (Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y) > 15) return;
 
-      if (Math.hypot(cx - pointerDownPos.x, cy - pointerDownPos.y) > 15) return;
-
-      const clicked = getTouchedArrow(cx, cy);
+      const clicked = getTouchedArrow(e.clientX, e.clientY);
 
       if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
         if (isArrowBlocked(clicked)) {
@@ -1043,22 +1234,28 @@
           playSound('escape');
           clicked.state = 'moving';
         }
-
-        if (!isAnimating) {
-          isAnimating = true;
-          requestAnimationFrame(animate);
-        }
+        triggerAnimation();
       }
     }
 
-    canvas.addEventListener('mousedown', onPointerDown);
-    canvas.addEventListener('mouseup', onPointerUp);
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e); }, { passive: false });
-    canvas.addEventListener('touchend', (e) => { e.preventDefault(); onPointerUp(e); }, { passive: false });
+    function onPointerCancel() {
+      clearTimeout(longPressTimer);
+      if (previewArrow) {
+        previewArrow = null;
+        draw();
+      }
+    }
 
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerCancel);
+
+    // --- Win & Game Over Modal Triggers ---
     function checkWinCondition() {
+      if (isGameOverOrWon) return;
       const remaining = arrows.filter(a => a.state !== 'escaped');
       if (remaining.length === 0) {
+        isGameOverOrWon = true;
         clearInterval(timerInterval);
         playSound('win');
 
@@ -1090,6 +1287,7 @@
     }
 
     function handleGameOver(reason) {
+      isGameOverOrWon = true;
       clearInterval(timerInterval);
       modalTitle.innerText = reason;
       modalSubtitle.innerText = "Don't give up! Try again to clear this maze.";
@@ -1102,6 +1300,7 @@
       gameModal.style.display = 'flex';
     }
 
+    // Launch Game at Saved Level
     generateLevel(currentLevel);
   </script>
 </body>
