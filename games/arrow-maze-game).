@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Maze Untangle - 5000 Levels</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background-color: #0b0f19;
+      background-image: url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(3px);
+      z-index: 0;
+    }
+    #game-container {
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      max-height: 840px;
+      background: rgba(255, 255, 255, 0.92);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      border-radius: 20px;
+      overflow: hidden;
+      z-index: 1;
+      backdrop-filter: blur(10px);
+    }
+    /* Top Header UI */
+    .header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(248, 250, 252, 0.9);
+      border-bottom: 2px solid #edf2f7;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    /* Gaming Avatar / Logo DP */
+    .profile-dp {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #2563eb;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+      flex-shrink: 0;
+    }
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .level-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1.1;
+    }
+    .lives-box {
+      display: flex;
+      gap: 5px;
+    }
+    .heart {
+      width: 12px;
+      height: 12px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .heart.lost {
+      opacity: 0.2;
+      transform: scale(0.8);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timer-badge {
+      background: #e0f2fe;
+      color: #0284c7;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-icon {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #475569;
+      transition: background 0.2s;
+    }
+    .btn-icon:active {
+      transform: scale(0.92);
+    }
+
+    /* Canvas Area */
+    #canvas-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    canvas {
+      touch-action: none;
+      border-radius: 12px;
+    }
+
+    /* Bottom Footer */
+    .footer {
+      padding: 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #2563eb;
+      text-transform: uppercase;
+      background: rgba(248, 250, 252, 0.9);
+      border-top: 2px solid #edf2f7;
+    }
+
+    /* Modal / Popups */
+    .modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(5px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      z-index: 10;
+    }
+    .modal-card {
+      background: #fff;
+      color: #1e293b;
+      padding: 28px;
+      border-radius: 22px;
+      text-align: center;
+      width: 82%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .modal-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .modal-card p {
+      font-size: 15px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .modal-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Audio Element -->
+  <audio id="bgm" loop preload="auto">
+    <source src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/ZIKR_by_Lasani_Sarkar(256k).mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="game-container">
+    <!-- Top Bar with Gaming DP -->
+    <div class="header">
+      <div class="header-left">
+        <img class="profile-dp" src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/file_00000000a3f482088bfdca19f7851f75.png" alt="Gaming Logo">
+        <div class="header-info">
+          <div class="level-title" id="level-display">Level 1</div>
+          <div class="lives-box" id="lives-container">
+            <span class="heart"></span>
+            <span class="heart"></span>
+            <span class="heart"></span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="timer-badge">
+          <span>⏱</span>
+          <span id="time-display">60s</span>
+        </div>
+        <button class="btn-icon" id="music-btn" title="Toggle Music">🎵</button>
+        <button class="btn-icon" id="restart-btn" title="Restart Level">🔄</button>
+      </div>
+    </div>
+
+    <!-- Playfield Canvas -->
+    <div id="canvas-wrap">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <!-- Footer Text -->
+    <div class="footer">Tap Arrow • Clear Path</div>
+
+    <!-- Game Over / Level Complete Modal -->
+    <div class="modal" id="gameModal">
+      <div class="modal-card">
+        <h2 id="modal-title">Level Cleared! 🎉</h2>
+        <p id="modal-subtitle">Great job navigating the maze.</p>
+        <button class="modal-btn" id="modal-action-btn">Next Level</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio System ---
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('music-btn');
+    let isMusicPlaying = false;
+    bgm.volume = 0.5;
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgm.pause();
+        musicBtn.innerText = '🔇';
+        isMusicPlaying = false;
+      } else {
+        bgm.play().then(() => {
+          musicBtn.innerText = '🎵';
+          isMusicPlaying = true;
+        }).catch(() => {});
+      }
+    }
+    musicBtn.addEventListener('click', toggleMusic);
+
+    window.addEventListener('click', () => {
+      if (!isMusicPlaying && bgm.paused) {
+        bgm.play().then(() => {
+          isMusicPlaying = true;
+          musicBtn.innerText = '🎵';
+        }).catch(() => {});
+      }
+    }, { once: true });
+
+    // Built-in Sound FX Engine
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+    function initAudio() {
+      if (!actx) actx = new AudioCtx();
+      if (actx.state === 'suspended') actx.resume();
+    }
+
+    function playSound(type) {
+      initAudio();
+      if (!actx) return;
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+
+      const t = actx.currentTime;
+
+      if (type === 'escape') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, t);
+        osc.frequency.exponentialRampToValueAtTime(880, t + 0.15);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.15);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.2);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.2);
+        osc.start(t);
+        osc.stop(t + 0.2);
+      } else if (type === 'win') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const o = actx.createOscillator();
+          const g = actx.createGain();
+          o.connect(g);
+          g.connect(actx.destination);
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.2, t + idx * 0.1);
+          g.gain.linearRampToValueAtTime(0.01, t + idx * 0.1 + 0.25);
+          o.start(t + idx * 0.1);
+          o.stop(t + idx * 0.1 + 0.25);
+        });
+      }
+    }
+
+    // --- Game Configuration & State ---
+    let currentLevel = parseInt(localStorage.getItem('saved_level')) || 1;
+    let lives = 3;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let arrows = [];
+    let isAnimating = false;
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const levelDisplay = document.getElementById('level-display');
+    const timeDisplay = document.getElementById('time-display');
+    const livesContainer = document.getElementById('lives-container');
+    const gameModal = document.getElementById('gameModal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const modalActionBtn = document.getElementById('modal-action-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const DIRS = {
+      'UP':    { x: 0,  y: -1, angle: -Math.PI / 2 },
+      'DOWN':  { x: 0,  y: 1,  angle: Math.PI / 2 },
+      'LEFT':  { x: -1, y: 0,  angle: Math.PI },
+      'RIGHT': { x: 1,  y: 0,  angle: 0 }
+    };
+    const DIR_KEYS = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
+
+    function resizeCanvas() {
+      const wrap = document.getElementById('canvas-wrap');
+      const size = Math.min(wrap.clientWidth - 20, wrap.clientHeight - 20, 390);
+      canvas.width = size;
+      canvas.height = size;
+      draw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function seededRandom(seed) {
+      let x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    }
+
+    // --- Level Generation (5000+ Distinct Levels) ---
+    function generateLevel(lvl) {
+      arrows = [];
+      
+      let gridSize = 6;
+      if (lvl > 30) gridSize = 7;
+      if (lvl > 150) gridSize = 8;
+      if (lvl > 800) gridSize = 9;
+      if (lvl > 2000) gridSize = 10;
+
+      timeLeft = Math.max(25, 45 + Math.floor(gridSize * 3.5) - Math.floor(lvl / 180));
+      timeDisplay.innerText = timeLeft + 's';
+
+      let randCounter = lvl * 137;
+      const getRand = () => seededRandom(randCounter++);
+
+      const arrowCount = Math.min(10 + Math.floor(lvl / 14), Math.floor((gridSize * gridSize) * 0.42));
+      const occupied = new Set();
+
+      for (let i = 0; i < arrowCount; i++) {
+        let gx = Math.floor(getRand() * (gridSize - 2)) + 1;
+        let gy = Math.floor(getRand() * (gridSize - 2)) + 1;
+        let key = `${gx},${gy}`;
+
+        if (!occupied.has(key)) {
+          occupied.add(key);
+          const dirKey = DIR_KEYS[Math.floor(getRand() * DIR_KEYS.length)];
+          arrows.push({
+            id: i,
+            gx: gx,
+            gy: gy,
+            dir: dirKey,
+            gridSize: gridSize,
+            color: '#0f172a',
+            state: 'idle',
+            progress: 0,
+            shake: 0
+          });
+        }
+      }
+
+      startTimer();
+      updateUI();
+      draw();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeDisplay.innerText = timeLeft + 's';
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          playSound('hit');
+          handleGameOver("Time's Up!");
+        }
+      }, 1000);
+    }
+
+    function updateUI() {
+      levelDisplay.innerText = `Level ${currentLevel}`;
+      livesContainer.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const heart = document.createElement('span');
+        heart.className = `heart ${i >= lives ? 'lost' : ''}`;
+        livesContainer.appendChild(heart);
+      }
+    }
+
+    function isArrowBlocked(target) {
+      const d = DIRS[target.dir];
+      let curX = target.gx + d.x;
+      let curY = target.gy + d.y;
+
+      while (curX >= 0 && curX < target.gridSize && curY >= 0 && curY < target.gridSize) {
+        for (let other of arrows) {
+          if (other.state === 'idle' && other.id !== target.id) {
+            if (other.gx === curX && other.gy === curY) {
+              return true;
+            }
+          }
+        }
+        curX += d.x;
+        curY += d.y;
+      }
+      return false;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (arrows.length === 0) return;
+
+      const gridSize = arrows[0].gridSize;
+      const cellSize = canvas.width / gridSize;
+
+      // Board Border
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+
+      arrows.forEach(arrow => {
+        if (arrow.state === 'escaped') return;
+
+        let x = (arrow.gx + 0.5) * cellSize;
+        let y = (arrow.gy + 0.5) * cellSize;
+
+        if (arrow.state === 'moving') {
+          const d = DIRS[arrow.dir];
+          x += d.x * arrow.progress * canvas.width;
+          y += d.y * arrow.progress * canvas.height;
+        }
+
+        if (arrow.shake > 0) {
+          x += Math.sin(arrow.shake * 12) * 4;
+          arrow.shake -= 0.1;
+          if (arrow.shake < 0) arrow.shake = 0;
+        }
+
+        drawArrow(x, y, cellSize * 0.72, arrow.dir, arrow.color);
+      });
+    }
+
+    function drawArrow(x, y, length, dirName, color) {
+      const d = DIRS[dirName];
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(d.angle);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 4.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const half = length / 2;
+      ctx.beginPath();
+      ctx.moveTo(-half, 0);
+      ctx.lineTo(half, 0);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(half - 9, -7);
+      ctx.lineTo(half + 3, 0);
+      ctx.lineTo(half - 9, 7);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function animate() {
+      let active = false;
+
+      arrows.forEach(arrow => {
+        if (arrow.state === 'moving') {
+          arrow.progress += 0.085;
+          active = true;
+          if (arrow.progress >= 1.2) {
+            arrow.state = 'escaped';
+            checkWinCondition();
+          }
+        }
+        if (arrow.shake > 0) {
+          active = true;
+        }
+      });
+
+      draw();
+
+      if (active) {
+        requestAnimationFrame(animate);
+      } else {
+        isAnimating = false;
+      }
+    }
+
+    function handlePointer(evt) {
+      if (isAnimating || arrows.length === 0) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+      const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
+
+      const gridSize = arrows[0].gridSize;
+      const cellSize = canvas.width / gridSize;
+
+      for (let arrow of arrows) {
+        if (arrow.state !== 'idle') continue;
+
+        const ax = (arrow.gx + 0.5) * cellSize;
+        const ay = (arrow.gy + 0.5) * cellSize;
+        const dist = Math.hypot(px - ax, py - ay);
+
+        if (dist < cellSize * 0.45) {
+          if (isArrowBlocked(arrow)) {
+            playSound('hit');
+            arrow.shake = 1.0;
+            arrow.color = '#ef4444';
+            setTimeout(() => { arrow.color = '#0f172a'; }, 300);
+            lives--;
+            updateUI();
+            if (lives <= 0) {
+              handleGameOver("Out of Lives!");
+            }
+          } else {
+            playSound('escape');
+            arrow.state = 'moving';
+            arrow.color = '#2563eb';
+          }
+
+          if (!isAnimating) {
+            isAnimating = true;
+            requestAnimationFrame(animate);
+          }
+          break;
+        }
+      }
+    }
+
+    canvas.addEventListener('mousedown', handlePointer);
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handlePointer(e);
+    }, { passive: false });
+
+    function checkWinCondition() {
+      const remaining = arrows.filter(a => a.state !== 'escaped');
+      if (remaining.length === 0) {
+        clearInterval(timerInterval);
+        playSound('win');
+        modalTitle.innerText = "Level Complete! 🎉";
+        modalSubtitle.innerText = `Great job! Level ${currentLevel} cleared.`;
+        modalActionBtn.innerText = "Next Level";
+        modalActionBtn.onclick = () => {
+          currentLevel++;
+          if (currentLevel > 5000) currentLevel = 1;
+          localStorage.setItem('saved_level', currentLevel);
+          gameModal.style.display = 'none';
+          generateLevel(currentLevel);
+        };
+        gameModal.style.display = 'flex';
+      }
+    }
+
+    function handleGameOver(reason) {
+      clearInterval(timerInterval);
+      modalTitle.innerText = reason;
+      modalSubtitle.innerText = "Don't give up! Try again to solve it.";
+      modalActionBtn.innerText = "Try Again";
+      modalActionBtn.onclick = () => {
+        lives = 3;
+        gameModal.style.display = 'none';
+        generateLevel(currentLevel);
+      };
+      gameModal.style.display = 'flex';
+    }
+
+    restartBtn.addEventListener('click', () => {
+      lives = 3;
+      generateLevel(currentLevel);
+    });
+
+    // Start Game
+    resizeCanvas();
+    generateLevel(currentLevel);
+  </script>
+</body>
+</html>
