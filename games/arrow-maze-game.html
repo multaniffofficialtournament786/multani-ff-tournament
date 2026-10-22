@@ -169,12 +169,12 @@
       flex-direction: column;
       gap: 4px;
       z-index: 100;
-      min-width: 145px;
+      min-width: 155px;
     }
     .dropdown-item {
       padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: #1e293b;
       border-radius: 10px;
       cursor: pointer;
@@ -285,6 +285,7 @@
       width: 100%;
     }
 
+    /* Levels Modal */
     #levels-modal .modal-card {
       width: 90%;
       max-height: 80vh;
@@ -336,6 +337,67 @@
     .level-box.locked span {
       font-size: 12px;
     }
+
+    /* Rules & Ranks Modal */
+    #rules-modal .modal-card {
+      width: 92%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+      text-align: left;
+    }
+    .rules-scroll {
+      overflow-y: auto;
+      max-height: 60vh;
+      padding-right: 6px;
+      margin-bottom: 14px;
+    }
+    .rules-section-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rank-tier-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .rank-name {
+      font-weight: 800;
+    }
+    .rules-list {
+      list-style: none;
+      padding: 0;
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .rules-list li {
+      margin-bottom: 6px;
+      padding-left: 14px;
+      position: relative;
+    }
+    .rules-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #2563eb;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -372,6 +434,7 @@
 
       <div class="dropdown-menu" id="dropdown-menu">
         <button class="dropdown-item" id="opt-all-levels">📋 All Levels</button>
+        <button class="dropdown-item" id="opt-rules">📖 Ranks & Rules</button>
         <button class="dropdown-item" id="opt-restart-level">🔄 Restart Level</button>
       </div>
     </div>
@@ -382,6 +445,7 @@
 
     <div class="footer">Tap Arrow • Untangle The Maze</div>
 
+    <!-- Win Modal -->
     <div class="modal" id="gameModal">
       <div class="modal-card">
         <h2 id="modal-title">Level Cleared! 🎉</h2>
@@ -400,12 +464,56 @@
       </div>
     </div>
 
+    <!-- Levels Selector Modal -->
     <div class="modal" id="levels-modal">
       <div class="modal-card">
         <h2>Select Level</h2>
         <p id="unlocked-count-text">Unlocked: 1 / 5000</p>
         <div class="levels-grid" id="levels-container-grid"></div>
         <button class="modal-btn" id="close-levels-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- Ranks & Rules Modal -->
+    <div class="modal" id="rules-modal">
+      <div class="modal-card">
+        <h2 style="text-align: center; margin-bottom: 4px;">Game Guide</h2>
+        <p style="text-align: center; margin-bottom: 12px;">Ranks, Rules & Mechanics</p>
+
+        <div class="rules-scroll">
+          <div class="rules-section-title">🏆 5,000 Levels Progression</div>
+          <div class="rank-tier-item">
+            <span class="rank-name" style="color: #22c55e;">Easy</span>
+            <span>Levels 1 – 100</span>
+          </div>
+          <div class="rank-tier-item">
+            <span class="rank-name" style="color: #2563eb;">Normal</span>
+            <span>Levels 101 – 500</span>
+          </div>
+          <div class="rank-tier-item">
+            <span class="rank-name" style="color: #eab308;">Hard</span>
+            <span>Levels 501 – 1500</span>
+          </div>
+          <div class="rank-tier-item">
+            <span class="rank-name" style="color: #f97316;">Expert</span>
+            <span>Levels 1501 – 3000</span>
+          </div>
+          <div class="rank-tier-item">
+            <span class="rank-name" style="color: #ef4444;">Master</span>
+            <span>Levels 3001 – 5000</span>
+          </div>
+
+          <div class="rules-section-title">🎮 Gameplay Rules</div>
+          <ul class="rules-list">
+            <li><strong>Arrow Escape:</strong> Arrowhead jis taraf ishara karega, arrow usi direction me bahar niklega.</li>
+            <li><strong>Snake Motion:</strong> L-shape ya turns wale arrows seedhe track par follow karte huye smoothly bahar nikalte hain.</li>
+            <li><strong>Fast Combo Tap:</strong> Agar aage wala arrow nikal raha ho aur aap fauran peeche wale par tap karein, toh <strong>Life/Heart zaya nahi hoga</strong> aur dono arrows baari baari nikal jayenge.</li>
+            <li><strong>Long Press Preview:</strong> Kisi bhi arrow par thori der press karke rakhein toh uska bahar nikalne ka rasta blue line se highlight hoga.</li>
+            <li><strong>3 Hearts:</strong> Har naye level par 3 Hearts wapas milenge. Wrong tap se heart kam hota hai.</li>
+          </ul>
+        </div>
+
+        <button class="modal-btn" id="close-rules-btn">Got It!</button>
       </div>
     </div>
   </div>
@@ -512,11 +620,15 @@
     const menuDotsBtn = document.getElementById('menu-dots-btn');
     const dropdownMenu = document.getElementById('dropdown-menu');
     const optAllLevels = document.getElementById('opt-all-levels');
+    const optRules = document.getElementById('opt-rules');
     const optRestartLevel = document.getElementById('opt-restart-level');
     const levelsModal = document.getElementById('levels-modal');
     const levelsContainerGrid = document.getElementById('levels-container-grid');
     const unlockedCountText = document.getElementById('unlocked-count-text');
     const closeLevelsBtn = document.getElementById('close-levels-btn');
+
+    const rulesModal = document.getElementById('rules-modal');
+    const closeRulesBtn = document.getElementById('close-rules-btn');
 
     let cols = 16;
     let rows = 22;
@@ -549,6 +661,15 @@
     optAllLevels.addEventListener('click', () => {
       dropdownMenu.style.display = 'none';
       showLevelsMap();
+    });
+
+    optRules.addEventListener('click', () => {
+      dropdownMenu.style.display = 'none';
+      rulesModal.style.display = 'flex';
+    });
+
+    closeRulesBtn.addEventListener('click', () => {
+      rulesModal.style.display = 'none';
     });
 
     function showLevelsMap() {
@@ -590,7 +711,7 @@
       canvas.width = w;
       canvas.height = h;
 
-      const margin = 16;
+      const margin = 14;
       cellSize = Math.floor(Math.min((w - margin * 2) / cols, (h - margin * 2) / rows));
       originX = Math.floor((w - cols * cellSize) / 2);
       originY = Math.floor((h - rows * cellSize) / 2);
@@ -675,6 +796,7 @@
       }
     }
 
+    // High Density Settings (Maze Full Packed)
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
@@ -683,11 +805,11 @@
           cols: 14,
           rows: 18,
           maxLen: 7,
-          turnChance: 0.35,
-          minArrows: 14,
-          maxArrows: 24,
+          turnChance: 0.38,
+          minArrows: 16,
+          maxArrows: 28,
           minDepth: 2,
-          maxInitialFreeRatio: 0.70
+          maxInitialFreeRatio: 0.65
         };
       } else if (lvl <= 500) {
         return {
@@ -696,11 +818,11 @@
           cols: 16,
           rows: 20,
           maxLen: 8,
-          turnChance: 0.40,
-          minArrows: 22,
-          maxArrows: 34,
+          turnChance: 0.42,
+          minArrows: 24,
+          maxArrows: 38,
           minDepth: 3,
-          maxInitialFreeRatio: 0.55
+          maxInitialFreeRatio: 0.50
         };
       } else if (lvl <= 1500) {
         return {
@@ -710,10 +832,10 @@
           rows: 22,
           maxLen: 9,
           turnChance: 0.45,
-          minArrows: 28,
-          maxArrows: 42,
+          minArrows: 30,
+          maxArrows: 46,
           minDepth: 4,
-          maxInitialFreeRatio: 0.45
+          maxInitialFreeRatio: 0.40
         };
       } else if (lvl <= 3000) {
         return {
@@ -723,10 +845,10 @@
           rows: 24,
           maxLen: 10,
           turnChance: 0.50,
-          minArrows: 36,
-          maxArrows: 50,
+          minArrows: 38,
+          maxArrows: 54,
           minDepth: 5,
-          maxInitialFreeRatio: 0.35
+          maxInitialFreeRatio: 0.32
         };
       } else {
         return {
@@ -735,11 +857,11 @@
           cols: 20,
           rows: 26,
           maxLen: 11,
-          turnChance: 0.52,
-          minArrows: 44,
-          maxArrows: 60,
+          turnChance: 0.54,
+          minArrows: 46,
+          maxArrows: 65,
           minDepth: 6,
-          maxInitialFreeRatio: 0.30
+          maxInitialFreeRatio: 0.25
         };
       }
     }
@@ -810,6 +932,7 @@
       };
     }
 
+    // Dense corridor generator - Fills 80%+ of valid shape cells
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -850,9 +973,9 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        const isSuperLong = prng() < 0.28;
+        const isSuperLong = prng() < 0.32;
         const targetLen = isSuperLong 
-          ? Math.floor(prng() * 4) + (diff.maxLen - 3) 
+          ? Math.floor(prng() * 4) + (diff.maxLen - 2) 
           : Math.floor(prng() * 3) + 2;
 
         for (let step = 1; step < targetLen; step++) {
@@ -1005,8 +1128,7 @@
       if (released) triggerAnimation();
     }
 
-    // --- Snake Motion: Path Follower Engine ---
-    // Tail corner par aate hi turn follow karke seedhi ho jayegi
+    // Snake Follow Engine (Smooth Track Unroll)
     function getSnakePolyline(points, exitDir, progress) {
       const origPts = points.map(pt => ({
         x: originX + (pt.c + 0.5) * cellSize,
@@ -1015,7 +1137,6 @@
 
       if (progress <= 0) return { poly: origPts, tipDir: exitDir };
 
-      // Calculate segment lengths
       const segLens = [];
       let totalLength = 0;
       for (let i = 0; i < origPts.length - 1; i++) {
@@ -1027,13 +1148,11 @@
       const travelDist = progress * (Math.max(cols, rows) * cellSize * 1.5);
       const head = origPts[origPts.length - 1];
 
-      // New Head point travelling straight out along exitDir
       const newHead = {
         x: head.x + exitDir.dx * travelDist,
         y: head.y + exitDir.dy * travelDist
       };
 
-      // If tail has completely left the maze original segments
       if (travelDist >= totalLength) {
         const remainingLength = Math.max(0, totalLength - (travelDist - totalLength));
         const tailX = newHead.x - exitDir.dx * remainingLength;
@@ -1044,7 +1163,6 @@
         };
       }
 
-      // Tail moves forward along the bends (turns follow karti hai)
       let advance = travelDist;
       let startIdx = 0;
       let newTail = origPts[0];
@@ -1140,7 +1258,6 @@
         }
         ctx.translate(shakeX, shakeY);
 
-        // Snake tracking calculation
         let snakeData;
         if (arrow.state === 'moving') {
           snakeData = getSnakePolyline(arrow.points, arrow.exitDir, arrow.progress);
@@ -1201,12 +1318,13 @@
       }
     }
 
+    // Smooth extraction speed (Clear visual feedback)
     function animate() {
       let active = false;
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.045; // Smooth realistic snake speed
+          arrow.progress += 0.026; // Smooth, cinematic speed
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -1359,7 +1477,7 @@
         modalSubtitle.innerText = `Awesome! Level ${currentLevel} fully untangled.`;
         modalActionBtn.onclick = () => {
           currentLevel++;
-          lives = 3; // Har naye level par 3 hearts wapas milenge
+          lives = 3;
           if (currentLevel > maxUnlockedLevel) {
             maxUnlockedLevel = currentLevel;
             localStorage.setItem('max_unlocked_level', maxUnlockedLevel);
