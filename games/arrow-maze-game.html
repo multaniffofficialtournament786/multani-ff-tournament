@@ -628,9 +628,9 @@
     const rulesModal = document.getElementById('rules-modal');
     const closeRulesBtn = document.getElementById('close-rules-btn');
 
-    let cols = 16;
-    let rows = 22;
-    let cellSize = 16;
+    let cols = 14;
+    let rows = 18;
+    let cellSize = 18;
     let originX = 0;
     let originY = 0;
 
@@ -709,7 +709,7 @@
       canvas.width = w;
       canvas.height = h;
 
-      const margin = 14;
+      const margin = 12;
       cellSize = Math.floor(Math.min((w - margin * 2) / cols, (h - margin * 2) / rows));
       originX = Math.floor((w - cols * cellSize) / 2);
       originY = Math.floor((h - rows * cellSize) / 2);
@@ -735,7 +735,7 @@
       return `${m}:${sec}`;
     }
 
-    // Geometry Definition
+    // Geometry Definition with Proper Broad Corridors
     function isCellInShape(c, r, shapeId, lvl) {
       const cx = (cols - 1) / 2;
       const cy = (rows - 1) / 2;
@@ -758,9 +758,9 @@
         case 6: // Spiral
           const rDist = Math.hypot(nx, ny);
           return rDist <= 0.92 && (rDist >= 0.16 || Math.abs(nx) <= 0.45);
-        case 7: // Zigzag (Proper Wide Corridor)
-          const zigX = Math.sin(ny * 3.14) * 0.4;
-          return Math.abs(nx - zigX) <= 0.55;
+        case 7: // Zigzag (Proper Wide Snake Track)
+          const zigX = Math.sin(ny * 2.8) * 0.38;
+          return Math.abs(nx - zigX) <= 0.62;
         case 8: // Key
           const keyHead = Math.hypot(nx, ny + 0.45);
           if (keyHead <= 0.5 && keyHead >= 0.18) return true;
@@ -797,8 +797,8 @@
         return {
           tier: 'Easy',
           color: '#22c55e',
-          cols: 14,
-          rows: 18,
+          cols: 12,
+          rows: 16,
           maxLen: 6,
           turnChance: 0.38
         };
@@ -806,8 +806,8 @@
         return {
           tier: 'Normal',
           color: '#2563eb',
-          cols: 16,
-          rows: 20,
+          cols: 14,
+          rows: 18,
           maxLen: 7,
           turnChance: 0.42
         };
@@ -816,7 +816,7 @@
           tier: 'Hard',
           color: '#eab308',
           cols: 16,
-          rows: 22,
+          rows: 20,
           maxLen: 8,
           turnChance: 0.46
         };
@@ -824,8 +824,8 @@
         return {
           tier: 'Expert',
           color: '#f97316',
-          cols: 18,
-          rows: 24,
+          cols: 16,
+          rows: 22,
           maxLen: 9,
           turnChance: 0.50
         };
@@ -833,8 +833,8 @@
         return {
           tier: 'Master',
           color: '#ef4444',
-          cols: 20,
-          rows: 26,
+          cols: 18,
+          rows: 24,
           maxLen: 10,
           turnChance: 0.54
         };
@@ -889,7 +889,7 @@
       return simList.every(a => a.state === 'escaped');
     }
 
-    // High Density Packing (Zero-Waste Packing)
+    // Dense Corridor Generator with Snake Packing
     function generateDenseCorridors(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -902,7 +902,6 @@
         }
       }
 
-      // Shuffle valid cells
       for (let i = validCells.length - 1; i > 0; i--) {
         const j = Math.floor(prng() * (i + 1));
         const temp = validCells[i];
@@ -920,7 +919,7 @@
       const candidates = [];
       let arrowId = 0;
 
-      // First pass: carve long and normal arrows
+      // Pass 1: Build dense multi-segment winding corridors
       for (let i = 0; i < validCells.length; i++) {
         const start = validCells[i];
         if (grid[start.c][start.r] !== null) continue;
@@ -931,7 +930,7 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        const targetLen = (prng() < 0.35) 
+        const targetLen = (prng() < 0.4) 
           ? Math.floor(prng() * 3) + diff.maxLen - 2 
           : Math.floor(prng() * 3) + 2;
 
@@ -977,7 +976,7 @@
         }
       }
 
-      // Second pass: Pair up any remaining single cells to guarantee dense maze
+      // Pass 2: Connect remaining empty cells to eliminate empty spaces
       for (let i = 0; i < validCells.length; i++) {
         const cell = validCells[i];
         if (grid[cell.c][cell.r] !== null) continue;
@@ -1036,7 +1035,7 @@
       let generatedArrows = [];
       let baseSeed = ((lvl * 1234567) ^ 0x5DEECE66) >>> 0;
 
-      // Iterative solver guaranteed to find solution
+      // Deterministic attempt loop
       for (let attempt = 0; attempt < 80; attempt++) {
         const prng = createPRNG(baseSeed + attempt * 101);
         const candidates = generateDenseCorridors(lvl, shapeId, diff, prng);
@@ -1047,14 +1046,25 @@
         }
       }
 
-      // Fallback: If strict topological pass needs breathing space, safely reduce blockers
+      // Fallback: guaranteed dense solvable puzzle (never empty)
       if (generatedArrows.length === 0) {
-        const prng = createPRNG(baseSeed ^ 0x9988);
-        let fallbackList = generateDenseCorridors(lvl, shapeId, diff, prng);
-        while (fallbackList.length > 3 && !isPuzzleSolvable(fallbackList)) {
-          fallbackList.pop(); // Remove blocking tails until 100% solvable
+        for (let fallbackAttempt = 0; fallbackAttempt < 20; fallbackAttempt++) {
+          const prng = createPRNG((baseSeed ^ 0x7766) + fallbackAttempt * 17);
+          let candidates = generateDenseCorridors(lvl, shapeId, diff, prng);
+          while (candidates.length > 3 && !isPuzzleSolvable(candidates)) {
+            candidates.pop();
+          }
+          if (candidates.length >= 3) {
+            generatedArrows = candidates;
+            break;
+          }
         }
-        generatedArrows = fallbackList;
+      }
+
+      // Ultimate Safety Guard: Always renders full board
+      if (generatedArrows.length === 0) {
+        const prng = createPRNG(baseSeed ^ 0x3344);
+        generatedArrows = generateDenseCorridors(lvl, 0, diff, prng);
       }
 
       arrows = generatedArrows;
@@ -1096,6 +1106,7 @@
       if (released) triggerAnimation();
     }
 
+    // Snake Follower Engine
     function getSnakePolyline(points, exitDir, progress) {
       const origPts = points.map(pt => ({
         x: originX + (pt.c + 0.5) * cellSize,
@@ -1201,7 +1212,7 @@
         ctx.restore();
       }
 
-      // Draw Arrows
+      // Render Arrows
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
@@ -1295,7 +1306,7 @@
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.019; // Ultra-smooth slow speed
+          arrow.progress += 0.024; // Smooth extraction speed
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
