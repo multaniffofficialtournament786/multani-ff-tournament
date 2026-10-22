@@ -145,7 +145,7 @@
       transform: scale(0.92);
     }
 
-    /* 3-Dot Dropdown Menu */
+    /* 3-Dot Dropdown */
     .dropdown-menu {
       position: absolute;
       top: 55px;
@@ -159,7 +159,7 @@
       flex-direction: column;
       gap: 4px;
       z-index: 100;
-      min-width: 140px;
+      min-width: 145px;
     }
     .dropdown-item {
       padding: 10px 14px;
@@ -188,7 +188,7 @@
       justify-content: center;
       position: relative;
       background: #ffffff;
-      padding: 8px;
+      padding: 12px;
     }
     canvas {
       touch-action: none;
@@ -196,9 +196,9 @@
     }
 
     .footer {
-      padding: 12px;
+      padding: 10px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       letter-spacing: 1.5px;
       color: #64748b;
@@ -271,7 +271,7 @@
       width: 100%;
     }
 
-    /* Levels Map Modal */
+    /* Levels Map */
     #levels-modal .modal-card {
       width: 90%;
       max-height: 80vh;
@@ -305,10 +305,6 @@
       background: #eff6ff;
       color: #2563eb;
       border-color: #bfdbfe;
-    }
-    .level-box.unlocked:active {
-      background: #2563eb;
-      color: #fff;
     }
     .level-box.current {
       background: #2563eb;
@@ -353,11 +349,9 @@
           <span id="live-time-display">00:00</span>
         </div>
         <button class="btn-icon" id="music-btn">🎵</button>
-        <!-- 3 Dots Button -->
         <button class="btn-icon" id="menu-dots-btn" style="font-weight: 900; font-size: 20px;">⋮</button>
       </div>
 
-      <!-- Dropdown Menu -->
       <div class="dropdown-menu" id="dropdown-menu">
         <button class="dropdown-item" id="opt-all-levels">📋 All Levels</button>
         <button class="dropdown-item" id="opt-restart-level">🔄 Restart Level</button>
@@ -370,7 +364,7 @@
 
     <div class="footer">Tap Arrow • Untangle The Maze</div>
 
-    <!-- Win / Game Over Modal -->
+    <!-- Modals -->
     <div class="modal" id="gameModal">
       <div class="modal-card">
         <h2 id="modal-title">Level Cleared! 🎉</h2>
@@ -389,7 +383,6 @@
       </div>
     </div>
 
-    <!-- Levels Selector Modal -->
     <div class="modal" id="levels-modal">
       <div class="modal-card">
         <h2>Select Level</h2>
@@ -472,7 +465,7 @@
       }
     }
 
-    // Game state & Level Tracking
+    // Game state
     let currentLevel = parseInt(localStorage.getItem('saved_level')) || 1;
     let maxUnlockedLevel = parseInt(localStorage.getItem('max_unlocked_level')) || 1;
     if (currentLevel > maxUnlockedLevel) maxUnlockedLevel = currentLevel;
@@ -499,7 +492,6 @@
     const statTimeTaken = document.getElementById('stat-time-taken');
     const statBestTime = document.getElementById('stat-best-time');
 
-    // 3 Dots & Levels Elements
     const menuDotsBtn = document.getElementById('menu-dots-btn');
     const dropdownMenu = document.getElementById('dropdown-menu');
     const optAllLevels = document.getElementById('opt-all-levels');
@@ -509,13 +501,12 @@
     const unlockedCountText = document.getElementById('unlocked-count-text');
     const closeLevelsBtn = document.getElementById('close-levels-btn');
 
-    let cols = 14;
-    let rows = 20;
-    let cellSize = 20;
+    let cols = 18;
+    let rows = 26;
+    let cellSize = 14;
     let originX = 0;
     let originY = 0;
 
-    // Menu Toggle
     menuDotsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdownMenu.style.display = dropdownMenu.style.display === 'flex' ? 'none' : 'flex';
@@ -539,8 +530,6 @@
     function showLevelsMap() {
       levelsContainerGrid.innerHTML = '';
       unlockedCountText.innerText = `Unlocked: ${maxUnlockedLevel} / 5000`;
-
-      // Show up to 100 levels ahead of current progress
       const totalToShow = Math.min(5000, Math.max(80, maxUnlockedLevel + 20));
 
       for (let i = 1; i <= totalToShow; i++) {
@@ -561,10 +550,8 @@
           box.classList.add('locked');
           box.innerHTML = `<span>🔒</span>`;
         }
-
         levelsContainerGrid.appendChild(box);
       }
-
       levelsModal.style.display = 'flex';
     }
 
@@ -598,6 +585,7 @@
       return `${m}:${sec}`;
     }
 
+    // Exact Shapes from Screenshots (Key, Knight, Box Spiral, Shield)
     function isShapeActive(c, r, lvl) {
       const shapeType = lvl % 5;
       const cx = (cols - 1) / 2;
@@ -605,43 +593,55 @@
       const nx = (c - cx) / cx;
       const ny = (r - cy) / cy;
 
-      if (lvl <= 3) return Math.abs(nx) < 0.7 && Math.abs(ny) < 0.7;
-
       switch(shapeType) {
-        case 0:
-          return Math.abs(nx) < 0.94 && Math.abs(ny) < 0.94;
-        case 1:
-          return (ny >= -0.5 && ny <= 0.8 && Math.abs(nx) <= 0.68) || (ny >= -0.1 && ny <= 0.4 && nx > 0.68 && nx < 0.95);
-        case 2:
-          return (Math.abs(nx) + Math.abs(ny)) < 1.1;
-        case 3:
-          return (Math.abs(nx) < 0.42 && Math.abs(ny) < 0.92) || (Math.abs(nx) < 0.92 && Math.abs(ny) < 0.42);
-        case 4:
-          if (ny < -0.3) return Math.abs(nx) < 0.45;
-          if (ny < 0.2) return Math.abs(nx) < 0.68;
-          return Math.abs(nx) < 0.92;
+        case 1: // Key Shape (Chabi - 2nd Screenshot)
+          // Top Circle
+          const distTop = Math.hypot(nx, ny + 0.45);
+          if (distTop <= 0.48 && distTop >= 0.22) return true;
+          // Shaft
+          if (ny >= -0.15 && ny <= 0.85 && Math.abs(nx) <= 0.18) return true;
+          // Teeth
+          if (ny >= 0.45 && ny <= 0.78 && nx > 0.18 && nx <= 0.55) return true;
+          return false;
+
+        case 2: // Chess Knight (Ghoda - 3rd Screenshot)
+          if (ny < -0.7 && nx < 0.2 && nx > -0.4) return true; // Ears
+          if (ny >= -0.7 && ny < -0.2 && nx < 0.3 && nx > -0.6) return true; // Head / Snout
+          if (ny >= -0.2 && ny < 0.5 && nx < 0.65 && nx > -0.45) return true; // Neck / Body
+          if (ny >= 0.6 && ny <= 0.85 && Math.abs(nx) <= 0.8) return true; // Base pedestal
+          return false;
+
+        case 3: // Shield / Teardrop
+          if (ny < 0) return Math.abs(nx) <= 0.8;
+          return Math.abs(nx) <= (0.8 - ny * 0.7);
+
+        case 4: // Bottle / Vase
+          if (ny < -0.5) return Math.abs(nx) <= 0.25;
+          return Math.abs(nx) <= 0.75 && ny <= 0.85;
+
+        case 0: // Square Spiral Box (1st Screenshot)
         default:
-          return true;
+          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88;
       }
     }
 
-    // 100% Solvable Generator
+    // Clean Orthogonal Procedural Generation
     function generateLevel(lvl) {
       arrows = [];
       previewArrow = null;
       secondsSpent = 0;
       liveTimeDisplay.innerText = "00:00";
 
-      const isHard = lvl > 10;
-      diffTag.innerText = isHard ? (lvl > 100 ? "Master" : "Super Hard") : "Normal";
+      const isHard = lvl > 5;
+      diffTag.innerText = isHard ? (lvl > 50 ? "Master" : "Hard") : "Normal";
       diffTag.style.color = isHard ? "#ef4444" : "#2563eb";
 
-      cols = isHard ? 14 : 10;
-      rows = isHard ? 18 : 14;
+      cols = isHard ? 20 : 16;
+      rows = isHard ? 28 : 22;
 
       resizeCanvas();
 
-      let randCounter = lvl * 523;
+      let randCounter = lvl * 617;
       const getRand = () => seededRandom(randCounter++);
 
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
@@ -678,10 +678,11 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(getRand() * dirs.length)];
-        const maxLen = isHard ? Math.floor(getRand() * 5) + 3 : Math.floor(getRand() * 3) + 2;
+        const maxLen = isHard ? Math.floor(getRand() * 6) + 4 : Math.floor(getRand() * 3) + 3;
 
         for (let step = 1; step < maxLen; step++) {
-          if (step > 1 && getRand() < 0.4) {
+          if (step > 1 && getRand() < 0.42) {
+            // Strictly 90 degree orthogonal turn
             const turnOptions = (curDir.dx === 0) ? [dirs[1], dirs[3]] : [dirs[0], dirs[2]];
             curDir = turnOptions[Math.floor(getRand() * turnOptions.length)];
           }
@@ -713,7 +714,7 @@
             id: arrowId,
             points: path,
             exitDir: exitDir,
-            state: 'idle',
+            state: 'idle', // idle, queued (red), moving (green), escaped
             progress: 0,
             shake: 0
           });
@@ -724,6 +725,7 @@
       }
 
       ensureBorderExits();
+      resolveDeadlockIfNeeded();
 
       startTimer();
       updateUI();
@@ -733,10 +735,10 @@
     function ensureBorderExits() {
       arrows.forEach(arrow => {
         const head = arrow.points[arrow.points.length - 1];
-        if (head.r <= 1) arrow.exitDir = { dx: 0, dy: -1 };
-        else if (head.r >= rows - 2) arrow.exitDir = { dx: 0, dy: 1 };
-        else if (head.c <= 1) arrow.exitDir = { dx: -1, dy: 0 };
-        else if (head.c >= cols - 2) arrow.exitDir = { dx: 1, dy: 0 };
+        if (head.r <= 2) arrow.exitDir = { dx: 0, dy: -1 };
+        else if (head.r >= rows - 3) arrow.exitDir = { dx: 0, dy: 1 };
+        else if (head.c <= 2) arrow.exitDir = { dx: -1, dy: 0 };
+        else if (head.c >= cols - 3) arrow.exitDir = { dx: 1, dy: 0 };
       });
     }
 
@@ -780,14 +782,14 @@
     }
 
     function resolveDeadlockIfNeeded() {
-      const activeArrows = arrows.filter(a => a.state !== 'escaped');
-      if (activeArrows.length === 0) return;
+      const active = arrows.filter(a => a.state !== 'escaped');
+      if (active.length === 0) return;
 
-      const hasMove = activeArrows.some(a => !isArrowBlocked(a));
+      const hasMove = active.some(a => !isArrowBlocked(a));
       if (!hasMove) {
-        let bestArrow = activeArrows[0];
+        let best = active[0];
         let minDist = 999;
-        activeArrows.forEach(a => {
+        active.forEach(a => {
           const head = a.points[a.points.length - 1];
           let dTop = head.r;
           let dBottom = rows - head.r;
@@ -796,7 +798,7 @@
           let m = Math.min(dTop, dBottom, dLeft, dRight);
           if (m < minDist) {
             minDist = m;
-            bestArrow = a;
+            best = a;
             if (m === dTop) a.exitDir = { dx: 0, dy: -1 };
             else if (m === dBottom) a.exitDir = { dx: 0, dy: 1 };
             else if (m === dLeft) a.exitDir = { dx: -1, dy: 0 };
@@ -821,39 +823,38 @@
       }
     }
 
+    // Precise Crisp Rendering (Matching screenshots 1, 2, 3)
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const occupiedCoords = new Set();
+      const occupied = new Set();
       arrows.forEach(arrow => {
         if (arrow.state !== 'escaped') {
-          arrow.points.forEach(pt => {
-            occupiedCoords.add(`${pt.c},${pt.r}`);
-          });
+          arrow.points.forEach(pt => occupied.add(`${pt.c},${pt.r}`));
         }
       });
 
-      // Dots show where arrows have cleared
-      ctx.fillStyle = '#cbd5e1';
+      // Subtle Dots only on cleared areas
+      ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
-          if (isShapeActive(c, r, currentLevel) && !occupiedCoords.has(`${c},${r}`)) {
+          if (isShapeActive(c, r, currentLevel) && !occupied.has(`${c},${r}`)) {
             const dx = originX + (c + 0.5) * cellSize;
             const dy = originY + (r + 0.5) * cellSize;
             ctx.beginPath();
-            ctx.arc(dx, dy, 1.8, 0, Math.PI * 2);
+            ctx.arc(dx, dy, 1.3, 0, Math.PI * 2);
             ctx.fill();
           }
         }
       }
 
-      // Long press preview
+      // Preview Ray
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
         ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 3.5;
-        ctx.setLineDash([6, 6]);
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
         ctx.beginPath();
         const startX = originX + (head.c + 0.5) * cellSize;
         const startY = originY + (head.r + 0.5) * cellSize;
@@ -866,20 +867,21 @@
         ctx.restore();
       }
 
-      // Render arrows
+      // Draw Thin Crisp Maze Corridors
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
-        let strokeColor = '#0f172a';
-        if (arrow.state === 'queued') strokeColor = '#ef4444';
+        let strokeColor = '#0f172a'; // Black Maze (Default)
+        if (arrow.state === 'queued') strokeColor = '#ef4444'; // Red Waiting
+        if (arrow.state === 'moving') strokeColor = '#22c55e'; // Green Escaping
         if (arrow === previewArrow) strokeColor = '#2563eb';
 
         ctx.save();
         ctx.strokeStyle = strokeColor;
         ctx.fillStyle = strokeColor;
-        ctx.lineWidth = Math.max(3.5, cellSize * 0.32);
+        ctx.lineWidth = 2.2; // Clean thin line matching screenshots
         ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+        ctx.lineJoin = 'miter';
 
         let offsetX = 0;
         let offsetY = 0;
@@ -888,12 +890,13 @@
           offsetY = arrow.exitDir.dy * arrow.progress * canvas.height;
         }
         if (arrow.shake > 0) {
-          offsetX += Math.sin(arrow.shake * 12) * 4;
+          offsetX += Math.sin(arrow.shake * 12) * 3;
           arrow.shake -= 0.1;
         }
 
         ctx.translate(offsetX, offsetY);
 
+        // Corridor Path
         ctx.beginPath();
         for (let i = 0; i < arrow.points.length; i++) {
           const pt = arrow.points[i];
@@ -904,6 +907,7 @@
         }
         ctx.stroke();
 
+        // Compact Proportional Arrowhead
         const head = arrow.points[arrow.points.length - 1];
         const hx = originX + (head.c + 0.5) * cellSize;
         const hy = originY + (head.r + 0.5) * cellSize;
@@ -912,11 +916,12 @@
         ctx.save();
         ctx.translate(hx, hy);
         ctx.rotate(angle);
-        const arrowHeadLen = Math.max(8, cellSize * 0.48);
+        const headSize = 5.5; // Sharp & compact
         ctx.beginPath();
-        ctx.moveTo(-arrowHeadLen, -arrowHeadLen * 0.65);
-        ctx.lineTo(arrowHeadLen * 0.25, 0);
-        ctx.lineTo(-arrowHeadLen, arrowHeadLen * 0.65);
+        ctx.moveTo(-headSize, -headSize * 0.7);
+        ctx.lineTo(1.5, 0);
+        ctx.lineTo(-headSize, headSize * 0.7);
+        ctx.lineWidth = 2.2;
         ctx.stroke();
         ctx.restore();
 
@@ -929,7 +934,7 @@
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.085;
+          arrow.progress += 0.09;
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -961,7 +966,7 @@
           const ax = originX + (pt.c + 0.5) * cellSize;
           const ay = originY + (pt.r + 0.5) * cellSize;
           const dist = Math.hypot(px - ax, py - ay);
-          if (dist < cellSize * 0.8 && dist < minDistance) {
+          if (dist < cellSize * 0.9 && dist < minDistance) {
             minDistance = dist;
             found = arrow;
           }
