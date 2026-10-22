@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Maze Untangle - 5000 Levels</title>
+  <title>Maze Untangle - Super Hard</title>
   <style>
     * {
       box-sizing: border-box;
@@ -39,7 +39,7 @@
       max-width: 440px;
       height: 100vh;
       max-height: 840px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.96);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -47,15 +47,13 @@
       border-radius: 20px;
       overflow: hidden;
       z-index: 1;
-      backdrop-filter: blur(10px);
     }
-    /* Top Header UI */
     .header {
-      padding: 10px 14px;
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(248, 250, 252, 0.95);
+      background: #ffffff;
       border-bottom: 2px solid #edf2f7;
     }
     .header-left {
@@ -64,28 +62,33 @@
       gap: 10px;
     }
     .profile-dp {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid #2563eb;
       box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
-      flex-shrink: 0;
     }
     .header-info {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
     .level-title {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 800;
-      color: #1e293b;
-      line-height: 1.1;
+      color: #0f172a;
+    }
+    .diff-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563eb;
+      text-transform: uppercase;
     }
     .lives-box {
       display: flex;
       gap: 4px;
+      margin-top: 2px;
     }
     .heart {
       width: 11px;
@@ -100,49 +103,35 @@
       transform: scale(0.8);
     }
 
-    /* Timers in Top Bar */
     .header-right {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     .timer-badge {
-      padding: 5px 10px;
-      border-radius: 16px;
-      font-weight: 700;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .live-time-badge {
       background: #ecfdf5;
       color: #059669;
       border: 1px solid #a7f3d0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    .limit-time-badge {
-      background: #eff6ff;
-      color: #2563eb;
-      border: 1px solid #bfdbfe;
-    }
-
     .btn-icon {
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
       color: #475569;
-      transition: background 0.2s;
-    }
-    .btn-icon:active {
-      transform: scale(0.92);
     }
 
     #canvas-wrap {
@@ -151,10 +140,10 @@
       align-items: center;
       justify-content: center;
       position: relative;
+      background: #fafbfc;
     }
     canvas {
       touch-action: none;
-      border-radius: 12px;
     }
 
     .footer {
@@ -165,7 +154,7 @@
       letter-spacing: 1.5px;
       color: #2563eb;
       text-transform: uppercase;
-      background: rgba(248, 250, 252, 0.95);
+      background: #ffffff;
       border-top: 2px solid #edf2f7;
     }
 
@@ -188,7 +177,6 @@
       border-radius: 22px;
       text-align: center;
       width: 84%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .modal-card h2 {
       font-size: 22px;
@@ -250,6 +238,7 @@
         <img class="profile-dp" src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/file_00000000a3f482088bfdca19f7851f75.png" alt="Gaming Logo">
         <div class="header-info">
           <div class="level-title" id="level-display">Level 1</div>
+          <span class="diff-badge" id="diff-tag">Normal</span>
           <div class="lives-box" id="lives-container">
             <span class="heart"></span>
             <span class="heart"></span>
@@ -258,18 +247,12 @@
         </div>
       </div>
       <div class="header-right">
-        <!-- Live Run Timer -->
-        <div class="timer-badge live-time-badge" title="Current Level Time">
+        <div class="timer-badge">
           <span>⏱</span>
           <span id="live-time-display">00:00</span>
         </div>
-        <!-- Time Limit Left -->
-        <div class="timer-badge limit-time-badge" title="Time Left">
-          <span>⏳</span>
-          <span id="time-left-display">60s</span>
-        </div>
-        <button class="btn-icon" id="music-btn" title="Toggle Music">🎵</button>
-        <button class="btn-icon" id="restart-btn" title="Restart Level">🔄</button>
+        <button class="btn-icon" id="music-btn">🎵</button>
+        <button class="btn-icon" id="restart-btn">🔄</button>
       </div>
     </div>
 
@@ -277,14 +260,13 @@
       <canvas id="gameCanvas"></canvas>
     </div>
 
-    <div class="footer">Tap Arrow • Clear Path</div>
+    <div class="footer">Long Press to Preview • Tap to Untangle</div>
 
     <div class="modal" id="gameModal">
       <div class="modal-card">
-        <h2 id="modal-title">Level Complete! 🎉</h2>
+        <h2 id="modal-title">Level Cleared! 🎉</h2>
         <p id="modal-subtitle">Great job navigating the maze.</p>
-
-        <div class="stats-card" id="stats-box">
+        <div class="stats-card">
           <div class="stat-item">
             <span class="stat-label">Total Time</span>
             <span class="stat-value" id="stat-time-taken">0s</span>
@@ -294,14 +276,13 @@
             <span class="stat-value" id="stat-best-time">--</span>
           </div>
         </div>
-
         <button class="modal-btn" id="modal-action-btn">Next Level</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Audio System
+    // Audio FX
     const bgm = document.getElementById('bgm');
     const musicBtn = document.getElementById('music-btn');
     let isMusicPlaying = false;
@@ -332,14 +313,9 @@
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let actx = null;
-    function initAudio() {
+    function playSound(type) {
       if (!actx) actx = new AudioCtx();
       if (actx.state === 'suspended') actx.resume();
-    }
-
-    function playSound(type) {
-      initAudio();
-      if (!actx) return;
       const osc = actx.createOscillator();
       const gain = actx.createGain();
       osc.connect(gain);
@@ -356,23 +332,23 @@
         osc.stop(t + 0.15);
       } else if (type === 'hit') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, t);
-        osc.frequency.exponentialRampToValueAtTime(70, t + 0.2);
+        osc.frequency.setValueAtTime(160, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.2);
         gain.gain.setValueAtTime(0.3, t);
         gain.gain.linearRampToValueAtTime(0.01, t + 0.2);
         osc.start(t);
         osc.stop(t + 0.2);
       } else if (type === 'win') {
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        [523, 659, 783, 1046].forEach((f, i) => {
           const o = actx.createOscillator();
           const g = actx.createGain();
           o.connect(g);
           g.connect(actx.destination);
-          o.frequency.value = freq;
-          g.gain.setValueAtTime(0.2, t + idx * 0.1);
-          g.gain.linearRampToValueAtTime(0.01, t + idx * 0.1 + 0.25);
-          o.start(t + idx * 0.1);
-          o.stop(t + idx * 0.1 + 0.25);
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.2, t + i * 0.1);
+          g.gain.linearRampToValueAtTime(0.01, t + i * 0.1 + 0.25);
+          o.start(t + i * 0.1);
+          o.stop(t + i * 0.1 + 0.25);
         });
       }
     }
@@ -380,17 +356,19 @@
     // Game Variables
     let currentLevel = parseInt(localStorage.getItem('saved_level')) || 1;
     let lives = 3;
-    let totalGivenTime = 60;
-    let timeLeft = 60;
     let secondsSpent = 0;
     let timerInterval = null;
     let arrows = [];
     let isAnimating = false;
+    let previewArrow = null;
+    let longPressTimer = null;
+    let gridCols = 10;
+    let gridRows = 14;
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const levelDisplay = document.getElementById('level-display');
-    const timeLeftDisplay = document.getElementById('time-left-display');
+    const diffTag = document.getElementById('diff-tag');
     const liveTimeDisplay = document.getElementById('live-time-display');
     const livesContainer = document.getElementById('lives-container');
     const gameModal = document.getElementById('gameModal');
@@ -398,80 +376,88 @@
     const modalSubtitle = document.getElementById('modal-subtitle');
     const modalActionBtn = document.getElementById('modal-action-btn');
     const restartBtn = document.getElementById('restart-btn');
-    const statsBox = document.getElementById('stats-box');
     const statTimeTaken = document.getElementById('stat-time-taken');
     const statBestTime = document.getElementById('stat-best-time');
 
-    const DIRS = {
-      'UP':    { x: 0,  y: -1, angle: -Math.PI / 2 },
-      'DOWN':  { x: 0,  y: 1,  angle: Math.PI / 2 },
-      'LEFT':  { x: -1, y: 0,  angle: Math.PI },
-      'RIGHT': { x: 1,  y: 0,  angle: 0 }
-    };
-    const DIR_KEYS = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
-
     function resizeCanvas() {
       const wrap = document.getElementById('canvas-wrap');
-      const size = Math.min(wrap.clientWidth - 20, wrap.clientHeight - 20, 390);
-      canvas.width = size;
-      canvas.height = size;
+      const w = wrap.clientWidth - 16;
+      const h = wrap.clientHeight - 16;
+      canvas.width = Math.min(w, 400);
+      canvas.height = Math.min(h, 560);
       draw();
     }
     window.addEventListener('resize', resizeCanvas);
+
+    function formatTime(s) {
+      const m = Math.floor(s / 60).toString().padStart(2, '0');
+      const sec = (s % 60).toString().padStart(2, '0');
+      return `${m}:${sec}`;
+    }
 
     function seededRandom(seed) {
       let x = Math.sin(seed++) * 10000;
       return x - Math.floor(x);
     }
 
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60).toString().padStart(2, '0');
-      const s = (sec % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    }
-
+    // Procedural Level Generator
     function generateLevel(lvl) {
       arrows = [];
-      
-      let gridSize = 6;
-      if (lvl > 30) gridSize = 7;
-      if (lvl > 150) gridSize = 8;
-      if (lvl > 800) gridSize = 9;
-      if (lvl > 2000) gridSize = 10;
-
-      totalGivenTime = Math.max(25, 45 + Math.floor(gridSize * 3.5) - Math.floor(lvl / 180));
-      timeLeft = totalGivenTime;
+      previewArrow = null;
       secondsSpent = 0;
-
       liveTimeDisplay.innerText = "00:00";
-      timeLeftDisplay.innerText = timeLeft + 's';
 
-      let randCounter = lvl * 137;
+      // 10 Level k baad Super Hard Mode
+      const isHard = lvl > 10;
+      diffTag.innerText = isHard ? (lvl > 100 ? "Master Hard" : "Super Hard") : "Normal";
+      diffTag.style.color = isHard ? "#ef4444" : "#2563eb";
+
+      gridCols = isHard ? 12 : 8;
+      gridRows = isHard ? 16 : 10;
+
+      let randCounter = lvl * 179;
       const getRand = () => seededRandom(randCounter++);
 
-      const arrowCount = Math.min(10 + Math.floor(lvl / 14), Math.floor((gridSize * gridSize) * 0.42));
+      const count = isHard ? Math.min(18 + Math.floor(lvl / 5), 45) : (5 + lvl);
       const occupied = new Set();
 
-      for (let i = 0; i < arrowCount; i++) {
-        let gx = Math.floor(getRand() * (gridSize - 2)) + 1;
-        let gy = Math.floor(getRand() * (gridSize - 2)) + 1;
-        let key = `${gx},${gy}`;
+      for (let i = 0; i < count; i++) {
+        let sx = Math.floor(getRand() * (gridCols - 4)) + 2;
+        let sy = Math.floor(getRand() * (gridRows - 4)) + 2;
+        let key = `${sx},${sy}`;
+        if (occupied.has(key)) continue;
 
-        if (!occupied.has(key)) {
-          occupied.add(key);
-          const dirKey = DIR_KEYS[Math.floor(getRand() * DIR_KEYS.length)];
-          arrows.push({
-            id: i,
-            gx: gx,
-            gy: gy,
-            dir: dirKey,
-            gridSize: gridSize,
-            color: '#0f172a',
-            state: 'idle',
-            progress: 0,
-            shake: 0
-          });
+        let points = [{x: sx, y: sy}];
+        occupied.add(key);
+
+        // Hard level me turns aur maze branches banegi
+        const turns = isHard ? (Math.floor(getRand() * 3) + 1) : 0;
+        let dirs = [{x:0,y:-1}, {x:1,y:0}, {x:0,y:1}, {x:-1,y:0}];
+        let curDir = dirs[Math.floor(getRand() * 4)];
+
+        let cx = sx;
+        let cy = sy;
+        for (let t = 0; t <= turns; t++) {
+          let stepLen = isHard ? (Math.floor(getRand() * 3) + 2) : 2;
+          cx += curDir.x * stepLen;
+          cy += curDir.y * stepLen;
+          cx = Math.max(1, Math.min(gridCols - 2, cx));
+          cy = Math.max(1, Math.min(gridRows - 2, cy));
+          points.push({x: cx, y: cy});
+
+          // Change direction for next segment (90 degree turn)
+          curDir = (curDir.x === 0) ? (getRand() > 0.5 ? {x:1,y:0} : {x:-1,y:0}) : (getRand() > 0.5 ? {x:0,y:1} : {x:0,y:-1});
         }
+
+        arrows.push({
+          id: i,
+          points: points,
+          dir: curDir,
+          state: 'idle', // idle, queued (red waiting), moving, escaped
+          isRed: false,
+          progress: 0,
+          shake: 0
+        });
       }
 
       startTimer();
@@ -482,19 +468,8 @@
     function startTimer() {
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        // Live Stopwatch
         secondsSpent++;
         liveTimeDisplay.innerText = formatTime(secondsSpent);
-
-        // Countdown Timer
-        timeLeft--;
-        timeLeftDisplay.innerText = timeLeft + 's';
-
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          playSound('hit');
-          handleGameOver("Time's Up!");
-        }
       }, 1000);
     }
 
@@ -502,168 +477,232 @@
       levelDisplay.innerText = `Level ${currentLevel}`;
       livesContainer.innerHTML = '';
       for (let i = 0; i < 3; i++) {
-        const heart = document.createElement('span');
-        heart.className = `heart ${i >= lives ? 'lost' : ''}`;
-        livesContainer.appendChild(heart);
+        const h = document.createElement('span');
+        h.className = `heart ${i >= lives ? 'lost' : ''}`;
+        livesContainer.appendChild(h);
       }
     }
 
-    function isArrowBlocked(target) {
-      const d = DIRS[target.dir];
-      let curX = target.gx + d.x;
-      let curY = target.gy + d.y;
+    // Raycast Collision Detection
+    function isArrowBlocked(arrow) {
+      const head = arrow.points[arrow.points.length - 1];
+      const d = arrow.dir;
+      let rx = head.x + d.x;
+      let ry = head.y + d.y;
 
-      while (curX >= 0 && curX < target.gridSize && curY >= 0 && curY < target.gridSize) {
+      while (rx >= 0 && rx <= gridCols && ry >= 0 && ry <= gridRows) {
         for (let other of arrows) {
-          if (other.state === 'idle' && other.id !== target.id) {
-            if (other.gx === curX && other.gy === curY) {
-              return true;
+          if (other.id === arrow.id || other.state === 'escaped') continue;
+          for (let p of other.points) {
+            if (p.x === rx && p.y === ry) {
+              return true; // Saamne koi dusra arrow hai
             }
           }
         }
-        curX += d.x;
-        curY += d.y;
+        rx += d.x;
+        ry += d.y;
       }
       return false;
     }
 
+    // Check agar koi Red Waiting Arrow ab nikal sakta hai
+    function checkQueuedArrows() {
+      let triggered = false;
+      arrows.forEach(arrow => {
+        if (arrow.state === 'queued' && !isArrowBlocked(arrow)) {
+          arrow.state = 'moving';
+          playSound('escape');
+          triggered = true;
+        }
+      });
+      if (triggered && !isAnimating) {
+        isAnimating = true;
+        requestAnimationFrame(animate);
+      }
+    }
+
+    // Render Everything
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (arrows.length === 0) return;
+      const cellW = canvas.width / gridCols;
+      const cellH = canvas.height / gridRows;
 
-      const gridSize = arrows[0].gridSize;
-      const cellSize = canvas.width / gridSize;
+      // 1. Dotted Background Grid
+      ctx.fillStyle = '#cbd5e1';
+      for (let x = 1; x < gridCols; x++) {
+        for (let y = 1; y < gridRows; y++) {
+          ctx.beginPath();
+          ctx.arc(x * cellW, y * cellH, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 2.5;
-      ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+      // 2. Long Press Path Preview
+      if (previewArrow && previewArrow.state !== 'escaped') {
+        const head = previewArrow.points[previewArrow.points.length - 1];
+        ctx.save();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(head.x * cellW, head.y * cellH);
+        ctx.lineTo((head.x + previewArrow.dir.x * gridCols) * cellW, (head.y + previewArrow.dir.y * gridRows) * cellH);
+        ctx.stroke();
+        ctx.restore();
+      }
 
+      // 3. Draw Arrows / Maze Lines
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
-        let x = (arrow.gx + 0.5) * cellSize;
-        let y = (arrow.gy + 0.5) * cellSize;
+        let strokeColor = '#0f172a';
+        if (arrow.isRed || arrow.state === 'queued') strokeColor = '#ef4444';
+        if (arrow === previewArrow) strokeColor = '#2563eb';
 
+        ctx.save();
+        ctx.strokeStyle = strokeColor;
+        ctx.fillStyle = strokeColor;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        let offsetX = 0;
+        let offsetY = 0;
         if (arrow.state === 'moving') {
-          const d = DIRS[arrow.dir];
-          x += d.x * arrow.progress * canvas.width;
-          y += d.y * arrow.progress * canvas.height;
+          offsetX = arrow.dir.x * arrow.progress * canvas.width;
+          offsetY = arrow.dir.y * arrow.progress * canvas.height;
         }
-
         if (arrow.shake > 0) {
-          x += Math.sin(arrow.shake * 12) * 4;
+          offsetX += Math.sin(arrow.shake * 12) * 4;
           arrow.shake -= 0.1;
-          if (arrow.shake < 0) arrow.shake = 0;
         }
 
-        drawArrow(x, y, cellSize * 0.72, arrow.dir, arrow.color);
+        ctx.translate(offsetX, offsetY);
+
+        // Draw segments
+        ctx.beginPath();
+        for (let i = 0; i < arrow.points.length; i++) {
+          let px = arrow.points[i].x * cellW;
+          let py = arrow.points[i].y * cellH;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Draw Arrowhead on the final segment
+        const head = arrow.points[arrow.points.length - 1];
+        const hx = head.x * cellW;
+        const hy = head.y * cellH;
+        const angle = Math.atan2(arrow.dir.y, arrow.dir.x);
+
+        ctx.save();
+        ctx.translate(hx, hy);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(-10, -6);
+        ctx.lineTo(2, 0);
+        ctx.lineTo(-10, 6);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.restore();
       });
     }
 
-    function drawArrow(x, y, length, dirName, color) {
-      const d = DIRS[dirName];
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(d.angle);
-
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
-      ctx.lineWidth = 4.5;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      const half = length / 2;
-      ctx.beginPath();
-      ctx.moveTo(-half, 0);
-      ctx.lineTo(half, 0);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(half - 9, -7);
-      ctx.lineTo(half + 3, 0);
-      ctx.lineTo(half - 9, 7);
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
+    // Animation Loop
     function animate() {
       let active = false;
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.085;
+          arrow.progress += 0.08;
           active = true;
           if (arrow.progress >= 1.2) {
             arrow.state = 'escaped';
+            checkQueuedArrows();
             checkWinCondition();
           }
         }
-        if (arrow.shake > 0) {
-          active = true;
-        }
+        if (arrow.shake > 0) active = true;
       });
 
       draw();
 
-      if (active) {
-        requestAnimationFrame(animate);
-      } else {
-        isAnimating = false;
+      if (active) requestAnimationFrame(animate);
+      else isAnimating = false;
+    }
+
+    // Touch & Pointer Logic
+    function getClickedArrow(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
+      const cellW = canvas.width / gridCols;
+      const cellH = canvas.height / gridRows;
+
+      for (let arrow of arrows) {
+        if (arrow.state === 'escaped') continue;
+        for (let p of arrow.points) {
+          let dist = Math.hypot(px - p.x * cellW, py - p.y * cellH);
+          if (dist < cellW * 0.75) return arrow;
+        }
+      }
+      return null;
+    }
+
+    function handlePointerDown(e) {
+      const cx = e.clientX || (e.touches && e.touches[0].clientX);
+      const cy = e.clientY || (e.touches && e.touches[0].clientY);
+      const clicked = getClickedArrow(cx, cy);
+
+      if (clicked) {
+        longPressTimer = setTimeout(() => {
+          previewArrow = clicked;
+          draw();
+        }, 300);
       }
     }
 
-    function handlePointer(evt) {
-      if (isAnimating || arrows.length === 0) return;
+    function handlePointerUp(e) {
+      clearTimeout(longPressTimer);
+      if (previewArrow) {
+        previewArrow = null;
+        draw();
+        return;
+      }
 
-      const rect = canvas.getBoundingClientRect();
-      const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
-      const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+      const cx = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+      const cy = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+      const clicked = getClickedArrow(cx, cy);
 
-      const px = clientX - rect.left;
-      const py = clientY - rect.top;
+      if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
+        if (isArrowBlocked(clicked)) {
+          // Blocked: Red ho jayega aur queue me wait karega
+          playSound('hit');
+          clicked.isRed = true;
+          clicked.state = 'queued';
+          clicked.shake = 1.0;
+          lives--;
+          updateUI();
+          if (lives <= 0) handleGameOver("Out of Lives!");
+        } else {
+          // Raasta saaf hai: seedha bahar
+          playSound('escape');
+          clicked.state = 'moving';
+          clicked.isRed = false;
+        }
 
-      const gridSize = arrows[0].gridSize;
-      const cellSize = canvas.width / gridSize;
-
-      for (let arrow of arrows) {
-        if (arrow.state !== 'idle') continue;
-
-        const ax = (arrow.gx + 0.5) * cellSize;
-        const ay = (arrow.gy + 0.5) * cellSize;
-        const dist = Math.hypot(px - ax, py - ay);
-
-        if (dist < cellSize * 0.45) {
-          if (isArrowBlocked(arrow)) {
-            playSound('hit');
-            arrow.shake = 1.0;
-            arrow.color = '#ef4444';
-            setTimeout(() => { arrow.color = '#0f172a'; }, 300);
-            lives--;
-            updateUI();
-            if (lives <= 0) {
-              handleGameOver("Out of Lives!");
-            }
-          } else {
-            playSound('escape');
-            arrow.state = 'moving';
-            arrow.color = '#2563eb';
-          }
-
-          if (!isAnimating) {
-            isAnimating = true;
-            requestAnimationFrame(animate);
-          }
-          break;
+        if (!isAnimating) {
+          isAnimating = true;
+          requestAnimationFrame(animate);
         }
       }
     }
 
-    canvas.addEventListener('mousedown', handlePointer);
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      handlePointer(e);
-    }, { passive: false });
+    canvas.addEventListener('mousedown', handlePointerDown);
+    canvas.addEventListener('mouseup', handlePointerUp);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handlePointerDown(e); }, { passive: false });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); handlePointerUp(e); }, { passive: false });
 
     function checkWinCondition() {
       const remaining = arrows.filter(a => a.state !== 'escaped');
@@ -671,21 +710,18 @@
         clearInterval(timerInterval);
         playSound('win');
 
-        const timeTaken = secondsSpent;
         const bestTimeKey = `best_time_lvl_${currentLevel}`;
         let savedBest = localStorage.getItem(bestTimeKey);
-        if (!savedBest || timeTaken < parseInt(savedBest)) {
-          localStorage.setItem(bestTimeKey, timeTaken);
-          savedBest = timeTaken;
+        if (!savedBest || secondsSpent < parseInt(savedBest)) {
+          localStorage.setItem(bestTimeKey, secondsSpent);
+          savedBest = secondsSpent;
         }
 
-        statTimeTaken.innerText = `${timeTaken}s`;
+        statTimeTaken.innerText = `${secondsSpent}s`;
         statBestTime.innerText = `${savedBest}s`;
-        statsBox.style.display = 'flex';
 
         modalTitle.innerText = "Level Complete! 🎉";
         modalSubtitle.innerText = `Shaandar! Aapne Level ${currentLevel} solve kar liya.`;
-        modalActionBtn.innerText = "Next Level";
         modalActionBtn.onclick = () => {
           currentLevel++;
           if (currentLevel > 5000) currentLevel = 1;
@@ -699,9 +735,8 @@
 
     function handleGameOver(reason) {
       clearInterval(timerInterval);
-      statsBox.style.display = 'none';
       modalTitle.innerText = reason;
-      modalSubtitle.innerText = "Koshish jaari rakhein! Dobara try karein.";
+      modalSubtitle.innerText = "Dobara koshish karein maze ko untangle karne ki.";
       modalActionBtn.innerText = "Try Again";
       modalActionBtn.onclick = () => {
         lives = 3;
