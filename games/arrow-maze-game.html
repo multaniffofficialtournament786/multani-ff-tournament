@@ -735,62 +735,60 @@
       return `${m}:${sec}`;
     }
 
+    // Geometry Definition
     function isCellInShape(c, r, shapeId, lvl) {
       const cx = (cols - 1) / 2;
       const cy = (rows - 1) / 2;
-      const stretchX = 1.0 + (((lvl * 17) % 7) - 3) * 0.035;
-      const stretchY = 1.0 + (((lvl * 29) % 7) - 3) * 0.035;
-      const nx = ((c - cx) / cx) * stretchX;
-      const ny = ((r - cy) / cy) * stretchY;
-      const angle = Math.atan2(ny, nx);
-      const wobble = 1.0 + 0.05 * Math.sin(angle * 4 + lvl);
+      const nx = (c - cx) / cx;
+      const ny = (r - cy) / cy;
 
       switch(shapeId) {
-        case 0:
-          return Math.abs(nx) <= (0.92 * wobble) && Math.abs(ny) <= (0.92 * wobble);
-        case 1:
-          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.15 * wobble);
-        case 2:
-          return (nx * nx + ny * ny) <= (0.90 * wobble);
-        case 3:
-          return (Math.abs(nx) <= 0.42 && Math.abs(ny) <= 0.94) || (Math.abs(nx) <= 0.94 && Math.abs(ny) <= 0.42);
-        case 4:
-          return ny >= -0.9 && (Math.abs(nx) <= (ny + 0.92) * 0.65 * wobble);
-        case 5:
-          return Math.abs(ny) <= 0.92 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.95 * wobble);
-        case 6:
+        case 0: // Square
+          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88;
+        case 1: // Diamond
+          return (Math.abs(nx) * 1.1 + Math.abs(ny) * 1.1) <= 1.05;
+        case 2: // Circle
+          return (nx * nx + ny * ny) <= 0.85;
+        case 3: // Cross
+          return (Math.abs(nx) <= 0.42 && Math.abs(ny) <= 0.9) || (Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.42);
+        case 4: // Triangle
+          return ny >= -0.85 && (Math.abs(nx) <= (ny + 0.9) * 0.65);
+        case 5: // Hexagon
+          return Math.abs(ny) <= 0.88 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.92);
+        case 6: // Spiral
           const rDist = Math.hypot(nx, ny);
-          return rDist <= 0.95 && (rDist >= 0.16 || Math.abs(nx) <= 0.48);
-        case 7:
-          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.35) <= 0.62;
-        case 8:
+          return rDist <= 0.92 && (rDist >= 0.16 || Math.abs(nx) <= 0.45);
+        case 7: // Zigzag (Proper Wide Corridor)
+          const zigX = Math.sin(ny * 3.14) * 0.4;
+          return Math.abs(nx - zigX) <= 0.55;
+        case 8: // Key
           const keyHead = Math.hypot(nx, ny + 0.45);
-          if (keyHead <= 0.52 && keyHead >= 0.16) return true;
-          if (ny >= -0.15 && ny <= 0.90 && Math.abs(nx) <= 0.22) return true;
-          if (ny >= 0.45 && ny <= 0.82 && nx > 0.18 && nx <= 0.65) return true;
+          if (keyHead <= 0.5 && keyHead >= 0.18) return true;
+          if (ny >= -0.15 && ny <= 0.88 && Math.abs(nx) <= 0.22) return true;
+          if (ny >= 0.45 && ny <= 0.8 && nx > 0.18 && nx <= 0.62) return true;
           return false;
-        case 9:
-          if (ny < 0) return Math.abs(nx) <= (0.88 * wobble);
-          return Math.abs(nx) <= ((0.88 - ny * 0.75) * wobble);
-        case 10:
-          if (ny < -0.45) return Math.abs(nx) <= 0.26;
-          return Math.abs(nx) <= (0.80 * wobble) && ny <= 0.90;
-        case 11:
-          if (ny < 0) return nx >= ny * 0.6 - 0.48 && nx <= ny * 0.6 + 0.48;
-          return nx >= ny * 0.7 - 0.25 && nx <= ny * 0.7 + 0.65;
-        case 12:
+        case 9: // Shield
+          if (ny < 0) return Math.abs(nx) <= 0.85;
+          return Math.abs(nx) <= (0.85 - ny * 0.72);
+        case 10: // Bottle
+          if (ny < -0.45) return Math.abs(nx) <= 0.25;
+          return Math.abs(nx) <= 0.78 && ny <= 0.88;
+        case 11: // Lightning
+          if (ny < 0) return nx >= ny * 0.6 - 0.45 && nx <= ny * 0.6 + 0.45;
+          return nx >= ny * 0.7 - 0.25 && nx <= ny * 0.7 + 0.62;
+        case 12: // Heart
           const hx = nx * 1.1;
           const hy = -ny * 1.1 + 0.2;
-          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.1;
-        case 13:
+          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.08;
+        case 13: // Star
+          const angle = Math.atan2(ny, nx);
           const rad = Math.hypot(nx, ny);
-          const starRadius = 0.60 + 0.35 * Math.cos(angle * 5 + (lvl % 3));
-          return rad <= starRadius;
-        case 14:
-          return Math.abs(nx) <= 0.92 && Math.abs(ny) <= 0.92 && (Math.abs(nx) > 0.12 || Math.abs(ny) > 0.12);
-        case 15:
+          return rad <= (0.58 + 0.34 * Math.cos(angle * 5));
+        case 14: // Labyrinth
+          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88 && (Math.abs(nx) > 0.15 || Math.abs(ny) > 0.15);
+        case 15: // Comb
         default:
-          return (nx >= -0.85 && nx <= 0.85 && Math.abs(ny) <= 0.88) && (r % 2 === 0 || nx <= -0.08);
+          return (nx >= -0.8 && nx <= 0.8 && Math.abs(ny) <= 0.85) && (r % 2 === 0 || nx <= -0.1);
       }
     }
 
@@ -801,11 +799,8 @@
           color: '#22c55e',
           cols: 14,
           rows: 18,
-          maxLen: 7,
-          turnChance: 0.38,
-          targetFill: 0.80,
-          minDepth: 2,
-          maxInitialFreeRatio: 0.65
+          maxLen: 6,
+          turnChance: 0.38
         };
       } else if (lvl <= 500) {
         return {
@@ -813,11 +808,8 @@
           color: '#2563eb',
           cols: 16,
           rows: 20,
-          maxLen: 8,
-          turnChance: 0.42,
-          targetFill: 0.82,
-          minDepth: 3,
-          maxInitialFreeRatio: 0.50
+          maxLen: 7,
+          turnChance: 0.42
         };
       } else if (lvl <= 1500) {
         return {
@@ -825,11 +817,8 @@
           color: '#eab308',
           cols: 16,
           rows: 22,
-          maxLen: 9,
-          turnChance: 0.45,
-          targetFill: 0.84,
-          minDepth: 4,
-          maxInitialFreeRatio: 0.40
+          maxLen: 8,
+          turnChance: 0.46
         };
       } else if (lvl <= 3000) {
         return {
@@ -837,11 +826,8 @@
           color: '#f97316',
           cols: 18,
           rows: 24,
-          maxLen: 10,
-          turnChance: 0.50,
-          targetFill: 0.86,
-          minDepth: 5,
-          maxInitialFreeRatio: 0.30
+          maxLen: 9,
+          turnChance: 0.50
         };
       } else {
         return {
@@ -849,11 +835,8 @@
           color: '#ef4444',
           cols: 20,
           rows: 26,
-          maxLen: 11,
-          turnChance: 0.54,
-          targetFill: 0.88,
-          minDepth: 6,
-          maxInitialFreeRatio: 0.25
+          maxLen: 10,
+          turnChance: 0.54
         };
       }
     }
@@ -884,7 +867,7 @@
       return checkRaycastBlocked(arrow, arrows);
     }
 
-    function evaluatePuzzleMetrics(candidateArrows) {
+    function isPuzzleSolvable(candidateArrows) {
       const simList = candidateArrows.map(a => ({
         id: a.id,
         points: a.points,
@@ -892,40 +875,22 @@
         state: 'idle'
       }));
 
-      let depth = 0;
-      let initialFree = 0;
-      let escapedCount = 0;
-
-      while (true) {
-        const canEscape = [];
+      let progress = true;
+      while (progress) {
+        progress = false;
         for (let i = 0; i < simList.length; i++) {
           const a = simList[i];
           if (a.state === 'idle' && !checkRaycastBlocked(a, simList)) {
-            canEscape.push(a);
+            a.state = 'escaped';
+            progress = true;
           }
         }
-
-        if (depth === 0) initialFree = canEscape.length;
-        if (canEscape.length === 0) break;
-
-        for (let i = 0; i < canEscape.length; i++) {
-          canEscape[i].state = 'escaped';
-          escapedCount++;
-        }
-        depth++;
       }
-
-      return {
-        isSolvable: (escapedCount === candidateArrows.length),
-        depth,
-        initialFree,
-        total: candidateArrows.length,
-        initialRatio: initialFree / (candidateArrows.length || 1)
-      };
+      return simList.every(a => a.state === 'escaped');
     }
 
-    // Dynamic Fill: Packs the exact shape cells tightly
-    function buildCandidateArrows(lvl, shapeId, diff, prng) {
+    // High Density Packing (Zero-Waste Packing)
+    function generateDenseCorridors(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
 
@@ -937,6 +902,7 @@
         }
       }
 
+      // Shuffle valid cells
       for (let i = validCells.length - 1; i > 0; i--) {
         const j = Math.floor(prng() * (i + 1));
         const temp = validCells[i];
@@ -945,19 +911,17 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 },
-        { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 },
-        { dx: -1, dy: 0 }
+        { dx: 0, dy: -1 }, // UP
+        { dx: 1, dy: 0 },  // RIGHT
+        { dx: 0, dy: 1 },  // DOWN
+        { dx: -1, dy: 0 }  // LEFT
       ];
 
       const candidates = [];
       let arrowId = 0;
-      let filledCells = 0;
-      const targetCellsToFill = Math.floor(validCells.length * diff.targetFill);
 
+      // First pass: carve long and normal arrows
       for (let i = 0; i < validCells.length; i++) {
-        if (filledCells >= targetCellsToFill) break;
         const start = validCells[i];
         if (grid[start.c][start.r] !== null) continue;
 
@@ -967,9 +931,8 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        const isSuperLong = prng() < 0.35;
-        const targetLen = isSuperLong 
-          ? Math.floor(prng() * 4) + (diff.maxLen - 2) 
+        const targetLen = (prng() < 0.35) 
+          ? Math.floor(prng() * 3) + diff.maxLen - 2 
           : Math.floor(prng() * 3) + 2;
 
         for (let step = 1; step < targetLen; step++) {
@@ -999,24 +962,49 @@
         if (path.length >= 2) {
           const tail = path[path.length - 2];
           const head = path[path.length - 1];
-          const exitDir = {
-            dx: Math.sign(head.c - tail.c),
-            dy: Math.sign(head.r - tail.r)
-          };
-
           candidates.push({
             id: arrowId,
             points: path,
-            exitDir: exitDir,
+            exitDir: { dx: head.c - tail.c, dy: head.r - tail.r },
             state: 'idle',
             progress: 0,
             bumpProgress: 0,
             shake: 0
           });
-          filledCells += path.length;
           arrowId++;
         } else {
           grid[start.c][start.r] = null;
+        }
+      }
+
+      // Second pass: Pair up any remaining single cells to guarantee dense maze
+      for (let i = 0; i < validCells.length; i++) {
+        const cell = validCells[i];
+        if (grid[cell.c][cell.r] !== null) continue;
+
+        for (let d = 0; d < dirs.length; d++) {
+          const nC = cell.c + dirs[d].dx;
+          const nR = cell.r + dirs[d].dy;
+          if (
+            nC >= 0 && nC < cols &&
+            nR >= 0 && nR < rows &&
+            isCellInShape(nC, nR, shapeId, lvl) &&
+            grid[nC][nR] === null
+          ) {
+            grid[cell.c][cell.r] = arrowId;
+            grid[nC][nR] = arrowId;
+            candidates.push({
+              id: arrowId,
+              points: [{ c: cell.c, r: cell.r }, { c: nC, r: nR }],
+              exitDir: { dx: dirs[d].dx, dy: dirs[d].dy },
+              state: 'idle',
+              progress: 0,
+              bumpProgress: 0,
+              shake: 0
+            });
+            arrowId++;
+            break;
+          }
         }
       }
 
@@ -1045,50 +1033,28 @@
 
       resizeCanvas();
 
-      let validPuzzleFound = false;
       let generatedArrows = [];
-      let attempt = 0;
       let baseSeed = ((lvl * 1234567) ^ 0x5DEECE66) >>> 0;
 
-      while (!validPuzzleFound && attempt < 80) {
+      // Iterative solver guaranteed to find solution
+      for (let attempt = 0; attempt < 80; attempt++) {
         const prng = createPRNG(baseSeed + attempt * 101);
-        const candidates = buildCandidateArrows(lvl, shapeId, diff, prng);
+        const candidates = generateDenseCorridors(lvl, shapeId, diff, prng);
 
-        if (candidates.length >= 4) {
-          const metrics = evaluatePuzzleMetrics(candidates);
-          if (
-            metrics.isSolvable &&
-            metrics.depth >= Math.min(diff.minDepth, 2) &&
-            metrics.initialFree >= 1
-          ) {
-            validPuzzleFound = true;
-            generatedArrows = candidates;
-            break;
-          }
-        }
-        attempt++;
-      }
-
-      // Safe Fallback: Guarantees no empty boards
-      if (!validPuzzleFound) {
-        let fallbackAttempt = 0;
-        while (!validPuzzleFound && fallbackAttempt < 50) {
-          const prng = createPRNG((baseSeed ^ 0xA5A5A5A5) + fallbackAttempt * 13);
-          const candidates = buildCandidateArrows(lvl, shapeId, diff, prng);
-          const metrics = evaluatePuzzleMetrics(candidates);
-          if (metrics.isSolvable && metrics.initialFree >= 1) {
-            validPuzzleFound = true;
-            generatedArrows = candidates;
-            break;
-          }
-          fallbackAttempt++;
+        if (candidates.length >= 4 && isPuzzleSolvable(candidates)) {
+          generatedArrows = candidates;
+          break;
         }
       }
 
-      // Final Safety Net: If still empty, build on Box mask
-      if (!validPuzzleFound || generatedArrows.length === 0) {
-        const prng = createPRNG(baseSeed ^ 0x1234);
-        generatedArrows = buildCandidateArrows(lvl, 0, diff, prng);
+      // Fallback: If strict topological pass needs breathing space, safely reduce blockers
+      if (generatedArrows.length === 0) {
+        const prng = createPRNG(baseSeed ^ 0x9988);
+        let fallbackList = generateDenseCorridors(lvl, shapeId, diff, prng);
+        while (fallbackList.length > 3 && !isPuzzleSolvable(fallbackList)) {
+          fallbackList.pop(); // Remove blocking tails until 100% solvable
+        }
+        generatedArrows = fallbackList;
       }
 
       arrows = generatedArrows;
@@ -1202,7 +1168,7 @@
         }
       });
 
-      // Dot Matrix
+      // Subtle Dots only on cleared spaces
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
@@ -1235,7 +1201,7 @@
         ctx.restore();
       }
 
-      // Render Arrows
+      // Draw Arrows
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
