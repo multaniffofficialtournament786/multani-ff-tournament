@@ -319,6 +319,10 @@
       color: #2563eb;
       border-color: #bfdbfe;
     }
+    .level-box.unlocked:active {
+      background: #2563eb;
+      color: #fff;
+    }
     .level-box.current {
       background: #2563eb;
       color: #ffffff;
@@ -563,7 +567,7 @@
             currentLevel = i;
             localStorage.setItem('saved_level', currentLevel);
             levelsModal.style.display = 'none';
-            lives = 3; // Reset lives on selecting level
+            lives = 3;
             generateLevel(currentLevel);
           };
         } else {
@@ -671,7 +675,6 @@
       }
     }
 
-    // High Density Difficulty Setting (Full Board Packing)
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
@@ -679,9 +682,9 @@
           color: '#22c55e',
           cols: 14,
           rows: 18,
-          maxLen: 7, // Varied short and long corridors
+          maxLen: 7,
           turnChance: 0.35,
-          minArrows: 12,
+          minArrows: 14,
           maxArrows: 24,
           minDepth: 2,
           maxInitialFreeRatio: 0.70
@@ -694,7 +697,7 @@
           rows: 20,
           maxLen: 8,
           turnChance: 0.40,
-          minArrows: 20,
+          minArrows: 22,
           maxArrows: 34,
           minDepth: 3,
           maxInitialFreeRatio: 0.55
@@ -807,7 +810,6 @@
       };
     }
 
-    // Dense Full-Maze Corridor Synthesis (Pack Board Completely)
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -828,10 +830,10 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 }, // UP
-        { dx: 1, dy: 0 },  // RIGHT
-        { dx: 0, dy: 1 },  // DOWN
-        { dx: -1, dy: 0 }  // LEFT
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 }
       ];
 
       const candidates = [];
@@ -848,8 +850,6 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        
-        // Dynamic path length: Mix of short (2-3), normal (4-5), and super long (6-11)
         const isSuperLong = prng() < 0.28;
         const targetLen = isSuperLong 
           ? Math.floor(prng() * 4) + (diff.maxLen - 3) 
@@ -1005,7 +1005,73 @@
       if (released) triggerAnimation();
     }
 
-    // Straight Orthogonal Exit Trajectory (Fix for diagonal lines)
+    // --- Snake Motion: Path Follower Engine ---
+    // Tail corner par aate hi turn follow karke seedhi ho jayegi
+    function getSnakePolyline(points, exitDir, progress) {
+      const origPts = points.map(pt => ({
+        x: originX + (pt.c + 0.5) * cellSize,
+        y: originY + (pt.r + 0.5) * cellSize
+      }));
+
+      if (progress <= 0) return { poly: origPts, tipDir: exitDir };
+
+      // Calculate segment lengths
+      const segLens = [];
+      let totalLength = 0;
+      for (let i = 0; i < origPts.length - 1; i++) {
+        const dist = Math.hypot(origPts[i+1].x - origPts[i].x, origPts[i+1].y - origPts[i].y);
+        segLens.push(dist);
+        totalLength += dist;
+      }
+
+      const travelDist = progress * (Math.max(cols, rows) * cellSize * 1.5);
+      const head = origPts[origPts.length - 1];
+
+      // New Head point travelling straight out along exitDir
+      const newHead = {
+        x: head.x + exitDir.dx * travelDist,
+        y: head.y + exitDir.dy * travelDist
+      };
+
+      // If tail has completely left the maze original segments
+      if (travelDist >= totalLength) {
+        const remainingLength = Math.max(0, totalLength - (travelDist - totalLength));
+        const tailX = newHead.x - exitDir.dx * remainingLength;
+        const tailY = newHead.y - exitDir.dy * remainingLength;
+        return {
+          poly: [{ x: tailX, y: tailY }, newHead],
+          tipDir: exitDir
+        };
+      }
+
+      // Tail moves forward along the bends (turns follow karti hai)
+      let advance = travelDist;
+      let startIdx = 0;
+      let newTail = origPts[0];
+
+      for (let i = 0; i < segLens.length; i++) {
+        if (advance >= segLens[i]) {
+          advance -= segLens[i];
+          startIdx = i + 1;
+        } else {
+          const ratio = advance / segLens[i];
+          newTail = {
+            x: origPts[i].x + (origPts[i+1].x - origPts[i].x) * ratio,
+            y: origPts[i].y + (origPts[i+1].y - origPts[i].y) * ratio
+          };
+          break;
+        }
+      }
+
+      const poly = [newTail];
+      for (let i = startIdx; i < origPts.length; i++) {
+        poly.push(origPts[i]);
+      }
+      poly.push(newHead);
+
+      return { poly, tipDir: exitDir };
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1031,7 +1097,7 @@
         }
       }
 
-      // Long-Press Preview Ray
+      // Preview Ray
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -1066,64 +1132,64 @@
         ctx.lineCap = 'round';
         ctx.lineJoin = 'miter';
 
-        let moveDist = 0;
-        if (arrow.state === 'moving') {
-          moveDist = arrow.progress * (Math.max(cols, rows) * cellSize * 1.5);
-        }
-
         let shakeX = 0;
         let shakeY = 0;
         if (arrow.shake > 0) {
           shakeX = Math.sin(arrow.shake * 12) * 3;
           arrow.shake -= 0.1;
         }
-
         ctx.translate(shakeX, shakeY);
 
-        // Path coordinates
-        const pts = arrow.points.map(pt => ({
-          x: originX + (pt.c + 0.5) * cellSize,
-          y: originY + (pt.r + 0.5) * cellSize
-        }));
-
-        // Move strictly straight out along exitDir
-        ctx.beginPath();
-        for (let i = 0; i < pts.length; i++) {
-          const px = pts[i].x + arrow.exitDir.dx * moveDist;
-          const py = pts[i].y + arrow.exitDir.dy * moveDist;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
+        // Snake tracking calculation
+        let snakeData;
+        if (arrow.state === 'moving') {
+          snakeData = getSnakePolyline(arrow.points, arrow.exitDir, arrow.progress);
+        } else {
+          snakeData = {
+            poly: arrow.points.map(pt => ({
+              x: originX + (pt.c + 0.5) * cellSize,
+              y: originY + (pt.r + 0.5) * cellSize
+            })),
+            tipDir: arrow.exitDir
+          };
         }
-        ctx.stroke();
 
-        // Tip arrowhead at the head point
-        const headPt = pts[pts.length - 1];
-        const hx = headPt.x + arrow.exitDir.dx * moveDist;
-        const hy = headPt.y + arrow.exitDir.dy * moveDist;
+        const poly = snakeData.poly;
 
-        const dx = arrow.exitDir.dx;
-        const dy = arrow.exitDir.dy;
-        const sz = 5.2;
+        if (poly.length >= 2) {
+          ctx.beginPath();
+          ctx.moveTo(poly[0].x, poly[0].y);
+          for (let i = 1; i < poly.length; i++) {
+            ctx.lineTo(poly[i].x, poly[i].y);
+          }
+          ctx.stroke();
 
-        ctx.beginPath();
-        if (dx === 1) { // Right
-          ctx.moveTo(hx - sz, hy - sz * 0.7);
-          ctx.lineTo(hx + 1, hy);
-          ctx.lineTo(hx - sz, hy + sz * 0.7);
-        } else if (dx === -1) { // Left
-          ctx.moveTo(hx + sz, hy - sz * 0.7);
-          ctx.lineTo(hx - 1, hy);
-          ctx.lineTo(hx + sz, hy + sz * 0.7);
-        } else if (dy === 1) { // Down
-          ctx.moveTo(hx - sz * 0.7, hy - sz);
-          ctx.lineTo(hx, hy + 1);
-          ctx.lineTo(hx + sz * 0.7, hy - sz);
-        } else if (dy === -1) { // Up
-          ctx.moveTo(hx - sz * 0.7, hy + sz);
-          ctx.lineTo(hx, hy - 1);
-          ctx.lineTo(hx + sz * 0.7, hy + sz);
+          // Arrowhead drawn strictly at the moving tip
+          const tip = poly[poly.length - 1];
+          const dx = arrow.exitDir.dx;
+          const dy = arrow.exitDir.dy;
+          const sz = 5.2;
+
+          ctx.beginPath();
+          if (dx === 1) {
+            ctx.moveTo(tip.x - sz, tip.y - sz * 0.7);
+            ctx.lineTo(tip.x + 1, tip.y);
+            ctx.lineTo(tip.x - sz, tip.y + sz * 0.7);
+          } else if (dx === -1) {
+            ctx.moveTo(tip.x + sz, tip.y - sz * 0.7);
+            ctx.lineTo(tip.x - 1, tip.y);
+            ctx.lineTo(tip.x + sz, tip.y + sz * 0.7);
+          } else if (dy === 1) {
+            ctx.moveTo(tip.x - sz * 0.7, tip.y - sz);
+            ctx.lineTo(tip.x, tip.y + 1);
+            ctx.lineTo(tip.x + sz * 0.7, tip.y - sz);
+          } else if (dy === -1) {
+            ctx.moveTo(tip.x - sz * 0.7, tip.y + sz);
+            ctx.lineTo(tip.x, tip.y - 1);
+            ctx.lineTo(tip.x + sz * 0.7, tip.y + sz);
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
 
         ctx.restore();
       });
@@ -1140,7 +1206,7 @@
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.08;
+          arrow.progress += 0.045; // Smooth realistic snake speed
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -1198,7 +1264,6 @@
       }
     }
 
-    // Smart Fast Tap Combo Engine (No lives lost on chained taps)
     function onPointerUp(e) {
       clearTimeout(longPressTimer);
       if (isGameOverOrWon) return;
@@ -1215,7 +1280,6 @@
 
       if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
         if (!isArrowBlocked(clicked)) {
-          // Free to escape immediately
           playSound('escape');
           clicked.state = 'moving';
           triggerAnimation();
@@ -1295,7 +1359,7 @@
         modalSubtitle.innerText = `Awesome! Level ${currentLevel} fully untangled.`;
         modalActionBtn.onclick = () => {
           currentLevel++;
-          lives = 3; // Har naye level par 3 hearts restore
+          lives = 3; // Har naye level par 3 hearts wapas milenge
           if (currentLevel > maxUnlockedLevel) {
             maxUnlockedLevel = currentLevel;
             localStorage.setItem('max_unlocked_level', maxUnlockedLevel);
