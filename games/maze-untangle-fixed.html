@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b0f19">
+<title>Maze Untangle — Master Puzzle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none}
+:root{--blue:#2563eb;--ink:#0f172a;--muted:#64748b}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0b0f19 url('https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg') center/cover fixed no-repeat;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+body:before{content:"";position:fixed;inset:0;background:#0b0f19b8;backdrop-filter:blur(4px)}
+#game{position:relative;z-index:1;width:min(100%,440px);height:min(100dvh,840px);min-height:420px;background:#fff;display:flex;flex-direction:column;overflow:hidden;border-radius:20px;box-shadow:0 20px 45px #0009}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:2px solid #f1f5f9;background:#fff;z-index:5}
+.brand{display:flex;align-items:center;gap:9px;min-width:0}.logo{width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--blue)}
+.info{min-width:0}.line{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.level{font-weight:850;font-size:15px;color:var(--ink)}.pill{font-size:9px;font-weight:850;text-transform:uppercase;padding:3px 6px;border-radius:6px;background:#eff6ff;color:var(--blue)}.shape{background:#f1f5f9;color:#64748b}
+.lives{display:flex;gap:4px;margin-top:4px}.heart{width:10px;height:10px;background:#ef4444;border-radius:50%}.heart.lost{opacity:.2;transform:scale(.75)}
+.right{display:flex;align-items:center;gap:6px}.timer{white-space:nowrap;border:1px solid #bbf7d0;background:#f0fdf4;color:#16a34a;border-radius:18px;padding:6px 8px;font-size:12px;font-weight:800}.iconbtn{width:34px;height:34px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:50%;font-size:17px;color:#475569}
+.menu{display:none;position:absolute;top:54px;right:12px;min-width:155px;padding:6px;background:white;border:1px solid #e2e8f0;border-radius:13px;box-shadow:0 10px 25px #0002;z-index:20}.menu.show{display:flex;flex-direction:column;gap:4px}.menu button{padding:10px;border:0;background:white;text-align:left;border-radius:8px;font-weight:700;color:#1e293b}
+#board-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:#fff;touch-action:none}canvas{display:block;touch-action:none;max-width:100%;max-height:100%}
+footer{text-align:center;padding:10px;font-size:10px;font-weight:850;letter-spacing:1.3px;color:#64748b;border-top:1px solid #f1f5f9}
+.modal{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:#0f172ab8;backdrop-filter:blur(4px);padding:16px}.modal.show{display:flex}.card{width:min(100%,350px);max-height:85%;overflow:auto;background:#fff;color:var(--ink);padding:22px 17px;border-radius:20px;text-align:center;box-shadow:0 15px 30px #0004}.card h2{font-size:22px;margin-bottom:6px}.card p{font-size:13px;color:#64748b;margin-bottom:15px}.stats{display:flex;justify-content:space-around;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:15px}.statlabel{display:block;font-size:10px;color:#64748b;font-weight:800;text-transform:uppercase}.statvalue{font-size:18px;color:#16a34a;font-weight:850}.primary{width:100%;border:0;background:var(--blue);color:white;border-radius:11px;padding:12px 15px;font-weight:800;font-size:15px}
+#levels-card{width:min(100%,380px)}.levelgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:50vh;overflow:auto;padding:5px;margin:8px 0 14px}.levelbox{aspect-ratio:1;border-radius:10px;border:2px solid transparent;font-weight:850;background:#f1f5f9;color:#94a3b8}.levelbox.open{background:#eff6ff;border-color:#bfdbfe;color:var(--blue)}.levelbox.current{background:var(--blue);color:#fff}.levelbox.locked{cursor:not-allowed}
+@media(max-height:560px){header{padding:6px 9px}.logo{width:32px;height:32px}footer{padding:6px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<div id="game">
+<header>
+  <div class="brand">
+    <img class="logo" src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/games/file_00000000a3f482088bfdca19f7851f75.png" alt="Game logo" onerror="this.style.display='none'">
+    <div class="info"><div class="line"><span class="level" id="level-label">Level 1</span><span class="pill" id="difficulty">Easy</span><span class="pill shape" id="shape-label">Square</span></div><div class="lives" id="lives"></div></div>
+  </div>
+  <div class="right"><div class="timer">⏱ <span id="timer">00:00</span></div><button class="iconbtn" id="music" aria-label="Toggle music">🎵</button><button class="iconbtn" id="menu-button" aria-label="Menu">⋮</button></div>
+  <div class="menu" id="menu"><button id="levels-button">📋 All Levels</button><button id="restart-button">🔄 Restart Level</button></div>
+</header>
+<div id="board-wrap"><canvas id="board" aria-label="Tap arrows to move them out of the puzzle"></canvas></div>
+<footer>TAP AN ARROW • UNTANGLE THE MAZE</footer>
+<div class="modal" id="result-modal"><div class="card"><h2 id="result-title">Level Cleared! 🎉</h2><p id="result-text">Great job!</p><div class="stats"><div><span class="statlabel">Time</span><span class="statvalue" id="time-stat">0s</span></div><div><span class="statlabel">Best record</span><span class="statvalue" id="best-stat">--</span></div></div><button class="primary" id="result-action">Next Level</button></div></div>
+<div class="modal" id="levels-modal"><div class="card" id="levels-card"><h2>Select Level</h2><p id="unlock-count">Unlocked: 1 / 5000</p><div class="levelgrid" id="level-grid"></div><button class="primary" id="close-levels">Close</button></div></div>
+</div>
+<audio id="bgm" loop preload="none"><source src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/ZIKR_by_Lasani_Sarkar(256k).mp3" type="audio/mpeg"></audio>
+<script>
+"use strict";
+(() => {
+const $=id=>document.getElementById(id);
+const canvas=$("board"),ctx=canvas.getContext("2d"),wrap=$("board-wrap");
+const bgm=$("bgm"),musicBtn=$("music");
+bgm.volume=.35;
+let musicOn=false, audioCtx=null, currentLevel=1, maxUnlocked=1, lives=3, seconds=0, timerId=null, raf=0;
+let arrows=[], cols=12, rows=16, cell=16, ox=0, oy=0, ended=false, preview=null, pressTimer=0, downAt=null;
+const SHAPES=["Square","Diamond","Circle","Cross","Triangle","Hexagon","Spiral","Zigzag","Key","Shield","Bottle","Lightning","Heart","Star","Labyrinth","Comb"];
+try { currentLevel=Math.max(1,Math.min(5000,parseInt(localStorage.getItem("saved_level"),10)||1)); maxUnlocked=Math.max(1,Math.min(5000,parseInt(localStorage.getItem("max_unlocked_level"),10)||1),currentLevel); } catch(e) {}
+function beep(type){
+ try {
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  if(!audioCtx)audioCtx=new AC();if(audioCtx.state==="suspended")audioCtx.resume();
+  const t=audioCtx.currentTime;
+  if(type==="win"){[523,659,784,1046].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=f;g.gain.setValueAtTime(.14,t+i*.09);g.gain.exponentialRampToValueAtTime(.001,t+i*.09+.22);o.start(t+i*.09);o.stop(t+i*.09+.23)});return}
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);
+  o.type=type==="hit"?"sawtooth":"sine";o.frequency.setValueAtTime(type==="hit"?140:450,t);o.frequency.exponentialRampToValueAtTime(type==="hit"?60:900,t+.13);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);o.start(t);o.stop(t+.16);
+ }catch(e){}
+}
+async function toggleMusic(){
+ if(!bgm.paused){bgm.pause();musicOn=false;musicBtn.textContent="🔇";return}
+ try{await bgm.play();musicOn=true;musicBtn.textContent="🎵"}catch(e){musicOn=false;musicBtn.textContent="🔇"}
+}
+musicBtn.addEventListener("click",toggleMusic);
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)|0;let t=Math.imul(s^(s>>>15),1|s);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296}}
+function config(lvl){
+ if(lvl<=100)return{tier:"Easy",color:"#22c55e",cols:12,rows:16,count:8+Math.min(6,Math.floor(lvl/15)),len:3};
+ if(lvl<=500)return{tier:"Normal",color:"#2563eb",cols:14,rows:18,count:15+Math.min(7,Math.floor((lvl-100)/40)),len:4};
+ if(lvl<=1500)return{tier:"Hard",color:"#ca8a04",cols:16,rows:22,count:22+Math.min(10,Math.floor((lvl-500)/60)),len:5};
+ if(lvl<=3000)return{tier:"Expert",color:"#f97316",cols:18,rows:24,count:30+Math.min(12,Math.floor((lvl-1500)/75)),len:6};
+ return{tier:"Master",color:"#ef4444",cols:20,rows:26,count:38+Math.min(14,Math.floor((lvl-3000)/90)),len:7};
+}
+function inShape(c,r,id,lvl){
+ const nx=((c-(cols-1)/2)/((cols-1)/2)),ny=((r-(rows-1)/2)/((rows-1)/2)),a=Math.atan2(ny,nx),w=1+.035*Math.sin(a*4+lvl*.17);
+ switch(id){
+ case 0:return Math.abs(nx)<.88&&Math.abs(ny)<.88;
+ case 1:return Math.abs(nx)+Math.abs(ny)<1.18;
+ case 2:return nx*nx+ny*ny<.91;
+ case 3:return(Math.abs(nx)<.38&&Math.abs(ny)<.9)||(Math.abs(nx)<.9&&Math.abs(ny)<.38);
+ case 4:return ny>-.85&&Math.abs(nx)<(ny+.88)*.58;
+ case 5:return Math.abs(ny)<.88&&Math.abs(nx)+Math.abs(ny)*.48<.92;
+ case 6:{let d=Math.hypot(nx,ny);return d<.92&&(d>.24||Math.abs(nx)<.4)}
+ case 7:return Math.abs(nx-Math.sin(ny*3.5+lvl)*.3)<.55;
+ case 8:{let d=Math.hypot(nx,ny+.45);return(d<.48&&d>.2)||(ny>-.15&&ny<.85&&Math.abs(nx)<.18)||(ny>.45&&ny<.78&&nx>.18&&nx<.55)}
+ case 9:return ny<0?Math.abs(nx)<.82*w:Math.abs(nx)<(.82-ny*.75)*w;
+ case 10:return ny<-.45?Math.abs(nx)<.22:Math.abs(nx)<.72*w&&ny<.86;
+ case 11:return ny<0?(nx>ny*.6-.4&&nx<ny*.6+.4):(nx>ny*.7-.2&&nx<ny*.7+.55);
+ case 12:{let x=nx*1.1,y=-ny*1.1+.2;return(x*x+y*y-1)**3-x*x*y**3<=.05}
+ case 13:return Math.hypot(nx,ny)<.54+.34*Math.cos(a*5+lvl%3);
+ case 14:return Math.abs(nx)<.88&&Math.abs(ny)<.88&&(Math.abs(nx)>.18||Math.abs(ny)>.18);
+ default:return nx>-.75&&nx<.75&&Math.abs(ny)<.8&&(r%2===0||nx<-.15);
+ }
+}
+function makePuzzle(lvl,cfg){
+ // Guaranteed-solvable construction: arrows point right in each row.
+ // Arrows further right can leave first; then arrows behind them become free.
+ const rand=rng(((lvl*1234567)^0x5DEECE66)>>>0), shape=(lvl-1)%SHAPES.length;
+ const out=[];let id=0;
+ for(let r=0;r<rows && out.length<cfg.count;r++){
+  let run=[];
+  const flush=()=>{
+   if(run.length<2)return;
+   let at=0;
+   while(at<run.length-1 && out.length<cfg.count){
+    const remaining=run.length-at;
+    const maxLen=Math.min(cfg.len,remaining);
+    if(maxLen<2)break;
+    const len=2+Math.floor(rand()*(maxLen-1));
+    const pts=run.slice(at,at+len).map(c=>({c,r}));
+    out.push({id:id++,points:pts,exitDir:{dx:1,dy:0},state:"idle",progress:0,shake:0});
+    at+=len;
+   }
+  };
+  for(let c=0;c<cols;c++){
+   if(inShape(c,r,shape,lvl))run.push(c);
+   else{flush();run=[];}
+  }
+  flush();
+ }
+ // If a narrow shape did not provide enough runs, fill with safe horizontal paths.
+ // This fallback also uses right-facing arrows, so the rightmost arrow always
+ // clears before arrows to its left.
+ if(out.length<Math.min(4,cfg.count)){
+  out.length=0;id=0;
+  for(let r=1;r<rows-1 && out.length<Math.min(cfg.count,rows-2);r+=2){
+   out.push({id:id++,points:[{c:1,r},{c:2,r},{c:3,r}],exitDir:{dx:1,dy:0},state:"idle",progress:0,shake:0});
+  }
+ }
+ return out;
+}
+function blocked(a){
+ const h=a.points[a.points.length-1],d=a.exitDir;
+ let c=h.c+d.dx,r=h.r+d.dy;
+ while(c>=0&&c<cols&&r>=0&&r<rows){
+  for(const b of arrows){if(b===a||b.state==="escaped")continue;if(b.points.some(p=>p.c===c&&p.r===r))return true}
+  c+=d.dx;r+=d.dy;
+ }
+ return false;
+}
+function resize(){
+ const w=wrap.clientWidth,h=wrap.clientHeight;if(!w||!h)return;
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ canvas.style.width=w+"px";canvas.style.height=h+"px";canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ cell=Math.max(7,Math.min((w-20)/cols,(h-20)/rows));ox=(w-cols*cell)/2;oy=(h-rows*cell)/2;draw();
+}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function updateUI(){
+ $("level-label").textContent="Level "+currentLevel;
+ const cfg=config(currentLevel);$("difficulty").textContent=cfg.tier;$("difficulty").style.color=cfg.color;
+ $("shape-label").textContent=SHAPES[(currentLevel-1)%SHAPES.length];
+ $("lives").innerHTML="";for(let i=0;i<3;i++){const h=document.createElement("span");h.className="heart"+(i>=lives?" lost":"");$("lives").appendChild(h)}
+}
+function draw(){
+ if(!ctx)return;const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
+ const shape=(currentLevel-1)%SHAPES.length,occupied=new Set();
+ arrows.forEach(a=>{if(a.state!=="escaped")a.points.forEach(p=>occupied.add(p.c+","+p.r))});
+ ctx.fillStyle="#e2e8f0";
+ for(let c=0;c<cols;c++)for(let r=0;r<rows;r++)if(inShape(c,r,shape,currentLevel)&&!occupied.has(c+","+r)){ctx.beginPath();ctx.arc(ox+(c+.5)*cell,oy+(r+.5)*cell,Math.max(1,cell*.075),0,Math.PI*2);ctx.fill()}
+ if(preview){const p=preview.points.at(-1);ctx.save();ctx.strokeStyle="#38bdf8";ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.beginPath();let x=ox+(p.c+.5)*cell,y=oy+(p.r+.5)*cell;ctx.moveTo(x,y);ctx.lineTo(x+preview.exitDir.dx*w,y+preview.exitDir.dy*h);ctx.stroke();ctx.restore()}
+ for(const a of arrows){if(a.state==="escaped")continue;
+  let color=a.state==="queued"?"#ef4444":a.state==="moving"?"#22c55e":"#0f172a";if(a===preview)color="#2563eb";
+  let dx=a.state==="moving"?a.exitDir.dx*a.progress*w:0,dy=a.state==="moving"?a.exitDir.dy*a.progress*h:0;
+  if(a.shake>0){dx+=Math.sin(a.shake*12)*3;a.shake=Math.max(0,a.shake-.1)}
+  ctx.save();ctx.translate(dx,dy);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=Math.max(1.7,cell*.14);ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();
+  a.points.forEach((p,i)=>{const x=ox+(p.c+.5)*cell,y=oy+(p.r+.5)*cell;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+  const p=a.points.at(-1),x=ox+(p.c+.5)*cell,y=oy+(p.r+.5)*cell,d=a.exitDir,s=Math.max(4,cell*.32);
+  ctx.beginPath();ctx.moveTo(x-d.dx*s-d.dy*s*.7,y-d.dy*s+d.dx*s*.7);ctx.lineTo(x+d.dx*1.2,y+d.dy*1.2);ctx.lineTo(x-d.dx*s+d.dy*s*.7,y-d.dy*s-d.dx*s*.7);ctx.stroke();ctx.restore();
+ }
+}
+function animate(){
+ let active=false;
+ for(const a of arrows){if(a.state==="moving"){a.progress+=.085;active=true;if(a.progress>=1.15){a.state="escaped";releaseQueued();checkWin()}}if(a.shake>0)active=true}
+ draw();if(active)raf=requestAnimationFrame(animate);else raf=0;
+}
+function animateStart(){if(!raf)raf=requestAnimationFrame(animate)}
+function releaseQueued(){for(const a of arrows)if(a.state==="queued"&&!blocked(a)){a.state="moving";beep("escape");animateStart()}}
+function stopTimer(){clearInterval(timerId);timerId=null}
+function startTimer(){stopTimer();timerId=setInterval(()=>{if(!ended){seconds++;$("timer").textContent=fmt(seconds)}},1000)}
+function generate(lvl){
+ if(raf)cancelAnimationFrame(raf);raf=0;stopTimer();ended=false;preview=null;seconds=0;$("timer").textContent="00:00";lives=3;
+ currentLevel=Math.max(1,Math.min(5000,lvl));const cfg=config(currentLevel);cols=cfg.cols;rows=cfg.rows;
+ arrows=makePuzzle(currentLevel,cfg);updateUI();resize();startTimer();
+ try{localStorage.setItem("saved_level",currentLevel)}catch(e){}
+}
+function openModal(el){el.classList.add("show")}function closeModal(el){el.classList.remove("show")}
+function bestKey(){return"best_time_lvl_"+currentLevel}
+function checkWin(){
+ if(ended||arrows.some(a=>a.state!=="escaped"))return;
+ ended=true;stopTimer();beep("win");
+ let best=seconds;try{const old=localStorage.getItem(bestKey());if(old!==null&&Number(old)<best)best=Number(old);localStorage.setItem(bestKey(),String(best))}catch(e){}
+ $("result-title").textContent="Level Cleared! 🎉";$("result-text").textContent="Awesome! Level "+currentLevel+" fully untangled.";
+ $("time-stat").textContent=seconds+"s";$("best-stat").textContent=best+"s";$("result-action").textContent=currentLevel>=5000?"Play from Level 1":"Next Level";
+ $("result-action").onclick=()=>{closeModal($("result-modal"));let next=currentLevel>=5000?1:currentLevel+1;maxUnlocked=Math.max(maxUnlocked,next);try{localStorage.setItem("max_unlocked_level",maxUnlocked)}catch(e){}generate(next)};openModal($("result-modal"));
+}
+function gameOver(){
+ ended=true;stopTimer();$("result-title").textContent="Out of Lives!";$("result-text").textContent="Don't give up! Try again to clear this maze.";
+ $("time-stat").textContent=seconds+"s";$("best-stat").textContent="--";$("result-action").textContent="Try Again";
+ $("result-action").onclick=()=>{closeModal($("result-modal"));generate(currentLevel)};openModal($("result-modal"));
+}
+function hitArrow(x,y){
+ const rect=canvas.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;let found=null,dist=Infinity;
+ for(const a of arrows){if(a.state==="escaped"||a.state==="moving")continue;for(const p of a.points){const d=Math.hypot(px-(ox+(p.c+.5)*cell),py-(oy+(p.r+.5)*cell));if(d<cell*.9&&d<dist){dist=d;found=a}}}
+ return found;
+}
+canvas.addEventListener("pointerdown",e=>{if(ended)return;downAt={x:e.clientX,y:e.clientY};const a=hitArrow(e.clientX,e.clientY);clearTimeout(pressTimer);if(a)pressTimer=setTimeout(()=>{preview=a;draw()},350)});
+canvas.addEventListener("pointerup",e=>{clearTimeout(pressTimer);if(ended)return;if(preview){preview=null;draw();return}if(!downAt||Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)>15)return;const a=hitArrow(e.clientX,e.clientY);if(!a)return;
+ if(blocked(a)){beep("hit");a.state="queued";a.shake=1;lives--;updateUI();if(lives<=0){draw();gameOver();return}}
+ else{a.state="moving";beep("escape")}
+ animateStart();draw();
+});
+canvas.addEventListener("pointercancel",()=>{clearTimeout(pressTimer);preview=null;draw()});
+$("menu-button").addEventListener("click",e=>{e.stopPropagation();$("menu").classList.toggle("show")});
+document.addEventListener("click",e=>{if(!$("menu").contains(e.target)&&e.target!==$("menu-button"))$("menu").classList.remove("show")});
+$("restart-button").addEventListener("click",()=>{$("menu").classList.remove("show");generate(currentLevel)});
+$("levels-button").addEventListener("click",()=>{
+ $("menu").classList.remove("show");const grid=$("level-grid");grid.innerHTML="";$("unlock-count").textContent="Unlocked: "+maxUnlocked+" / 5000";
+ const limit=Math.min(5000,Math.max(80,maxUnlocked+20));
+ for(let i=1;i<=limit;i++){const b=document.createElement("button");b.className="levelbox "+(i<=maxUnlocked?(i===currentLevel?"current":"open"):"locked");b.textContent=i<=maxUnlocked?i:"🔒";b.disabled=i>maxUnlocked;b.addEventListener("click",()=>{closeModal($("levels-modal"));generate(i)});grid.appendChild(b)}
+ openModal($("levels-modal"));
+});
+$("close-levels").addEventListener("click",()=>closeModal($("levels-modal")));
+window.addEventListener("resize",resize);
+generate(currentLevel);
+})();
+</script>
+</body>
+</html>
