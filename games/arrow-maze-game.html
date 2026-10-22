@@ -57,6 +57,7 @@
       border-bottom: 2px solid #f1f5f9;
       position: relative;
       z-index: 20;
+      flex-shrink: 0;
     }
     .header-left {
       display: flex;
@@ -192,15 +193,17 @@
 
     #canvas-wrap {
       flex: 1;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       background: #ffffff;
-      padding: 10px;
       touch-action: none;
+      overflow: hidden;
     }
     canvas {
+      display: block;
       touch-action: none;
       background: #ffffff;
     }
@@ -216,6 +219,7 @@
       background: #ffffff;
       border-top: 1px solid #f1f5f9;
       z-index: 20;
+      flex-shrink: 0;
     }
 
     .modal {
@@ -378,7 +382,6 @@
 
     <div class="footer">Tap Arrow • Untangle The Maze</div>
 
-    <!-- Victory Modal -->
     <div class="modal" id="gameModal">
       <div class="modal-card">
         <h2 id="modal-title">Level Cleared! 🎉</h2>
@@ -397,7 +400,6 @@
       </div>
     </div>
 
-    <!-- Levels Map Modal -->
     <div class="modal" id="levels-modal">
       <div class="modal-card">
         <h2>Select Level</h2>
@@ -409,7 +411,6 @@
   </div>
 
   <script>
-    // --- Audio Engine ---
     const bgm = document.getElementById('bgm');
     const musicBtn = document.getElementById('music-btn');
     let isMusicPlaying = false;
@@ -480,7 +481,6 @@
       }
     }
 
-    // --- State Variables ---
     let currentLevel = parseInt(localStorage.getItem('saved_level')) || 1;
     let maxUnlockedLevel = parseInt(localStorage.getItem('max_unlocked_level')) || 1;
     if (currentLevel > maxUnlockedLevel) maxUnlockedLevel = currentLevel;
@@ -524,7 +524,6 @@
     let originX = 0;
     let originY = 0;
 
-    // --- 16 Distinct Base Shapes ---
     const SHAPE_NAMES = [
       'Square', 'Diamond', 'Circle', 'Cross', 
       'Triangle', 'Hexagon', 'Spiral', 'Zigzag', 
@@ -584,22 +583,23 @@
       levelsModal.style.display = 'none';
     });
 
+    // Drift-Proof Canvas Resize (Maze hamesha center me rahega)
     function resizeCanvas() {
       const wrap = document.getElementById('canvas-wrap');
-      const w = wrap.clientWidth;
-      const h = wrap.clientHeight;
+      const w = wrap.clientWidth || 360;
+      const h = wrap.clientHeight || 520;
       canvas.width = w;
       canvas.height = h;
 
-      cellSize = Math.min((w - 20) / cols, (h - 20) / rows);
-      originX = (w - (cols * cellSize)) / 2;
-      originY = (h - (rows * cellSize)) / 2;
+      const margin = 20;
+      cellSize = Math.floor(Math.min((w - margin * 2) / cols, (h - margin * 2) / rows));
+      originX = Math.floor((w - cols * cellSize) / 2);
+      originY = Math.floor((h - rows * cellSize) / 2);
 
       draw();
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // --- Deterministic Mulberry32 PRNG ---
     function createPRNG(seed) {
       let s = seed >>> 0;
       return function() {
@@ -617,71 +617,65 @@
       return `${m}:${sec}`;
     }
 
-    // --- Procedural Shape Masks with Dynamic Proportions ---
     function isCellInShape(c, r, shapeId, lvl) {
       const cx = (cols - 1) / 2;
       const cy = (rows - 1) / 2;
-      
-      // Systematic structural modifications based on level
       const stretchX = 1.0 + (((lvl * 17) % 7) - 3) * 0.035;
       const stretchY = 1.0 + (((lvl * 29) % 7) - 3) * 0.035;
       const nx = ((c - cx) / cx) * stretchX;
       const ny = ((r - cy) / cy) * stretchY;
-
-      // Asymmetric boundary perturber
       const angle = Math.atan2(ny, nx);
       const wobble = 1.0 + 0.05 * Math.sin(angle * 4 + lvl);
 
       switch(shapeId) {
-        case 0: // Square with edge modifications
+        case 0:
           return Math.abs(nx) <= (0.86 * wobble) && Math.abs(ny) <= (0.86 * wobble);
-        case 1: // Diamond
+        case 1:
           return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.08 * wobble);
-        case 2: // Circle / Ellipse
+        case 2:
           return (nx * nx + ny * ny) <= (0.82 * wobble);
-        case 3: // Cross
+        case 3:
           return (Math.abs(nx) <= 0.38 && Math.abs(ny) <= 0.9) || (Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.38);
-        case 4: // Triangle
+        case 4:
           return ny >= -0.85 && (Math.abs(nx) <= (ny + 0.88) * 0.58 * wobble);
-        case 5: // Hexagon
+        case 5:
           return Math.abs(ny) <= 0.88 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.9 * wobble);
-        case 6: // Spiral
+        case 6:
           const rDist = Math.hypot(nx, ny);
           return rDist <= 0.9 && (rDist >= 0.22 || Math.abs(nx) <= 0.4);
-        case 7: // Zigzag Channel
+        case 7:
           return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.32) <= 0.54;
-        case 8: // Key
+        case 8:
           const keyHead = Math.hypot(nx, ny + 0.45);
           if (keyHead <= 0.48 && keyHead >= 0.2) return true;
           if (ny >= -0.15 && ny <= 0.85 && Math.abs(nx) <= 0.18) return true;
           if (ny >= 0.45 && ny <= 0.78 && nx > 0.18 && nx <= 0.55) return true;
           return false;
-        case 9: // Shield
+        case 9:
           if (ny < 0) return Math.abs(nx) <= (0.82 * wobble);
           return Math.abs(nx) <= ((0.82 - ny * 0.75) * wobble);
-        case 10: // Bottle
+        case 10:
           if (ny < -0.45) return Math.abs(nx) <= 0.22;
           return Math.abs(nx) <= (0.75 * wobble) && ny <= 0.85;
-        case 11: // Lightning Bolt
+        case 11:
           if (ny < 0) return nx >= ny * 0.6 - 0.4 && nx <= ny * 0.6 + 0.4;
           return nx >= ny * 0.7 - 0.2 && nx <= ny * 0.7 + 0.55;
-        case 12: // Heart
+        case 12:
           const hx = nx * 1.1;
           const hy = -ny * 1.1 + 0.2;
           return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.05;
-        case 13: // Star
+        case 13:
           const rad = Math.hypot(nx, ny);
           const starRadius = 0.54 + 0.34 * Math.cos(angle * 5 + (lvl % 3));
           return rad <= starRadius;
-        case 14: // Labyrinth / Irregular Hollow
+        case 14:
           return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88 && (Math.abs(nx) > 0.18 || Math.abs(ny) > 0.18);
-        case 15: // Asymmetric Comb
+        case 15:
         default:
           return (nx >= -0.75 && nx <= 0.75 && Math.abs(ny) <= 0.8) && (r % 2 === 0 || nx <= -0.15);
       }
     }
 
-    // --- Difficulty Tuning Matrix ---
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
@@ -751,7 +745,6 @@
       }
     }
 
-    // --- High-Speed Bit-Packed Collision Engine ---
     function checkRaycastBlocked(arrow, activeArrows) {
       const head = arrow.points[arrow.points.length - 1];
       const d = arrow.exitDir;
@@ -778,7 +771,6 @@
       return checkRaycastBlocked(arrow, arrows);
     }
 
-    // --- Topological Dependency Solver & Metric Profiler ---
     function evaluatePuzzleMetrics(candidateArrows) {
       const simList = candidateArrows.map(a => ({
         id: a.id,
@@ -810,9 +802,8 @@
         depth++;
       }
 
-      const isSolvable = (escapedCount === candidateArrows.length);
       return {
-        isSolvable,
+        isSolvable: (escapedCount === candidateArrows.length),
         depth,
         initialFree,
         total: candidateArrows.length,
@@ -820,7 +811,6 @@
       };
     }
 
-    // --- Deterministic Grid Synthesis ---
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -833,7 +823,6 @@
         }
       }
 
-      // Fisher-Yates shuffle
       for (let i = validCells.length - 1; i > 0; i--) {
         const j = Math.floor(prng() * (i + 1));
         const temp = validCells[i];
@@ -842,10 +831,10 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 }, // UP
-        { dx: 1, dy: 0 },  // RIGHT
-        { dx: 0, dy: 1 },  // DOWN
-        { dx: -1, dy: 0 }  // LEFT
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 }
       ];
 
       const candidates = [];
@@ -891,7 +880,6 @@
         if (path.length >= 2) {
           const tail = path[path.length - 2];
           const head = path[path.length - 1];
-          // Exit vector locked strictly to terminal trajectory
           const exitDir = {
             dx: Math.sign(head.c - tail.c),
             dy: Math.sign(head.r - tail.r)
@@ -914,7 +902,6 @@
       return candidates;
     }
 
-    // --- Pure Deterministic Level Generator ---
     function generateLevel(lvl) {
       if (animFrameId) {
         cancelAnimationFrame(animFrameId);
@@ -940,8 +927,6 @@
       let validPuzzleFound = false;
       let generatedArrows = [];
       let attempt = 0;
-
-      // Seed uniquely derived from level number
       let baseSeed = ((lvl * 1234567) ^ 0x5DEECE66) >>> 0;
 
       while (!validPuzzleFound && attempt < 80) {
@@ -950,7 +935,6 @@
 
         if (candidates.length >= diff.minArrows) {
           const metrics = evaluatePuzzleMetrics(candidates);
-          // Strict Solvability + Strict Depth Validation
           if (
             metrics.isSolvable &&
             metrics.depth >= diff.minDepth &&
@@ -965,7 +949,6 @@
         attempt++;
       }
 
-      // Tier-Preserving Fallback
       if (!validPuzzleFound) {
         let fallbackAttempt = 0;
         while (!validPuzzleFound && fallbackAttempt < 50) {
@@ -1020,7 +1003,62 @@
       if (released) triggerAnimation();
     }
 
-    // --- High Fidelity Rendering Engine ---
+    // --- Snake / Pipe Following Extraction Logic ---
+    function computeShiftedPolyline(points, exitDir, progress) {
+      // Har point ko path ke sath interpolate karke bahar slide karta hai
+      const poly = points.map(pt => ({
+        x: originX + (pt.c + 0.5) * cellSize,
+        y: originY + (pt.r + 0.5) * cellSize
+      }));
+
+      if (progress <= 0) return poly;
+
+      // Distance in pixels
+      const totalMove = progress * (Math.max(cols, rows) * cellSize * 1.5);
+      const head = poly[poly.length - 1];
+      
+      // Extension line bahar ki taraf
+      const extendedHead = {
+        x: head.x + exitDir.dx * totalMove,
+        y: head.y + exitDir.dy * totalMove
+      };
+
+      // Segments calculation
+      const segLengths = [];
+      let totalLen = 0;
+      for (let i = 0; i < poly.length - 1; i++) {
+        const d = Math.hypot(poly[i+1].x - poly[i].x, poly[i+1].y - poly[i].y);
+        segLengths.push(d);
+        totalLen += d;
+      }
+
+      // Truncate tail based on movement
+      let cutDist = totalMove;
+      let startIndex = 0;
+      let startPoint = poly[0];
+
+      for (let i = 0; i < segLengths.length; i++) {
+        if (cutDist >= segLengths[i]) {
+          cutDist -= segLengths[i];
+          startIndex = i + 1;
+        } else {
+          const ratio = cutDist / segLengths[i];
+          startPoint = {
+            x: poly[i].x + (poly[i+1].x - poly[i].x) * ratio,
+            y: poly[i].y + (poly[i+1].y - poly[i].y) * ratio
+          };
+          break;
+        }
+      }
+
+      const result = [startPoint];
+      for (let i = startIndex + 1; i < poly.length; i++) {
+        result.push(poly[i]);
+      }
+      result.push(extendedHead);
+      return result;
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1032,7 +1070,7 @@
         }
       });
 
-      // Cleared Area Dot Matrix
+      // Dot Matrix
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
@@ -1046,7 +1084,7 @@
         }
       }
 
-      // Long-Press Preview Ray
+      // Preview Ray
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -1065,7 +1103,7 @@
         ctx.restore();
       }
 
-      // Render Interlocking Arrows
+      // Draw Arrows with True Sequential Path Following
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
@@ -1081,58 +1119,51 @@
         ctx.lineCap = 'round';
         ctx.lineJoin = 'miter';
 
-        let offsetX = 0;
-        let offsetY = 0;
-        if (arrow.state === 'moving') {
-          offsetX = arrow.exitDir.dx * arrow.progress * canvas.width;
-          offsetY = arrow.exitDir.dy * arrow.progress * canvas.height;
-        }
+        let shakeX = 0;
+        let shakeY = 0;
         if (arrow.shake > 0) {
-          offsetX += Math.sin(arrow.shake * 12) * 3;
+          shakeX = Math.sin(arrow.shake * 12) * 3;
           arrow.shake -= 0.1;
         }
 
-        ctx.translate(offsetX, offsetY);
+        ctx.translate(shakeX, shakeY);
 
-        // Path Corridor
-        ctx.beginPath();
-        for (let i = 0; i < arrow.points.length; i++) {
-          const pt = arrow.points[i];
-          const px = originX + (pt.c + 0.5) * cellSize;
-          const py = originY + (pt.r + 0.5) * cellSize;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
+        // Path Calculation
+        let poly;
+        if (arrow.state === 'moving') {
+          poly = computeShiftedPolyline(arrow.points, arrow.exitDir, arrow.progress);
+        } else {
+          poly = arrow.points.map(pt => ({
+            x: originX + (pt.c + 0.5) * cellSize,
+            y: originY + (pt.r + 0.5) * cellSize
+          }));
         }
-        ctx.stroke();
 
-        // Directionally Aligned Arrowhead
-        const head = arrow.points[arrow.points.length - 1];
-        const hx = originX + (head.c + 0.5) * cellSize;
-        const hy = originY + (head.r + 0.5) * cellSize;
+        // Draw Line
+        if (poly.length >= 2) {
+          ctx.beginPath();
+          ctx.moveTo(poly[0].x, poly[0].y);
+          for (let i = 1; i < poly.length; i++) {
+            ctx.lineTo(poly[i].x, poly[i].y);
+          }
+          ctx.stroke();
 
-        const dx = arrow.exitDir.dx;
-        const dy = arrow.exitDir.dy;
-        const sz = 5.2;
+          // Arrowhead strictly at the tip
+          const tip = poly[poly.length - 1];
+          const prev = poly[poly.length - 2];
+          const angle = Math.atan2(tip.y - prev.y, tip.x - prev.x);
+          const sz = 5.2;
 
-        ctx.beginPath();
-        if (dx === 1) { // Right
-          ctx.moveTo(hx - sz, hy - sz * 0.7);
-          ctx.lineTo(hx + 1, hy);
-          ctx.lineTo(hx - sz, hy + sz * 0.7);
-        } else if (dx === -1) { // Left
-          ctx.moveTo(hx + sz, hy - sz * 0.7);
-          ctx.lineTo(hx - 1, hy);
-          ctx.lineTo(hx + sz, hy + sz * 0.7);
-        } else if (dy === 1) { // Down
-          ctx.moveTo(hx - sz * 0.7, hy - sz);
-          ctx.lineTo(hx, hy + 1);
-          ctx.lineTo(hx + sz * 0.7, hy - sz);
-        } else if (dy === -1) { // Up
-          ctx.moveTo(hx - sz * 0.7, hy + sz);
-          ctx.lineTo(hx, hy - 1);
-          ctx.lineTo(hx + sz * 0.7, hy + sz);
+          ctx.save();
+          ctx.translate(tip.x, tip.y);
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.moveTo(-sz, -sz * 0.7);
+          ctx.lineTo(1.5, 0);
+          ctx.lineTo(-sz, sz * 0.7);
+          ctx.stroke();
+          ctx.restore();
         }
-        ctx.stroke();
 
         ctx.restore();
       });
@@ -1149,7 +1180,7 @@
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.09;
+          arrow.progress += 0.055; // Smooth realistic exit speed
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -1169,7 +1200,6 @@
       }
     }
 
-    // --- Unified Pointer Input Handling ---
     function getTouchedArrow(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const px = clientX - rect.left;
@@ -1250,7 +1280,6 @@
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerCancel);
 
-    // --- Win & Game Over Modal Triggers ---
     function checkWinCondition() {
       if (isGameOverOrWon) return;
       const remaining = arrows.filter(a => a.state !== 'escaped');
@@ -1300,7 +1329,7 @@
       gameModal.style.display = 'flex';
     }
 
-    // Launch Game at Saved Level
+    // Initialize Game
     generateLevel(currentLevel);
   </script>
 </body>
