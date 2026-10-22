@@ -506,10 +506,10 @@
           <div class="rules-section-title">🎮 Gameplay Rules</div>
           <ul class="rules-list">
             <li><strong>Arrow Escape:</strong> Arrowhead jis taraf ishara karega, arrow usi direction me bahar niklega.</li>
-            <li><strong>Snake Motion:</strong> L-shape ya turns wale arrows seedhe track par follow karte huye smoothly bahar nikalte hain.</li>
-            <li><strong>Fast Combo Tap:</strong> Agar aage wala arrow nikal raha ho aur aap fauran peeche wale par tap karein, toh <strong>Life/Heart zaya nahi hoga</strong> aur dono arrows baari baari nikal jayenge.</li>
-            <li><strong>Long Press Preview:</strong> Kisi bhi arrow par thori der press karke rakhein toh uska bahar nikalne ka rasta blue line se highlight hoga.</li>
-            <li><strong>3 Hearts:</strong> Har naye level par 3 Hearts wapas milenge. Wrong tap se heart kam hota hai.</li>
+            <li><strong>Snake Motion:</strong> Turns wale arrows track follow karte huye smooth bahar nikalte hain.</li>
+            <li><strong>Wall Bump:</strong> Blocked arrow tap karne par saamne takra kar wapas aayega.</li>
+            <li><strong>Fast Combo Tap:</strong> Aage wale arrow ke peeche turant tap karne par bina life gawaye arrow queue ho jayega.</li>
+            <li><strong>3 Hearts:</strong> Har naye level par 3 Hearts reset milenge.</li>
           </ul>
         </div>
 
@@ -749,54 +749,54 @@
 
       switch(shapeId) {
         case 0:
-          return Math.abs(nx) <= (0.88 * wobble) && Math.abs(ny) <= (0.88 * wobble);
+          return Math.abs(nx) <= (0.92 * wobble) && Math.abs(ny) <= (0.92 * wobble);
         case 1:
-          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.12 * wobble);
+          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.15 * wobble);
         case 2:
-          return (nx * nx + ny * ny) <= (0.85 * wobble);
+          return (nx * nx + ny * ny) <= (0.90 * wobble);
         case 3:
-          return (Math.abs(nx) <= 0.4 && Math.abs(ny) <= 0.92) || (Math.abs(nx) <= 0.92 && Math.abs(ny) <= 0.4);
+          return (Math.abs(nx) <= 0.42 && Math.abs(ny) <= 0.94) || (Math.abs(nx) <= 0.94 && Math.abs(ny) <= 0.42);
         case 4:
-          return ny >= -0.88 && (Math.abs(nx) <= (ny + 0.9) * 0.62 * wobble);
+          return ny >= -0.9 && (Math.abs(nx) <= (ny + 0.92) * 0.65 * wobble);
         case 5:
-          return Math.abs(ny) <= 0.9 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.92 * wobble);
+          return Math.abs(ny) <= 0.92 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.95 * wobble);
         case 6:
           const rDist = Math.hypot(nx, ny);
-          return rDist <= 0.92 && (rDist >= 0.18 || Math.abs(nx) <= 0.45);
+          return rDist <= 0.95 && (rDist >= 0.16 || Math.abs(nx) <= 0.48);
         case 7:
-          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.35) <= 0.58;
+          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.35) <= 0.62;
         case 8:
           const keyHead = Math.hypot(nx, ny + 0.45);
-          if (keyHead <= 0.5 && keyHead >= 0.18) return true;
-          if (ny >= -0.15 && ny <= 0.88 && Math.abs(nx) <= 0.2) return true;
-          if (ny >= 0.45 && ny <= 0.8 && nx > 0.18 && nx <= 0.6) return true;
+          if (keyHead <= 0.52 && keyHead >= 0.16) return true;
+          if (ny >= -0.15 && ny <= 0.90 && Math.abs(nx) <= 0.22) return true;
+          if (ny >= 0.45 && ny <= 0.82 && nx > 0.18 && nx <= 0.65) return true;
           return false;
         case 9:
-          if (ny < 0) return Math.abs(nx) <= (0.85 * wobble);
-          return Math.abs(nx) <= ((0.85 - ny * 0.75) * wobble);
+          if (ny < 0) return Math.abs(nx) <= (0.88 * wobble);
+          return Math.abs(nx) <= ((0.88 - ny * 0.75) * wobble);
         case 10:
-          if (ny < -0.45) return Math.abs(nx) <= 0.25;
-          return Math.abs(nx) <= (0.78 * wobble) && ny <= 0.88;
+          if (ny < -0.45) return Math.abs(nx) <= 0.26;
+          return Math.abs(nx) <= (0.80 * wobble) && ny <= 0.90;
         case 11:
-          if (ny < 0) return nx >= ny * 0.6 - 0.45 && nx <= ny * 0.6 + 0.45;
-          return nx >= ny * 0.7 - 0.25 && nx <= ny * 0.7 + 0.6;
+          if (ny < 0) return nx >= ny * 0.6 - 0.48 && nx <= ny * 0.6 + 0.48;
+          return nx >= ny * 0.7 - 0.25 && nx <= ny * 0.7 + 0.65;
         case 12:
           const hx = nx * 1.1;
           const hy = -ny * 1.1 + 0.2;
-          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.08;
+          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.1;
         case 13:
           const rad = Math.hypot(nx, ny);
-          const starRadius = 0.58 + 0.35 * Math.cos(angle * 5 + (lvl % 3));
+          const starRadius = 0.60 + 0.35 * Math.cos(angle * 5 + (lvl % 3));
           return rad <= starRadius;
         case 14:
-          return Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.9 && (Math.abs(nx) > 0.15 || Math.abs(ny) > 0.15);
+          return Math.abs(nx) <= 0.92 && Math.abs(ny) <= 0.92 && (Math.abs(nx) > 0.12 || Math.abs(ny) > 0.12);
         case 15:
         default:
-          return (nx >= -0.8 && nx <= 0.8 && Math.abs(ny) <= 0.85) && (r % 2 === 0 || nx <= -0.1);
+          return (nx >= -0.85 && nx <= 0.85 && Math.abs(ny) <= 0.88) && (r % 2 === 0 || nx <= -0.08);
       }
     }
 
-    // High Density Settings (Maze Full Packed)
+    // Dense Difficulty Progression
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
@@ -806,10 +806,10 @@
           rows: 18,
           maxLen: 7,
           turnChance: 0.38,
-          minArrows: 16,
-          maxArrows: 28,
+          minArrows: Math.min(20 + Math.floor(lvl / 6), 34),
+          maxArrows: 42,
           minDepth: 2,
-          maxInitialFreeRatio: 0.65
+          maxInitialFreeRatio: 0.60
         };
       } else if (lvl <= 500) {
         return {
@@ -819,10 +819,10 @@
           rows: 20,
           maxLen: 8,
           turnChance: 0.42,
-          minArrows: 24,
-          maxArrows: 38,
+          minArrows: Math.min(30 + Math.floor((lvl - 100) / 20), 45),
+          maxArrows: 52,
           minDepth: 3,
-          maxInitialFreeRatio: 0.50
+          maxInitialFreeRatio: 0.45
         };
       } else if (lvl <= 1500) {
         return {
@@ -832,10 +832,10 @@
           rows: 22,
           maxLen: 9,
           turnChance: 0.45,
-          minArrows: 30,
-          maxArrows: 46,
+          minArrows: Math.min(38 + Math.floor((lvl - 500) / 40), 55),
+          maxArrows: 62,
           minDepth: 4,
-          maxInitialFreeRatio: 0.40
+          maxInitialFreeRatio: 0.35
         };
       } else if (lvl <= 3000) {
         return {
@@ -845,10 +845,10 @@
           rows: 24,
           maxLen: 10,
           turnChance: 0.50,
-          minArrows: 38,
-          maxArrows: 54,
+          minArrows: Math.min(46 + Math.floor((lvl - 1500) / 50), 65),
+          maxArrows: 72,
           minDepth: 5,
-          maxInitialFreeRatio: 0.32
+          maxInitialFreeRatio: 0.28
         };
       } else {
         return {
@@ -858,10 +858,10 @@
           rows: 26,
           maxLen: 11,
           turnChance: 0.54,
-          minArrows: 46,
-          maxArrows: 65,
+          minArrows: Math.min(54 + Math.floor((lvl - 3000) / 60), 75),
+          maxArrows: 85,
           minDepth: 6,
-          maxInitialFreeRatio: 0.25
+          maxInitialFreeRatio: 0.22
         };
       }
     }
@@ -932,7 +932,7 @@
       };
     }
 
-    // Dense corridor generator - Fills 80%+ of valid shape cells
+    // High Density synthesis (fills 85%+ available cells)
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -953,10 +953,10 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 },
-        { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 },
-        { dx: -1, dy: 0 }
+        { dx: 0, dy: -1 }, // UP
+        { dx: 1, dy: 0 },  // RIGHT
+        { dx: 0, dy: 1 },  // DOWN
+        { dx: -1, dy: 0 }  // LEFT
       ];
 
       const candidates = [];
@@ -973,7 +973,7 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        const isSuperLong = prng() < 0.32;
+        const isSuperLong = prng() < 0.35;
         const targetLen = isSuperLong 
           ? Math.floor(prng() * 4) + (diff.maxLen - 2) 
           : Math.floor(prng() * 3) + 2;
@@ -1014,8 +1014,9 @@
             id: arrowId,
             points: path,
             exitDir: exitDir,
-            state: 'idle',
+            state: 'idle', // idle, moving, bump, queued, escaped
             progress: 0,
+            bumpProgress: 0,
             shake: 0
           });
           arrowId++;
@@ -1128,7 +1129,7 @@
       if (released) triggerAnimation();
     }
 
-    // Snake Follow Engine (Smooth Track Unroll)
+    // Snake Follow Path Calculation
     function getSnakePolyline(points, exitDir, progress) {
       const origPts = points.map(pt => ({
         x: originX + (pt.c + 0.5) * cellSize,
@@ -1201,7 +1202,7 @@
         }
       });
 
-      // Dot Matrix
+      // Cleared Area Dot Matrix
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
@@ -1239,7 +1240,7 @@
         if (arrow.state === 'escaped') return;
 
         let strokeColor = '#0f172a';
-        if (arrow.state === 'queued') strokeColor = '#ef4444';
+        if (arrow.state === 'bump' || arrow.state === 'queued') strokeColor = '#ef4444';
         if (arrow.state === 'moving') strokeColor = '#22c55e';
         if (arrow === previewArrow) strokeColor = '#2563eb';
 
@@ -1256,7 +1257,15 @@
           shakeX = Math.sin(arrow.shake * 12) * 3;
           arrow.shake -= 0.1;
         }
-        ctx.translate(shakeX, shakeY);
+
+        // Bump Displacement (Runs forward into obstacle, then bounces back)
+        let bumpDist = 0;
+        if (arrow.state === 'bump') {
+          // Sine curve: 0 -> peak (cellSize * 0.45) -> 0
+          bumpDist = Math.sin(arrow.bumpProgress * Math.PI) * (cellSize * 0.45);
+        }
+
+        ctx.translate(shakeX + arrow.exitDir.dx * bumpDist, shakeY + arrow.exitDir.dy * bumpDist);
 
         let snakeData;
         if (arrow.state === 'moving') {
@@ -1281,7 +1290,7 @@
           }
           ctx.stroke();
 
-          // Arrowhead drawn strictly at the moving tip
+          // Arrowhead strictly at tip
           const tip = poly[poly.length - 1];
           const dx = arrow.exitDir.dx;
           const dy = arrow.exitDir.dy;
@@ -1318,13 +1327,14 @@
       }
     }
 
-    // Smooth extraction speed (Clear visual feedback)
+    // Ultra-Smooth Animation Loop
     function animate() {
       let active = false;
 
       arrows.forEach(arrow => {
+        // Escape motion (Slow, smooth & crystal clear)
         if (arrow.state === 'moving') {
-          arrow.progress += 0.026; // Smooth, cinematic speed
+          arrow.progress += 0.019; // Ultra-smooth slow speed
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -1332,6 +1342,17 @@
             checkWinCondition();
           }
         }
+
+        // Bump & Rebound collision animation
+        if (arrow.state === 'bump') {
+          arrow.bumpProgress += 0.085;
+          active = true;
+          if (arrow.bumpProgress >= 1.0) {
+            arrow.bumpProgress = 0;
+            arrow.state = 'queued'; // Settle back to queue
+          }
+        }
+
         if (arrow.shake > 0) active = true;
       });
 
@@ -1396,13 +1417,14 @@
 
       const clicked = getTouchedArrow(e.clientX, e.clientY);
 
-      if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
+      if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped' && clicked.state !== 'bump') {
         if (!isArrowBlocked(clicked)) {
+          // Free path -> slide out
           playSound('escape');
           clicked.state = 'moving';
           triggerAnimation();
         } else {
-          // Check if blocking obstacle is ALREADY moving/escaping
+          // Check if blocking arrow is already leaving
           const head = clicked.points[clicked.points.length - 1];
           const d = clicked.exitDir;
           let checkC = head.c + d.dx;
@@ -1425,14 +1447,15 @@
           }
 
           if (isDirectBlockerLeaving) {
-            // Fast tap combo: Queue cleanly without losing life
+            // Fast combo tap -> queue smoothly without penalty
             clicked.state = 'queued';
             playSound('escape');
             triggerAnimation();
           } else {
-            // Real wrong tap -> shake, lose life, queue
+            // Collision Bump & Rebound -> moves forward, hits wall, bounces back!
             playSound('hit');
-            clicked.state = 'queued';
+            clicked.state = 'bump';
+            clicked.bumpProgress = 0;
             clicked.shake = 1.0;
             lives--;
             updateUI();
@@ -1477,7 +1500,7 @@
         modalSubtitle.innerText = `Awesome! Level ${currentLevel} fully untangled.`;
         modalActionBtn.onclick = () => {
           currentLevel++;
-          lives = 3;
+          lives = 3; // Har naye level par 3 hearts wapas
           if (currentLevel > maxUnlockedLevel) {
             maxUnlockedLevel = currentLevel;
             localStorage.setItem('max_unlocked_level', maxUnlockedLevel);
