@@ -319,10 +319,6 @@
       color: #2563eb;
       border-color: #bfdbfe;
     }
-    .level-box.unlocked:active {
-      background: #2563eb;
-      color: #fff;
-    }
     .level-box.current {
       background: #2563eb;
       color: #ffffff;
@@ -567,7 +563,7 @@
             currentLevel = i;
             localStorage.setItem('saved_level', currentLevel);
             levelsModal.style.display = 'none';
-            lives = 3;
+            lives = 3; // Reset lives on selecting level
             generateLevel(currentLevel);
           };
         } else {
@@ -583,7 +579,6 @@
       levelsModal.style.display = 'none';
     });
 
-    // Drift-Proof Canvas Resize (Maze hamesha center me rahega)
     function resizeCanvas() {
       const wrap = document.getElementById('canvas-wrap');
       const w = wrap.clientWidth || 360;
@@ -591,7 +586,7 @@
       canvas.width = w;
       canvas.height = h;
 
-      const margin = 20;
+      const margin = 16;
       cellSize = Math.floor(Math.min((w - margin * 2) / cols, (h - margin * 2) / rows));
       originX = Math.floor((w - cols * cellSize) / 2);
       originY = Math.floor((h - rows * cellSize) / 2);
@@ -629,79 +624,80 @@
 
       switch(shapeId) {
         case 0:
-          return Math.abs(nx) <= (0.86 * wobble) && Math.abs(ny) <= (0.86 * wobble);
+          return Math.abs(nx) <= (0.88 * wobble) && Math.abs(ny) <= (0.88 * wobble);
         case 1:
-          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.08 * wobble);
+          return (Math.abs(nx) * 1.15 + Math.abs(ny) * 1.15) <= (1.12 * wobble);
         case 2:
-          return (nx * nx + ny * ny) <= (0.82 * wobble);
+          return (nx * nx + ny * ny) <= (0.85 * wobble);
         case 3:
-          return (Math.abs(nx) <= 0.38 && Math.abs(ny) <= 0.9) || (Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.38);
+          return (Math.abs(nx) <= 0.4 && Math.abs(ny) <= 0.92) || (Math.abs(nx) <= 0.92 && Math.abs(ny) <= 0.4);
         case 4:
-          return ny >= -0.85 && (Math.abs(nx) <= (ny + 0.88) * 0.58 * wobble);
+          return ny >= -0.88 && (Math.abs(nx) <= (ny + 0.9) * 0.62 * wobble);
         case 5:
-          return Math.abs(ny) <= 0.88 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.9 * wobble);
+          return Math.abs(ny) <= 0.9 && (Math.abs(nx) + Math.abs(ny) * 0.48 <= 0.92 * wobble);
         case 6:
           const rDist = Math.hypot(nx, ny);
-          return rDist <= 0.9 && (rDist >= 0.22 || Math.abs(nx) <= 0.4);
+          return rDist <= 0.92 && (rDist >= 0.18 || Math.abs(nx) <= 0.45);
         case 7:
-          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.32) <= 0.54;
+          return Math.abs(nx - Math.sin(ny * 3.5 + lvl) * 0.35) <= 0.58;
         case 8:
           const keyHead = Math.hypot(nx, ny + 0.45);
-          if (keyHead <= 0.48 && keyHead >= 0.2) return true;
-          if (ny >= -0.15 && ny <= 0.85 && Math.abs(nx) <= 0.18) return true;
-          if (ny >= 0.45 && ny <= 0.78 && nx > 0.18 && nx <= 0.55) return true;
+          if (keyHead <= 0.5 && keyHead >= 0.18) return true;
+          if (ny >= -0.15 && ny <= 0.88 && Math.abs(nx) <= 0.2) return true;
+          if (ny >= 0.45 && ny <= 0.8 && nx > 0.18 && nx <= 0.6) return true;
           return false;
         case 9:
-          if (ny < 0) return Math.abs(nx) <= (0.82 * wobble);
-          return Math.abs(nx) <= ((0.82 - ny * 0.75) * wobble);
+          if (ny < 0) return Math.abs(nx) <= (0.85 * wobble);
+          return Math.abs(nx) <= ((0.85 - ny * 0.75) * wobble);
         case 10:
-          if (ny < -0.45) return Math.abs(nx) <= 0.22;
-          return Math.abs(nx) <= (0.75 * wobble) && ny <= 0.85;
+          if (ny < -0.45) return Math.abs(nx) <= 0.25;
+          return Math.abs(nx) <= (0.78 * wobble) && ny <= 0.88;
         case 11:
-          if (ny < 0) return nx >= ny * 0.6 - 0.4 && nx <= ny * 0.6 + 0.4;
-          return nx >= ny * 0.7 - 0.2 && nx <= ny * 0.7 + 0.55;
+          if (ny < 0) return nx >= ny * 0.6 - 0.45 && nx <= ny * 0.6 + 0.45;
+          return nx >= ny * 0.7 - 0.25 && nx <= ny * 0.7 + 0.6;
         case 12:
           const hx = nx * 1.1;
           const hy = -ny * 1.1 + 0.2;
-          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.05;
+          return (hx * hx + hy * hy - 1) ** 3 - hx * hx * (hy ** 3) <= 0.08;
         case 13:
           const rad = Math.hypot(nx, ny);
-          const starRadius = 0.54 + 0.34 * Math.cos(angle * 5 + (lvl % 3));
+          const starRadius = 0.58 + 0.35 * Math.cos(angle * 5 + (lvl % 3));
           return rad <= starRadius;
         case 14:
-          return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88 && (Math.abs(nx) > 0.18 || Math.abs(ny) > 0.18);
+          return Math.abs(nx) <= 0.9 && Math.abs(ny) <= 0.9 && (Math.abs(nx) > 0.15 || Math.abs(ny) > 0.15);
         case 15:
         default:
-          return (nx >= -0.75 && nx <= 0.75 && Math.abs(ny) <= 0.8) && (r % 2 === 0 || nx <= -0.15);
+          return (nx >= -0.8 && nx <= 0.8 && Math.abs(ny) <= 0.85) && (r % 2 === 0 || nx <= -0.1);
       }
     }
 
+    // High Density Difficulty Setting (Full Board Packing)
     function getDifficultyConfig(lvl) {
       if (lvl <= 100) {
         return {
           tier: 'Easy',
           color: '#22c55e',
-          cols: 12,
-          rows: 16,
-          maxLen: 3,
-          turnChance: 0.25,
-          minArrows: 6,
-          maxArrows: Math.min(8 + Math.floor(lvl / 15), 14),
+          cols: 14,
+          rows: 18,
+          maxLen: 7, // Varied short and long corridors
+          turnChance: 0.35,
+          minArrows: 12,
+          maxArrows: 24,
           minDepth: 2,
-          maxInitialFreeRatio: 0.60
+          maxInitialFreeRatio: 0.70
         };
       } else if (lvl <= 500) {
         return {
           tier: 'Normal',
           color: '#2563eb',
-          cols: 14,
-          rows: 18,
-          maxLen: 4,
-          turnChance: 0.35,
-          minArrows: 14,
-          maxArrows: Math.min(15 + Math.floor((lvl - 100) / 40), 22),
+          cols: 16,
+          rows: 20,
+          maxLen: 8,
+          turnChance: 0.40,
+          minArrows: 20,
+          maxArrows: 34,
           minDepth: 3,
-          maxInitialFreeRatio: 0.45
+          maxInitialFreeRatio: 0.55
         };
       } else if (lvl <= 1500) {
         return {
@@ -709,12 +705,12 @@
           color: '#eab308',
           cols: 16,
           rows: 22,
-          maxLen: 5,
-          turnChance: 0.42,
-          minArrows: 20,
-          maxArrows: Math.min(22 + Math.floor((lvl - 500) / 60), 32),
+          maxLen: 9,
+          turnChance: 0.45,
+          minArrows: 28,
+          maxArrows: 42,
           minDepth: 4,
-          maxInitialFreeRatio: 0.35
+          maxInitialFreeRatio: 0.45
         };
       } else if (lvl <= 3000) {
         return {
@@ -722,12 +718,12 @@
           color: '#f97316',
           cols: 18,
           rows: 24,
-          maxLen: 6,
-          turnChance: 0.48,
-          minArrows: 28,
-          maxArrows: Math.min(30 + Math.floor((lvl - 1500) / 75), 42),
+          maxLen: 10,
+          turnChance: 0.50,
+          minArrows: 36,
+          maxArrows: 50,
           minDepth: 5,
-          maxInitialFreeRatio: 0.25
+          maxInitialFreeRatio: 0.35
         };
       } else {
         return {
@@ -735,12 +731,12 @@
           color: '#ef4444',
           cols: 20,
           rows: 26,
-          maxLen: 7,
+          maxLen: 11,
           turnChance: 0.52,
-          minArrows: 36,
-          maxArrows: Math.min(38 + Math.floor((lvl - 3000) / 90), 52),
+          minArrows: 44,
+          maxArrows: 60,
           minDepth: 6,
-          maxInitialFreeRatio: 0.20
+          maxInitialFreeRatio: 0.30
         };
       }
     }
@@ -754,7 +750,7 @@
       while (checkC >= -1 && checkC <= cols && checkR >= -1 && checkR <= rows) {
         for (let i = 0; i < activeArrows.length; i++) {
           const other = activeArrows[i];
-          if (other.id === arrow.id || other.state === 'escaped') continue;
+          if (other.id === arrow.id || other.state === 'escaped' || other.state === 'moving') continue;
           for (let p = 0; p < other.points.length; p++) {
             if (other.points[p].c === checkC && other.points[p].r === checkR) {
               return true;
@@ -811,6 +807,7 @@
       };
     }
 
+    // Dense Full-Maze Corridor Synthesis (Pack Board Completely)
     function buildCandidateArrows(lvl, shapeId, diff, prng) {
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
       const validCells = [];
@@ -831,10 +828,10 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 },
-        { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 },
-        { dx: -1, dy: 0 }
+        { dx: 0, dy: -1 }, // UP
+        { dx: 1, dy: 0 },  // RIGHT
+        { dx: 0, dy: 1 },  // DOWN
+        { dx: -1, dy: 0 }  // LEFT
       ];
 
       const candidates = [];
@@ -851,7 +848,12 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(prng() * dirs.length)];
-        const targetLen = Math.floor(prng() * (diff.maxLen - 2)) + 3;
+        
+        // Dynamic path length: Mix of short (2-3), normal (4-5), and super long (6-11)
+        const isSuperLong = prng() < 0.28;
+        const targetLen = isSuperLong 
+          ? Math.floor(prng() * 4) + (diff.maxLen - 3) 
+          : Math.floor(prng() * 3) + 2;
 
         for (let step = 1; step < targetLen; step++) {
           if (step > 1 && prng() < diff.turnChance) {
@@ -1003,62 +1005,7 @@
       if (released) triggerAnimation();
     }
 
-    // --- Snake / Pipe Following Extraction Logic ---
-    function computeShiftedPolyline(points, exitDir, progress) {
-      // Har point ko path ke sath interpolate karke bahar slide karta hai
-      const poly = points.map(pt => ({
-        x: originX + (pt.c + 0.5) * cellSize,
-        y: originY + (pt.r + 0.5) * cellSize
-      }));
-
-      if (progress <= 0) return poly;
-
-      // Distance in pixels
-      const totalMove = progress * (Math.max(cols, rows) * cellSize * 1.5);
-      const head = poly[poly.length - 1];
-      
-      // Extension line bahar ki taraf
-      const extendedHead = {
-        x: head.x + exitDir.dx * totalMove,
-        y: head.y + exitDir.dy * totalMove
-      };
-
-      // Segments calculation
-      const segLengths = [];
-      let totalLen = 0;
-      for (let i = 0; i < poly.length - 1; i++) {
-        const d = Math.hypot(poly[i+1].x - poly[i].x, poly[i+1].y - poly[i].y);
-        segLengths.push(d);
-        totalLen += d;
-      }
-
-      // Truncate tail based on movement
-      let cutDist = totalMove;
-      let startIndex = 0;
-      let startPoint = poly[0];
-
-      for (let i = 0; i < segLengths.length; i++) {
-        if (cutDist >= segLengths[i]) {
-          cutDist -= segLengths[i];
-          startIndex = i + 1;
-        } else {
-          const ratio = cutDist / segLengths[i];
-          startPoint = {
-            x: poly[i].x + (poly[i+1].x - poly[i].x) * ratio,
-            y: poly[i].y + (poly[i+1].y - poly[i].y) * ratio
-          };
-          break;
-        }
-      }
-
-      const result = [startPoint];
-      for (let i = startIndex + 1; i < poly.length; i++) {
-        result.push(poly[i]);
-      }
-      result.push(extendedHead);
-      return result;
-    }
-
+    // Straight Orthogonal Exit Trajectory (Fix for diagonal lines)
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1084,7 +1031,7 @@
         }
       }
 
-      // Preview Ray
+      // Long-Press Preview Ray
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -1103,7 +1050,7 @@
         ctx.restore();
       }
 
-      // Draw Arrows with True Sequential Path Following
+      // Render Arrows
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
@@ -1119,6 +1066,11 @@
         ctx.lineCap = 'round';
         ctx.lineJoin = 'miter';
 
+        let moveDist = 0;
+        if (arrow.state === 'moving') {
+          moveDist = arrow.progress * (Math.max(cols, rows) * cellSize * 1.5);
+        }
+
         let shakeX = 0;
         let shakeY = 0;
         if (arrow.shake > 0) {
@@ -1128,42 +1080,50 @@
 
         ctx.translate(shakeX, shakeY);
 
-        // Path Calculation
-        let poly;
-        if (arrow.state === 'moving') {
-          poly = computeShiftedPolyline(arrow.points, arrow.exitDir, arrow.progress);
-        } else {
-          poly = arrow.points.map(pt => ({
-            x: originX + (pt.c + 0.5) * cellSize,
-            y: originY + (pt.r + 0.5) * cellSize
-          }));
+        // Path coordinates
+        const pts = arrow.points.map(pt => ({
+          x: originX + (pt.c + 0.5) * cellSize,
+          y: originY + (pt.r + 0.5) * cellSize
+        }));
+
+        // Move strictly straight out along exitDir
+        ctx.beginPath();
+        for (let i = 0; i < pts.length; i++) {
+          const px = pts[i].x + arrow.exitDir.dx * moveDist;
+          const py = pts[i].y + arrow.exitDir.dy * moveDist;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
         }
+        ctx.stroke();
 
-        // Draw Line
-        if (poly.length >= 2) {
-          ctx.beginPath();
-          ctx.moveTo(poly[0].x, poly[0].y);
-          for (let i = 1; i < poly.length; i++) {
-            ctx.lineTo(poly[i].x, poly[i].y);
-          }
-          ctx.stroke();
+        // Tip arrowhead at the head point
+        const headPt = pts[pts.length - 1];
+        const hx = headPt.x + arrow.exitDir.dx * moveDist;
+        const hy = headPt.y + arrow.exitDir.dy * moveDist;
 
-          // Arrowhead strictly at the tip
-          const tip = poly[poly.length - 1];
-          const prev = poly[poly.length - 2];
-          const angle = Math.atan2(tip.y - prev.y, tip.x - prev.x);
-          const sz = 5.2;
+        const dx = arrow.exitDir.dx;
+        const dy = arrow.exitDir.dy;
+        const sz = 5.2;
 
-          ctx.save();
-          ctx.translate(tip.x, tip.y);
-          ctx.rotate(angle);
-          ctx.beginPath();
-          ctx.moveTo(-sz, -sz * 0.7);
-          ctx.lineTo(1.5, 0);
-          ctx.lineTo(-sz, sz * 0.7);
-          ctx.stroke();
-          ctx.restore();
+        ctx.beginPath();
+        if (dx === 1) { // Right
+          ctx.moveTo(hx - sz, hy - sz * 0.7);
+          ctx.lineTo(hx + 1, hy);
+          ctx.lineTo(hx - sz, hy + sz * 0.7);
+        } else if (dx === -1) { // Left
+          ctx.moveTo(hx + sz, hy - sz * 0.7);
+          ctx.lineTo(hx - 1, hy);
+          ctx.lineTo(hx + sz, hy + sz * 0.7);
+        } else if (dy === 1) { // Down
+          ctx.moveTo(hx - sz * 0.7, hy - sz);
+          ctx.lineTo(hx, hy + 1);
+          ctx.lineTo(hx + sz * 0.7, hy - sz);
+        } else if (dy === -1) { // Up
+          ctx.moveTo(hx - sz * 0.7, hy + sz);
+          ctx.lineTo(hx, hy - 1);
+          ctx.lineTo(hx + sz * 0.7, hy + sz);
         }
+        ctx.stroke();
 
         ctx.restore();
       });
@@ -1180,7 +1140,7 @@
 
       arrows.forEach(arrow => {
         if (arrow.state === 'moving') {
-          arrow.progress += 0.055; // Smooth realistic exit speed
+          arrow.progress += 0.08;
           active = true;
           if (arrow.progress >= 1.25) {
             arrow.state = 'escaped';
@@ -1238,6 +1198,7 @@
       }
     }
 
+    // Smart Fast Tap Combo Engine (No lives lost on chained taps)
     function onPointerUp(e) {
       clearTimeout(longPressTimer);
       if (isGameOverOrWon) return;
@@ -1253,18 +1214,50 @@
       const clicked = getTouchedArrow(e.clientX, e.clientY);
 
       if (clicked && clicked.state !== 'moving' && clicked.state !== 'escaped') {
-        if (isArrowBlocked(clicked)) {
-          playSound('hit');
-          clicked.state = 'queued';
-          clicked.shake = 1.0;
-          lives--;
-          updateUI();
-          if (lives <= 0) handleGameOver("Out of Lives!");
-        } else {
+        if (!isArrowBlocked(clicked)) {
+          // Free to escape immediately
           playSound('escape');
           clicked.state = 'moving';
+          triggerAnimation();
+        } else {
+          // Check if blocking obstacle is ALREADY moving/escaping
+          const head = clicked.points[clicked.points.length - 1];
+          const d = clicked.exitDir;
+          let checkC = head.c + d.dx;
+          let checkR = head.r + d.dy;
+          let isDirectBlockerLeaving = false;
+
+          while (checkC >= -1 && checkC <= cols && checkR >= -1 && checkR <= rows) {
+            for (let i = 0; i < arrows.length; i++) {
+              const other = arrows[i];
+              if (other.id === clicked.id || other.state === 'escaped') continue;
+              for (let p = 0; p < other.points.length; p++) {
+                if (other.points[p].c === checkC && other.points[p].r === checkR) {
+                  if (other.state === 'moving') isDirectBlockerLeaving = true;
+                  break;
+                }
+              }
+            }
+            checkC += d.dx;
+            checkR += d.dy;
+          }
+
+          if (isDirectBlockerLeaving) {
+            // Fast tap combo: Queue cleanly without losing life
+            clicked.state = 'queued';
+            playSound('escape');
+            triggerAnimation();
+          } else {
+            // Real wrong tap -> shake, lose life, queue
+            playSound('hit');
+            clicked.state = 'queued';
+            clicked.shake = 1.0;
+            lives--;
+            updateUI();
+            if (lives <= 0) handleGameOver("Out of Lives!");
+            triggerAnimation();
+          }
         }
-        triggerAnimation();
       }
     }
 
@@ -1302,6 +1295,7 @@
         modalSubtitle.innerText = `Awesome! Level ${currentLevel} fully untangled.`;
         modalActionBtn.onclick = () => {
           currentLevel++;
+          lives = 3; // Har naye level par 3 hearts restore
           if (currentLevel > maxUnlockedLevel) {
             maxUnlockedLevel = currentLevel;
             localStorage.setItem('max_unlocked_level', maxUnlockedLevel);
@@ -1329,7 +1323,7 @@
       gameModal.style.display = 'flex';
     }
 
-    // Initialize Game
+    // Start Game
     generateLevel(currentLevel);
   </script>
 </body>
