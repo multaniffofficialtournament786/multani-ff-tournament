@@ -145,7 +145,6 @@
       transform: scale(0.92);
     }
 
-    /* 3-Dot Dropdown */
     .dropdown-menu {
       position: absolute;
       top: 55px;
@@ -207,7 +206,6 @@
       border-top: 1px solid #f1f5f9;
     }
 
-    /* Modals */
     .modal {
       position: absolute;
       inset: 0;
@@ -271,7 +269,6 @@
       width: 100%;
     }
 
-    /* Levels Map */
     #levels-modal .modal-card {
       width: 90%;
       max-height: 80vh;
@@ -394,7 +391,7 @@
   </div>
 
   <script>
-    // Audio engine
+    // Audio FX
     const bgm = document.getElementById('bgm');
     const musicBtn = document.getElementById('music-btn');
     let isMusicPlaying = false;
@@ -585,7 +582,7 @@
       return `${m}:${sec}`;
     }
 
-    // Exact Shapes from Screenshots (Key, Knight, Box Spiral, Shield)
+    // Precise Shape Masks
     function isShapeActive(c, r, lvl) {
       const shapeType = lvl % 5;
       const cx = (cols - 1) / 2;
@@ -594,38 +591,35 @@
       const ny = (r - cy) / cy;
 
       switch(shapeType) {
-        case 1: // Key Shape (Chabi - 2nd Screenshot)
-          // Top Circle
+        case 1: // Key Shape
           const distTop = Math.hypot(nx, ny + 0.45);
           if (distTop <= 0.48 && distTop >= 0.22) return true;
-          // Shaft
           if (ny >= -0.15 && ny <= 0.85 && Math.abs(nx) <= 0.18) return true;
-          // Teeth
           if (ny >= 0.45 && ny <= 0.78 && nx > 0.18 && nx <= 0.55) return true;
           return false;
 
-        case 2: // Chess Knight (Ghoda - 3rd Screenshot)
-          if (ny < -0.7 && nx < 0.2 && nx > -0.4) return true; // Ears
-          if (ny >= -0.7 && ny < -0.2 && nx < 0.3 && nx > -0.6) return true; // Head / Snout
-          if (ny >= -0.2 && ny < 0.5 && nx < 0.65 && nx > -0.45) return true; // Neck / Body
-          if (ny >= 0.6 && ny <= 0.85 && Math.abs(nx) <= 0.8) return true; // Base pedestal
+        case 2: // Chess Knight
+          if (ny < -0.7 && nx < 0.2 && nx > -0.4) return true;
+          if (ny >= -0.7 && ny < -0.2 && nx < 0.3 && nx > -0.6) return true;
+          if (ny >= -0.2 && ny < 0.5 && nx < 0.65 && nx > -0.45) return true;
+          if (ny >= 0.6 && ny <= 0.85 && Math.abs(nx) <= 0.8) return true;
           return false;
 
-        case 3: // Shield / Teardrop
+        case 3: // Shield
           if (ny < 0) return Math.abs(nx) <= 0.8;
           return Math.abs(nx) <= (0.8 - ny * 0.7);
 
-        case 4: // Bottle / Vase
+        case 4: // Bottle
           if (ny < -0.5) return Math.abs(nx) <= 0.25;
           return Math.abs(nx) <= 0.75 && ny <= 0.85;
 
-        case 0: // Square Spiral Box (1st Screenshot)
+        case 0: // Square Spiral
         default:
           return Math.abs(nx) <= 0.88 && Math.abs(ny) <= 0.88;
       }
     }
 
-    // Clean Orthogonal Procedural Generation
+    // Robust Non-Head-On Generator
     function generateLevel(lvl) {
       arrows = [];
       previewArrow = null;
@@ -636,12 +630,12 @@
       diffTag.innerText = isHard ? (lvl > 50 ? "Master" : "Hard") : "Normal";
       diffTag.style.color = isHard ? "#ef4444" : "#2563eb";
 
-      cols = isHard ? 20 : 16;
-      rows = isHard ? 28 : 22;
+      cols = isHard ? 18 : 14;
+      rows = isHard ? 24 : 18;
 
       resizeCanvas();
 
-      let randCounter = lvl * 617;
+      let randCounter = lvl * 719;
       const getRand = () => seededRandom(randCounter++);
 
       const grid = Array.from({ length: cols }, () => Array(rows).fill(null));
@@ -661,10 +655,10 @@
       }
 
       const dirs = [
-        { dx: 0, dy: -1 },
-        { dx: 1, dy: 0 },
-        { dx: 0, dy: 1 },
-        { dx: -1, dy: 0 }
+        { dx: 0, dy: -1 }, // UP
+        { dx: 1, dy: 0 },  // RIGHT
+        { dx: 0, dy: 1 },  // DOWN
+        { dx: -1, dy: 0 }  // LEFT
       ];
 
       let arrowId = 0;
@@ -678,11 +672,10 @@
         grid[curC][curR] = arrowId;
 
         let curDir = dirs[Math.floor(getRand() * dirs.length)];
-        const maxLen = isHard ? Math.floor(getRand() * 6) + 4 : Math.floor(getRand() * 3) + 3;
+        const maxLen = isHard ? Math.floor(getRand() * 5) + 3 : Math.floor(getRand() * 3) + 2;
 
         for (let step = 1; step < maxLen; step++) {
-          if (step > 1 && getRand() < 0.42) {
-            // Strictly 90 degree orthogonal turn
+          if (step > 1 && getRand() < 0.4) {
             const turnOptions = (curDir.dx === 0) ? [dirs[1], dirs[3]] : [dirs[0], dirs[2]];
             curDir = turnOptions[Math.floor(getRand() * turnOptions.length)];
           }
@@ -708,13 +701,17 @@
         if (path.length >= 2) {
           const tail = path[path.length - 2];
           const head = path[path.length - 1];
-          let exitDir = { dx: head.c - tail.c, dy: head.r - tail.r };
+          // Exit vector MUST be strictly from tail to head (towards outside)
+          let exitDir = {
+            dx: Math.sign(head.c - tail.c),
+            dy: Math.sign(head.r - tail.r)
+          };
 
           arrows.push({
             id: arrowId,
             points: path,
             exitDir: exitDir,
-            state: 'idle', // idle, queued (red), moving (green), escaped
+            state: 'idle',
             progress: 0,
             shake: 0
           });
@@ -724,12 +721,43 @@
         }
       }
 
+      // Eliminate Head-on collision (No arrow points directly into another arrow's face)
+      fixOpposingCollisions();
       ensureBorderExits();
       resolveDeadlockIfNeeded();
 
       startTimer();
       updateUI();
       draw();
+    }
+
+    // Fix head-on collision
+    function fixOpposingCollisions() {
+      for (let i = 0; i < arrows.length; i++) {
+        for (let j = i + 1; j < arrows.length; j++) {
+          const a1 = arrows[i];
+          const a2 = arrows[j];
+          const h1 = a1.points[a1.points.length - 1];
+          const h2 = a2.points[a2.points.length - 1];
+
+          // Check if they are facing each other in same axis
+          if (a1.exitDir.dx === -a2.exitDir.dx && a1.exitDir.dy === -a2.exitDir.dy) {
+            // Same horizontal line facing each other
+            if (a1.exitDir.dy === 0 && h1.r === h2.r) {
+              if ((a1.exitDir.dx > 0 && h1.c < h2.c) || (a1.exitDir.dx < 0 && h1.c > h2.c)) {
+                // Divert one upwards or downwards
+                a1.exitDir = (h1.r <= rows / 2) ? { dx: 0, dy: -1 } : { dx: 0, dy: 1 };
+              }
+            }
+            // Same vertical line facing each other
+            if (a1.exitDir.dx === 0 && h1.c === h2.c) {
+              if ((a1.exitDir.dy > 0 && h1.r < h2.r) || (a1.exitDir.dy < 0 && h1.r > h2.r)) {
+                a1.exitDir = (h1.c <= cols / 2) ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
+              }
+            }
+          }
+        }
+      }
     }
 
     function ensureBorderExits() {
@@ -823,7 +851,6 @@
       }
     }
 
-    // Precise Crisp Rendering (Matching screenshots 1, 2, 3)
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -834,7 +861,7 @@
         }
       });
 
-      // Subtle Dots only on cleared areas
+      // Subtle Dots on cleared channels
       ctx.fillStyle = '#e2e8f0';
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
@@ -842,13 +869,13 @@
             const dx = originX + (c + 0.5) * cellSize;
             const dy = originY + (r + 0.5) * cellSize;
             ctx.beginPath();
-            ctx.arc(dx, dy, 1.3, 0, Math.PI * 2);
+            ctx.arc(dx, dy, 1.2, 0, Math.PI * 2);
             ctx.fill();
           }
         }
       }
 
-      // Preview Ray
+      // Long press preview
       if (previewArrow && previewArrow.state !== 'escaped') {
         const head = previewArrow.points[previewArrow.points.length - 1];
         ctx.save();
@@ -867,19 +894,19 @@
         ctx.restore();
       }
 
-      // Draw Thin Crisp Maze Corridors
+      // Draw all arrows with true-direction pointing arrowheads
       arrows.forEach(arrow => {
         if (arrow.state === 'escaped') return;
 
-        let strokeColor = '#0f172a'; // Black Maze (Default)
-        if (arrow.state === 'queued') strokeColor = '#ef4444'; // Red Waiting
-        if (arrow.state === 'moving') strokeColor = '#22c55e'; // Green Escaping
+        let strokeColor = '#0f172a';
+        if (arrow.state === 'queued') strokeColor = '#ef4444';
+        if (arrow.state === 'moving') strokeColor = '#22c55e';
         if (arrow === previewArrow) strokeColor = '#2563eb';
 
         ctx.save();
         ctx.strokeStyle = strokeColor;
         ctx.fillStyle = strokeColor;
-        ctx.lineWidth = 2.2; // Clean thin line matching screenshots
+        ctx.lineWidth = 2.2;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'miter';
 
@@ -907,7 +934,7 @@
         }
         ctx.stroke();
 
-        // Compact Proportional Arrowhead
+        // Arrowhead pointing forward
         const head = arrow.points[arrow.points.length - 1];
         const hx = originX + (head.c + 0.5) * cellSize;
         const hy = originY + (head.r + 0.5) * cellSize;
@@ -916,11 +943,11 @@
         ctx.save();
         ctx.translate(hx, hy);
         ctx.rotate(angle);
-        const headSize = 5.5; // Sharp & compact
+        const sz = 5.2;
         ctx.beginPath();
-        ctx.moveTo(-headSize, -headSize * 0.7);
+        ctx.moveTo(-sz, -sz * 0.75);
         ctx.lineTo(1.5, 0);
-        ctx.lineTo(-headSize, headSize * 0.7);
+        ctx.lineTo(-sz, sz * 0.75);
         ctx.lineWidth = 2.2;
         ctx.stroke();
         ctx.restore();
