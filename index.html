@@ -4,10 +4,10 @@
   <!-- Essential Meta Tags -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MULTANI FF OFFICIAL TOURNAMENT</title>
+  <title>MULTANI FF ARENA - OFFICIAL TOURNAMENT</title>
   
-  <meta name="description" content="Join Multani FF Official Tournaments, play daily Free Fire matches, earn rewards, and cash out instantly." />
-  <meta name="keywords" content="Multani FF, Free Fire Tournament, Pakistan Free Fire, Multani FF Official, Daily Spin, Free Fire Coins" />
+  <meta name="description" content="Join Multani FF Arena Tournaments, play daily Free Fire matches, earn rewards, and cash out instantly." />
+  <meta name="keywords" content="Multani FF, Multani FF Arena, Free Fire Tournament, Pakistan Free Fire, Daily Spin, Free Fire Coins" />
   <meta name="author" content="Multani FF Official" />
   <meta name="theme-color" content="#080b11" />
   <meta name="robots" content="index, follow" />
@@ -17,14 +17,14 @@
 
   <!-- Open Graph / WhatsApp / Facebook Share Previews -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="MULTANI FF OFFICIAL TOURNAMENT" />
+  <meta property="og:title" content="MULTANI FF ARENA - TOURNAMENT" />
   <meta property="og:description" content="Play daily Free Fire tournaments, spin the wheel, and win real cash prizes." />
   <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" />
 
   <!-- Twitter Meta Tags -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MULTANI FF OFFICIAL TOURNAMENT" />
-  <meta name="twitter:description" content="Join Multani FF Official Tournaments and win prizes." />
+  <meta name="twitter:title" content="MULTANI FF ARENA - TOURNAMENT" />
+  <meta name="twitter:description" content="Join Multani FF Arena Tournaments and win prizes." />
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -86,53 +86,65 @@
     .header-logo-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-brand-wrap {
+      text-align: center;
       cursor: pointer;
     }
-    .header-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid var(--accent-gold);
-      object-fit: cover;
+    .header-brand-sub {
+      font-size: 8px;
+      color: #ff5733;
+      letter-spacing: 2px;
+      display: block;
+      font-weight: bold;
     }
     .header-brand {
       font-family: var(--font-gaming);
       font-size: 16px;
       letter-spacing: 1px;
-      color: var(--accent-gold);
+      color: #ffffff;
       text-transform: uppercase;
       line-height: 1.1;
-    }
-    .header-brand-sub {
-      font-size: 9px;
-      color: var(--accent-cyan);
-      letter-spacing: 2px;
-      display: block;
     }
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+    }
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1.5px solid #ff5733;
+      object-fit: cover;
+      cursor: pointer;
     }
     .icon-btn {
       position: relative;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
+      background: none;
+      border: none;
       color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: var(--transition);
     }
     .badge-dot {
       position: absolute;
-      top: 2px;
-      right: 2px;
+      top: -2px;
+      right: -2px;
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -203,10 +215,10 @@
       font-size: 16px;
     }
     .nav-item.active {
-      color: var(--accent-cyan);
+      color: #ff5733;
     }
     .nav-item.active i {
-      color: var(--accent-cyan);
+      color: #ff5733;
       transform: translateY(-2px);
     }
 
@@ -223,8 +235,8 @@
       top: 0;
       left: 0;
       bottom: 0;
-      width: 280px;
-      background: var(--bg-card);
+      width: 290px;
+      background: #0d121c;
       z-index: 201;
       display: flex;
       flex-direction: column;
@@ -236,31 +248,30 @@
       transform: translateX(0);
     }
     .drawer-header {
-      padding: 20px 16px;
-      background: linear-gradient(135deg, #182030, #0c1017);
-      border-bottom: 1px solid var(--border-color);
+      padding: 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
     }
     .drawer-avatar {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
-      border: 2px solid var(--accent-gold);
+      border: 2px solid #ff5733;
       object-fit: cover;
     }
     .drawer-menu-list {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 0;
+      padding: 8px 0;
     }
     .drawer-menu-item {
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 12px 20px;
-      color: var(--text-muted);
+      padding: 11px 18px;
+      color: #d1d5db;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -268,13 +279,55 @@
     }
     .drawer-menu-item:hover, .drawer-menu-item:active {
       background: var(--bg-surface);
-      color: var(--accent-cyan);
     }
     .drawer-menu-item i {
       font-size: 16px;
       width: 20px;
       text-align: center;
-      color: var(--accent-gold);
+    }
+    .text-gold { color: #ffaa00 !important; }
+    .text-cyan { color: #00f0ff !important; }
+    .text-red { color: #ff1744 !important; }
+
+    /* Floating Robot Menu Button */
+    .floating-bot-container {
+      position: fixed;
+      right: 14px;
+      bottom: 80px;
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .floating-bot-badge {
+      background: linear-gradient(135deg, #ff4624, #e62200);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-bottom: -4px;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+    }
+    .floating-bot-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #121722;
+      border: 2px solid #ff5733;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(255, 87, 51, 0.5);
+      color: #00f0ff;
+      font-size: 22px;
+      transition: var(--transition);
+    }
+    .floating-bot-btn:active {
+      transform: scale(0.92);
     }
 
     /* Cards, Buttons, and UI Components */
@@ -293,10 +346,10 @@
       margin-bottom: 12px;
     }
     .hero-avatar {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      border: 2px solid var(--accent-gold);
+      border: 2px solid #ff5733;
       object-fit: cover;
     }
     .hero-details h2 {
@@ -305,8 +358,9 @@
       letter-spacing: 0.5px;
     }
     .uid-tag {
-      font-size: 10px;
-      color: var(--text-muted);
+      font-size: 11px;
+      color: #00f0ff;
+      font-weight: 700;
       display: block;
     }
     .hero-stats-grid {
@@ -369,7 +423,7 @@
     /* LED Ticker */
     .led-signboard {
       background: #000;
-      border: 1px solid var(--border-color);
+      border: 1px solid #ffbe0055;
       border-radius: var(--radius-sm);
       padding: 6px 10px;
       display: flex;
@@ -377,6 +431,7 @@
       gap: 8px;
       margin-bottom: 12px;
       overflow: hidden;
+      box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
     }
     .led-signboard i {
       color: var(--accent-gold);
@@ -810,23 +865,26 @@
 </head>
 <body>
 
-  <!-- Top Master Header -->
+  <!-- Top Master Header (With Hamburger ☰, Brand, Share, Bell, and Profile Avatar) -->
   <header id="master-header-bar" class="master-header">
-    <div class="header-logo-group" onclick="window.Drawer.open()">
-      <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="header-avatar" alt="Avatar" />
-      <div>
-        <div class="header-brand">MULTANI FF</div>
-        <span class="header-brand-sub">TOURNAMENT</span>
+    <div class="header-logo-group">
+      <button class="hamburger-btn" onclick="window.Drawer.open()" aria-label="Open Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="header-brand-wrap" onclick="window.Router.navigate('home')">
+        <span class="header-brand-sub">MULTANI FF</span>
+        <div class="header-brand">ARENA</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="icon-btn" onclick="window.Router.navigate('notifications')">
-        <i class="fa-solid fa-bell text-sm"></i>
+      <button class="icon-btn" onclick="window.shareAppWebsite()" title="Share App">
+        <i class="fa-solid fa-share-nodes text-cyan"></i>
+      </button>
+      <button class="icon-btn" onclick="window.Router.navigate('notifications')" title="Notifications">
+        <i class="fa-solid fa-bell"></i>
         <div id="header-notif-badge" class="badge-dot hidden"></div>
-      </div>
-      <div class="icon-btn" onclick="window.Router.navigate('wallet')">
-        <i class="fa-solid fa-wallet text-sm" style="color:var(--accent-gold);"></i>
-      </div>
+      </button>
+      <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="header-avatar" onclick="window.Router.navigate('profile')" alt="Profile Avatar" />
     </div>
   </header>
 
@@ -841,51 +899,69 @@
   <!-- Main Dynamic View Container -->
   <main id="app-view"></main>
 
-  <!-- Side Drawer Overlay & Menu -->
+  <!-- Floating Menu Robot Button -->
+  <div class="floating-bot-container" onclick="window.Drawer.open()">
+    <span class="floating-bot-badge">MENU</span>
+    <div class="floating-bot-btn">
+      <i class="fa-solid fa-robot"></i>
+    </div>
+  </div>
+
+  <!-- Side Drawer Overlay & Menu (Matching Old Website Exactly) -->
   <div id="drawer-overlay" class="drawer-overlay hidden" onclick="window.Drawer.close()"></div>
   <aside id="side-drawer" class="side-drawer">
-    <div class="drawer-header" onclick="window.Router.navigate('profile')">
-      <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="drawer-avatar" alt="User Profile" />
-      <div style="flex:1;">
-        <h3 id="drawer-name" style="font-size:14px; color:#fff; font-weight:700;">Player Name</h3>
-        <span id="drawer-uid" style="font-size:11px; color:var(--text-muted);">UID: --</span>
+    <div class="drawer-header">
+      <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="window.Router.navigate('profile')">
+        <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="drawer-avatar" alt="User Profile" />
+        <div>
+          <h3 id="drawer-name" style="font-size:14px; color:#fff; font-weight:700;">Player Name</h3>
+          <span id="drawer-uid" style="font-size:11px; color:var(--accent-cyan); font-weight:700;"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+        </div>
       </div>
+      <button onclick="window.Drawer.close()" style="background:none; border:none; color:#8b9bb4; font-size:18px; cursor:pointer; padding:4px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div class="drawer-menu-list">
+      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('games')"><i class="fa-solid fa-gamepad text-gold"></i> Mini Games</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('chat')"><i class="fa-solid fa-comments"></i> Chat Room</div>
       <div class="drawer-menu-item" onclick="window.Router.navigate('home')"><i class="fa-solid fa-house"></i> Home</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('games')"><i class="fa-solid fa-gamepad"></i> Play Games</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('spin')"><i class="fa-solid fa-dharmachakra"></i> Daily Spin</div>
+      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('spin')"><i class="fa-solid fa-dharmachakra text-gold"></i> Daily Spin Wheel</div>
       <div class="drawer-menu-item" onclick="window.Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i> Tournaments</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i> My Wallet</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Cash Out</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('diamonds')"><i class="fa-solid fa-gem"></i> Buy Diamonds</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('winners')"><i class="fa-solid fa-medal"></i> Match Winners</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('leaderboard')"><i class="fa-solid fa-ranking-star"></i> Top Players</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i> Invite Friends</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('rules')"><i class="fa-solid fa-book"></i> Rules & Fair Play</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('about')"><i class="fa-solid fa-circle-info"></i> About Us</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('profile')"><i class="fa-solid fa-user-gear"></i> Settings & Profile</div>
+      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('winners')"><i class="fa-solid fa-medal text-gold"></i> Hall of Winners</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i> Wallet & History</div>
+      <div class="drawer-menu-item text-cyan" onclick="window.Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer text-cyan"></i> Withdraw / Cashout</div>
+      <div class="drawer-menu-item text-cyan" onclick="window.Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down text-cyan"></i> Deposit Money</div>
+      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('diamonds')"><i class="fa-solid fa-gem text-gold"></i> Buy FF Diamonds</div>
+      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('invite')"><i class="fa-solid fa-user-plus text-gold"></i> Invite Friends & Rewards</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('leaderboard')"><i class="fa-solid fa-ranking-star"></i> Leaderboard</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
+      <div class="drawer-menu-item text-cyan" onclick="window.shareAppWebsite()"><i class="fa-solid fa-share-nodes text-cyan"></i> Share App</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profile & VIP Protocol</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('rules')"><i class="fa-solid fa-book-open"></i> Rules (A to Z)</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('about')"><i class="fa-solid fa-shield-halved"></i> About Us</div>
+      <div class="drawer-menu-item text-red" onclick="window.logoutUser()"><i class="fa-solid fa-arrow-right-from-bracket text-red"></i> Logout</div>
     </div>
   </aside>
 
-  <!-- Bottom Navigation Bar -->
+  <!-- Bottom Navigation Bar (Matches Old Screenshot: Home, Matches, Withdraw, Winners, Wallet) -->
   <nav id="bottom-nav" class="bottom-nav">
     <div class="nav-item active" data-page="home" onclick="window.Router.navigate('home')">
       <i class="fa-solid fa-house"></i>
       <span>Home</span>
     </div>
-    <div class="nav-item" data-page="games" onclick="window.Router.navigate('games')">
-      <i class="fa-solid fa-gamepad"></i>
-      <span>Games</span>
-    </div>
-    <div class="nav-item" data-page="spin" onclick="window.Router.navigate('spin')">
-      <i class="fa-solid fa-dharmachakra"></i>
-      <span>Spin</span>
-    </div>
     <div class="nav-item" data-page="tournaments" onclick="window.Router.navigate('tournaments')">
       <i class="fa-solid fa-trophy"></i>
       <span>Matches</span>
+    </div>
+    <div class="nav-item" data-page="withdrawal" onclick="window.Router.navigate('withdrawal')">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Withdraw</span>
+    </div>
+    <div class="nav-item" data-page="winners" onclick="window.Router.navigate('winners')">
+      <i class="fa-solid fa-medal"></i>
+      <span>Winners</span>
     </div>
     <div class="nav-item" data-page="wallet" onclick="window.Router.navigate('wallet')">
       <i class="fa-solid fa-wallet"></i>
@@ -944,10 +1020,7 @@
     <span id="global-loader-text" style="font-size:12px; font-weight:700; color:var(--accent-cyan); letter-spacing:1px;">LOADING ARENA...</span>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- MASTER JAVASCRIPT MODULE LOADER                          -->
-  <!-- تمام الگ کی گئیں ماڈیول فائلیں یہاں سے لائیو چلیں گی     -->
-  <!-- ======================================================== -->
+  <!-- Master Script Connection -->
   <script type="module" src="./multaniwebsite/main.js"></script>
 
 </body>
