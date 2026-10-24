@@ -3,925 +3,660 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MULTANI FF CHAT</title>
+  <title>MULTANI FF ARENA - OFFICIAL TOURNAMENT</title>
+  
+  <meta name="description" content="Join Multani FF Arena Tournaments, play daily Free Fire matches, earn rewards, and cash out instantly." />
+  <meta name="keywords" content="Multani FF, Multani FF Arena, Free Fire Tournament, Pakistan Free Fire, Daily Spin, Free Fire Coins" />
+  <meta name="author" content="Multani FF Official" />
+  <meta name="theme-color" content="#080b11" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="google-site-verification-token" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MULTANI FF ARENA - TOURNAMENT" />
+  <meta property="og:description" content="Play daily Free Fire tournaments, spin the wheel, and win real cash prizes." />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MULTANI FF ARENA - TOURNAMENT" />
+  <meta name="twitter:description" content="Join Multani FF Arena Tournaments and win prizes." />
+
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
-      --bg-color: #0b0e14;
-      --card-bg: #151a24;
-      --primary: #f59e0b;
-      --text: #ffffff;
-      --font-scale: 14px;
-      --bubble-radius: 12px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    
-    html, body {
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg-color);
-      color: var(--text);
-      overflow: hidden;
-      position: relative;
+      --bg-dark: #080b11;
+      --bg-card: #121722;
+      --bg-surface: #182030;
+      --primary: #ff5733;
+      --primary-glow: rgba(255, 87, 51, 0.4);
+      --accent-gold: #ffbe00;
+      --accent-cyan: #00f0ff;
+      --text-main: #ffffff;
+      --text-muted: #8b9bb4;
+      --text-dim: #5c687a;
+      --border-color: #222c3d;
+      --success: #00e676;
+      --danger: #ff1744;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --transition: all 0.25s ease-in-out;
+      --font-gaming: 'Impact', 'Arial Black', sans-serif;
     }
 
-    /* Header */
-    .chat-header {
-      position: fixed;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 75px;
+    }
+
+    /* Master Top Header */
+    .master-header {
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      background: rgba(17, 24, 39, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #1f2937;
       z-index: 100;
-    }
-    .header-left { display: flex; align-items: center; gap: 10px; }
-    .header-actions { display: flex; align-items: center; gap: 6px; }
-    .back-btn { background: #1f2937; color: #fff; border: 0; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 13px; }
-    .room-title { font-size: 15px; font-weight: bold; color: #fff; display: flex; flex-direction: column; }
-    .room-title span.ff-tag { color: #ef4444; }
-    .online-tag { font-size: 11px; color: #10b981; font-weight: normal; }
-    .refresh-btn {
-      background: #1f2937;
-      border: 1px solid #374151;
-      color: #38bdf8;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .refresh-btn:active { transform: rotate(180deg) scale(0.9); }
-    .menu-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px; }
-
-    /* Messages Scroll Area */
-    .chat-container {
-      position: absolute;
-      top: 56px;
-      bottom: 58px;
-      left: 0;
-      right: 0;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    .load-more-btn { align-self: center; background: rgba(31, 41, 55, 0.85); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 6px; backdrop-filter: blur(4px); }
-
-    /* Message Item */
-    .msg-row { display: flex; flex-direction: column; max-width: 85%; position: relative; user-select: none; }
-    .msg-me { align-self: flex-end; align-items: flex-end; }
-    .msg-other { align-self: flex-start; align-items: flex-start; }
-
-    /* Message Header: DP, Game Name & UID */
-    .msg-user-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      padding: 0 4px;
-    }
-    .msg-me .msg-user-header { flex-direction: row-reverse; }
-    .header-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1.5px solid var(--primary);
-      object-fit: cover;
-      background: #111827;
-    }
-
-    /* VIP Royal Crown Frame Container for Admin */
-    .admin-crown-frame-wrapper {
-      position: relative;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
-    /* Neon Glowing Center Circle with 'ADMIN' */
-    .admin-neon-core {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #e63946 0%, #1a0404 90%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffd700;
-      font-size: 7.5px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-shadow: 0 0 5px #ff4624, 0 0 10px #ffbe00;
-      box-shadow: 0 0 10px #ff4624, inset 0 0 5px #ffbe00;
-      animation: core-neon-glow 1.5s infinite alternate ease-in-out;
-      z-index: 1;
-    }
-
-    /* SVG Royal Crown Overlay matching the uploaded image */
-    .admin-frame-svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 2;
-      filter: drop-shadow(0 0 4px rgba(255, 70, 36, 0.8));
-      animation: frame-spin-glow 2.5s infinite alternate ease-in-out;
-    }
-
-    @keyframes core-neon-glow {
-      0% {
-        box-shadow: 0 0 6px #ff4624, inset 0 0 4px #ffbe00;
-        transform: scale(0.96);
-      }
-      100% {
-        box-shadow: 0 0 16px #ff7b00, 0 0 24px #e63946, inset 0 0 8px #fffb00;
-        transform: scale(1.05);
-      }
-    }
-
-    @keyframes frame-spin-glow {
-      0% { filter: drop-shadow(0 0 3px #ff4624); }
-      100% { filter: drop-shadow(0 0 9px #ffd700) drop-shadow(0 0 14px #e63946); }
-    }
-
-    .header-name {
-      font-size: 12px;
-      font-weight: bold;
-      color: #f59e0b;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-    }
-    
-    .admin-name-tag {
-      background: linear-gradient(135deg, #ffd700 0%, #ff4624 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 900;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      filter: drop-shadow(0 0 6px rgba(255, 70, 36, 0.65));
-      letter-spacing: 0.5px;
-    }
-
-    .header-uid {
-      font-size: 11px;
-      color: #ffffff;
-      background: rgba(17, 24, 39, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    }
-
-    .admin-uid-tag {
-      background: linear-gradient(135deg, #ffd700, #ff4624) !important;
-      color: #0b0e14 !important;
-      border: 1px solid #ffd700 !important;
-      font-weight: 900 !important;
-      box-shadow: 0 0 8px rgba(255, 70, 36, 0.6) !important;
-      text-shadow: none !important;
-    }
-
-    /* Message Bubble */
-    .msg-bubble {
-      background: transparent !important;
-      padding: 8px 12px;
-      border-radius: var(--bubble-radius);
-      font-size: var(--font-scale);
-      word-break: break-word;
-      width: fit-content;
-      backdrop-filter: blur(2px);
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-    }
-    
-    /* Sender: Glowing Green Border */
-    .msg-me .msg-bubble {
-      border: 2px solid #10b981;
-      border-top-right-radius: 2px;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
-    }
-
-    /* Receiver: Silver / White Border */
-    .msg-other .msg-bubble {
-      border: 2px solid rgba(255, 255, 255, 0.55);
-      border-top-left-radius: 2px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Admin VIP Bubble: Royal Golden & Crimson Border with Glow */
-    .msg-admin .msg-bubble {
-      background: linear-gradient(135deg, rgba(35, 10, 10, 0.85) 0%, rgba(20, 5, 5, 0.95) 100%) !important;
-      border: 2px solid #ffd700 !important;
-      border-top-left-radius: 2px;
-      box-shadow: 0 0 15px rgba(255, 70, 36, 0.65), inset 0 0 10px rgba(255, 215, 0, 0.25) !important;
-      color: #fff8f0 !important;
-      position: relative;
-    }
-
-    /* Time & Double Blue Tick */
-    .msg-footer-info {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 4px;
-      margin-top: 4px;
-    }
-    .msg-time { font-size: 10px; color: #f3f4f6; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
-    .msg-tick { font-size: 11px; color: #38bdf8; font-weight: bold; }
-
-    .reply-quote { background: rgba(0,0,0,0.6); border-left: 3px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; color: #d1d5db; }
-    .animated-sticker-msg { width: 110px; max-height: 110px; object-fit: contain; display: block; margin: 4px 0; border-radius: 8px; }
-
-    /* Reply bar */
-    .reply-preview-bar {
-      position: fixed;
-      bottom: 58px;
-      left: 0;
-      right: 0;
-      background: #1f2937;
-      padding: 6px 12px;
-      display: none;
       align-items: center;
       justify-content: space-between;
-      border-left: 4px solid var(--primary);
-      font-size: 12px;
-      z-index: 101;
+      padding: 10px 16px;
+      background: rgba(8, 11, 17, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-brand-wrap {
+      text-align: center;
+      cursor: pointer;
+    }
+    .header-brand-sub {
+      font-size: 8px;
+      color: #ff5733;
+      letter-spacing: 2px;
+      display: block;
+      font-weight: bold;
+    }
+    .header-brand {
+      font-family: var(--font-gaming);
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1.5px solid #ff5733;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .icon-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .badge-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      border: 1px solid var(--bg-dark);
     }
 
-    /* Footer Input */
-    .chat-footer {
+    /* Sub Header Bar */
+    .sub-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(8, 11, 17, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sub-header-title {
+      font-family: var(--font-gaming);
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+    }
+
+    /* App View Container */
+    .view-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 14px 14px 20px 14px;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 58px;
-      background: rgba(17, 24, 39, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 8px 10px;
+      height: 60px;
+      background: rgba(18, 23, 34, 0.98);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 600;
+      gap: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+      height: 100%;
+    }
+    .nav-item i {
+      font-size: 16px;
+    }
+    .nav-item.active {
+      color: #ff5733;
+    }
+    .nav-item.active i {
+      color: #ff5733;
+      transform: translateY(-2px);
+    }
+
+    /* Side Drawer Menu */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+    }
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 290px;
+      background: #0d121c;
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-right: 1px solid var(--border-color);
+    }
+    .side-drawer.open {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      padding: 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-top: 1px solid #1f2937;
-      z-index: 100;
+      justify-content: space-between;
     }
-    .action-icon { background: none; border: 0; color: #9ca3af; font-size: 20px; cursor: pointer; padding: 6px; }
-    .input-box { flex: 1; background: #1f2937; border: 1px solid #374151; border-radius: 20px; color: #fff; padding: 9px 14px; font-size: 14px; outline: none; }
-    .send-btn { background: #10b981; color: #fff; border: 0; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; flex-shrink: 0; }
-
-    /* Drawers */
-    .panel-drawer {
-      position: fixed;
-      bottom: 58px;
-      left: 0;
-      right: 0;
-      display: none;
-      background: #111827;
-      height: 180px;
+    .drawer-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 2px solid #ff5733;
+      object-fit: cover;
+    }
+    .drawer-menu-list {
+      flex: 1;
       overflow-y: auto;
-      padding: 10px;
-      border-top: 1px solid #1f2937;
-      grid-template-columns: repeat(6, 1fr);
+      padding: 8px 0;
+    }
+    .drawer-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 18px;
+      color: #ffaa00;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .drawer-menu-item:hover, .drawer-menu-item:active {
+      background: var(--bg-surface);
+    }
+    .drawer-menu-item i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #ffaa00;
+    }
+    .drawer-menu-item.logout-item {
+      color: #ff1744 !important;
+    }
+    .drawer-menu-item.logout-item i {
+      color: #ff1744 !important;
+    }
+
+    /* Draggable Floating Robot Speed-Dial */
+    #draggable-bot-container {
+      position: fixed;
+      bottom: 90px;
+      right: 16px;
+      z-index: 250;
+      touch-action: none;
+    }
+    .bot-dial-options {
+      position: absolute;
+      bottom: 60px;
+      right: 4px;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      z-index: 102;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s ease-out;
     }
-    .sticker-drawer {
-      position: fixed;
-      bottom: 58px;
-      left: 0;
-      right: 0;
-      display: none;
-      background: #111827;
-      height: 210px;
-      overflow-y: auto;
-      padding: 10px;
-      border-top: 1px solid #1f2937;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      z-index: 102;
+    .bot-dial-options.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
-    .emoji-item { font-size: 24px; text-align: center; cursor: pointer; }
-    .sticker-card { background: #1f2937; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #374151; display: flex; align-items: center; justify-content: center; }
-    .sticker-card img { width: 50px; height: 50px; object-fit: contain; }
+    .bot-sub-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffaa00;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border: 2px solid #fff;
+      font-size: 17px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s;
+    }
+    .bot-sub-btn:active {
+      transform: scale(0.9);
+    }
+    .floating-bot-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: grab;
+    }
+    .floating-bot-wrapper:active {
+      cursor: grabbing;
+    }
+    .floating-bot-badge {
+      background: linear-gradient(135deg, #ff4624, #e62200);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-bottom: -4px;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+    }
+    .floating-bot-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #121722;
+      border: 2px solid #ff5733;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(255, 87, 51, 0.5);
+      color: #00f0ff;
+      font-size: 22px;
+    }
 
-    /* Dropdown & Modals */
-    .dropdown-menu { display: none; position: fixed; top: 56px; right: 12px; background: #1f2937; border-radius: 8px; border: 1px solid #374151; width: 190px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 110; }
-    .menu-item { padding: 10px 14px; font-size: 13px; display: flex; gap: 8px; align-items: center; color: #fff; cursor: pointer; }
-    .menu-item:hover { background: #374151; }
-    
-    .msg-modal, .rules-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 200; padding: 15px; }
-    .modal-content { background: #1f2937; border-radius: 10px; width: 280px; overflow: hidden; border: 1px solid #374151; }
-    .rules-card { background: #151a24; border: 1px solid #ef4444; border-radius: 12px; padding: 16px; width: 100%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
-    .rules-card h3 { color: #ef4444; font-size: 16px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
-    .rules-card ol { padding-left: 18px; font-size: 13px; line-height: 1.6; color: #e5e7eb; }
-    .rules-card li { margin-bottom: 8px; }
-    .rules-close { margin-top: 14px; width: 100%; background: #ef4444; color: #fff; border: 0; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    /* Modal Sheet Styling */
+    .custom-bottom-sheet {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 400;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-card {
+      background: #121722;
+      border-radius: 16px 16px 0 0;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 480px;
+      padding: 16px 18px 24px 18px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #e62200);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: #fff;
+      border: 1px solid var(--border-color);
+    }
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 11px;
+      width: auto;
+    }
+
+    .hidden { display: none !important; }
+    #toast-container {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+      width: 90%;
+      max-width: 400px;
+    }
+    .toast-msg {
+      background: rgba(18, 23, 34, 0.95);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .toast-success { border-color: var(--success); color: var(--success); }
+    .toast-error { border-color: var(--danger); color: var(--danger); }
+    .toast-info { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+    .global-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 87, 51, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
-<body id="chatBody">
+<body>
 
-  <header class="chat-header">
-    <div class="header-left">
-      <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Home</a>
-      <div class="room-title">
-        <div>MULTANI <span class="ff-tag">FF</span> CHAT</div>
-        <div class="online-tag">● Online: <span id="onlineCount">1</span></div>
+  <!-- Top Master Header -->
+  <header id="master-header-bar" class="master-header">
+    <div class="header-logo-group">
+      <button class="hamburger-btn" onclick="window.Drawer.open()" aria-label="Open Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="header-brand-wrap" onclick="window.Router.navigate('home')">
+        <span class="header-brand-sub">MULTANI FF</span>
+        <div class="header-brand">ARENA</div>
       </div>
     </div>
     <div class="header-actions">
-      <button class="refresh-btn" id="btnManualRefresh" onclick="manualRefreshChat()" title="Refresh Chat"><i class="fas fa-rotate"></i></button>
-      <button class="menu-btn" onclick="toggleHeaderMenu()"><i class="fas fa-ellipsis-v"></i></button>
+      <button class="icon-btn" onclick="window.openShareModal()" title="Share App">
+        <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
+      </button>
+      <button class="icon-btn" onclick="window.Router.navigate('notifications')" title="Notifications">
+        <i class="fa-solid fa-bell"></i>
+        <div id="header-notif-badge" class="badge-dot hidden"></div>
+      </button>
+      <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="header-avatar" onclick="window.Router.navigate('profile')" alt="Profile Avatar" />
     </div>
   </header>
 
-  <div class="dropdown-menu" id="headerMenu">
-    <div class="menu-item" onclick="triggerBgUpload()"><i class="fas fa-image"></i> Chat Background</div>
-    <input type="file" id="bgUpload" accept="image/*" style="display:none;" onchange="handleBgUpload(event)" />
-    <div class="menu-item" onclick="clearMyChat()"><i class="fas fa-broom"></i> Clear Chat for Me</div>
-    <div class="menu-item" onclick="showRules()"><i class="fas fa-shield-alt"></i> Info & Rules</div>
-    <div class="menu-item" onclick="resetTheme()"><i class="fas fa-redo"></i> Reset Background</div>
-  </div>
+  <!-- Sub Header Bar -->
+  <header id="sub-header-bar" class="sub-header hidden">
+    <button class="icon-btn" onclick="window.Router.back()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h3 id="sub-header-title" class="sub-header-title">PAGE TITLE</h3>
+  </header>
 
-  <main class="chat-container" id="chatBox">
-    <button class="load-more-btn" onclick="loadOldMessages()"><i class="fas fa-history"></i> Load Old Messages</button>
-  </main>
+  <!-- Main View Container -->
+  <main id="app-view"></main>
 
-  <div class="reply-preview-bar" id="replyBar">
-    <span id="replyText">Replying to...</span>
-    <i class="fas fa-times" style="cursor:pointer;" onclick="cancelReply()"></i>
-  </div>
-
-  <footer class="chat-footer">
-    <button class="action-icon" onclick="toggleEmojiDrawer()"><i class="far fa-smile"></i></button>
-    <button class="action-icon" onclick="toggleStickerDrawer()"><i class="fas fa-fire"></i></button>
-    <input type="text" id="msgInput" class="input-box" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendTextMessage()" />
-    <button class="send-btn" onclick="sendTextMessage()"><i class="fas fa-paper-plane"></i></button>
-  </footer>
-
-  <div class="panel-drawer" id="emojiDrawer">
-    <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
-    <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
-    <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
-    <span class="emoji-item" onclick="insertEmoji('👑')">👑</span>
-    <span class="emoji-item" onclick="insertEmoji('💪')">💪</span>
-    <span class="emoji-item" onclick="insertEmoji('🎯')">🎯</span>
-    <span class="emoji-item" onclick="insertEmoji('⚡')">⚡</span>
-    <span class="emoji-item" onclick="insertEmoji('🏆')">🏆</span>
-    <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
-    <span class="emoji-item" onclick="insertEmoji('😡')">😡</span>
-    <span class="emoji-item" onclick="insertEmoji('🤣')">🤣</span>
-    <span class="emoji-item" onclick="insertEmoji('👏')">👏</span>
-  </div>
-
-  <div class="sticker-drawer" id="stickerDrawer"></div>
-
-  <div class="msg-modal" id="msgModal" onclick="closeModal(event)">
-    <div class="modal-content">
-      <div class="menu-item" onclick="triggerReply()"><i class="fas fa-reply"></i> Reply</div>
-      <div class="menu-item" onclick="copyActiveMsg()"><i class="fas fa-copy"></i> Copy Text</div>
-      <div class="menu-item" onclick="hideActiveMsg()"><i class="fas fa-eye-slash"></i> Hide for Me</div>
-      <div class="menu-item" id="deleteEveryoneBtn" style="display:none;" onclick="deleteActiveMsgForEveryone()"><i class="fas fa-trash" style="color:#ef4444;"></i> <span style="color:#ef4444;">Delete for Everyone</span></div>
+  <!-- Draggable Speed-Dial Floating Robot Menu with Your Actual Links -->
+  <div id="draggable-bot-container">
+    <div id="bot-dial-options" class="bot-dial-options">
+      <!-- Instagram Link -->
+      <a href="https://www.instagram.com/multani.ff.gaming?psln=NnBiYTN1eTM0eXc1" target="_blank" class="bot-sub-btn" title="Instagram">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <!-- YouTube Link -->
+      <a href="https://youtube.com/@multaniff-b2k" target="_blank" class="bot-sub-btn" title="YouTube">
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+      <!-- TikTok Link -->
+      <a href="https://tiktok.com/@multaniffgaming" target="_blank" class="bot-sub-btn" title="TikTok">
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+      <!-- WhatsApp Group Link -->
+      <a href="https://chat.whatsapp.com/G3E6JbO3U0tL75L1K4iO8r" target="_blank" class="bot-sub-btn" title="WhatsApp Group">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+      <!-- Facebook Profile Link -->
+      <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="bot-sub-btn" title="Facebook">
+        <i class="fa-brands fa-facebook-f"></i>
+      </a>
+      <!-- Customer Support (WhatsApp) Link -->
+      <a href="https://wa.me/923281926729?text=Hello%20Multani%20FF%20Support" target="_blank" class="bot-sub-btn" title="Support">
+        <i class="fa-solid fa-headset"></i>
+      </a>
+    </div>
+    <div id="floating-bot-trigger" class="floating-bot-wrapper">
+      <span class="floating-bot-badge">MENU</span>
+      <div class="floating-bot-btn">
+        <i class="fa-solid fa-robot"></i>
+      </div>
     </div>
   </div>
 
-  <div class="rules-modal" id="rulesModal">
-    <div class="rules-card">
-      <h3><i class="fas fa-shield-alt"></i> MULTANI FF RULES</h3>
-      <ol>
-        <li><b>Gali Galoch Par Direct Ban:</b> Kisi bhi player se bad-tameezi par permanent ban hoga.</li>
-        <li><b>Room ID & Password Leak:</b> Match details leak karne par foran disqualify kar diya jayega.</li>
-        <li><b>Hacks / Panel Baazi:</b> Hack ya config use karne wale ki UID blacklist hogi.</li>
-        <li><b>Scam & Fraud:</b> Fake payment screenshot ya fraud par account freeze hoga.</li>
-        <li><b>Spamming:</b> Links ya promotion bar-bar bhejna sakht mana hai.</li>
-      </ol>
-      <button class="rules-close" onclick="document.getElementById('rulesModal').style.display='none'">I Agree</button>
+  <!-- Side Drawer Menu -->
+  <div id="drawer-overlay" class="drawer-overlay hidden" onclick="window.Drawer.close()"></div>
+  <aside id="side-drawer" class="side-drawer">
+    <div class="drawer-header">
+      <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="window.Router.navigate('profile')">
+        <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="drawer-avatar" alt="User Profile" />
+        <div>
+          <h3 id="drawer-name" style="font-size:14px; color:#fff; font-weight:700;">Player Name</h3>
+          <span id="drawer-uid" style="font-size:11px; color:var(--accent-cyan); font-weight:700;"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+        </div>
+      </div>
+      <button onclick="window.Drawer.close()" style="background:none; border:none; color:#8b9bb4; font-size:18px; cursor:pointer; padding:4px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="drawer-menu-list">
+      <div class="drawer-menu-item" onclick="window.Router.navigate('games')"><i class="fa-solid fa-gamepad"></i> Mini Games</div>
+      <a href="./chat.html" class="drawer-menu-item"><i class="fa-solid fa-comments"></i> Chat Room</a>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('home')"><i class="fa-solid fa-house"></i> Home</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('spin')"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i> Tournaments</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('winners')"><i class="fa-solid fa-medal"></i> Hall of Winners</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i> Wallet & History</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('diamonds')"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('invite')"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('leaderboard')"><i class="fa-solid fa-ranking-star"></i> Leaderboard</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
+      <div class="drawer-menu-item" onclick="window.openShareModal()"><i class="fa-solid fa-share-nodes"></i> Share App</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profile & VIP Protocol</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('rules')"><i class="fa-solid fa-book-open"></i> Rules (A to Z)</div>
+      <div class="drawer-menu-item" onclick="window.Router.navigate('about')"><i class="fa-solid fa-shield-halved"></i> About Us</div>
+      <div class="drawer-menu-item logout-item" onclick="window.logoutUser()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</div>
+    </div>
+  </aside>
+
+  <!-- Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="bottom-nav">
+    <div class="nav-item active" data-page="home" onclick="window.Router.navigate('home')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" data-page="tournaments" onclick="window.Router.navigate('tournaments')">
+      <i class="fa-solid fa-trophy"></i>
+      <span>Matches</span>
+    </div>
+    <div class="nav-item" data-page="withdrawal" onclick="window.Router.navigate('withdrawal')">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Withdraw</span>
+    </div>
+    <div class="nav-item" data-page="winners" onclick="window.Router.navigate('winners')">
+      <i class="fa-solid fa-medal"></i>
+      <span>Winners</span>
+    </div>
+    <div class="nav-item" data-page="wallet" onclick="window.Router.navigate('wallet')">
+      <i class="fa-solid fa-wallet"></i>
+      <span>Wallet</span>
+    </div>
+  </nav>
+
+  <!-- Share App & Earn Bottom Modal Sheet -->
+  <div id="share-modal-sheet" class="custom-bottom-sheet hidden" onclick="window.closeShareModal(event)">
+    <div class="sheet-card" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff; letter-spacing:0.5px;">SHARE APP & EARN</h3>
+        <button onclick="window.closeShareModal()" style="background:none; border:none; color:#8b9bb4; font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:18px;">
+        Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 3 coins milenge!
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; text-align:center;">
+        <div onclick="window.shareViaPlatform('whatsapp')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:#25d366; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <span style="font-size:11px; font-weight:600; color:#fff;">WhatsApp</span>
+        </div>
+        <div onclick="window.shareViaPlatform('facebook')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:#1877f2; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;">
+            <i class="fa-brands fa-facebook-f"></i>
+          </div>
+          <span style="font-size:11px; font-weight:600; color:#fff;">Facebook</span>
+        </div>
+        <div onclick="window.shareViaPlatform('telegram')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:#0088cc; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;">
+            <i class="fa-brands fa-telegram"></i>
+          </div>
+          <span style="font-size:11px; font-weight:600; color:#fff;">Telegram</span>
+        </div>
+        <div onclick="window.shareViaPlatform('copy')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:#ffbe00; display:flex; align-items:center; justify-content:center; color:#000; font-size:24px;">
+            <i class="fa-solid fa-copy"></i>
+          </div>
+          <span style="font-size:11px; font-weight:600; color:#fff;">Copy Link</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div id="toast-container"></div>
+  <div id="global-loader" class="global-loader hidden">
+    <div class="spinner"></div>
+    <span id="global-loader-text" style="font-size:12px; font-weight:700; color:var(--accent-cyan); letter-spacing:1px;">LOADING...</span>
+  </div>
+
+  <!-- Master Script Connection -->
+  <script type="module" src="./multaniwebsite/main.js"></script>
 
-    let currentUser = {
-      name: "",
-      uid: "",
-      user_id: "",
-      avatar: ""
-    };
-
-    let activeSelectedMsg = null;
-    let activeReply = null;
-    let hiddenMessages = JSON.parse(localStorage.getItem("chat_hidden_msgs") || "[]");
-    let lastRenderedMsgId = 0;
-    let autoPollingInterval = null;
-
-    async function syncPlayerProfile() {
-      try {
-        const { data: authData } = await supabaseClient.auth.getUser();
-        if (authData && authData.user) {
-          currentUser.user_id = authData.user.id;
-
-          const { data: pData } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('id', authData.user.id)
-            .maybeSingle();
-
-          if (pData) {
-            currentUser.name = pData.free_fire_name || pData.ign || pData.in_game_name || pData.full_name || "";
-            currentUser.uid = String(pData.free_fire_uid || pData.uid || pData.player_uid || "");
-            currentUser.avatar = pData.avatar_url || pData.avatar || "";
-          }
-        }
-      } catch (err) {
-        console.warn("Auth sync error:", err);
-      }
-
-      if (!currentUser.name) {
-        currentUser.name = localStorage.getItem("ign") || 
-                           localStorage.getItem("free_fire_name") || 
-                           localStorage.getItem("in_game_name") || 
-                           localStorage.getItem("full_name") || "";
-      }
-      if (!currentUser.uid) {
-        currentUser.uid = localStorage.getItem("free_fire_uid") || 
-                          localStorage.getItem("uid") || 
-                          localStorage.getItem("player_uid") || "";
-      }
-      if (!currentUser.avatar) {
-        currentUser.avatar = localStorage.getItem("avatar_url") || 
-                             localStorage.getItem("avatar") || "";
-      }
-
-      if (!currentUser.name) currentUser.name = "Player";
-      if (!currentUser.uid) currentUser.uid = "0000";
-      if (!currentUser.avatar) {
-        currentUser.avatar = "https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(currentUser.name);
-      }
-    }
-
-    const myStickers = [
-      "stickers/200w.webp",
-      "stickers/200w (1).webp",
-      "stickers/200w (2).webp",
-      "stickers/200w (3).webp",
-      "stickers/200w (4).webp",
-      "stickers/200w (5).webp",
-      "stickers/200w (6).webp",
-      "stickers/200w (7).webp",
-      "stickers/200w (8).webp",
-      "stickers/200w (9).webp",
-      "stickers/200w (10).webp",
-      "stickers/200w (11).webp",
-      "stickers/200w (12).webp",
-      "stickers/200w (13).webp",
-      "stickers/200w (14).webp",
-      "stickers/200w (15).webp",
-      "stickers/giphy.gif"
-    ];
-
-    async function initChat() {
-      applyStoredTheme();
-      await syncPlayerProfile();
-      loadStickerDrawer();
-      await loadMessages();
-
-      // Realtime listener for chat_messages
-      setupChatRealtime();
-
-      // 3-second auto-sync background timer
-      startAutoSyncPolling();
-    }
-
-    function setupChatRealtime() {
-      supabaseClient
-        .channel('multani_chat_feed')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
-          renderSingleMessage(payload.new, true);
-        })
-        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'chat_messages' }, payload => {
-          const el = document.getElementById(`msg-${payload.old.id}`);
-          if (el) el.remove();
-        })
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_messages' }, payload => {
-          if (payload.new.is_deleted) {
-            const el = document.getElementById(`msg-${payload.new.id}`);
-            if (el) el.remove();
-          }
-        })
-        .subscribe();
-    }
-
-    // Auto-sync polling every 3 seconds
-    function startAutoSyncPolling() {
-      if (autoPollingInterval) clearInterval(autoPollingInterval);
-      autoPollingInterval = setInterval(async () => {
-        try {
-          if (!lastRenderedMsgId) return;
-          const { data } = await supabaseClient
-            .from('chat_messages')
-            .select('*')
-            .gt('id', lastRenderedMsgId)
-            .or('is_deleted.is.null,is_deleted.eq.false')
-            .order('id', { ascending: true });
-
-          if (data && data.length > 0) {
-            data.forEach(m => renderSingleMessage(m, true));
-          }
-        } catch (e) {
-          // silent sync
-        }
-      }, 3000);
-    }
-
-    // Manual Refresh button handler
-    async function manualRefreshChat() {
-      const btn = document.getElementById('btnManualRefresh');
-      if (btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-      await loadMessages();
-      if (btn) btn.innerHTML = `<i class="fas fa-rotate"></i>`;
-    }
-
-    function loadStickerDrawer() {
-      const drawer = document.getElementById('stickerDrawer');
-      drawer.innerHTML = '';
-      myStickers.forEach(filePath => {
-        const card = document.createElement('div');
-        card.className = 'sticker-card';
-        card.onclick = () => sendAnimatedSticker(filePath);
-        card.innerHTML = `<img src="${encodeURI(filePath)}" alt="Sticker" loading="lazy" />`;
-        drawer.appendChild(card);
-      });
-    }
-
-    async function loadMessages(limit = 100) {
-      const { data, error } = await supabaseClient
-        .from('chat_messages')
-        .select('*')
-        .or('is_deleted.is.null,is_deleted.eq.false')
-        .order('id', { ascending: true })
-        .limit(limit);
-
-      if (error) {
-        console.error("Load error:", error);
-        return;
-      }
-
-      const box = document.getElementById('chatBox');
-      box.querySelectorAll('.msg-row').forEach(e => e.remove());
-      if (data) {
-        data.forEach(m => renderSingleMessage(m, false));
-      }
-      box.scrollTop = box.scrollHeight;
-    }
-
-    // Message Render: Only official Admin Panel messages get VIP Crown Frame & Glow
-    function renderSingleMessage(msg, shouldScroll = false) {
-      if (msg.is_deleted) return;
-      if (hiddenMessages.includes(msg.id)) return;
-      if (document.getElementById(`msg-${msg.id}`)) return;
-
-      const box = document.getElementById('chatBox');
-      const senderUserId = String(msg.user_id || msg.sender_id || '');
-      
-      // Update highest message ID tracked
-      if (Number(msg.id) > lastRenderedMsgId) {
-        lastRenderedMsgId = Number(msg.id);
-      }
-
-      // STRICT CHECK: Only messages sent via Master Admin Panel get VIP Crown & Badge
-      const isAdminMsg = (msg.is_announcement === true);
-
-      let isMe = false;
-      if (!isAdminMsg) {
-        if (currentUser.user_id && senderUserId) {
-          isMe = (senderUserId === String(currentUser.user_id));
-        } else if (currentUser.uid && msg.uid && currentUser.uid !== "0000") {
-          isMe = (String(msg.uid) === String(currentUser.uid));
-        }
-      }
-
-      const row = document.createElement('div');
-      row.className = `msg-row ${isMe ? 'msg-me' : 'msg-other'} ${isAdminMsg ? 'msg-admin' : ''}`;
-      row.id = `msg-${msg.id}`;
-
-      let pressTimer;
-      row.addEventListener('touchstart', () => { pressTimer = setTimeout(() => openMsgMenu(msg, isMe), 500); });
-      row.addEventListener('touchend', () => clearTimeout(pressTimer));
-      row.addEventListener('contextmenu', (e) => { e.preventDefault(); openMsgMenu(msg, isMe); });
-
-      const replyHtml = msg.reply_text ? `<div class="reply-quote">${escapeHtml(msg.reply_text)}</div>` : '';
-      const formattedTime = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const msgText = msg.content || msg.message || "";
-      let contentHtml = '';
-      if (msgText.startsWith('STICKER:')) {
-        const rawUrl = msgText.replace('STICKER:', '');
-        contentHtml = `<img src="${encodeURI(rawUrl)}" class="animated-sticker-msg" />`;
-      } else {
-        contentHtml = `<div>${escapeHtml(msgText)}</div>`;
-      }
-
-      let avatarHtml = '';
-      let nameHtml = '';
-
-      if (isAdminMsg) {
-        // High-definition Royal Crown DP Frame with Blinking Neon Core
-        avatarHtml = `
-          <div class="admin-crown-frame-wrapper">
-            <div class="admin-neon-core">ADMIN</div>
-            <svg class="admin-frame-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="54" r="32" stroke="#d4af37" stroke-width="2.5" />
-              <circle cx="50" cy="54" r="28" stroke="#ff4624" stroke-width="1.2" stroke-dasharray="3 2" />
-              <path d="M36 30 L40 40 L50 33 L60 40 L64 30 L66 45 L34 45 Z" fill="#ffd700" stroke="#b8860b" stroke-width="1" />
-              <circle cx="50" cy="29" r="2.5" fill="#e63946" stroke="#fff" stroke-width="0.5" />
-              <circle cx="36" cy="27" r="1.8" fill="#e63946" />
-              <circle cx="64" cy="27" r="1.8" fill="#e63946" />
-              <circle cx="50" cy="85" r="4.5" fill="#e63946" stroke="#ffd700" stroke-width="1.5" />
-              <path d="M22 45 Q16 62 26 76 Q30 65 32 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
-              <path d="M78 45 Q84 62 74 76 Q70 65 68 55 Z" fill="#2d3748" stroke="#d4af37" stroke-width="0.8" />
-            </svg>
-          </div>
-        `;
-        nameHtml = `
-          <div class="header-name admin-name-tag">
-            <i class="fa-solid fa-crown" style="color:#ffd700; font-size:11px;"></i> VIP ADMIN Ⓥ
-            <span class="header-uid admin-uid-tag">#OFFICIAL</span>
-          </div>
-        `;
-      } else {
-        // Normal Player Message
-        const senderName = msg.name || "Player";
-        const senderUid = msg.uid || "0000";
-        const senderAvatar = msg.avatar || ("https://api.dicebear.com/7.x/bottts/svg?seed=" + encodeURIComponent(senderName));
-
-        avatarHtml = `<img src="${senderAvatar}" class="header-avatar" />`;
-        nameHtml = `
-          <div class="header-name">
-            ${escapeHtml(senderName)}
-            <span class="header-uid">#${escapeHtml(senderUid)}</span>
-          </div>
-        `;
-      }
-
-      const tickHtml = isMe ? `<span class="msg-tick"><i class="fas fa-check-double"></i></span>` : '';
-
-      row.innerHTML = `
-        <div class="msg-user-header">
-          ${avatarHtml}
-          ${nameHtml}
-        </div>
-        <div class="msg-bubble">
-          ${replyHtml}
-          ${contentHtml}
-          <div class="msg-footer-info">
-            <span class="msg-time">${formattedTime}</span>
-            ${tickHtml}
-          </div>
-        </div>
-      `;
-      box.appendChild(row);
-
-      if (shouldScroll || isMe) {
-        box.scrollTop = box.scrollHeight;
-      }
-    }
-
-    async function sendTextMessage() {
-      const input = document.getElementById('msgInput');
-      const text = input.value.trim();
-      if (!text) return;
-      await postToSupabase(text);
-      input.value = '';
-    }
-
-    async function sendAnimatedSticker(stickerPath) {
-      await postToSupabase(`STICKER:${stickerPath}`);
-      toggleStickerDrawer(false);
-    }
-
-    async function postToSupabase(content) {
-      if (!currentUser.user_id || currentUser.name === "Player" || currentUser.uid === "0000") {
-        await syncPlayerProfile();
-      }
-
-      const payload = {
-        name: currentUser.name,
-        uid: currentUser.uid,
-        user_id: currentUser.user_id,
-        avatar: currentUser.avatar,
-        content: content,
-        message: content,
-        is_admin: false,
-        is_announcement: false,
-        is_deleted: false,
-        reply_text: activeReply ? `${activeReply.name}: ${activeReply.content.slice(0, 30)}` : null,
-        created_at: new Date().toISOString()
-      };
-
-      cancelReply();
-
-      const { data, error } = await supabaseClient.from('chat_messages').insert([payload]).select();
-      if (error) {
-        alert("Message bhejne mein masla hua: " + error.message);
-      } else if (data && data[0]) {
-        renderSingleMessage(data[0], true);
-      }
-    }
-
-    function toggleEmojiDrawer(force) {
-      const d = document.getElementById('emojiDrawer');
-      const shouldOpen = (force !== undefined ? force : d.style.display !== 'grid');
-      d.style.display = shouldOpen ? 'grid' : 'none';
-      document.getElementById('stickerDrawer').style.display = 'none';
-    }
-
-    function toggleStickerDrawer(force) {
-      const d = document.getElementById('stickerDrawer');
-      const shouldOpen = (force !== undefined ? force : d.style.display !== 'grid');
-      d.style.display = shouldOpen ? 'grid' : 'none';
-      document.getElementById('emojiDrawer').style.display = 'none';
-    }
-
-    function insertEmoji(emo) {
-      document.getElementById('msgInput').value += emo;
-    }
-
-    function toggleHeaderMenu() {
-      const m = document.getElementById('headerMenu');
-      m.style.display = m.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function openMsgMenu(msg, isMe) {
-      activeSelectedMsg = msg;
-      const delBtn = document.getElementById('deleteEveryoneBtn');
-      delBtn.style.display = isMe ? 'flex' : 'none';
-      document.getElementById('msgModal').style.display = 'flex';
-    }
-
-    function closeModal(e) {
-      if (e.target.id === 'msgModal') document.getElementById('msgModal').style.display = 'none';
-    }
-
-    function triggerReply() {
-      if (!activeSelectedMsg) return;
-      activeReply = activeSelectedMsg;
-      document.getElementById('replyBar').style.display = 'flex';
-      const rawText = activeSelectedMsg.content || activeSelectedMsg.message || "";
-      const preview = rawText.startsWith('STICKER:') ? '[Animated Sticker]' : rawText;
-      document.getElementById('replyText').innerText = `Replying to ${activeReply.name}: ${preview.slice(0, 25)}...`;
-      document.getElementById('msgModal').style.display = 'none';
-    }
-
-    function cancelReply() {
-      activeReply = null;
-      document.getElementById('replyBar').style.display = 'none';
-    }
-
-    function copyActiveMsg() {
-      if (activeSelectedMsg) {
-        const rawText = activeSelectedMsg.content || activeSelectedMsg.message || "";
-        const textToCopy = rawText.startsWith('STICKER:') ? 'Sticker' : rawText;
-        navigator.clipboard.writeText(textToCopy);
-      }
-      document.getElementById('msgModal').style.display = 'none';
-    }
-
-    function hideActiveMsg() {
-      if (!activeSelectedMsg) return;
-      hiddenMessages.push(activeSelectedMsg.id);
-      localStorage.setItem("chat_hidden_msgs", JSON.stringify(hiddenMessages));
-      const el = document.getElementById(`msg-${activeSelectedMsg.id}`);
-      if (el) el.remove();
-      document.getElementById('msgModal').style.display = 'none';
-    }
-
-    async function deleteActiveMsgForEveryone() {
-      if (!activeSelectedMsg) return;
-      await supabaseClient.from('chat_messages').update({ is_deleted: true }).eq('id', activeSelectedMsg.id);
-      const el = document.getElementById(`msg-${activeSelectedMsg.id}`);
-      if (el) el.remove();
-      document.getElementById('msgModal').style.display = 'none';
-    }
-
-    function clearMyChat() {
-      document.getElementById('chatBox').querySelectorAll('.msg-row').forEach(e => e.remove());
-      toggleHeaderMenu();
-    }
-
-    async function loadOldMessages() {
-      const { data, error } = await supabaseClient
-        .from('chat_messages')
-        .select('*')
-        .or('is_deleted.is.null,is_deleted.eq.false')
-        .order('id', { ascending: true })
-        .limit(100);
-
-      if (!error && data) {
-        const box = document.getElementById('chatBox');
-        box.querySelectorAll('.msg-row').forEach(e => e.remove());
-        data.forEach(m => renderSingleMessage(m, false));
-      }
-    }
-
-    function triggerBgUpload() {
-      toggleHeaderMenu();
-      document.getElementById('bgUpload').click();
-    }
-
-    function handleBgUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const maxDim = 800;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxDim) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            }
-          } else {
-            if (height > maxDim) {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
-          document.getElementById('chatBox').style.backgroundImage = `url("${compressedBase64}")`;
-          
-          try {
-            localStorage.setItem("chat_bg", compressedBase64);
-          } catch (storageErr) {
-            console.warn("Storage full:", storageErr);
-          }
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function resetTheme() {
-      document.getElementById('chatBox').style.backgroundImage = 'none';
-      localStorage.removeItem("chat_bg");
-      toggleHeaderMenu();
-    }
-
-    function applyStoredTheme() {
-      const bg = localStorage.getItem("chat_bg");
-      if (bg) document.getElementById('chatBox').style.backgroundImage = `url("${bg}")`;
-    }
-
-    function showRules() {
-      toggleHeaderMenu();
-      document.getElementById('rulesModal').style.display = 'flex';
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    window.onload = initChat;
-  </script>
 </body>
 </html>
