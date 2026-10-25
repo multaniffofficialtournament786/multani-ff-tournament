@@ -197,7 +197,7 @@ export async function renderNotifications() {
 }
 
 // ==========================================
-// 4. INVITE & EARN (EXACT DESIGN MATCH)
+// 4. INVITE & EARN (FULL INVITED FRIENDS LIST)
 // ==========================================
 export async function renderInvite() {
   if (!state.currentUser) { window.Router.navigate('login'); return; }
@@ -206,18 +206,23 @@ export async function renderInvite() {
   const p = state.currentProfile || {};
   const myUid = p.free_fire_uid || state.currentUser.id.slice(0, 8);
 
-  // Referral counts (Safe fallbacks)
-  let referralCount = 0;
+  // Fetch invited friends details from profiles
+  let invitedFriends = [];
   try {
-    const { count } = await sbClient
+    const { data, error } = await sbClient
       .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('referred_by', myUid);
-    referralCount = count || 0;
+      .select('free_fire_name, free_fire_uid, avatar_url, created_at')
+      .eq('referred_by', myUid)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      invitedFriends = data;
+    }
   } catch (err) {
-    console.warn("Referral count fetch:", err);
+    console.warn("Referral list fetch error:", err);
   }
 
+  const referralCount = invitedFriends.length;
   const shareText = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_URL}\n\nUse my Referral UID: *${myUid}* when registering!`;
 
   window.toggleInvitedListDropdown = () => {
@@ -225,7 +230,7 @@ export async function renderInvite() {
     const arrow = document.getElementById('invited-list-arrow');
     if (!list) return;
     const isHidden = list.style.display === 'none';
-    list.style.display = isHidden ? 'block' : 'none';
+    list.style.display = isHidden ? 'flex' : 'none';
     if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
   };
 
@@ -240,6 +245,33 @@ export async function renderInvite() {
       window.openShareModal();
     }
   };
+
+  // Build the invited friends HTML list
+  const defaultAvatar = 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+  let invitedListHtml = '';
+
+  if (invitedFriends.length > 0) {
+    invitedListHtml = invitedFriends.map((friend) => {
+      const joinDate = friend.created_at ? new Date(friend.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+      return `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#141926; border:1px solid #20283b; border-radius:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img src="${friend.avatar_url || defaultAvatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1.5px solid var(--primary);" />
+            <div>
+              <div style="color:#fff; font-size:12px; font-weight:700;">${escapeHTML(friend.free_fire_name || 'Free Fire Gamer')}</div>
+              <div style="font-size:10px; color:#00f0ff;">UID: ${escapeHTML(friend.free_fire_uid || '--')}</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:10px; color:#8e9bb0; display:block;">Joined</span>
+            <span style="font-size:11px; font-weight:600; color:#00e676;">${joinDate}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    invitedListHtml = '<p style="text-align:center; color:#5c687a; font-size:12px; padding:12px 0;">No players registered with your UID yet.</p>';
+  }
 
   document.getElementById('app-view').innerHTML = `
     <div class="view-container">
@@ -276,16 +308,16 @@ export async function renderInvite() {
         </button>
       </div>
 
-      <!-- INVITED LIST ACCORDION -->
+      <!-- INVITED LIST ACCORDION WITH COMPLETE FRIENDS LIST -->
       <div style="background:#121622; border:1px solid #232c3d; border-radius:12px; margin-bottom:16px; overflow:hidden;">
-        <div onclick="window.toggleInvitedListDropdown()" style="padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+        <div onclick="window.toggleInvitedListDropdown()" style="padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:#161c2b;">
           <div style="font-family:var(--font-gaming); font-size:13px; font-weight:800; color:#ffbe00; display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-users"></i> INVITED LIST (${referralCount})
           </div>
           <i id="invited-list-arrow" class="fa-solid fa-chevron-down" style="color:#ffbe00; font-size:12px; transition:transform 0.3s ease;"></i>
         </div>
-        <div id="invited-list-body" style="display:none; padding:12px 14px; border-top:1px solid #1c2333; font-size:12px; color:#8e9bb0; background:#0c0f17;">
-          ${referralCount === 0 ? 'No players registered with your UID yet.' : `Total ${referralCount} player(s) joined.`}
+        <div id="invited-list-body" style="display:none; padding:12px 14px; border-top:1px solid #1c2333; background:#0c0f17; flex-direction:column; gap:8px;">
+          ${invitedListHtml}
         </div>
       </div>
 
