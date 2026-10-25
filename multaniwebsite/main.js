@@ -2,7 +2,7 @@
 // MULTANI FF OFFICIAL - MASTER MODULE LOADER
 // ==========================================
 
-import { state, Sound, Toast, Loader } from './config.js';
+import { supabase, state, Sound, Toast, Loader } from './config.js';
 import { syncAuthAndProfile, renderAuth, renderForgotPassword, renderProfile, uploadAvatarPhoto, saveUserProfile } from './auth.js';
 import { Router, Drawer, setupRouterEvents } from './router.js';
 import { renderHome } from './home.js';
@@ -203,6 +203,150 @@ function setupFloatingBotWidget() {
 }
 
 // ==========================================
+// 4. ADMIN SUPPORT CHAT MODAL & SUPABASE LOGIC
+// ==========================================
+let supportChatSub = null;
+
+window.ChatModal = {
+  open: async () => {
+    const overlay = document.getElementById('chat-modal-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+
+    if (!state.currentUser) {
+      Toast.show("Please login to contact support", "info");
+      return;
+    }
+
+    // Load Chat History
+    await window.ChatModal.loadMessages();
+
+    // Listen to real-time incoming messages from Admin
+    if (!supportChatSub && supabase) {
+      supportChatSub = supabase
+        .channel('support-chat-room')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `user_id=eq.${state.currentUser.id}`
+          },
+          (payload) => {
+            const newMsg = payload.new;
+            if (newMsg.sender_role === 'admin') {
+              window.ChatModal.appendMessage(newMsg.message, 'theirs', newMsg.created_at, 'Admin Support');
+              Sound.play('notification');
+            }
+          }
+        )
+        .subscribe();
+    }
+  },
+
+  close: () => {
+    document.getElementById('chat-modal-overlay')?.classList.add('hidden');
+  },
+
+  loadMessages: async () => {
+    if (!supabase || !state.currentUser) return;
+    const container = document.getElementById('chat-modal-messages');
+    if (!container) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('support_messages')
+        .select('*')
+        .eq('user_id', state.currentUser.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      // Reset to default greeting first
+      container.innerHTML = `
+        <div class="chat-row theirs">
+          <div class="chat-bubble theirs">
+            Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+          </div>
+          <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+        </div>
+      `;
+
+      if (data && data.length > 0) {
+        data.forEach(msg => {
+          const type = msg.sender_role === 'admin' ? 'theirs' : 'mine';
+          const label = msg.sender_role === 'admin' ? 'Support Desk' : (state.currentProfile?.full_name || 'You');
+          window.ChatModal.appendMessage(msg.message, type, msg.created_at, label);
+        });
+      }
+      container.scrollTop = container.scrollHeight;
+    } catch (err) {
+      console.error("Support chat load error:", err);
+    }
+  },
+
+  appendMessage: (text, type, timeStr, senderLabel) => {
+    const container = document.getElementById('chat-modal-messages');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.className = `chat-row ${type}`;
+
+    const formattedTime = timeStr ? new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now';
+
+    row.innerHTML = `
+      <div class="chat-bubble ${type}">
+        ${text}
+      </div>
+      <div class="chat-time-tag" style="text-align:${type === 'mine' ? 'right' : 'left'}; padding-${type === 'mine' ? 'right' : 'left'}:4px; color:#6b7280;">
+        ${senderLabel} • ${formattedTime}
+      </div>
+    `;
+
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
+  },
+
+  sendMessage: async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('chat-modal-input');
+    if (!input) return;
+    const msgText = input.value.trim();
+    if (!msgText) return;
+
+    if (!state.currentUser) {
+      Toast.show("Please login first!", "error");
+      return;
+    }
+
+    input.value = '';
+
+    // Optimistically render message on UI
+    window.ChatModal.appendMessage(msgText, 'mine', new Date().toISOString(), state.currentProfile?.full_name || 'You');
+
+    try {
+      const payload = {
+        user_id: state.currentUser.id,
+        user_name: state.currentProfile?.full_name || 'Player',
+        user_uid: state.currentProfile?.free_fire_uid || 'N/A',
+        message: msgText,
+        sender_role: 'user',
+        is_read_by_admin: false,
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('support_messages').insert([payload]);
+      if (error) throw error;
+      Sound.play('click');
+    } catch (err) {
+      console.error("Failed to send support message:", err);
+      Toast.show("Message send failed. Check internet!", "error");
+    }
+  }
+};
+
+// ==========================================
 // INITIALIZATION & EVENT BINDINGS
 // ==========================================
 function bindHeaderAndUIEvents() {
@@ -220,6 +364,11 @@ function bindHeaderAndUIEvents() {
       e.stopPropagation();
       window.openShareModal();
     };
+  }
+
+  const chatForm = document.getElementById('chat-modal-form');
+  if (chatForm) {
+    chatForm.onsubmit = window.ChatModal.sendMessage;
   }
 
   setupFloatingBotWidget();
