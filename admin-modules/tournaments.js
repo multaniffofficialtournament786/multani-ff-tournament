@@ -250,12 +250,16 @@ export function openEditModal(id) {
   document.getElementById('edit-t-map').value = t.map;
   document.getElementById('edit-t-fee').value = t.entry_fee;
   
+  const editMax = document.getElementById('edit-t-max');
+  if (editMax) editMax.value = t.max_players || 48;
+
   document.getElementById('edit-t-prize-1').value = t.prize_pool || '';
   document.getElementById('edit-t-prize-2').value = t.prize_2 || '';
   document.getElementById('edit-t-prize-3').value = t.prize_3 || '';
   document.getElementById('edit-t-prize-4').value = t.prize_4 || '';
 
-  document.getElementById('edit-t-file').value = '';
+  const editFile = document.getElementById('edit-t-file');
+  if (editFile) editFile.value = '';
   
   if (t.match_date) {
     const dateObj = new Date(t.match_date);
@@ -277,8 +281,11 @@ export async function saveEditedTournament() {
   const title = document.getElementById('edit-t-title').value.trim();
   const mode = document.getElementById('edit-t-mode').value;
   const map = document.getElementById('edit-t-map').value;
-  const entry_fee = parseFloat(document.getElementById('edit-t-fee').value);
+  const entry_fee = parseFloat(document.getElementById('edit-t-fee').value) || 0;
   
+  const editMaxEl = document.getElementById('edit-t-max');
+  const max_players = editMaxEl ? (parseInt(editMaxEl.value) || 48) : undefined;
+
   const prize_1 = parseFloat(document.getElementById('edit-t-prize-1').value) || 0;
   const prize_2 = parseFloat(document.getElementById('edit-t-prize-2').value) || 0;
   const prize_3 = parseFloat(document.getElementById('edit-t-prize-3').value) || 0;
@@ -287,6 +294,17 @@ export async function saveEditedTournament() {
   const match_date_val = document.getElementById('edit-t-date').value;
   const fileInput = document.getElementById('edit-t-file');
 
+  // Freeze save button to avoid duplicate clicks/popups
+  const saveBtn = document.querySelector('#modal-edit-tournament button[onclick="saveEditedTournament()"]') || 
+                  document.querySelector('#modal-edit-tournament button.bg-gradient-to-r') ||
+                  document.getElementById('btn-save-edit');
+  const origText = saveBtn ? saveBtn.innerText : 'SAVE';
+
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = "SAVING...";
+  }
+
   const updateData = {
     title, mode, map, entry_fee, 
     prize_pool: prize_1,
@@ -294,12 +312,16 @@ export async function saveEditedTournament() {
     updated_at: new Date().toISOString()
   };
 
+  if (max_players !== undefined) {
+    updateData.max_players = max_players;
+  }
+
   if (match_date_val) {
     updateData.match_date = new Date(match_date_val).toISOString();
   }
 
   try {
-    if (fileInput.files && fileInput.files[0]) {
+    if (fileInput && fileInput.files && fileInput.files[0]) {
       const file = fileInput.files[0];
       const path = `tournaments/${Date.now()}_${file.name}`;
       const { error: upErr } = await sbClient.storage.from('deposit-screenshots').upload(path, file);
@@ -314,9 +336,14 @@ export async function saveEditedTournament() {
 
     alert("Tournament updated successfully!");
     closeEditModal();
-    loadTournaments();
+    await loadTournaments();
   } catch (err) {
     alert("Error: " + err.message);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = origText;
+    }
   }
 }
 
@@ -377,5 +404,4 @@ export async function kickPlayerFromMatch(entryId, tId) {
     closePlayersModal();
     loadTournaments();
   }
-    }
-    
+}
