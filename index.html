@@ -1,1026 +1,553 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Essential Meta Tags -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MULTANI FF ARENA - OFFICIAL TOURNAMENT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   
-  <meta name="description" content="Join Multani FF Arena Tournaments, play daily Free Fire matches, earn rewards, and cash out instantly." />
-  <meta name="keywords" content="Multani FF, Multani FF Arena, Free Fire Tournament, Pakistan Free Fire, Daily Spin, Free Fire Coins" />
-  <meta name="author" content="Multani FF Official" />
-  <meta name="theme-color" content="#080b11" />
+  <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
+  <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
+
+  <!-- ADVANCED SEO META TAGS -->
+  <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
+  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
+  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire, Multani FF official website, Free Fire daily esports tournament Pakistan, Multani FF gaming zone" />
+  <meta name="author" content="Muhammad Nadeem" />
   <meta name="robots" content="index, follow" />
-
-  <!-- Google Search Console Verification Meta Tag -->
-  <meta name="google-site-verification" content="google-site-verification-token" />
-
-  <!-- Open Graph / WhatsApp / Facebook Share Previews -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="MULTANI FF ARENA - TOURNAMENT" />
-  <meta property="og:description" content="Play daily Free Fire tournaments, spin the wheel, and win real cash prizes." />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" />
-
-  <!-- Twitter Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MULTANI FF ARENA - TOURNAMENT" />
-  <meta name="twitter:description" content="Join Multani FF Arena Tournaments and win prizes." />
-
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <meta name="theme-color" content="#0a0a0f" />
   
-  <!-- Supabase JS Client Library -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  
   <style>
     :root {
-      --bg-dark: #080b11;
-      --bg-card: #121722;
-      --bg-surface: #182030;
-      --primary: #ff5733;
-      --primary-glow: rgba(255, 87, 51, 0.4);
-      --accent-gold: #ffbe00;
+      --bg-base: #06070a;
+      --bg-surface: #0e1118;
+      --bg-card: #151922;
+      --border-color: #262f40;
+      --primary: #ff4624;
+      --primary-glow: rgba(255, 70, 36, 0.45);
       --accent-cyan: #00f0ff;
-      --text-main: #ffffff;
-      --text-muted: #8b9bb4;
-      --text-dim: #5c687a;
-      --border-color: #222c3d;
+      --accent-cyan-glow: rgba(0, 240, 255, 0.4);
+      --accent-gold: #ffbe00;
+      --accent-gold-glow: rgba(255, 190, 0, 0.4);
       --success: #00e676;
       --danger: #ff1744;
-      --radius: 12px;
+      --text-main: #f3f4f6;
+      --text-muted: #8e9bb0;
+      --text-dim: #5c687a;
+      --header-height: 56px;
+      --bottom-nav-height: 64px;
+      --max-app-width: 430px;
+      --font-gaming: 'Rajdhani', sans-serif;
+      --font-ui: 'Inter', sans-serif;
+      --radius: 14px;
       --radius-sm: 8px;
-      --transition: all 0.25s ease-in-out;
-      --font-gaming: 'Impact', 'Arial Black', sans-serif;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
+    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100dvh; display: flex; justify-content: center; align-items: center; user-select: none; }
+    
+    #app-container { 
+      width: 100%; 
+      max-width: var(--max-app-width); 
+      height: 100dvh; 
+      background-color: var(--bg-base); 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); 
+    }
+    @media (min-width: 431px) { #app-container { height: 94vh; border-radius: 28px; border: 1px solid #1f2636; } }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
+    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .header-bar { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
+    .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); position: relative; }
+    .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .sub-header-spacer { width: 38px; }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding-bottom: 75px;
-    }
+    .drawer-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 150; }
+    .side-drawer { position: absolute; top: 0; left: -320px; width: 290px; height: 100%; background: var(--bg-surface); border-right: 1px solid var(--border-color); z-index: 200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+    .side-drawer.open { transform: translateX(320px); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .drawer-user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar-round { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .user-meta h3 { font-family: var(--font-gaming); font-size: 18px; color: var(--text-main); line-height: 1.1; }
+    .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
+    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
+    .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
+    .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
+    .drawer-link.logout-link { color: var(--danger); }
+    .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
+    .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
 
-    /* Master Top Header */
-    .master-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      background: rgba(8, 11, 17, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
+    .main-content { 
+      flex: 1; 
+      overflow-y: auto; 
+      overflow-x: hidden; 
+      padding-bottom: 85px; 
+      position: relative; 
+      -webkit-overflow-scrolling: touch; 
     }
-    .header-logo-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .hamburger-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .header-brand-wrap {
-      text-align: center;
-      cursor: pointer;
-    }
-    .header-brand-sub {
-      font-size: 8px;
-      color: #ff5733;
-      letter-spacing: 2px;
-      display: block;
-      font-weight: bold;
-    }
-    .header-brand {
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      letter-spacing: 1px;
-      color: #ffffff;
-      text-transform: uppercase;
-      line-height: 1.1;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .header-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1.5px solid #ff5733;
-      object-fit: cover;
-      cursor: pointer;
-    }
-    .icon-btn {
-      position: relative;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .badge-dot {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--danger);
-      border: 1px solid var(--bg-dark);
-    }
+    .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Sub Header Bar for Inner Pages */
-    .sub-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgba(8, 11, 17, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-    }
-    .sub-header-title {
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      letter-spacing: 1px;
-      color: var(--accent-gold);
-      text-transform: uppercase;
-    }
-
-    /* App View Container */
-    .view-container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 14px 14px 20px 14px;
-    }
-
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: rgba(18, 23, 34, 0.98);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dim);
-      font-size: 10px;
-      font-weight: 600;
-      gap: 4px;
-      cursor: pointer;
-      transition: var(--transition);
-      flex: 1;
-      height: 100%;
-    }
-    .nav-item i {
-      font-size: 16px;
-    }
-    .nav-item.active {
-      color: #ff5733;
-    }
-    .nav-item.active i {
-      color: #ff5733;
-      transform: translateY(-2px);
-    }
-
-    /* Side Drawer Menu */
-    .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-    }
-    .side-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 290px;
-      background: #0d121c;
-      z-index: 201;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-right: 1px solid var(--border-color);
-    }
-    .side-drawer.open {
-      transform: translateX(0);
-    }
-    .drawer-header {
-      padding: 18px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .drawer-avatar {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 2px solid #ff5733;
-      object-fit: cover;
-    }
-    .drawer-menu-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px 0;
-    }
-    .drawer-menu-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 11px 18px;
-      color: #d1d5db;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .drawer-menu-item:hover, .drawer-menu-item:active {
-      background: var(--bg-surface);
-    }
-    .drawer-menu-item i {
-      font-size: 16px;
-      width: 20px;
-      text-align: center;
-    }
-    .text-gold { color: #ffaa00 !important; }
-    .text-cyan { color: #00f0ff !important; }
-    .text-red { color: #ff1744 !important; }
-
-    /* Floating Robot Menu Button */
-    .floating-bot-container {
-      position: fixed;
-      right: 14px;
-      bottom: 80px;
-      z-index: 150;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
-    .floating-bot-badge {
-      background: linear-gradient(135deg, #ff4624, #e62200);
-      color: #fff;
-      font-size: 8px;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 8px;
-      margin-bottom: -4px;
-      z-index: 2;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      letter-spacing: 1px;
-    }
-    .floating-bot-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #121722;
-      border: 2px solid #ff5733;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 16px rgba(255, 87, 51, 0.5);
-      color: #00f0ff;
-      font-size: 22px;
-      transition: var(--transition);
-    }
-    .floating-bot-btn:active {
-      transform: scale(0.92);
-    }
-
-    /* Cards, Buttons, and UI Components */
-    .player-hero-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .hero-profile-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .hero-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 2px solid #ff5733;
-      object-fit: cover;
-    }
-    .hero-details h2 {
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      letter-spacing: 0.5px;
-    }
-    .uid-tag {
-      font-size: 11px;
-      color: #00f0ff;
-      font-weight: 700;
-      display: block;
-    }
-    .hero-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      border-top: 1px solid var(--border-color);
-      padding-top: 10px;
-    }
-    .stat-box {
-      text-align: center;
-    }
-    .stat-label {
-      font-size: 10px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 2px;
-    }
-    .stat-val {
-      font-family: var(--font-gaming);
-      font-size: 15px;
-      font-weight: bold;
-    }
-    .stat-val.gold { color: var(--accent-gold); }
-    .stat-val.green { color: var(--success); }
-
-    .btn {
-      width: 100%;
-      border: none;
-      outline: none;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 13px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), #e62200);
-      color: #fff;
-      box-shadow: 0 4px 15px var(--primary-glow);
-    }
-    .btn-secondary {
-      background: var(--bg-surface);
-      color: #fff;
-      border: 1px solid var(--border-color);
-    }
-    .btn-sm {
-      padding: 6px 10px;
-      font-size: 11px;
-      width: auto;
-    }
-
-    /* LED Ticker */
-    .led-signboard {
-      background: #000;
-      border: 1px solid #ffbe0055;
-      border-radius: var(--radius-sm);
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
-    }
-    .led-signboard i {
-      color: var(--accent-gold);
-      font-size: 14px;
-    }
-    .ticker-viewport {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .ticker-content {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      color: #00f0ff;
-    }
-    .ticker-content.active {
-      animation: tickerRun linear infinite;
-    }
-    @keyframes tickerRun {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Category Circles */
-    .category-scroll-container {
-      display: flex;
-      gap: 14px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      scrollbar-width: none;
-      margin-bottom: 14px;
-    }
-    .category-scroll-container::-webkit-scrollbar { display: none; }
-    .cat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      min-width: 60px;
-      cursor: pointer;
-    }
-    .cat-circle {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: var(--primary);
-      transition: var(--transition);
-    }
-    .cat-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    /* Screenshot Card / ADS */
     .screenshot-card {
-      background-size: cover;
-      background-position: center;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 14px;
-      position: relative;
-    }
-    .screenshot-card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .screenshot-card-logo {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 12px;
-    }
-    .screenshot-brand-text {
-      font-size: 10px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-    .screenshot-title {
-      font-family: var(--font-gaming);
-      font-size: 17px;
-      color: var(--accent-gold);
-      margin-bottom: 2px;
-    }
-    .screenshot-subtitle {
-      font-size: 11px;
-      color: #fff;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    /* Social Links */
-    .social-footer {
-      text-align: center;
-      padding: 16px 0;
-      border-top: 1px solid var(--border-color);
-      margin-top: 20px;
-    }
-    .social-footer p {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .social-icons-row {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-    .social-icon-btn {
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 11px;
-      font-weight: bold;
-      color: #fff;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-    }
-    .social-icon-btn.whatsapp { border-color: #00e676; color: #00e676; }
-    .social-icon-btn.tiktok { border-color: #00f0ff; color: #00f0ff; }
-    .social-icon-btn.youtube { border-color: #ff1744; color: #ff1744; }
-
-    /* Tournament Cards */
-    .t-card-as8-large {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 14px;
-    }
-    .t-card-thumb-large {
-      position: relative;
-      height: 140px;
-      cursor: pointer;
-    }
-    .t-card-thumb-large img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .t-card-info-large {
-      padding: 12px;
-    }
-    .t-card-title-large {
-      font-family: var(--font-gaming);
-      font-size: 16px;
-      color: #fff;
-      margin-bottom: 4px;
-      cursor: pointer;
-    }
-    .t-card-meta-large {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      margin-bottom: 6px;
-    }
-    .filter-tab-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .filter-tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    /* Slots Grid */
-    .room-slots-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-top: 8px;
-    }
-    .slot-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 8px 4px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .slot-num {
-      font-size: 9px;
-      color: var(--text-dim);
-      font-weight: bold;
-    }
-    .slot-name {
-      font-size: 10px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-    .slot-card.occupied {
-      border-color: rgba(0, 240, 255, 0.4);
-    }
-    .slot-card.my-slot {
-      border-color: var(--primary);
-      background: rgba(255, 87, 51, 0.15);
-    }
-
-    /* Wallet Hero & Lists */
-    .wallet-hero {
-      background: linear-gradient(135deg, #182030, #0c1017);
-      border: 1px solid var(--border-color);
+      border: 1.5px solid #ff770055;
       border-radius: var(--radius);
       padding: 16px;
-      text-align: center;
       margin-bottom: 14px;
-    }
-    .wallet-balance-title {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .wallet-amount {
-      font-family: var(--font-gaming);
-      font-size: 32px;
-      color: var(--accent-gold);
-      margin: 4px 0 12px 0;
-    }
-    .tx-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .tx-info h4 {
-      font-size: 12px;
-      color: #fff;
-    }
-    .tx-info span {
-      font-size: 10px;
-      color: var(--text-dim);
-    }
-    .tx-amount {
-      font-family: var(--font-gaming);
-      font-size: 14px;
-    }
-    .tx-positive { color: var(--success); }
-    .tx-negative { color: var(--danger); }
-
-    /* Form Fields */
-    .form-group {
-      margin-bottom: 12px;
-    }
-    .form-label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .form-input {
-      width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-    }
-    .form-input:focus {
-      border-color: var(--primary);
-    }
-
-    /* Auth Screens */
-    .arena-login-wrap {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .arena-title {
-      font-family: var(--font-gaming);
-      font-size: 22px;
-      color: var(--accent-gold);
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .arena-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .arena-input-box {
       position: relative;
-      margin-bottom: 12px;
-    }
-    .arena-input-box i {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-dim);
-    }
-    .arena-field {
-      width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px 10px 36px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-    }
-
-    /* Rules Dropdown Container */
-    .rules-dropdown-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      background-color: transparent !important;
+      background-size: cover !important;
+      background-position: center !important;
       overflow: hidden;
     }
-    .rules-dropdown-header {
-      padding: 10px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
-    .rules-dropdown-content {
-      display: none;
-      padding: 12px;
-      border-top: 1px solid var(--border-color);
-      font-size: 12px;
-      line-height: 1.5;
-      color: var(--text-muted);
-    }
-    .rules-dropdown-container.open .rules-dropdown-content {
-      display: block;
-    }
+    .screenshot-card > * { position: relative; z-index: 2; }
 
-    /* Toast & Loader */
-    #toast-container {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      pointer-events: none;
-      width: 90%;
-      max-width: 400px;
-    }
-    .toast-msg {
-      background: rgba(18, 23, 34, 0.95);
-      border: 1px solid var(--border-color);
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      text-align: center;
-    }
-    .toast-success { border-color: var(--success); color: var(--success); }
-    .toast-error { border-color: var(--danger); color: var(--danger); }
-    .toast-info { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
+    .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
+    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-shadow: 0 1px 5px rgba(0,0,0,0.98); }
 
-    .global-loader {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 87, 51, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    .rules-dropdown-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 14px; overflow: hidden; }
+    .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; transition: var(--transition); }
+    .rules-dropdown-header:hover { background: #222736; }
+    .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
+    .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
+    .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
+    .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
 
+    .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); text-align: center; }
+    .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px var(--primary-glow); }
+
+    @keyframes ledGlow {
+      0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
+      33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
+      66% { box-shadow: 0 0 12px #ffbe00, inset 0 0 10px rgba(0,230,118,0.3); }
+    }
+    .led-signboard { background: #020305; border: 3px solid transparent; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; position: relative; box-shadow: 0 0 18px rgba(0, 240, 255, 0.35); animation: ledGlow 3s infinite ease-in-out; background-image: radial-gradient(circle, #151c28 1px, transparent 1px); background-size: 6px 6px; }
+    .led-signboard i { color: #ffbe00; font-size: 16px; filter: drop-shadow(0 0 6px #ffbe00); }
+    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
+    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 14px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)); padding-left: 100%; animation: smoothTicker linear infinite; animation-play-state: paused; }
+    .ticker-content.active { animation-play-state: running; }
+
+    @keyframes smoothTicker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+  
+    .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 110; position: absolute; bottom: 0; left: 0; right: 0; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
+    .nav-item i { font-size: 18px; }
+    .nav-item.active { color: var(--primary); }
+
+    .category-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 14px; scrollbar-width: none; }
+    .category-scroll-container::-webkit-scrollbar { display: none; }
+    
+    .cat-item { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; cursor: pointer; gap: 6px; }
+    .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
+    .cat-circle:active { transform: scale(0.92); }
+    .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .cat-item.active-action .cat-circle { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan); transform: scale(1.05); }
+
+    #admin-float-widget { position: absolute; bottom: 120px; right: 18px; z-index: 300; touch-action: none; user-select: none; cursor: grab; display: flex; flex-direction: column-reverse; align-items: center; }
+    #admin-float-widget:active { cursor: grabbing; }
+    .bot-bubble { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #1f293d, #0f131a); border: 2px solid var(--primary); box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3); display: flex; align-items: center; justify-content: center; position: relative; }
+    .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
+    .bot-badge-tag { margin-top: -6px; background: #ff4624; color: #fff; font-family: var(--font-gaming); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.3); }
+    .support-popup-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 10px; align-items: center; animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .support-popup-menu.show { display: flex; }
+    @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    
+    .support-action-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ffbe00, #ff9800); border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); cursor: pointer; text-decoration: none; transition: var(--transition); }
+    .support-action-btn:active { transform: scale(0.9); }
+
+    #chat-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 400; display: flex; flex-direction: column; justify-content: flex-end; }
+    .chat-dialog { height: 82%; background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .chat-dialog-header { padding: 14px 16px; background: #151922; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .chat-user-header { display: flex; align-items: center; gap: 10px; }
+    .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
+    .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    
+    .chat-row { display: flex; flex-direction: column; width: 100%; }
+    .chat-row.mine { align-items: flex-end; }
+    .chat-row.theirs { align-items: flex-start; }
+    
+    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+    .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.theirs { background: #1c2233; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
+    .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+
+    #share-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 500; display: flex; flex-direction: column; justify-content: flex-end; }
+    .share-sheet { background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); padding: 20px 16px 35px 16px; display: flex; flex-direction: column; gap: 16px; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .share-options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
+    .share-app-icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; color: var(--text-main); font-size: 11px; font-weight: 600; }
+    .share-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+
+    #pull-refresh-indicator { text-align: center; padding: 10px; font-family: var(--font-gaming); font-size: 12px; color: var(--accent-cyan); display: none; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
+    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
+    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
+    .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+    .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
+    .stat-val.gold { color: var(--accent-gold); }
+    .stat-val.green { color: var(--success); }
+    .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    
+    .tournaments-stack-as8 { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); position: relative; }
+    .t-card-thumb-large { width: 100%; height: 160px; position: relative; background: #000; cursor: pointer; }
+    .t-card-thumb-large img { width: 100%; height: 100%; object-fit: cover; }
+    .t-card-info-large { padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #11151e; }
+    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; }
+    .t-card-meta-large { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+
+    .room-slots-container { background: #090c12; border: 1.5px solid #262f40; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; }
+    .room-slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; }
+    .slot-card { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #131722; border: 1px solid #1f2636; border-radius: 6px; }
+    .slot-card.occupied { background: #1c2233; border-color: var(--accent-cyan); }
+    .slot-card.my-slot { background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233); border-color: var(--primary); }
+    .slot-num { font-family: var(--font-gaming); font-size: 12px; font-weight: 700; color: var(--text-dim); width: 22px; }
+    .slot-card.occupied .slot-num { color: var(--accent-gold); }
+    .slot-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .slot-card.occupied .slot-name { color: #fff; }
+    .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
+
+    .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
+    .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
+    .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
+    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; overflow: hidden; word-break: break-word; }
+    .tx-info { flex: 1; min-width: 0; padding-right: 8px; }
+    .tx-info h4 { font-size: 14px; font-weight: 600; white-space: normal; overflow-wrap: break-word; }
+    .tx-info span { font-size: 11px; color: var(--text-dim); display: block; white-space: normal; overflow-wrap: break-word; }
+    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; flex-shrink: 0; }
+    .tx-positive { color: var(--success); }
+    .tx-negative { color: var(--danger); }
+    .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+    .toast-msg.toast-success { border-color: var(--success); }
+    .toast-msg.toast-error { border-color: var(--danger); }
+    .toast-msg.toast-info { border-color: var(--accent-cyan); }
+    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
     .hidden { display: none !important; }
+    .text-accent { color: var(--accent-cyan) !important; }
+    .text-gold { color: var(--accent-gold) !important; }
+    .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; }
+    
+    .social-footer { background: #090c12; border-top: 1px solid var(--border-color); padding: 14px 16px; text-align: center; margin-top: 20px; border-radius: var(--radius-sm); }
+    .social-footer p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-family: var(--font-gaming); letter-spacing: 1px; font-weight: 700; }
+    .social-icons-row { display: flex; justify-content: center; gap: 12px; }
+    .social-icon-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; transition: var(--transition); border: 1px solid var(--border-color); color: #fff; }
+    .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
+    .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
+    .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
+    .social-icon-btn:active { transform: scale(0.95); }
+
+    /* ARENA AUTH STYLE OVERRIDES */
+    .arena-login-wrap { max-width: 380px; margin: 0 auto; padding: 20px 4px; }
+    .arena-title { font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #ff5733; letter-spacing: 1.5px; text-align: center; margin-bottom: 4px; text-transform: uppercase; }
+    .arena-subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+    .arena-input-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; transition: var(--transition); }
+    .arena-input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
+    .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
+
+    /* ANIMATED DRAGON & LIGHTING VIP FRAMES */
+    @keyframes dragonGlowGold {
+      0%, 100% { box-shadow: 0 0 20px #ffbe00, 0 0 40px #ff5500, inset 0 0 12px #ffbe00; border-color: #ffbe00; transform: scale(1); }
+      50% { box-shadow: 0 0 35px #ffea75, 0 0 60px #ff7700, inset 0 0 20px #ffea75; border-color: #ffea75; transform: scale(1.03); }
+    }
+    @keyframes dragonGlowSilver {
+      0%, 100% { box-shadow: 0 0 15px #00f0ff, 0 0 30px #0055ff, inset 0 0 10px #00f0ff; border-color: #00f0ff; }
+      50% { box-shadow: 0 0 25px #80f8ff, 0 0 45px #0088ff, inset 0 0 18px #80f8ff; border-color: #80f8ff; }
+    }
+    @keyframes dragonGlowBronze {
+      0%, 100% { box-shadow: 0 0 15px #ff7700, 0 0 30px #aa2200, inset 0 0 10px #ff7700; border-color: #ff7700; }
+      50% { box-shadow: 0 0 25px #ffa14a, 0 0 45px #dd4400, inset 0 0 18px #ffa14a; border-color: #ffa14a; }
+    }
+    .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 1.8s infinite ease-in-out; }
+    .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
+    .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
   </style>
 </head>
 <body>
 
-  <!-- Top Master Header (With Hamburger ☰, Brand, Share, Bell, and Profile Avatar) -->
-  <header id="master-header-bar" class="master-header">
-    <div class="header-logo-group">
-      <button class="hamburger-btn" onclick="window.Drawer.open()" aria-label="Open Menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      <div class="header-brand-wrap" onclick="window.Router.navigate('home')">
-        <span class="header-brand-sub">MULTANI FF</span>
-        <div class="header-brand">ARENA</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="icon-btn" onclick="window.shareAppWebsite()" title="Share App">
-        <i class="fa-solid fa-share-nodes text-cyan"></i>
-      </button>
-      <button class="icon-btn" onclick="window.Router.navigate('notifications')" title="Notifications">
-        <i class="fa-solid fa-bell"></i>
-        <div id="header-notif-badge" class="badge-dot hidden"></div>
-      </button>
-      <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="header-avatar" onclick="window.Router.navigate('profile')" alt="Profile Avatar" />
-    </div>
-  </header>
-
-  <!-- Sub Header Bar -->
-  <header id="sub-header-bar" class="sub-header hidden">
-    <button class="icon-btn" onclick="window.Router.back()">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-    <h3 id="sub-header-title" class="sub-header-title">PAGE TITLE</h3>
-  </header>
-
-  <!-- Main Dynamic View Container -->
-  <main id="app-view"></main>
-
-  <!-- Floating Menu Robot Button -->
-  <div class="floating-bot-container" onclick="window.Drawer.open()">
-    <span class="floating-bot-badge">MENU</span>
-    <div class="floating-bot-btn">
-      <i class="fa-solid fa-robot"></i>
-    </div>
-  </div>
-
-  <!-- Side Drawer Overlay & Menu (Matching Old Website Exactly) -->
-  <div id="drawer-overlay" class="drawer-overlay hidden" onclick="window.Drawer.close()"></div>
-  <aside id="side-drawer" class="side-drawer">
-    <div class="drawer-header">
-      <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="window.Router.navigate('profile')">
-        <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="drawer-avatar" alt="User Profile" />
-        <div>
-          <h3 id="drawer-name" style="font-size:14px; color:#fff; font-weight:700;">Player Name</h3>
-          <span id="drawer-uid" style="font-size:11px; color:var(--accent-cyan); font-weight:700;"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+  <div id="app-container">
+    <header id="main-header" class="app-header">
+      <div id="master-header-bar" class="header-bar">
+        <button id="btn-hamburger" class="icon-btn" aria-label="Open Menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="brand-logo" onclick="Router.navigate('home')">
+          <span class="brand-sub">MULTANI FF</span>
+          <span class="brand-main">ARENA</span>
         </div>
-      </div>
-      <button onclick="window.Drawer.close()" style="background:none; border:none; color:#8b9bb4; font-size:18px; cursor:pointer; padding:4px;">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div class="drawer-menu-list">
-      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('games')"><i class="fa-solid fa-gamepad text-gold"></i> Mini Games</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('chat')"><i class="fa-solid fa-comments"></i> Chat Room</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('home')"><i class="fa-solid fa-house"></i> Home</div>
-      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('spin')"><i class="fa-solid fa-dharmachakra text-gold"></i> Daily Spin Wheel</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i> Tournaments</div>
-      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('winners')"><i class="fa-solid fa-medal text-gold"></i> Hall of Winners</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i> Wallet & History</div>
-      <div class="drawer-menu-item text-cyan" onclick="window.Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer text-cyan"></i> Withdraw / Cashout</div>
-      <div class="drawer-menu-item text-cyan" onclick="window.Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down text-cyan"></i> Deposit Money</div>
-      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('diamonds')"><i class="fa-solid fa-gem text-gold"></i> Buy FF Diamonds</div>
-      <div class="drawer-menu-item text-gold" onclick="window.Router.navigate('invite')"><i class="fa-solid fa-user-plus text-gold"></i> Invite Friends & Rewards</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('leaderboard')"><i class="fa-solid fa-ranking-star"></i> Leaderboard</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
-      <div class="drawer-menu-item text-cyan" onclick="window.shareAppWebsite()"><i class="fa-solid fa-share-nodes text-cyan"></i> Share App</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profile & VIP Protocol</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('rules')"><i class="fa-solid fa-book-open"></i> Rules (A to Z)</div>
-      <div class="drawer-menu-item" onclick="window.Router.navigate('about')"><i class="fa-solid fa-shield-halved"></i> About Us</div>
-      <div class="drawer-menu-item text-red" onclick="window.logoutUser()"><i class="fa-solid fa-arrow-right-from-bracket text-red"></i> Logout</div>
-    </div>
-  </aside>
-
-  <!-- Bottom Navigation Bar (Matches Old Screenshot: Home, Matches, Withdraw, Winners, Wallet) -->
-  <nav id="bottom-nav" class="bottom-nav">
-    <div class="nav-item active" data-page="home" onclick="window.Router.navigate('home')">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
-    </div>
-    <div class="nav-item" data-page="tournaments" onclick="window.Router.navigate('tournaments')">
-      <i class="fa-solid fa-trophy"></i>
-      <span>Matches</span>
-    </div>
-    <div class="nav-item" data-page="withdrawal" onclick="window.Router.navigate('withdrawal')">
-      <i class="fa-solid fa-money-bill-transfer"></i>
-      <span>Withdraw</span>
-    </div>
-    <div class="nav-item" data-page="winners" onclick="window.Router.navigate('winners')">
-      <i class="fa-solid fa-medal"></i>
-      <span>Winners</span>
-    </div>
-    <div class="nav-item" data-page="wallet" onclick="window.Router.navigate('wallet')">
-      <i class="fa-solid fa-wallet"></i>
-      <span>Wallet</span>
-    </div>
-  </nav>
-
-  <!-- Daily Missions Modal Sheet -->
-  <div id="daily-missions-modal-overlay" class="drawer-overlay hidden" style="display:flex; align-items:flex-end; justify-content:center; padding:0;">
-    <div style="background:var(--bg-card); width:100%; max-width:480px; max-height:85vh; border-radius:16px 16px 0 0; border:1px solid var(--accent-gold); display:flex; flex-direction:column; overflow:hidden;">
-      <div style="padding:14px; background:linear-gradient(135deg, #182030, #0c1017); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="font-family:var(--font-gaming); font-size:16px; color:var(--accent-gold);"><i class="fa-solid fa-bullseye"></i> DAILY MISSIONS</h3>
-        <button onclick="window.closeDailyMissionsModal()" class="icon-btn" style="width:28px; height:28px;"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <!-- Missions Rules Dropdown Accordion -->
-      <div style="padding: 10px 14px 0 14px;">
-        <div style="background:#0a0e16; border:1px solid #ffbe0055; border-radius:8px; overflow:hidden;">
-          <div onclick="window.toggleMissionsRulesDropdown()" style="padding:8px 10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-            <span style="font-size:11px; font-weight:700; color:var(--accent-gold);"><i class="fa-solid fa-circle-question"></i> ڈیلی مشنز کے رولز اور طریقہ کار</span>
-            <i id="missions-rules-arrow" class="fa-solid fa-chevron-down" style="font-size:10px; color:var(--accent-gold); transition:0.2s;"></i>
-          </div>
-          <div id="missions-rules-content" style="display:none; padding:10px; border-top:1px solid #1f2636; font-size:11px; line-height:1.5; color:#c7cbd1; direction:rtl; text-align:right;">
-            1. <strong>لاگ اِن بونس:</strong> روزانہ ایپ اوپن کرتے ہی لاگ اِن کوائن کلیم ہو سکتا ہے۔<br>
-            2. <strong>10 الگ گیمز:</strong> ہر گیم کم از کم 30 سیکنڈ تک کھیلنا لازمی ہے، بار بار ایک ہی گیم کھیلنے سے کاؤنٹ نہیں ہوگی۔<br>
-            3. <strong>1 گھنٹہ کھیلیں:</strong> ٹوٹل گیمز کھیل کر 60 منٹ کا ٹائم پورا کریں اور 5 کوائنز حاصل کریں۔<br>
-            4. <strong>ٹورنامنٹ کھیلیں:</strong> دن میں کسی بھی ایک میچ میں حصہ لے کر کلیم کریں۔<br>
-            5. تمام مشنز مکمل کرنے پر <strong>+2 Extra Coins</strong> ملیں گے۔
-          </div>
+        <div class="header-actions">
+          <button id="btn-header-share" class="icon-btn" onclick="openShareModal()" title="Share App">
+            <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
+          </button>
+          <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
+            <i class="fa-solid fa-bell"></i>
+            <span id="header-notif-badge" class="hidden" style="position:absolute; top:6px; right:6px; width:9px; height:9px; background:var(--primary); border-radius:50%; border:1px solid #0e1118;"></span>
+          </button>
+          <button id="btn-header-profile" class="icon-btn avatar-btn" onclick="Router.navigate('profile')">
+            <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
+          </button>
         </div>
       </div>
 
-      <div id="daily-missions-cards-wrap" style="flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px;"></div>
+      <div id="sub-header-bar" class="header-bar hidden">
+        <button id="btn-back" class="icon-btn back-btn" onclick="Router.back()">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
+        <h1 id="sub-header-title" class="sub-header-title">Page</h1>
+        <div class="sub-header-spacer"></div>
+      </div>
+    </header>
+
+    <!-- FULLSCREEN GAME PLAYER MODAL -->
+    <div id="game-player-modal" class="hidden" style="position:fixed; inset:0; background:#000; z-index:999; display:flex; flex-direction:column;">
+      <div style="background:#0e1118; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); height:50px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-gamepad" style="color:var(--accent-gold);"></i>
+          <span id="active-game-title" style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:#fff;">Game</span>
+        </div>
+        <button onclick="closeGamePlayer()" class="btn btn-secondary btn-sm" style="padding:6px 12px; font-size:11px; background:#ff1744; border:none; color:#fff; border-radius:6px; cursor:pointer;">
+          <i class="fa-solid fa-xmark"></i> EXIT
+        </button>
+      </div>
+      <iframe id="game-iframe" src="" style="width:100%; height:calc(100% - 50px); border:none; flex:1;" allow="autoplay; fullscreen; gamepad"></iframe>
     </div>
+
+    <!-- DAILY MISSIONS MODAL SHEET -->
+    <div id="daily-missions-modal-overlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:998; display:flex; flex-direction:column; justify-content:flex-end;">
+      <div class="share-sheet" style="max-height:90vh; overflow-y:auto; padding:20px 16px 30px 16px; background:#0e1118; border-top-left-radius:24px; border-top-right-radius:24px; border-top:2px solid var(--accent-gold);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bullseye" style="color:var(--accent-gold); font-size:20px;"></i>
+            <h3 style="font-family:var(--font-gaming); font-size:19px; color:#ffaa00; text-transform:uppercase;">DAILY MISSIONS & REWARDS</h3>
+          </div>
+          <button onclick="closeDailyMissionsModal()" class="icon-btn" style="width:32px; height:32px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div id="daily-missions-cards-wrap" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
+
+        <!-- ACCORDION RULES & INSTRUCTIONS -->
+        <div id="missions-rules-container" class="rules-dropdown-container" style="margin-bottom:12px; border-color:#ffbe0088; background:#121620;">
+          <div class="rules-dropdown-header" onclick="toggleMissionsRulesDropdown()" style="background:#181e2b; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; cursor:pointer;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">🎁</span>
+              <span style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); letter-spacing:0.5px;">انعام کلیم کرنے کا طریقہ اور مکمل قوانین (Rules)</span>
+            </div>
+            <span id="missions-rules-arrow" style="color:var(--accent-gold); font-size:13px; transition:transform 0.3s ease;">&#9660;</span>
+          </div>
+
+          <div id="missions-rules-content" style="display:none; text-align:right; direction:rtl; padding:14px; font-size:13px; line-height:2; color:#e0e6ed; border-top:1px solid #262f40;">
+            <div style="color:var(--accent-gold); font-weight:bold; font-size:14px; margin-bottom:8px;">🎯 ڈیلی مشنز اور انعامات کی تمام شرائط و ضوابط:</div>
+            <p>1. <strong>روزانہ لاگ اِن (1 کوائن):</strong> ایپ میں لاگ اِن ہوتے ہی یہ مشن مکمل ہو جائے گا اور کھلاڑی 1 کوائن کلیم کر سکے گا۔</p>
+            <p>2. <strong>10 الگ الگ گیمز (1 کوائن):</strong> کھلاڑی کو لسٹ میں موجود 10 مختلف گیمز کھیلنی ہوں گی۔ ایک ہی گیم کو بار بار کھولنے یا ریفریش کرنے سے مشن شمار نہیں ہوگا، اور ہر گیم کو کم از کم 30 سیکنڈز تک ایکٹو کھیلنا لازمی ہے۔</p>
+            <p>3. <strong>1 گھنٹہ گیمز کھیلنا (5 کوائنز):</strong> پورا 1 گھنٹہ (60 منٹ یعنی 3600 سیکنڈز) گیمز کھیلنا لازمی ہے۔ اگر آپ سکرین بند کریں گے یا ایپ سے باہر جائیں گے تو ٹائمر خودبخود رک جائے گا۔</p>
+            <p>4. <strong>ایک ٹورنامنٹ کھیلنا (1 کوائن):</strong> کھلاڑی کو <u>آج کی تاریخ میں</u> کم از کم ایک نیا ٹورنامنٹ یا کسٹم روم میچ جوائن کرنا ہوگا۔ پرانے جوائن شدہ میچز پر اگلے دن کوائن نہیں ملے گا۔</p>
+            <p>5. <strong>اضافی بونس (2 کوائنز):</strong> جب اوپر دیے گئے چاروں مشنز مکمل کلیم ہو جائیں گے تو 2 اضافی کوائنز کا بونس بٹن فوری ان لاک ہو جائے گا۔</p>
+            <p>6. <strong>فوری والیٹ ٹرانسفر:</strong> کلیم بٹن دباتے ہی کوائنز خودبخود آپ کے مین والیٹ بیلنس میں جمع ہو جائیں گے جنہیں آپ ڈائمنڈز یا ٹورنامنٹ انٹری کے لیے استعمال کر سکتے ہیں۔</p>
+            <p>7. <strong>روزانہ ری سیٹ:</strong> تمام ڈیلی مشنز روزانہ رات 12:00 بجے (پاکستان ٹائم) ری سیٹ ہو جائیں گے اور اگلے دن کھلاڑی کو دوبارہ مشنز مکمل کرنے ہوں گے۔</p>
+            <p>8. <strong>سخت فیئر پلے پالیسی:</strong> کسی بھی قسم کی چیٹنگ، ہیک یا آٹو کلکر کا استعمال کرنے پر اکاؤنٹ مستقل بلاک کر دیا جائے گا۔</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHARE MODAL SHEET -->
+    <div id="share-modal-overlay" class="hidden">
+      <div class="share-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
+          <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff;">SHARE APP & EARN</h3>
+          <button onclick="closeShareModal()" class="icon-btn" style="width:30px; height:30px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 3 coins milenge!</p>
+        
+        <div class="share-options-grid">
+          <a id="share-whatsapp" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+            <span>WhatsApp</span>
+          </a>
+          <a id="share-facebook" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#1877f2;"><i class="fa-brands fa-facebook-f"></i></div>
+            <span>Facebook</span>
+          </a>
+          <a id="share-telegram" href="#" target="_blank" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:#0088cc;"><i class="fa-brands fa-telegram"></i></div>
+            <span>Telegram</span>
+          </a>
+          <div onclick="copyShareText()" class="share-app-icon-item">
+            <div class="share-icon-circle" style="background:var(--accent-gold); color:#000;"><i class="fa-solid fa-copy"></i></div>
+            <span>Copy Link</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
+    <aside id="side-drawer" class="side-drawer">
+      <div class="drawer-header">
+        <div class="drawer-user-info">
+          <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-round" />
+          <div class="user-meta">
+            <h3 id="drawer-name">Guest Gamer</h3>
+            <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+          </div>
+        </div>
+        <button id="btn-close-drawer" class="icon-btn" onclick="Drawer.close()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <nav class="drawer-nav">
+        <button onclick="Router.navigate('games')" class="drawer-link text-gold" style="font-weight:700;"><i class="fa-solid fa-gamepad" style="color:var(--accent-gold);"></i> Mini Games</button>
+        <a href="chat.html" class="drawer-link text-gold" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
+        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
+        <button onclick="Router.navigate('spin')" class="drawer-link text-gold"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
+        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
+        <button onclick="Router.navigate('winners')" class="drawer-link text-gold"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
+        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
+        <button onclick="Router.navigate('withdrawal')" class="drawer-link text-accent"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
+        <button onclick="Router.navigate('deposit')" class="drawer-link text-accent"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
+        <button onclick="Router.navigate('diamonds')" class="drawer-link text-gold"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
+        <button onclick="Router.navigate('invite')" class="drawer-link text-gold"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</button>
+        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
+        <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="fa-solid fa-bell"></i> Notifications</span>
+          <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
+        </button>
+        <button onclick="openShareModal()" class="drawer-link" style="color:var(--accent-cyan);"><i class="fa-solid fa-share-nodes"></i> Share App</button>
+        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile & VIP Protocol</button>
+        <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules (A to Z)</button>
+        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
+        <div class="drawer-divider"></div>
+        <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </nav>
+      <div class="drawer-footer">
+        <p>MULTANI FF OFFICIAL TOURNAMENT</p>
+      </div>
+    </aside>
+
+    <main id="app-view" class="main-content">
+      <div id="pull-refresh-indicator">🔄 Pull down to refresh...</div>
+    </main>
+
+    <div id="admin-float-widget">
+      <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
+        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
+      </div>
+
+      <div id="support-popup-menu" class="support-popup-menu">
+        <a href="https://www.instagram.com/multani.ff.gaming?stkn=NnBiYTN1eTM0eXc1" target="_blank" class="support-action-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="support-action-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="support-action-btn" title="Facebook Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn" title="Admin Support Chat"><i class="fa-solid fa-headset"></i></div>
+      </div>
+      <span class="bot-badge-tag">MENU</span>
+    </div>
+
+    <div id="chat-modal-overlay" class="hidden">
+      <div class="chat-dialog">
+        <div class="chat-dialog-header">
+          <div class="chat-user-header">
+            <div class="chat-avatar-status" style="position:relative;">
+              <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">STT</div>
+              <span class="chat-online-dot"></span>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:bold; color:#fff;">Multani FF Official Support</h4>
+              <p style="font-size:10px; color:#00e676;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> Online • Instant Help</p>
+            </div>
+          </div>
+          <button onclick="ChatModal.close()" class="icon-btn" style="color:#aaa;"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div id="chat-modal-messages" class="chat-dialog-body">
+          <div class="chat-row theirs">
+            <div class="chat-bubble theirs">
+              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+            </div>
+            <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+          </div>
+        </div>
+
+        <form id="chat-modal-form" class="chat-input-bar">
+          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
+          <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- JOIN COMMUNITY POPUP (WHATSAPP CHANNEL) -->
+    <div id="community-popup-overlay" class="hidden" style="position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:700; display:flex; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0e1118; border:1.5px solid var(--border-color); border-radius:16px; padding:24px 20px; width:100%; max-width:340px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
+        <div style="width:60px; height:60px; border-radius:50%; background:rgba(37, 211, 102, 0.15); border:2px solid #25d366; display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto; color:#25d366; font-size:28px;">
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+        <h3 style="font-family:var(--font-gaming); font-size:20px; color:#fff; margin-bottom:8px; text-transform:uppercase;">JOIN OUR COMMUNITY</h3>
+        <p style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:20px;">Get tournament updates, match results and exclusive rewards — join our official WhatsApp channel and never miss out!</p>
+        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="btn btn-primary" style="background:#25d366; color:#fff; margin-bottom:10px; text-decoration:none;" onclick="closeCommunityPopup()">JOIN NOW</a>
+        <button onclick="closeCommunityPopup()" class="btn btn-secondary" style="background:transparent; border:none; color:var(--text-dim); font-size:12px; padding:8px;">MAYBE LATER</button>
+      </div>
+    </div>
+
+    <nav id="bottom-nav" class="bottom-nav hidden">
+      <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+      <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
+      <div class="nav-item" data-page="withdrawal" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
+      <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
+      <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+    </nav>
   </div>
 
-  <!-- Fullscreen Game Player Modal -->
-  <div id="game-player-modal" class="drawer-overlay hidden" style="z-index:300; display:flex; flex-direction:column; background:#000;">
-    <div style="padding:10px 14px; background:#080b11; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-      <span id="active-game-title" style="font-family:var(--font-gaming); font-size:14px; color:var(--accent-cyan);">Playing Game</span>
-      <button onclick="window.closeGamePlayer()" class="btn btn-secondary btn-sm" style="width:auto; padding:4px 10px; font-size:11px; background:#ff1744; border:none;">
-        <i class="fa-solid fa-xmark"></i> EXIT GAME
-      </button>
-    </div>
-    <div style="flex:1; width:100%; height:100%; position:relative;">
-      <iframe id="game-iframe" src="" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
-    </div>
-  </div>
-
-  <!-- Toast Notification Box -->
-  <div id="toast-container"></div>
-
-  <!-- Global Fullscreen Loader -->
+  <div id="toast-container" class="toast-container"></div>
   <div id="global-loader" class="global-loader hidden">
-    <div class="spinner"></div>
-    <span id="global-loader-text" style="font-size:12px; font-weight:700; color:var(--accent-cyan); letter-spacing:1px;">LOADING ARENA...</span>
+    <div class="spinner-flame"></div>
+    <span id="global-loader-text" class="loader-text">Loading...</span>
   </div>
 
-  <!-- Master Script Connection -->
+  <!-- MULTANI WEBSITE JS MODULE CONNECTION -->
   <script type="module" src="./multaniwebsite/main.js"></script>
 
 </body>
