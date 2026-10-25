@@ -5,54 +5,62 @@ let activeDiamondTab = 'packs';
 let loadedPackagesList = [];
 
 export async function loadAdminDiamondRequests() {
-  updateTabButtonsUI();
+  const container = document.getElementById('admin-diamond-requests-container');
+  if (!container) return;
+
+  // Agar parent HTML me pehle se koi purane static text ya header ho to unhe clean karein
+  const parentSection = container.closest('#section-diamonds');
+  if (parentSection) {
+    const oldTitle = parentSection.querySelector('.section-title');
+    if (oldTitle) oldTitle.style.display = 'none';
+  }
+
+  // Render Top 2 Navigation Buttons & Dedicated Inner Content Area
+  container.innerHTML = `
+    <!-- Two Main Action Buttons -->
+    <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-1.5 rounded-xl border border-[#262f40] mb-3">
+      <button id="tab-btn-diamond-packs" onclick="switchDiamondTab('packs')" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeDiamondTab === 'packs' ? 'bg-[#ff4624] text-white shadow-lg' : 'bg-[#151922] text-gray-400 hover:text-white'} cursor-pointer">
+        <i class="fa-solid fa-gem"></i> Edit Diamond Packs
+      </button>
+      <button id="tab-btn-diamond-requests" onclick="switchDiamondTab('requests')" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeDiamondTab === 'requests' ? 'bg-[#ff4624] text-white shadow-lg' : 'bg-[#151922] text-gray-400 hover:text-white'} cursor-pointer">
+        <i class="fa-solid fa-list-check"></i> Purchase Requests
+      </button>
+    </div>
+
+    <!-- Active Tab Dynamic View -->
+    <div id="diamond-active-view-area" class="space-y-3">
+      <p class="text-gray-400 text-xs text-center py-4">Loading data...</p>
+    </div>
+  `;
+
+  // Attach global window handlers
+  window.switchDiamondTab = switchDiamondTab;
+  window.saveDiamondPackage = saveDiamondPackage;
+  window.deleteDiamondPackage = deleteDiamondPackage;
+  window.addNewDiamondPackage = addNewDiamondPackage;
+  window.filterDiamondRequests = filterDiamondRequests;
+  window.updateDiamondReqStatus = updateDiamondReqStatus;
+  window.deleteDiamondRequest = deleteDiamondRequest;
+
+  // Load the respective tab view
   if (activeDiamondTab === 'packs') {
     await loadAdminDiamondPackages();
   } else {
     await fetchAndRenderRequests();
-  }
-}
-
-function updateTabButtonsUI() {
-  const btnPacks = document.getElementById('tab-btn-diamond-packs');
-  const btnReqs = document.getElementById('tab-btn-diamond-requests');
-
-  if (btnPacks && btnReqs) {
-    if (activeDiamondTab === 'packs') {
-      btnPacks.className = "py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-[#ff4624] text-white shadow-lg cursor-pointer";
-      btnReqs.className = "py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-[#151922] text-gray-400 hover:text-white cursor-pointer";
-    } else {
-      btnPacks.className = "py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-[#151922] text-gray-400 hover:text-white cursor-pointer";
-      btnReqs.className = "py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-[#ff4624] text-white shadow-lg cursor-pointer";
-    }
   }
 }
 
 export async function switchDiamondTab(tab) {
   activeDiamondTab = tab;
-  updateTabButtonsUI();
-  if (activeDiamondTab === 'packs') {
-    await loadAdminDiamondPackages();
-  } else {
-    await fetchAndRenderRequests();
-  }
+  await loadAdminDiamondRequests();
 }
-
-// Global window mappings
-window.switchDiamondTab = switchDiamondTab;
-window.saveDiamondPackage = saveDiamondPackage;
-window.deleteDiamondPackage = deleteDiamondPackage;
-window.addNewDiamondPackage = addNewDiamondPackage;
-window.filterDiamondRequests = filterDiamondRequests;
-window.updateDiamondReqStatus = updateDiamondReqStatus;
-window.deleteDiamondRequest = deleteDiamondRequest;
 
 /* =========================================================
    1. DIAMOND PACKAGES MANAGEMENT (PRICE LIST & EDIT)
    ========================================================= */
 
 async function loadAdminDiamondPackages() {
-  const content = document.getElementById('admin-diamond-requests-container');
+  const content = document.getElementById('diamond-active-view-area');
   if (!content) return;
   content.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond packages...</p>`;
 
@@ -62,7 +70,7 @@ async function loadAdminDiamondPackages() {
     .order('diamond_count', { ascending: true });
 
   if (error) {
-    content.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${escapeHTML(error.message)}</p>`;
+    content.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading packages: ${escapeHTML(error.message)}</p>`;
     return;
   }
 
@@ -71,7 +79,7 @@ async function loadAdminDiamondPackages() {
 }
 
 function renderDiamondPackagesList() {
-  const content = document.getElementById('admin-diamond-requests-container');
+  const content = document.getElementById('diamond-active-view-area');
   if (!content) return;
 
   const cardsHtml = loadedPackagesList.map(pkg => `
@@ -120,7 +128,7 @@ function renderDiamondPackagesList() {
       </button>
     </div>
 
-    <!-- Existing Packages -->
+    <!-- Existing Packages Grid/List -->
     <div class="space-y-3">
       ${cardsHtml || '<p class="text-gray-500 text-xs text-center py-6">No diamond packages found.</p>'}
     </div>
@@ -152,7 +160,7 @@ export async function saveDiamondPackage(pkgId) {
     .select();
 
   if (error || !data || data.length === 0) {
-    alert("Save failed! " + (error ? error.message : "Database did not update."));
+    alert("Save failed! " + (error ? error.message : "Database did not update. Check Supabase permissions."));
     if (saveBtn) {
       saveBtn.disabled = false;
       saveBtn.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Save Changes`;
@@ -224,12 +232,12 @@ export async function deleteDiamondPackage(pkgId) {
    ========================================================= */
 
 async function fetchAndRenderRequests() {
-  const content = document.getElementById('admin-diamond-requests-container');
+  const content = document.getElementById('diamond-active-view-area');
   if (!content) return;
 
   content.innerHTML = `
     <!-- Filter Pills -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none mb-2">
       ${['all', 'pending', 'approved', 'delivered', 'rejected'].map(s => `
         <button id="diamond-filter-${s}" onclick="filterDiamondRequests('${s}')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${(state.currentDiamondFilter || 'all') === s ? 'bg-[#ff4624] text-white' : 'bg-[#151922] text-gray-400 border border-[#262f40]'}">
           ${s.toUpperCase()}
