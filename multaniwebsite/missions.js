@@ -137,9 +137,20 @@ export async function renderMissionsUI() {
     ];
   }
 
-  let allDone = true;
+  // Database se 5th bonus mission filter karke nikalna agar database mein shamil ho
+  const basicMissions = dbMissions.filter(m => m.action_type !== 'all_missions' && !m.title.includes('تمام'));
+  const hasDbBonus = dbMissions.find(m => m.action_type === 'all_missions' || m.title.includes('تمام'));
 
-  let html = dbMissions.map(m => {
+  // Check karna ke kya tamam basic tasks claim ho chuke hain
+  let allDone = basicMissions.length > 0;
+  basicMissions.forEach(bm => {
+    const key = `m_${bm.id}`;
+    if (!state.userMissionState.claimed[key]) {
+      allDone = false;
+    }
+  });
+
+  let html = basicMissions.map(m => {
     let isReady = false;
     let progressText = '';
     const claimKey = `m_${m.id}`;
@@ -159,11 +170,9 @@ export async function renderMissionsUI() {
       isReady = state.userMissionState.joinedTournament;
       progressText = isReady ? '1 / 1 مکمل' : '0 / 1 جوائن کریں';
     } else {
-      isReady = state.userMissionState.login;
-      progressText = 'ٹاسک مکمل کریں';
+      isReady = false;
+      progressText = 'ٹاسک نامکمل ہے';
     }
-
-    if (!isClaimed) allDone = false;
 
     let actionBtn = '';
     if (isClaimed) {
@@ -188,11 +197,16 @@ export async function renderMissionsUI() {
     `;
   }).join('');
 
+  // 5th Bonus Mission: sirf ek dafa render hoga aur strict allDone check par chalega
+  const bonusRewardCoins = hasDbBonus?.reward_coins || 2;
+  const bonusClaimKey = hasDbBonus ? `m_${hasDbBonus.id}` : 'allBonus';
+  const isBonusClaimed = !!state.userMissionState.claimed[bonusClaimKey] || !!state.userMissionState.claimed['allBonus'];
+
   let allBonusBtn = '';
-  if (state.userMissionState.claimed.allBonus) {
+  if (isBonusClaimed) {
     allBonusBtn = `<button class="btn btn-secondary btn-sm" style="background:#1b2434; color:var(--success); border-color:#00e67655; cursor:default;" disabled><i class="fa-solid fa-check"></i> وصول ہو گیا</button>`;
-  } else if (allDone && dbMissions.length > 0) {
-    allBonusBtn = `<button onclick="window.claimMissionReward('allBonus', 2, 'تمام مشنز مکمل بونس')" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000; font-weight:800; box-shadow:0 0 14px rgba(255,190,0,0.6);"><i class="fa-solid fa-crown"></i> CLAIM +2</button>`;
+  } else if (allDone) {
+    allBonusBtn = `<button onclick="window.claimMissionReward('${bonusClaimKey}', ${bonusRewardCoins}, 'تمام مشنز مکمل بونس')" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #ffbe00, #ff7700); color:#000; font-weight:800; box-shadow:0 0 14px rgba(255,190,0,0.6);"><i class="fa-solid fa-crown"></i> CLAIM +${bonusRewardCoins}</button>`;
   } else {
     allBonusBtn = `<button class="btn btn-secondary btn-sm" style="background:#262f40; color:var(--text-dim); cursor:default;" disabled>لاک ہے</button>`;
   }
@@ -202,9 +216,9 @@ export async function renderMissionsUI() {
       <div style="flex:1;">
         <div style="display:flex; align-items:center; gap:6px;">
           <span style="font-size:14px; font-weight:800; color:var(--accent-gold);">تمام ڈیلی مشنز مکمل کرنا</span>
-          <span style="font-family:var(--font-gaming); font-size:11px; font-weight:bold; color:#00e676; background:rgba(0,230,118,0.15); padding:2px 6px; border-radius:4px;">+2 Extra Coins</span>
+          <span style="font-family:var(--font-gaming); font-size:11px; font-weight:bold; color:#00e676; background:rgba(0,230,118,0.15); padding:2px 6px; border-radius:4px;">+${bonusRewardCoins} Extra Coins</span>
         </div>
-        <span style="font-size:11px; color:#c7cbd1; display:block; margin-top:2px;">تمام ایکٹو مشنز کلیم کرنے پر 2 اضافی کوائنز ملیں گے</span>
+        <span style="font-size:11px; color:#c7cbd1; display:block; margin-top:2px;">تمام ایکٹو مشنز کلیم کرنے پر ${bonusRewardCoins} اضافی کوائنز ملیں گے</span>
       </div>
       <div>${allBonusBtn}</div>
     </div>
