@@ -732,7 +732,7 @@
 
       <!-- TUTORIALS & ADS -->
       <section id="section-tutorials" class="space-y-4 hidden">
-        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
           <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
             <i class="fa-solid fa-video text-cyan-400"></i> Manage Video Tutorials & Ads
           </h2>
@@ -1054,18 +1054,26 @@
   </div>
 
   <!-- MODAL: EDIT TOURNAMENT -->
-  <div id="modal-edit-tournament" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
-      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Tournament</h3>
-      <input type="hidden" id="edit-t-id" />
-      <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Title</label>
-        <input type="text" id="edit-t-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+  <div id="modal-edit-tournament" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-md space-y-3 max-h-[82vh] overflow-y-auto sidebar-scroll pb-12 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base sm:text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-[#ff4624]"></i> Edit Tournament
+        </h3>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
+      
+      <input type="hidden" id="edit-t-id" />
+      
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Title</label>
+        <input type="text" id="edit-t-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mode</label>
-          <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Mode</label>
+          <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
             <option value="Squad">Squad</option>
             <option value="Solo">Solo</option>
             <option value="Duo">Duo</option>
@@ -1075,8 +1083,8 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Map</label>
-          <select id="edit-t-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white">
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Map</label>
+          <select id="edit-t-map" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
             <option value="Bermuda">Bermuda</option>
             <option value="Purgatory">Purgatory</option>
             <option value="Kalahari">Kalahari</option>
@@ -1085,10 +1093,15 @@
           </select>
         </div>
       </div>
+
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
-          <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white" />
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
+          <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Total Slots</label>
+          <input type="number" id="edit-t-max" placeholder="Slots (e.g. 12, 48)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
         </div>
       </div>
 
@@ -1097,34 +1110,36 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
-            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
           </div>
           <div>
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
-            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
           </div>
           <div>
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
-            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
           </div>
           <div>
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
-            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
           </div>
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
-        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" />
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
+        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
       </div>
+
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Change Match Photo</label>
-        <input type="file" id="edit-t-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-300 outline-none" />
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Change Match Photo</label>
+        <input type="file" id="edit-t-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-gray-300 outline-none" />
       </div>
+
       <div class="flex gap-2 pt-2">
-        <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
-        <button onclick="saveEditedTournament()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
+        <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hover:bg-[#262f40] transition">CANCEL</button>
+        <button onclick="saveEditedTournament()" id="btn-save-edit" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg text-xs font-bold font-gaming uppercase tracking-wider transition">SAVE</button>
       </div>
     </div>
   </div>
