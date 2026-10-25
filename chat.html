@@ -18,15 +18,44 @@
 .rule-body ol{margin:0;padding-left:18px}
 .rule-body li{margin-bottom:6px}
 
-.toolbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:#0c1019}.toolbar .room{font-weight:800;letter-spacing:.3px;flex:1}.iconbtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:10px;width:38px;height:36px;font-size:17px;cursor:pointer}.iconbtn:active,.send:active{transform:scale(.96)}.menuwrap{position:relative}.dropdown{display:none;position:absolute;right:0;top:43px;width:230px;background:#111724;border:1px solid #354055;border-radius:14px;padding:7px;z-index:10;box-shadow:0 15px 40px #000c}.dropdown.show{display:block}.dropdown button{width:100%;border:0;background:transparent;color:var(--text);padding:11px 10px;text-align:left;border-radius:9px;font-size:12px;cursor:pointer}.dropdown button:hover{background:#ffffff0d}.messages{flex:1;overflow-y:auto;padding:15px 12px 18px;scroll-behavior:smooth;background-size:cover!important;background-position:center!important}.day{text-align:center;color:var(--muted);font-size:10px;margin:0 auto 15px;background:#111723;border:1px solid var(--border);padding:6px 10px;border-radius:20px;width:max-content}.empty{text-align:center;color:var(--muted);padding:45px 20px}.empty .big{font-size:38px;margin-bottom:10px}.msgrow{display:flex;gap:8px;margin:12px 0;align-items:flex-end}.msgrow.mine{flex-direction:row-reverse}.avatar{width:30px;height:30px;flex:0 0 30px;border-radius:50%;object-fit:cover;background:#202b3b;border:1px solid #ffffff24;display:grid;place-items:center;font-size:12px;color:var(--cyan);overflow:hidden}.bubblewrap{max-width:82%;min-width:65px}.meta{font-size:10px;color:var(--muted);margin:0 5px 5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.meta .name{color:var(--cyan);font-weight:700}.mine .meta{justify-content:flex-end}.uid{color:#77849a}.bubble{background:var(--bubble);border:1px solid #ffffff0b;border-radius:15px 15px 15px 4px;padding:10px 12px;line-height:1.45;overflow-wrap:anywhere;white-space:pre-wrap}.mine .bubble{background:var(--mine);border-color:#20e7f425;border-radius:15px 15px 4px 15px}
+.toolbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:#0c1019}.toolbar .room{font-weight:800;letter-spacing:.3px;flex:1}.iconbtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:10px;width:38px;height:36px;font-size:17px;cursor:pointer}.iconbtn:active,.send:active{transform:scale(.96)}.menuwrap{position:relative}.dropdown{display:none;position:absolute;right:0;top:43px;width:230px;background:#111724;border:1px solid #354055;border-radius:14px;padding:7px;z-index:10;box-shadow:0 15px 40px #000c}.dropdown.show{display:block}.dropdown button{width:100%;border:0;background:transparent;color:var(--text);padding:11px 10px;text-align:left;border-radius:9px;font-size:12px;cursor:pointer}.dropdown button:hover{background:#ffffff0d}
+
+.messages{flex:1;overflow-y:auto;padding:15px 12px 18px;scroll-behavior:smooth;background-size:cover!important;background-position:center!important}.day{text-align:center;color:var(--muted);font-size:10px;margin:0 auto 15px;background:#111723;border:1px solid var(--border);padding:6px 10px;border-radius:20px;width:max-content}.empty{text-align:center;color:var(--muted);padding:45px 20px}.empty .big{font-size:38px;margin-bottom:10px}
+
+/* WhatsApp-like Compact Chat Bubbles */
+.msgrow{display:flex;gap:8px;margin:8px 0;align-items:flex-end;width:100%}
+.msgrow.mine{flex-direction:row-reverse}
+.avatar{width:30px;height:30px;flex:0 0 30px;border-radius:50%;object-fit:cover;background:#202b3b;border:1px solid #ffffff24;display:grid;place-items:center;font-size:12px;color:var(--cyan);overflow:hidden}
+.bubblewrap{max-width:78%;min-width:0;display:flex;flex-direction:column}
+.msgrow.mine .bubblewrap{align-items:flex-end}
+.meta{font-size:10.5px;color:var(--muted);margin:0 4px 3px;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.meta .name{color:var(--cyan);font-weight:700}
+.mine .meta{justify-content:flex-end}
+.uid{color:#77849a;font-size:9.5px}
+
+.bubble{display:inline-block;width:fit-content;max-width:100%;background:var(--bubble);border:1px solid #ffffff0d;border-radius:14px 14px 14px 2px;padding:6px 11px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.mine .bubble{background:var(--mine);border-color:#20e7f425;border-radius:14px 14px 2px 14px}
 
 /* Admin VIP Bubble & Badges */
 .admin-badge{background:linear-gradient(135deg,#ffd700,#ff8800);color:#0a0c10;font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;box-shadow:0 0 8px rgba(255,215,0,0.6);margin-left:4px;display:inline-block}
 .msgrow.admin .name{color:#ffd700!important;text-shadow:0 0 6px rgba(255,215,0,0.5)}
-.msgrow.admin .bubble{background:linear-gradient(135deg,#231b0a,#3d2a0d)!important;border:1px solid #ffd70066!important;box-shadow:0 0 14px rgba(255,215,0,0.22);color:#fff6db}
-.msgrow.admin.mine .bubble{background:linear-gradient(135deg,#2f240e,#4a3512)!important;border-color:#ffd700aa!important}
+.msgrow.admin .bubble{background:linear-gradient(135deg,#231b0a,#3a280c)!important;border:1px solid #ffd70066!important;box-shadow:0 0 10px rgba(255,215,0,0.2);color:#fff6db}
+.msgrow.admin.mine .bubble{background:linear-gradient(135deg,#2d210c,#463110)!important;border-color:#ffd700aa!important}
 
-.bubble.sticker{font-size:42px;background:transparent!important;border:0!important;padding:2px;box-shadow:none!important}.bubble.sticker img{max-width:140px;max-height:140px;display:block;border-radius:8px}.replyquote{border-left:3px solid var(--orange);background:#0003;border-radius:5px;padding:6px 8px;margin-bottom:7px;font-size:11px;color:#c0cada}.time{font-size:9px;color:#8591a4;text-align:right;margin-top:5px}.composerarea{border-top:1px solid var(--border);padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:#0c1019}.replybar{display:none;background:#151c2a;border-left:3px solid var(--orange);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#d4dbea}.replybar.show{display:flex;justify-content:space-between;align-items:center;gap:8px}.replybar button{border:0;background:transparent;color:var(--text);font-size:17px}.composer{display:flex;align-items:flex-end;gap:7px}.inputwrap{flex:1;display:flex;align-items:flex-end;gap:7px;border:1px solid #344055;background:#131a27;border-radius:17px;padding:7px 9px;min-width:0}.inputwrap textarea{flex:1;min-width:0;resize:none;max-height:100px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:var(--size);line-height:1.4;padding:4px 0}.smallbtn{background:transparent;border:0;color:#c7d2e4;font-size:21px;padding:2px;cursor:pointer}.send{width:43px;height:43px;border:0;border-radius:14px;color:#061015;background:linear-gradient(135deg,var(--cyan),#71f6d2);font-size:19px;font-weight:900;box-shadow:0 0 16px #20e7f42a;cursor:pointer}.send:disabled{opacity:.4}.hint{font-size:10px;color:#657187;text-align:center;margin-top:7px}.overlay{display:none;position:fixed;inset:0;background:#0009;z-index:30;align-items:flex-end;justify-content:center}.overlay.show{display:flex}.sheet{width:min(520px,100%);max-height:80dvh;overflow:auto;background:#111724;border:1px solid #344055;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -15px 45px #0008}.sheet h2{margin:0 0 14px;font-size:17px}.sheet button.opt{display:block;width:100%;padding:12px;border:1px solid #293548;background:#151d2b;color:var(--text);border-radius:11px;text-align:left;margin:7px 0;font-size:13px}.sheet button.danger{border-color:#8d342d;color:#ff9587}.sheet .close{float:right;background:transparent;border:0;color:var(--muted);font-size:22px}.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.themes button{height:65px;border-radius:12px;border:2px solid transparent;color:white;font-weight:700}.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#182333;border:1px solid #34445a;padding:10px 14px;border-radius:12px;font-size:12px;z-index:50;box-shadow:0 5px 25px #0008;display:none;max-width:90%;text-align:center}.toast.show{display:block}.stickergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stickergrid button{background:#1a2434;border:1px solid #2d3a50;border-radius:12px;padding:8px;display:grid;place-items:center;cursor:pointer}.stickergrid button img{width:46px;height:46px;object-fit:contain}.muted{color:var(--muted);font-size:11px;line-height:1.5}.signin{margin:auto;text-align:center;padding:28px;max-width:340px}.signin h2{font-family:Rajdhani;font-size:25px}.signin button{background:var(--orange);border:0;border-radius:10px;padding:12px 18px;color:#fff;font-weight:700}
+.bubble.sticker{background:transparent!important;border:0!important;padding:2px!important;box-shadow:none!important}
+.bubble.sticker img{max-width:125px;max-height:125px;display:block;border-radius:10px}
+.replyquote{border-left:3px solid var(--orange);background:#00000030;border-radius:5px;padding:4px 7px;margin-bottom:5px;font-size:10.5px;color:#c0cada}
+.time{font-size:9px;color:#8591a4;margin-top:3px;padding:0 2px}
+.mine .time{text-align:right}
+
+.composerarea{border-top:1px solid var(--border);padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:#0c1019}.replybar{display:none;background:#151c2a;border-left:3px solid var(--orange);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#d4dbea}.replybar.show{display:flex;justify-content:space-between;align-items:center;gap:8px}.replybar button{border:0;background:transparent;color:var(--text);font-size:17px}.composer{display:flex;align-items:flex-end;gap:7px}.inputwrap{flex:1;display:flex;align-items:flex-end;gap:7px;border:1px solid #344055;background:#131a27;border-radius:17px;padding:7px 9px;min-width:0}.inputwrap textarea{flex:1;min-width:0;resize:none;max-height:100px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:var(--size);line-height:1.4;padding:4px 0}.smallbtn{background:transparent;border:0;color:#c7d2e4;font-size:21px;padding:2px;cursor:pointer}.send{width:43px;height:43px;border:0;border-radius:14px;color:#061015;background:linear-gradient(135deg,var(--cyan),#71f6d2);font-size:19px;font-weight:900;box-shadow:0 0 16px #20e7f42a;cursor:pointer}.send:disabled{opacity:.4}.hint{font-size:10px;color:#657187;text-align:center;margin-top:7px}.overlay{display:none;position:fixed;inset:0;background:#0009;z-index:30;align-items:flex-end;justify-content:center}.overlay.show{display:flex}.sheet{width:min(520px,100%);max-height:80dvh;overflow:auto;background:#111724;border:1px solid #344055;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -15px 45px #0008}.sheet h2{margin:0 0 14px;font-size:17px}.sheet button.opt{display:block;width:100%;padding:12px;border:1px solid #293548;background:#151d2b;color:var(--text);border-radius:11px;text-align:left;margin:7px 0;font-size:13px}.sheet button.danger{border-color:#8d342d;color:#ff9587}.sheet .close{float:right;background:transparent;border:0;color:var(--muted);font-size:22px}.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.themes button{height:65px;border-radius:12px;border:2px solid transparent;color:white;font-weight:700}.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#182333;border:1px solid #34445a;padding:10px 14px;border-radius:12px;font-size:12px;z-index:50;box-shadow:0 5px 25px #0008;display:none;max-width:90%;text-align:center}.toast.show{display:block}
+
+/* Sticker Grid Sheet */
+.stickergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:6px 0}
+.stickergrid button{background:#151d2c;border:1px solid #2d3a50;border-radius:12px;padding:8px;display:grid;place-items:center;cursor:pointer;aspect-ratio:1;transition:transform 0.15s ease}
+.stickergrid button:active{transform:scale(0.92)}
+.stickergrid button img{width:100%;height:100%;object-fit:contain}
+.muted{color:var(--muted);font-size:11px;line-height:1.5}.signin{margin:auto;text-align:center;padding:28px;max-width:340px}.signin h2{font-family:Rajdhani;font-size:25px}.signin button{background:var(--orange);border:0;border-radius:10px;padding:12px 18px;color:#fff;font-weight:700}
 body.theme-purple{--orange:#c18aff;--cyan:#72a7ff;--mine:#302344;--bubble:#1b1c30}body.theme-green{--orange:#b8f56b;--cyan:#42f5b3;--mine:#16372e;--bubble:#172a27}body.theme-rose{--orange:#ff78a8;--cyan:#ffb4d0;--mine:#3b2130;--bubble:#2a1d29}body.theme-light{--bg:#e8edf5;--panel:#fff;--panel2:#e9eef6;--text:#182132;--muted:#68758a;--bubble:#e8edf5;--mine:#d2f3ed;--border:#cbd4e2;background:#e8edf5}.theme-light .app{background:#f7f9fc}.theme-light .top,.theme-light .toolbar,.theme-light .composerarea{background:#f0f4fa}.theme-light .inputwrap,.theme-light .dropdown,.theme-light .sheet{background:#fff}.theme-light .dropdown button{color:#182132}
 </style></head>
 <body><main class="app" id="app">
@@ -68,7 +97,7 @@ body.theme-purple{--orange:#c18aff;--cyan:#72a7ff;--mine:#302344;--bubble:#1b1c3
 <div class="toolbar">
   <button class="iconbtn" id="backBtn" title="Back">‹</button>
   <div class="room">🌐 Public Chat Room</div>
-  <button class="iconbtn" id="stickerTop" title="Stickers">👾</button>
+  <button class="iconbtn" id="stickerTop" title="Stickers">🏷️</button>
   <div class="menuwrap">
     <button class="iconbtn" id="menuBtn" title="Chat settings">⋮</button>
     <div class="dropdown" id="dropdown">
@@ -89,9 +118,10 @@ body.theme-purple{--orange:#c18aff;--cyan:#72a7ff;--mine:#302344;--bubble:#1b1c3
 <div class="composerarea">
   <div class="replybar" id="replybar"><span id="replyText">Replying to message</span><button id="cancelReply">×</button></div>
   <div class="composer">
-    <!-- Left corner: Stickers button -->
-    <button class="smallbtn" id="stickerBtn" title="Stickers">👾</button>
-    <!-- Inside input: Emoji button -->
+    <!-- Niche Corner: Sticker Button -->
+    <button class="smallbtn" id="stickerBtn" title="Stickers">🏷️</button>
+    
+    <!-- Input box k andar Emoji Button -->
     <div class="inputwrap">
       <button class="smallbtn" id="emojiBtn" title="Emoji">😊</button>
       <textarea id="messageInput" rows="1" maxlength="1000" placeholder="Message all players…"></textarea>
@@ -105,7 +135,7 @@ body.theme-purple{--orange:#c18aff;--cyan:#72a7ff;--mine:#302344;--bubble:#1b1c3
 <div class="overlay" id="overlay"><section class="sheet" id="sheet"></section></div>
 <div class="toast" id="toast"></div>
 
-<!-- Hidden File Input for Gallery Wallpaper -->
+<!-- Hidden File Input for Gallery Background -->
 <input type="file" id="bgFileInput" accept="image/*" style="display:none">
 
 <script type="module">
@@ -117,21 +147,32 @@ const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const ADMIN_UID='3239454397';
 const SEND_SOUND_URL='https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/media/sounds/iPhone_Text_Message_Sent_Sound_Effect(256k).mp3';
 
-// GitHub Stickers from repository folder
+// GitHub Repository se saare original stickers
 const GITHUB_STICKERS=[
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/1.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/2.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/3.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/4.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/5.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/6.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/7.png',
-  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/8.png'
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w.webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(1).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(2).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(3).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(4).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(5).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(6).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(7).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(8).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(9).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(10).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(11).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(12).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(13).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(14).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/200w%20(15).webp',
+  'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/giphy.gif'
 ];
 
 const $=id=>document.getElementById(id); 
 let me=null, myProfile={}, messages=[], hiddenIds=new Set(), replyTo=null, channel=null, presenceChannel=null, soundOn=true, notificationsOn=true, backgroundChoice='default', customBgData='', messageStyle='normal';
+
 const sendAudio=new Audio(SEND_SOUND_URL);
+sendAudio.preload='auto';
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -172,10 +213,11 @@ function applyBackground(){
   box.style.background=bgs[backgroundChoice]||'';
 }
 
+// 1.50 second silence skip kar ke play karna
 function playSendSound(){
   if(!soundOn)return;
   try{
-    sendAudio.currentTime=0;
+    sendAudio.currentTime=1.50;
     sendAudio.play().catch(()=>{});
   }catch{}
 }
@@ -347,9 +389,9 @@ function openMessageActions(id){
 }
 
 function showStickers(){
-  openSheet('Official Tournament Stickers',`
+  openSheet('Tournament Stickers',`
     <div class="stickergrid">
-      ${GITHUB_STICKERS.map(url=>`<button data-img="${url}"><img src="${url}" alt="sticker" onerror="this.outerHTML='🔥'"></button>`).join('')}
+      ${GITHUB_STICKERS.map(url=>`<button data-img="${url}"><img src="${url}" alt="sticker" loading="lazy" onerror="this.outerHTML='👾'"></button>`).join('')}
     </div>
   `);
   $('sheet').querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{
@@ -417,8 +459,8 @@ function handleMenu(action){
     $('sheet').querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{
       messageStyle=b.dataset.style;
       document.querySelectorAll('.bubble').forEach(x=>{
-        x.style.padding=messageStyle==='compact'?'6px 9px':messageStyle==='soft'?'12px 14px':'';
-        x.style.borderRadius=messageStyle==='soft'?'22px':'';
+        x.style.padding=messageStyle==='compact'?'4px 8px':messageStyle==='soft'?'10px 14px':'';
+        x.style.borderRadius=messageStyle==='soft'?'20px':'';
       });
       savePrefs();
       $('overlay').classList.remove('show');
