@@ -2,7 +2,7 @@
 // MULTANI FF OFFICIAL - MASTER MODULE LOADER
 // ==========================================
 
-import { state, Sound, Toast, Loader } from './config.js';
+import { sbClient, state, Sound, Toast, Loader } from './config.js';
 import { syncAuthAndProfile, renderAuth, renderForgotPassword, renderProfile, uploadAvatarPhoto, saveUserProfile } from './auth.js';
 import { Router, Drawer, setupRouterEvents } from './router.js';
 import { renderHome } from './home.js';
@@ -205,10 +205,6 @@ function setupFloatingBotWidget() {
 // ==========================================
 // 4. ADMIN SUPPORT CHAT MODAL & SUPABASE LOGIC
 // ==========================================
-function getSupabaseClient() {
-  return window.supabaseClient || window.supabase || null;
-}
-
 let supportChatSub = null;
 
 window.ChatModal = {
@@ -226,10 +222,9 @@ window.ChatModal = {
     await window.ChatModal.loadMessages();
 
     // Listen to real-time incoming messages from Admin
-    const sb = getSupabaseClient();
-    if (!supportChatSub && sb) {
+    if (!supportChatSub && sbClient) {
       try {
-        supportChatSub = sb
+        supportChatSub = sbClient
           .channel('support-chat-room')
           .on(
             'postgres_changes',
@@ -259,13 +254,12 @@ window.ChatModal = {
   },
 
   loadMessages: async () => {
-    const sb = getSupabaseClient();
-    if (!sb || !state.currentUser) return;
+    if (!sbClient || !state.currentUser) return;
     const container = document.getElementById('chat-modal-messages');
     if (!container) return;
 
     try {
-      const { data, error } = await sb
+      const { data, error } = await sbClient
         .from('support_messages')
         .select('*')
         .eq('user_id', state.currentUser.id)
@@ -286,7 +280,7 @@ window.ChatModal = {
       if (data && data.length > 0) {
         data.forEach(msg => {
           const type = msg.sender_role === 'admin' ? 'theirs' : 'mine';
-          const label = msg.sender_role === 'admin' ? 'Support Desk' : (state.currentProfile?.full_name || 'You');
+          const label = msg.sender_role === 'admin' ? 'Support Desk' : (state.currentProfile?.free_fire_name || state.currentProfile?.full_name || 'You');
           window.ChatModal.appendMessage(msg.message, type, msg.created_at, label);
         });
       }
@@ -332,16 +326,17 @@ window.ChatModal = {
 
     input.value = '';
 
+    const senderName = state.currentProfile?.free_fire_name || state.currentProfile?.full_name || 'Player';
+
     // Show message immediately on UI
-    window.ChatModal.appendMessage(msgText, 'mine', new Date().toISOString(), state.currentProfile?.full_name || 'You');
+    window.ChatModal.appendMessage(msgText, 'mine', new Date().toISOString(), senderName);
 
     try {
-      const sb = getSupabaseClient();
-      if (!sb) throw new Error("Supabase client not found");
+      if (!sbClient) throw new Error("Supabase client not initialized");
 
       const payload = {
         user_id: state.currentUser.id,
-        user_name: state.currentProfile?.full_name || 'Player',
+        user_name: senderName,
         user_uid: state.currentProfile?.free_fire_uid || 'N/A',
         message: msgText,
         sender_role: 'user',
@@ -349,7 +344,7 @@ window.ChatModal = {
         created_at: new Date().toISOString()
       };
 
-      const { error } = await sb.from('support_messages').insert([payload]);
+      const { error } = await sbClient.from('support_messages').insert([payload]);
       if (error) throw error;
       Sound?.play?.('click');
     } catch (err) {
