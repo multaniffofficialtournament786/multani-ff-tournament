@@ -17,10 +17,6 @@
   <meta property="og:description" content="Play daily Free Fire tournaments, spin the wheel, and win real cash prizes." />
   <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" />
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MULTANI FF ARENA - TOURNAMENT" />
-  <meta name="twitter:description" content="Join Multani FF Arena Tournaments and win prizes." />
-
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
@@ -168,53 +164,286 @@
       text-transform: uppercase;
     }
 
-    /* App View Container */
+    /* Main View Container */
     .view-container {
       max-width: 480px;
       margin: 0 auto;
       padding: 14px 14px 20px 14px;
     }
 
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: rgba(18, 23, 34, 0.98);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border-color);
+    /* Running Announcement Ticker */
+    .led-signboard {
+      background: #000;
+      border: 1px solid #ffbe0055;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
       display: flex;
-      justify-content: space-around;
       align-items: center;
-      z-index: 100;
-      max-width: 480px;
-      margin: 0 auto;
+      gap: 10px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
     }
-    .nav-item {
+    .ticker-icon {
+      color: var(--accent-gold);
+      font-size: 14px;
+      z-index: 2;
+    }
+    .ticker-viewport {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+      color: #00f0ff;
+      animation: tickerRun 25s linear infinite;
+    }
+    @keyframes tickerRun {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Home Hero Player Card */
+    .player-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .hero-profile-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hero-avatar-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #ff5733;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .hero-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-details {
+      margin-left: 12px;
+      flex: 1;
+    }
+    .hero-details h2 {
+      font-family: var(--font-gaming);
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .uid-tag {
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      display: block;
+    }
+    .whatsapp-tag {
+      font-size: 11px;
+      color: var(--success);
+      font-weight: 600;
+      display: block;
+    }
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+    .stat-box {
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .stat-val {
+      font-family: var(--font-gaming);
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .stat-val.gold { color: var(--accent-gold); }
+    .stat-val.green { color: var(--success); }
+
+    /* Category Circles Horizontal Scroll */
+    .category-scroll-container {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      margin-bottom: 14px;
+    }
+    .category-scroll-container::-webkit-scrollbar { display: none; }
+    .cat-item {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 6px;
+      min-width: 60px;
+      cursor: pointer;
+    }
+    .cat-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      display: flex;
+      align-items: center;
       justify-content: center;
-      color: var(--text-dim);
+      font-size: 18px;
+      transition: var(--transition);
+    }
+    .cat-circle.gold { border-color: #ffaa00; color: #ffaa00; }
+    .cat-circle.red { border-color: #ff5733; color: #ff5733; }
+    .cat-circle.cyan { border-color: #00f0ff; color: #00f0ff; }
+    .cat-label {
       font-size: 10px;
       font-weight: 600;
-      gap: 4px;
+      color: var(--text-muted);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* Video Banner Cards */
+    .screenshot-card {
+      background-size: cover;
+      background-position: center;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 14px;
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .screenshot-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .screenshot-card-logo {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+    }
+    .screenshot-brand-text {
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .screenshot-title {
+      font-family: var(--font-gaming);
+      font-size: 18px;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+    .screenshot-subtitle {
+      font-size: 11px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* Draggable Speed-Dial Floating Robot */
+    #draggable-bot-container {
+      position: fixed;
+      bottom: 90px;
+      right: 16px;
+      z-index: 250;
+      touch-action: none;
+    }
+    .bot-dial-options {
+      position: absolute;
+      bottom: 60px;
+      right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s ease-out;
+    }
+    .bot-dial-options.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .bot-sub-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffaa00;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border: 2px solid #fff;
+      font-size: 17px;
       cursor: pointer;
-      transition: var(--transition);
-      flex: 1;
-      height: 100%;
+      text-decoration: none;
+      transition: transform 0.15s;
     }
-    .nav-item i {
-      font-size: 16px;
+    .floating-bot-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: grab;
     }
-    .nav-item.active {
-      color: #ff5733;
+    .floating-bot-badge {
+      background: linear-gradient(135deg, #ff4624, #e62200);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-bottom: -4px;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
     }
-    .nav-item.active i {
-      color: #ff5733;
-      transform: translateY(-2px);
+    .floating-bot-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #121722;
+      border: 2px solid #ff5733;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(255, 87, 51, 0.5);
+      color: #00f0ff;
+      font-size: 22px;
     }
 
     /* Side Drawer Menu */
@@ -289,88 +518,49 @@
       color: #ff1744 !important;
     }
 
-    /* Draggable Floating Robot Speed-Dial */
-    #draggable-bot-container {
+    /* Bottom Navigation Bar */
+    .bottom-nav {
       position: fixed;
-      bottom: 90px;
-      right: 16px;
-      z-index: 250;
-      touch-action: none;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(18, 23, 34, 0.98);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      max-width: 480px;
+      margin: 0 auto;
     }
-    .bot-dial-options {
-      position: absolute;
-      bottom: 60px;
-      right: 4px;
+    .nav-item {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(10px);
-      transition: all 0.25s ease-out;
-    }
-    .bot-dial-options.open {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-    .bot-sub-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #ffaa00;
-      color: #000;
-      display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      border: 2px solid #fff;
-      font-size: 17px;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 600;
+      gap: 4px;
       cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s;
+      transition: var(--transition);
+      flex: 1;
+      height: 100%;
     }
-    .bot-sub-btn:active {
-      transform: scale(0.9);
+    .nav-item i {
+      font-size: 16px;
     }
-    .floating-bot-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: grab;
+    .nav-item.active {
+      color: #ff5733;
     }
-    .floating-bot-wrapper:active {
-      cursor: grabbing;
-    }
-    .floating-bot-badge {
-      background: linear-gradient(135deg, #ff4624, #e62200);
-      color: #fff;
-      font-size: 8px;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 8px;
-      margin-bottom: -4px;
-      z-index: 2;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      letter-spacing: 1px;
-    }
-    .floating-bot-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #121722;
-      border: 2px solid #ff5733;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 16px rgba(255, 87, 51, 0.5);
-      color: #00f0ff;
-      font-size: 22px;
+    .nav-item.active i {
+      color: #ff5733;
+      transform: translateY(-2px);
     }
 
-    /* Modal Sheet Styling */
+    /* Custom Share Bottom Sheet Modal */
     .custom-bottom-sheet {
       position: fixed;
       inset: 0;
@@ -411,16 +601,6 @@
       color: #fff;
       box-shadow: 0 4px 15px var(--primary-glow);
     }
-    .btn-secondary {
-      background: var(--bg-surface);
-      color: #fff;
-      border: 1px solid var(--border-color);
-    }
-    .btn-sm {
-      padding: 6px 10px;
-      font-size: 11px;
-      width: auto;
-    }
 
     .hidden { display: none !important; }
     #toast-container {
@@ -449,36 +629,11 @@
     }
     .toast-success { border-color: var(--success); color: var(--success); }
     .toast-error { border-color: var(--danger); color: var(--danger); }
-    .toast-info { border-color: var(--accent-cyan); color: var(--accent-cyan); }
-
-    .global-loader {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 87, 51, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
 
-  <!-- Top Master Header -->
+  <!-- Master Header -->
   <header id="master-header-bar" class="master-header">
     <div class="header-logo-group">
       <button class="hamburger-btn" onclick="window.Drawer.open()" aria-label="Open Menu">
@@ -509,36 +664,18 @@
     <h3 id="sub-header-title" class="sub-header-title">PAGE TITLE</h3>
   </header>
 
-  <!-- Main View Container -->
+  <!-- Dynamic Views -->
   <main id="app-view"></main>
 
-  <!-- Draggable Speed-Dial Floating Robot Menu with Your Actual Links -->
+  <!-- Draggable Speed-Dial Robot Menu -->
   <div id="draggable-bot-container">
     <div id="bot-dial-options" class="bot-dial-options">
-      <!-- Instagram Link -->
-      <a href="https://www.instagram.com/multani.ff.gaming?psln=NnBiYTN1eTM0eXc1" target="_blank" class="bot-sub-btn" title="Instagram">
-        <i class="fa-brands fa-instagram"></i>
-      </a>
-      <!-- YouTube Link -->
-      <a href="https://youtube.com/@multaniff-b2k" target="_blank" class="bot-sub-btn" title="YouTube">
-        <i class="fa-brands fa-youtube"></i>
-      </a>
-      <!-- TikTok Link -->
-      <a href="https://tiktok.com/@multaniffgaming" target="_blank" class="bot-sub-btn" title="TikTok">
-        <i class="fa-brands fa-tiktok"></i>
-      </a>
-      <!-- WhatsApp Group Link -->
-      <a href="https://chat.whatsapp.com/G3E6JbO3U0tL75L1K4iO8r" target="_blank" class="bot-sub-btn" title="WhatsApp Group">
-        <i class="fa-brands fa-whatsapp"></i>
-      </a>
-      <!-- Facebook Profile Link -->
-      <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="bot-sub-btn" title="Facebook">
-        <i class="fa-brands fa-facebook-f"></i>
-      </a>
-      <!-- Customer Support (WhatsApp) Link -->
-      <a href="https://wa.me/923281926729?text=Hello%20Multani%20FF%20Support" target="_blank" class="bot-sub-btn" title="Support">
-        <i class="fa-solid fa-headset"></i>
-      </a>
+      <a href="https://www.instagram.com/multani.ff.gaming?psln=NnBiYTN1eTM0eXc1" target="_blank" class="bot-sub-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://youtube.com/@multaniff-b2k" target="_blank" class="bot-sub-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      <a href="https://tiktok.com/@multaniffgaming" target="_blank" class="bot-sub-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+      <a href="https://chat.whatsapp.com/G3E6JbO3U0tL75L1K4iO8r" target="_blank" class="bot-sub-btn" title="WhatsApp Group"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="bot-sub-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="https://wa.me/923281926729?text=Hello%20Multani%20FF%20Support" target="_blank" class="bot-sub-btn" title="Support"><i class="fa-solid fa-headset"></i></a>
     </div>
     <div id="floating-bot-trigger" class="floating-bot-wrapper">
       <span class="floating-bot-badge">MENU</span>
@@ -650,10 +787,6 @@
   </div>
 
   <div id="toast-container"></div>
-  <div id="global-loader" class="global-loader hidden">
-    <div class="spinner"></div>
-    <span id="global-loader-text" style="font-size:12px; font-weight:700; color:var(--accent-cyan); letter-spacing:1px;">LOADING...</span>
-  </div>
 
   <!-- Master Script Connection -->
   <script type="module" src="./multaniwebsite/main.js"></script>
