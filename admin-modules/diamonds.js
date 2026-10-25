@@ -1,10 +1,241 @@
 import { sbClient, state, escapeHTML } from './config.js';
 import { loadDashboardStats } from './dashboard.js';
 
+// State to manage active sub-tab ('packs' or 'requests')
+let activeDiamondTab = 'packs';
+let loadedPackagesList = [];
+
 export async function loadAdminDiamondRequests() {
   const container = document.getElementById('admin-diamond-requests-container');
   if (!container) return;
-  container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond requests...</p>`;
+
+  // Render Main Layout with the 2 Main Action Tabs
+  container.innerHTML = `
+    <div class="space-y-4">
+      <!-- Two Main Buttons / Tabs -->
+      <div class="grid grid-cols-2 gap-2 bg-[#0e1118] p-1.5 rounded-xl border border-[#262f40]">
+        <button id="tab-btn-diamond-packs" onclick="switchDiamondTab('packs')" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeDiamondTab === 'packs' ? 'bg-[#ff4624] text-white shadow-lg' : 'bg-[#151922] text-gray-400 hover:text-white'}">
+          <i class="fa-solid fa-gem"></i> Edit Diamond Packs
+        </button>
+        <button id="tab-btn-diamond-requests" onclick="switchDiamondTab('requests')" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeDiamondTab === 'requests' ? 'bg-[#ff4624] text-white shadow-lg' : 'bg-[#151922] text-gray-400 hover:text-white'}">
+          <i class="fa-solid fa-list-check"></i> Purchase Requests
+        </button>
+      </div>
+
+      <!-- Container for Active Tab Content -->
+      <div id="diamond-tab-content" class="space-y-3">
+        <p class="text-gray-400 text-xs text-center py-4">Loading data...</p>
+      </div>
+    </div>
+  `;
+
+  // Attach tab switcher to global window
+  window.switchDiamondTab = switchDiamondTab;
+  window.saveDiamondPackage = saveDiamondPackage;
+  window.deleteDiamondPackage = deleteDiamondPackage;
+  window.addNewDiamondPackage = addNewDiamondPackage;
+
+  // Load the active tab view
+  if (activeDiamondTab === 'packs') {
+    await loadAdminDiamondPackages();
+  } else {
+    await fetchAndRenderRequests();
+  }
+}
+
+export async function switchDiamondTab(tab) {
+  activeDiamondTab = tab;
+  loadAdminDiamondRequests();
+}
+
+/* =========================================================
+   1. DIAMOND PACKAGES MANAGEMENT (PRICE LIST & EDIT)
+   ========================================================= */
+
+async function loadAdminDiamondPackages() {
+  const content = document.getElementById('diamond-tab-content');
+  if (!content) return;
+  content.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">Loading diamond packages...</p>`;
+
+  const { data, error } = await sbClient
+    .from('diamond_packages')
+    .select('*')
+    .order('diamond_count', { ascending: true });
+
+  if (error) {
+    content.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error loading packages: ${escapeHTML(error.message)}</p>`;
+    return;
+  }
+
+  loadedPackagesList = data || [];
+  renderDiamondPackagesList();
+}
+
+function renderDiamondPackagesList() {
+  const content = document.getElementById('diamond-tab-content');
+  if (!content) return;
+
+  const cardsHtml = loadedPackagesList.map(pkg => `
+    <div class="bg-[#151922] border border-[#262f40] rounded-xl p-3.5 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-gray-400">Pack ID: #${pkg.id}</span>
+        <span class="text-xs font-bold ${pkg.is_active ? 'text-green-400' : 'text-red-400'}">
+          ${pkg.is_active ? '● Active' : '● Hidden'}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Diamonds 💎</label>
+          <input type="number" id="pkg-dia-${pkg.id}" value="${pkg.diamond_count}" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2.5 py-1.5 text-orange-400 font-bold font-mono text-xs outline-none focus:border-[#ff4624]" />
+        </div>
+        <div>
+          <label class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Price (Coins) 🪙</label>
+          <input type="number" id="pkg-coin-${pkg.id}" value="${pkg.coin_price}" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2.5 py-1.5 text-cyan-400 font-bold font-mono text-xs outline-none focus:border-[#ff4624]" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-1 gap-2">
+        <button id="btn-pkg-save-${pkg.id}" onclick="saveDiamondPackage(${pkg.id})" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-xs font-bold cursor-pointer transition">
+          <i class="fa-solid fa-check mr-1"></i> Save
+        </button>
+        <button onclick="deleteDiamondPackage(${pkg.id})" class="bg-[#1f242d] hover:bg-red-700 text-red-400 hover:text-white px-3 py-1.5 rounded text-xs font-bold transition cursor-pointer">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  content.innerHTML = `
+    <!-- Add New Package Accordion/Card -->
+    <div class="bg-[#12161f] border border-[#ff4624]/30 rounded-xl p-3.5 space-y-2 mb-4">
+      <h4 class="text-white text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
+        <i class="fa-solid fa-plus-circle text-[#ff4624]"></i> Add New Diamond Pack
+      </h4>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="number" id="new-pkg-diamonds" placeholder="Diamonds (e.g. 100)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2.5 py-1.5 text-white text-xs outline-none focus:border-[#ff4624]" />
+        <input type="number" id="new-pkg-coins" placeholder="Price Coins (e.g. 150)" class="w-full bg-[#06070a] border border-[#262f40] rounded px-2.5 py-1.5 text-white text-xs outline-none focus:border-[#ff4624]" />
+      </div>
+      <button id="btn-add-pkg" onclick="addNewDiamondPackage()" class="w-full bg-[#ff4624] hover:bg-[#e03d1f] text-white py-2 rounded text-xs font-bold transition cursor-pointer">
+        + Add Pack to Store
+      </button>
+    </div>
+
+    <!-- Existing Packages -->
+    <div class="space-y-3">
+      ${cardsHtml || '<p class="text-gray-500 text-xs text-center py-6">No diamond packages found.</p>'}
+    </div>
+  `;
+}
+
+export async function saveDiamondPackage(pkgId) {
+  const diaInput = document.getElementById(`pkg-dia-${pkgId}`);
+  const coinInput = document.getElementById(`pkg-coin-${pkgId}`);
+  const saveBtn = document.getElementById(`btn-pkg-save-${pkgId}`);
+
+  const diamond_count = parseInt(diaInput.value);
+  const coin_price = parseInt(coinInput.value);
+
+  if (!diamond_count || !coin_price || diamond_count <= 0 || coin_price <= 0) {
+    alert("Please enter valid Diamond and Coin values.");
+    return;
+  }
+
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving...";
+  }
+
+  const { error } = await sbClient
+    .from('diamond_packages')
+    .update({ diamond_count, coin_price })
+    .eq('id', pkgId);
+
+  if (error) {
+    alert("Error saving: " + error.message);
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Save`;
+    }
+  } else {
+    alert("Package updated! All players will now see the new price.");
+    await loadAdminDiamondPackages();
+  }
+}
+
+export async function addNewDiamondPackage() {
+  const diaInput = document.getElementById('new-pkg-diamonds');
+  const coinInput = document.getElementById('new-pkg-coins');
+  const addBtn = document.getElementById('btn-add-pkg');
+
+  const diamond_count = parseInt(diaInput.value);
+  const coin_price = parseInt(coinInput.value);
+
+  if (!diamond_count || !coin_price || diamond_count <= 0 || coin_price <= 0) {
+    alert("Please enter valid Diamond and Coin values.");
+    return;
+  }
+
+  if (addBtn) {
+    addBtn.disabled = true;
+    addBtn.innerText = "Adding...";
+  }
+
+  const { error } = await sbClient
+    .from('diamond_packages')
+    .insert([{ diamond_count, coin_price, is_active: true }]);
+
+  if (error) {
+    alert("Error adding package: " + error.message);
+    if (addBtn) {
+      addBtn.disabled = false;
+      addBtn.innerText = "+ Add Pack to Store";
+    }
+  } else {
+    alert("New package added successfully!");
+    diaInput.value = '';
+    coinInput.value = '';
+    await loadAdminDiamondPackages();
+  }
+}
+
+export async function deleteDiamondPackage(pkgId) {
+  if (!confirm(`Are you sure you want to delete pack #${pkgId}? Players won't be able to buy it anymore.`)) return;
+
+  const { error } = await sbClient
+    .from('diamond_packages')
+    .delete()
+    .eq('id', pkgId);
+
+  if (error) {
+    alert("Cannot delete: " + error.message + "\nTip: If users already ordered this, you can set it inactive instead.");
+  } else {
+    alert("Package deleted successfully.");
+    await loadAdminDiamondPackages();
+  }
+}
+
+/* =========================================================
+   2. PLAYER PURCHASE REQUESTS MANAGEMENT
+   ========================================================= */
+
+async function fetchAndRenderRequests() {
+  const content = document.getElementById('diamond-tab-content');
+  if (!content) return;
+
+  content.innerHTML = `
+    <!-- Filter Pills -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+      ${['all', 'pending', 'approved', 'delivered', 'rejected'].map(s => `
+        <button id="diamond-filter-${s}" onclick="filterDiamondRequests('${s}')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${(state.currentDiamondFilter || 'all') === s ? 'bg-[#ff4624] text-white' : 'bg-[#151922] text-gray-400 border border-[#262f40]'}">
+          ${s.toUpperCase()}
+        </button>
+      `).join('')}
+    </div>
+    <div id="diamond-requests-items" class="space-y-3">
+      <p class="text-gray-400 text-xs text-center py-4">Loading requests...</p>
+    </div>
+  `;
 
   const [reqRes, profRes] = await Promise.all([
     sbClient.from('diamond_requests').select('*').order('created_at', { ascending: false }),
@@ -12,7 +243,7 @@ export async function loadAdminDiamondRequests() {
   ]);
 
   if (reqRes.error) {
-    container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${escapeHTML(reqRes.error.message)}</p>`;
+    document.getElementById('diamond-requests-items').innerHTML = `<p class="text-red-500 text-xs text-center py-4">Error: ${escapeHTML(reqRes.error.message)}</p>`;
     return;
   }
 
@@ -37,16 +268,16 @@ export function filterDiamondRequests(status) {
 }
 
 export function renderDiamondRequestsList() {
-  const container = document.getElementById('admin-diamond-requests-container');
+  const container = document.getElementById('diamond-requests-items');
   if (!container) return;
 
-  const filtered = state.loadedDiamondRequestsList.filter(req => {
-    if (state.currentDiamondFilter === 'all') return true;
+  const filtered = (state.loadedDiamondRequestsList || []).filter(req => {
+    if ((state.currentDiamondFilter || 'all') === 'all') return true;
     return (req.status || '').toLowerCase() === state.currentDiamondFilter;
   });
 
   if (!filtered.length) {
-    container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found for '${state.currentDiamondFilter}'.</p>`;
+    container.innerHTML = `<p class="text-gray-500 text-xs text-center py-6">No diamond requests found for '${state.currentDiamondFilter || 'all'}'.</p>`;
     return;
   }
 
@@ -148,7 +379,7 @@ export async function updateDiamondReqStatus(requestId, newStatus) {
     alert("Error: " + error.message);
   } else if (data && data.success) {
     alert(data.message);
-    loadAdminDiamondRequests();
+    fetchAndRenderRequests();
     loadDashboardStats();
   } else {
     alert(data?.message || "Failed to update status.");
@@ -166,4 +397,4 @@ export async function deleteDiamondRequest(requestId) {
     renderDiamondRequestsList();
     await loadDashboardStats();
   }
-              }
+}
