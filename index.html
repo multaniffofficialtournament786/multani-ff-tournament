@@ -130,7 +130,6 @@
     .rules-dropdown-header:hover { background: #222736; }
     .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
     .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
-    .rules-dropdown-container.open .rules-arrow { transform: rotate(180deg); }
     .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
 
     .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); text-align: center; }
@@ -575,52 +574,24 @@
   <!-- MULTANI WEBSITE JS MODULE CONNECTION -->
   <script type="module" src="./multaniwebsite/main.js"></script>
 
-<script>
-(function () {
-  function showOffline() {
-    if (document.getElementById("multani-offline-screen")) return;
-
-    var screen = document.createElement("div");
-    screen.id = "multani-offline-screen";
-
-    screen.style.cssText = `
-      position:fixed;inset:0;z-index:999999;
-      background:#07090e;color:white;
-      display:flex;align-items:center;justify-content:center;
-      text-align:center;padding:24px;font-family:Arial,sans-serif;
-    `;
-
-    screen.innerHTML = `
-      <div style="max-width:340px;border:1px solid #ff4624;
-      border-radius:20px;padding:28px;background:#11151d">
-        <div style="font-size:60px">📡</div>
-        <h2 style="color:#ff4624">INTERNET CONNECTION LOST!</h2>
-        <p style="line-height:1.7;color:#ddd">
-          Aapka internet connection band hai.
-          Please apna NET check karein.
-        </p>
-        <button onclick="location.reload()"
-        style="background:#ff4624;color:white;border:0;
-        padding:14px 24px;border-radius:9px;font-weight:bold">
-          RETRY CONNECTION
-        </button>
-      </div>`;
-
-    document.body.appendChild(screen);
-  }
-
-  function checkConnection() {
-    if (!navigator.onLine) showOffline();
-    else {
-      var screen = document.getElementById("multani-offline-screen");
-      if (screen) screen.remove();
+  <!-- MULTANI FF OFFICIAL OFFLINE SYSTEM -->
+  <script>
+  (function () {
+    if (!("serviceWorker" in navigator)) {
+      console.log("Service Worker supported nahi hai.");
+      return;
     }
-  }
 
-  window.addEventListener("offline", showOffline);
-  window.addEventListener("online", checkConnection);
-  checkConnection();
-})();
-</script>
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./service-worker.js")
+        .then(function () {
+          console.log("MULTANI FF Offline System Ready");
+        })
+        .catch(function (error) {
+          console.error("Offline System Error:", error);
+        });
+    });
+  })();
+  </script>
 </body>
 </html>
