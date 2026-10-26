@@ -35,7 +35,7 @@ body {
   padding: 8px 12px;
   background: rgba(10, 14, 24, 0.94);
   backdrop-filter: blur(8px);
-  border-bottom: 2px solid #ff542d66;
+  border-bottom: 2px solid #ff174466;
   z-index: 10;
 }
 .back-btn {
@@ -59,9 +59,9 @@ body {
   box-shadow: 0 0 10px rgba(255,190,0,0.5);
 }
 .shots-badge {
-  background: #00f0ff22;
-  border: 1px solid #00f0ff;
-  color: #00f0ff;
+  background: #ff174422;
+  border: 1px solid #ff1744;
+  color: #ff5252;
   padding: 3px 8px;
   border-radius: 12px;
 }
@@ -109,24 +109,26 @@ canvas { display: block; width: 100%; height: 100%; }
   height: 26px;
   border-radius: 50%;
   border: 2px solid #fff;
+  overflow: hidden;
+  position: relative;
 }
 .swap-text { font-size: 11px; font-weight: 900; color: #00f0ff; }
 .level-info-tag {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid #ffbe0088;
+  background: rgba(20, 10, 15, 0.9);
+  border: 1px solid #ff1744;
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 800;
-  color: #ffbe00;
+  font-weight: 900;
+  color: #ff5252;
 }
 
 /* OVERLAYS & MODALS */
 .overlay-screen {
   position: absolute;
   inset: 0;
-  background: rgba(4, 7, 15, 0.92);
-  backdrop-filter: blur(7px);
+  background: rgba(4, 7, 15, 0.94);
+  backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -168,7 +170,7 @@ canvas { display: block; width: 100%; height: 100%; }
 }
 .stars-display { font-size: 28px; margin: 8px 0 14px; letter-spacing: 4px; }
 
-/* LEVEL SELECT MODAL (500 LEVELS WITH RANGE TABS) */
+/* 500 LEVELS MODAL */
 #levelModal {
   position: absolute;
   inset: 0;
@@ -217,9 +219,9 @@ canvas { display: block; width: 100%; height: 100%; }
   cursor: pointer;
 }
 .tab-btn.active {
-  background: #ffbe00;
-  color: #000;
-  border-color: #ffbe00;
+  background: #ff1744;
+  color: #fff;
+  border-color: #ff1744;
 }
 .level-grid {
   display: grid;
@@ -243,10 +245,11 @@ canvas { display: block; width: 100%; height: 100%; }
 }
 .lvl-card.active { border-color: #00f0ff; background: #0f283d; }
 .lvl-card.locked { opacity: 0.35; pointer-events: none; }
-.lvl-card.hard { border-color: #ff542d; }
-.lvl-card.extreme { border-color: #ff1744; background: #260a12; }
+.lvl-card.hard { border-color: #ff542d; background: #201315; }
+.lvl-card.extreme { border-color: #ff1744; background: #2c0911; box-shadow: 0 0 6px rgba(255,23,68,0.4); }
 .lvl-card .num { font-size: 14px; font-weight: 900; color: #fff; }
 .lvl-card .sub { font-size: 9px; font-weight: 700; color: #94a3b8; }
+.lvl-card.extreme .sub { color: #ff5252; }
 .lvl-card .lvl-stars { font-size: 10px; color: #ffbe00; }
 
 .hidden { display: none !important; }
@@ -280,9 +283,12 @@ canvas { display: block; width: 100%; height: 100%; }
     <div class="overlay-screen" id="mainMenu">
       <h1>BUBBLE SHOOTER PRO</h1>
       <p>
-        🔥 <b>500 Levels Challenge!</b><br>
-        Jaise jaise aage jayenge, Rock obstacles aur tight shots ke sath game aur hard hoti jayegi!<br>
-        💣 <b>Bombs:</b> Surrounding bubbles ko blast karne ke liye use karein.
+        🌈 <b>8+ Vibrant Colors & Special Powers:</b><br>
+        💣 <b>Bomb:</b> 3x3 Blast karega.<br>
+        ⚡ <b>Laser:</b> Pura row/path uda dega.<br>
+        🌗 <b>Dual Color:</b> 2 colors ka mix bubble dono colors match karega!<br>
+        🪨 <b>Stone:</b> Direct match nahi hoga, drop karke ya Bomb se todein.<br>
+        🎯 <b>Fair Play:</b> Shooter sirf wahi colors dega jo board par baqi hain!
       </p>
       <div class="btn-group">
         <button class="action-btn" id="playBtn">▶ CONTINUE (LVL <span id="resumeLvlNum">1</span>)</button>
@@ -294,7 +300,7 @@ canvas { display: block; width: 100%; height: 100%; }
     <div class="overlay-screen hidden" id="winMenu">
       <h1 style="color: #00e676;">🎉 LEVEL COMPLETED!</h1>
       <div class="stars-display" id="winStars">⭐⭐⭐</div>
-      <p id="winDesc">Zabardast! Level mukammal ho gaya.</p>
+      <p id="winDesc">Zabardast! Board saaf ho gaya.</p>
       <div class="btn-group">
         <button class="action-btn" id="nextLevelBtn">NEXT LEVEL ➡</button>
         <button class="action-btn secondary" id="winRetryBtn">↻ REPLAY</button>
@@ -338,7 +344,7 @@ canvas { display: block; width: 100%; height: 100%; }
   const swapBox = document.getElementById("swapBox");
   const nextPreview = document.getElementById("nextPreview");
 
-  // Menus & Modals
+  // Menus
   const mainMenu = document.getElementById("mainMenu");
   const winMenu = document.getElementById("winMenu");
   const loseMenu = document.getElementById("loseMenu");
@@ -393,7 +399,8 @@ canvas { display: block; width: 100%; height: 100%; }
 
   function playPopSound() { playTone(450, "sine", 0.08, 1200); }
   function playShootSound() { playTone(240, "triangle", 0.07, 700); }
-  function playBombSound() { playTone(120, "sawtooth", 0.25, 30); }
+  function playBombSound() { playTone(120, "sawtooth", 0.28, 30); }
+  function playLaserSound() { playTone(950, "sawtooth", 0.22, 180); }
   function playWinSound() {
     [400, 520, 660, 880].forEach((f, i) => setTimeout(() => playTone(f, "triangle", 0.15, f + 50), i * 110));
   }
@@ -410,60 +417,64 @@ canvas { display: block; width: 100%; height: 100%; }
   }
   musicBtn.addEventListener("click", toggleMusic);
 
-  /* ---------------- 500 LEVELS DYNAMIC PROCEDURAL GENERATOR ---------------- */
-  const TOTAL_LEVELS = 500;
+  /* ---------------- 8+ VIBRANT COLORS & SPECIALS ---------------- */
   const COLOR_PALETTE = {
     CYAN: "#00f0ff",
     RED: "#ff1744",
     YELLOW: "#ffbe00",
     GREEN: "#00e676",
-    PURPLE: "#e040fb",
-    ORANGE: "#ff6d00"
+    PURPLE: "#b026ff",
+    ORANGE: "#ff6d00",
+    PINK: "#ff007f",
+    LIME: "#a6ff00",
+    INDIGO: "#3d5afe",
+    GOLD: "#fff3a8"
   };
-  const COLOR_KEYS = ["CYAN", "RED", "YELLOW", "GREEN", "PURPLE", "ORANGE"];
+  const COLOR_KEYS = Object.keys(COLOR_PALETTE); // 10 unique colors
+
+  const TOTAL_LEVELS = 500;
 
   function getLevelConfig(lvl) {
-    let colorsCount, rows, shots, rocks, bombs, difficulty;
+    let colorsCount, rows, shots, rocks, bombs, lasers, duals, difficulty;
 
-    if (lvl <= 20) {
-      difficulty = "EASY";
-      colorsCount = 3 + (lvl > 10 ? 1 : 0);
-      rows = 4 + (lvl > 12 ? 1 : 0);
-      shots = Math.max(25, 30 - Math.floor(lvl * 0.25));
-      rocks = lvl > 15 ? 1 : 0;
-      bombs = lvl > 5 ? 1 : 0;
-    } else if (lvl <= 80) {
+    if (lvl <= 5) {
+      difficulty = "TRAINING";
+      colorsCount = 4;
+      rows = 4;
+      shots = 32;
+      rocks = 0; bombs = 0; lasers = 0; duals = 1;
+    } else if (lvl <= 10) {
       difficulty = "NORMAL";
-      colorsCount = 4 + (lvl > 50 ? 1 : 0);
-      rows = 5 + (lvl > 60 ? 1 : 0);
-      shots = Math.max(22, 27 - Math.floor((lvl - 20) * 0.08));
-      rocks = Math.min(4, Math.floor((lvl - 20) * 0.07) + 1);
-      bombs = (lvl % 5 === 0) ? 2 : 1;
-    } else if (lvl <= 200) {
-      difficulty = "HARD";
-      colorsCount = 5 + (lvl > 150 ? 1 : 0);
-      rows = 6 + (lvl > 160 ? 1 : 0);
-      shots = Math.max(20, 24 - Math.floor((lvl - 80) * 0.03));
-      rocks = Math.min(7, Math.floor((lvl - 80) * 0.04) + 3);
-      bombs = (lvl % 4 === 0) ? 2 : 1;
-    } else if (lvl <= 400) {
-      difficulty = "EXPERT";
-      colorsCount = 6;
-      rows = 7 + (lvl > 300 ? 1 : 0);
-      shots = Math.max(18, 22 - Math.floor((lvl - 200) * 0.02));
-      rocks = Math.min(10, Math.floor((lvl - 200) * 0.03) + 5);
-      bombs = (lvl % 3 === 0) ? 3 : 2;
+      colorsCount = 5;
+      rows = 5;
+      shots = 28;
+      rocks = 1; bombs = 1; lasers = 0; duals = 2;
     } else {
-      difficulty = (lvl % 25 === 0 || lvl === 500) ? "BOSS" : "NIGHTMARE";
-      colorsCount = 6;
-      rows = 8;
-      shots = Math.max(17, 20 - Math.floor((lvl - 400) * 0.02));
-      rocks = Math.min(12, Math.floor((lvl - 400) * 0.03) + 8);
-      bombs = (lvl % 2 === 0) ? 3 : 2;
+      // LEVEL 11 SE AAGE HAR LEVEL PAR FULL HARD PROGRESSION
+      const step = lvl - 10;
+      // 8 se 10 colors ka full pool
+      colorsCount = Math.min(10, 6 + Math.floor(step / 35));
+      rows = Math.min(8, 6 + Math.floor(step / 40));
+
+      // Rocks ki tadaad barhti jayegi
+      rocks = Math.min(12, 3 + Math.floor(step * 0.04) + (lvl % 5 === 0 ? 3 : 0));
+
+      // Fair shots (18 se 24 shots) taake level strictly solvable ho
+      shots = Math.max(18, 26 - Math.floor(step * 0.02));
+
+      // Special items to guarantee winnability
+      bombs = (lvl % 3 === 0) ? 2 : 1;
+      lasers = (lvl % 4 === 0) ? 2 : 1;
+      duals = Math.min(6, 2 + Math.floor(step * 0.03));
+
+      if (lvl % 5 === 0) difficulty = "BOSS";
+      else if (lvl > 250) difficulty = "NIGHTMARE";
+      else if (lvl > 80) difficulty = "EXTREME";
+      else difficulty = "HARD";
     }
 
     const availableColors = COLOR_KEYS.slice(0, colorsCount);
-    return { lvl, difficulty, colors: availableColors, rows, shots, rocks, bombs };
+    return { lvl, difficulty, colors: availableColors, rows, shots, rocks, bombs, lasers, duals };
   }
 
   // Saved Data
@@ -496,10 +507,11 @@ canvas { display: block; width: 100%; height: 100%; }
 
   let grid = [];
   let currentBubble = null;
-  let nextBubbleType = "";
+  let nextBubbleData = null;
   let particles = [];
   let fallingBubbles = [];
   let floatingTexts = [];
+  let laserAnimations = [];
 
   let isAiming = false;
   let aimX = 0, aimY = 0;
@@ -524,17 +536,50 @@ canvas { display: block; width: 100%; height: 100%; }
     return { x, y };
   }
 
-  function getRandomPlayableColor() {
-    const available = currentLevelCfg.colors;
-    const boardColors = new Set();
+  // Board par active single colors check karta hai (Level hamesha solvable banane ke liye)
+  function getActiveBoardColors() {
+    const set = new Set();
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const item = grid[r][c];
-        if (item && item !== "ROCK" && item !== "BOMB") boardColors.add(item);
+        if (!item) continue;
+        if (typeof item === "string" && item !== "ROCK" && item !== "BOMB" && item !== "LASER") {
+          set.add(item);
+        } else if (item.kind === "DUAL") {
+          set.add(item.c1);
+          set.add(item.c2);
+        }
       }
     }
-    const pool = boardColors.size > 0 ? Array.from(boardColors) : available;
-    return pool[Math.floor(Math.random() * pool.length)];
+    return Array.from(set);
+  }
+
+  // Shooter ko hamesha wahi colors deta hai jo board par mojud hain
+  function getRandomPlayableBubbleData() {
+    const active = getActiveBoardColors();
+    const pool = active.length > 0 ? active : currentLevelCfg.colors;
+
+    // Small chance for Laser or Bomb in shooter for hard levels
+    const rand = Math.random();
+    if (rand < 0.05 && currentLevelCfg.bombs > 0) {
+      return { kind: "BOMB" };
+    }
+    if (rand >= 0.05 && rand < 0.10 && currentLevelCfg.lasers > 0) {
+      return { kind: "LASER" };
+    }
+    if (rand >= 0.10 && rand < 0.22 && pool.length >= 2) {
+      // Dual Color Mix Bubble
+      const c1 = pool[Math.floor(Math.random() * pool.length)];
+      let c2 = pool[Math.floor(Math.random() * pool.length)];
+      if (c1 === c2 && pool.length > 1) {
+        c2 = pool.find(c => c !== c1) || c1;
+      }
+      return { kind: "DUAL", c1, c2 };
+    }
+
+    // Normal Single Color Bubble
+    const col = pool[Math.floor(Math.random() * pool.length)];
+    return { kind: "SINGLE", color: col };
   }
 
   function initLevelGrid(lvl) {
@@ -547,65 +592,105 @@ canvas { display: block; width: 100%; height: 100%; }
 
     grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-    // Fill rows
+    // Normal single-color rows fill
     for (let r = 0; r < currentLevelCfg.rows; r++) {
       for (let c = 0; c < COLS; c++) {
-        const rndKey = currentLevelCfg.colors[Math.floor(Math.random() * currentLevelCfg.colors.length)];
-        grid[r][c] = rndKey;
+        const rndColor = currentLevelCfg.colors[Math.floor(Math.random() * currentLevelCfg.colors.length)];
+        grid[r][c] = rndColor;
       }
     }
 
-    // Place Bombs
+    // Place DUAL (2 COLOR MIX) Bubbles
+    let placedDuals = 0;
+    while (placedDuals < currentLevelCfg.duals) {
+      const rr = Math.floor(Math.random() * currentLevelCfg.rows);
+      const cc = Math.floor(Math.random() * COLS);
+      if (typeof grid[rr][cc] === "string" && grid[rr][cc] !== "ROCK") {
+        const c1 = grid[rr][cc];
+        const otherColors = currentLevelCfg.colors.filter(c => c !== c1);
+        const c2 = otherColors[Math.floor(Math.random() * otherColors.length)] || c1;
+        grid[rr][cc] = { kind: "DUAL", c1, c2 };
+        placedDuals++;
+      }
+    }
+
+    // Place Bomb Bubbles
     let placedBombs = 0;
     while (placedBombs < currentLevelCfg.bombs) {
       const rr = Math.floor(Math.random() * (currentLevelCfg.rows - 1)) + 1;
       const cc = Math.floor(Math.random() * COLS);
-      if (grid[rr][cc] && grid[rr][cc] !== "BOMB" && grid[rr][cc] !== "ROCK") {
+      if (grid[rr][cc] && grid[rr][cc] !== "ROCK" && grid[rr][cc] !== "BOMB" && grid[rr][cc] !== "LASER") {
         grid[rr][cc] = "BOMB";
         placedBombs++;
       }
     }
 
-    // Place Rocks (Obstacles)
+    // Place Laser Bubbles
+    let placedLasers = 0;
+    while (placedLasers < currentLevelCfg.lasers) {
+      const rr = Math.floor(Math.random() * (currentLevelCfg.rows - 1)) + 1;
+      const cc = Math.floor(Math.random() * COLS);
+      if (grid[rr][cc] && grid[rr][cc] !== "ROCK" && grid[rr][cc] !== "BOMB" && grid[rr][cc] !== "LASER") {
+        grid[rr][cc] = "LASER";
+        placedLasers++;
+      }
+    }
+
+    // Place Indestructible Stones (Rocks)
     let placedRocks = 0;
     while (placedRocks < currentLevelCfg.rocks) {
       const rr = Math.floor(Math.random() * (currentLevelCfg.rows - 1)) + 1;
       const cc = Math.floor(Math.random() * COLS);
-      if (grid[rr][cc] && grid[rr][cc] !== "BOMB" && grid[rr][cc] !== "ROCK") {
+      if (grid[rr][cc] && grid[rr][cc] !== "BOMB" && grid[rr][cc] !== "LASER" && grid[rr][cc] !== "ROCK") {
         grid[rr][cc] = "ROCK";
         placedRocks++;
       }
     }
 
+    // Setup initial shooter bubbles
     currentBubble = {
       x: W / 2,
       y: H - 50,
-      type: getRandomPlayableColor(),
+      data: getRandomPlayableBubbleData(),
       moving: false
     };
-    nextBubbleType = getRandomPlayableColor();
+    nextBubbleData = getRandomPlayableBubbleData();
     updateNextPreview();
   }
 
   function updateNextPreview() {
-    if (nextBubbleType === "BOMB") {
+    nextPreview.innerHTML = "";
+    nextPreview.style.background = "transparent";
+
+    if (nextBubbleData.kind === "BOMB") {
       nextPreview.style.background = "#ff1744";
       nextPreview.innerHTML = "💣";
       nextPreview.style.display = "flex";
       nextPreview.style.alignItems = "center";
       nextPreview.style.justifyContent = "center";
+      nextPreview.style.fontSize = "14px";
+    } else if (nextBubbleData.kind === "LASER") {
+      nextPreview.style.background = "#00e5ff";
+      nextPreview.innerHTML = "⚡";
+      nextPreview.style.display = "flex";
+      nextPreview.style.alignItems = "center";
+      nextPreview.style.justifyContent = "center";
+      nextPreview.style.fontSize = "14px";
+    } else if (nextBubbleData.kind === "DUAL") {
+      const col1 = COLOR_PALETTE[nextBubbleData.c1];
+      const col2 = COLOR_PALETTE[nextBubbleData.c2];
+      nextPreview.style.background = `linear-gradient(135deg, ${col1} 50%, ${col2} 50%)`;
     } else {
-      nextPreview.innerHTML = "";
-      nextPreview.style.background = COLOR_PALETTE[nextBubbleType] || "#fff";
+      nextPreview.style.background = COLOR_PALETTE[nextBubbleData.color] || "#fff";
     }
   }
 
   function swapBubble() {
     if (!running || (currentBubble && currentBubble.moving)) return;
     initAudio();
-    const temp = currentBubble.type;
-    currentBubble.type = nextBubbleType;
-    nextBubbleType = temp;
+    const temp = currentBubble.data;
+    currentBubble.data = nextBubbleData;
+    nextBubbleData = temp;
     updateNextPreview();
     playTone(550, "sine", 0.05, 750);
   }
@@ -614,7 +699,7 @@ canvas { display: block; width: 100%; height: 100%; }
     swapBubble();
   });
 
-  /* ---------------- POINTER CONTROLS ---------------- */
+  /* ---------------- CONTROLS ---------------- */
   function updateAim(clientX, clientY) {
     const rect = stage.getBoundingClientRect();
     aimX = clientX - rect.left;
@@ -646,8 +731,8 @@ canvas { display: block; width: 100%; height: 100%; }
     if (dy < -25) {
       const angle = Math.atan2(dy, dx);
       playShootSound();
-      currentBubble.vx = Math.cos(angle) * 16;
-      currentBubble.vy = Math.sin(angle) * 16;
+      currentBubble.vx = Math.cos(angle) * 16.5;
+      currentBubble.vy = Math.sin(angle) * 16.5;
       currentBubble.moving = true;
 
       shotsRemaining--;
@@ -674,6 +759,7 @@ canvas { display: block; width: 100%; height: 100%; }
     }
   }
 
+  // Dropping orphan floating bubbles
   function dropFloatingBubbles() {
     const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
     const queue = [];
@@ -710,7 +796,7 @@ canvas { display: block; width: 100%; height: 100%; }
           fallingBubbles.push({
             x: pos.x,
             y: pos.y,
-            type: grid[r][c],
+            item: grid[r][c],
             vx: (Math.random() - 0.5) * 4,
             vy: -2 - Math.random() * 2,
             gravity: 0.55
@@ -723,14 +809,21 @@ canvas { display: block; width: 100%; height: 100%; }
 
     if (dropped > 0) {
       playTone(700, "sine", 0.15, 1200);
-      score += dropped * 30;
+      score += dropped * 35;
       scoreText.innerText = score;
-      addFloatingText(`+${dropped * 30} DROP!`, W / 2, H / 2 - 20, "#00f0ff");
+      addFloatingText(`+${dropped * 35} DROP!`, W / 2, H / 2 - 20, "#00f0ff");
     }
   }
 
-  function checkMatches(startR, startC, targetType) {
-    if (targetType === "ROCK" || targetType === "BOMB") return [];
+  // Check color compatibility (Supports DUAL mix bubbles!)
+  function bubbleMatchesColor(item, targetColor) {
+    if (!item || item === "ROCK" || item === "BOMB" || item === "LASER") return false;
+    if (typeof item === "string") return item === targetColor;
+    if (item.kind === "DUAL") return item.c1 === targetColor || item.c2 === targetColor;
+    return false;
+  }
+
+  function findConnectedMatches(startR, startC, targetColor) {
     const matched = [];
     const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
     const queue = [{ r: startR, c: startC }];
@@ -747,7 +840,7 @@ canvas { display: block; width: 100%; height: 100%; }
       for (const [dr, dc] of nbs) {
         const nr = r + dr, nc = c + dc;
         if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
-          if (!visited[nr][nc] && grid[nr][nc] === targetType) {
+          if (!visited[nr][nc] && bubbleMatchesColor(grid[nr][nc], targetColor)) {
             visited[nr][nc] = true;
             queue.push({ r: nr, c: nc });
           }
@@ -769,7 +862,7 @@ canvas { display: block; width: 100%; height: 100%; }
     targetCells.forEach(({ r, c }) => {
       if (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c] !== null) {
         const p = getBubblePos(r, c);
-        spawnParticles(p.x, p.y, "#ff3d00", 14);
+        spawnParticles(p.x, p.y, "#ff1744", 14);
         grid[r][c] = null;
         destroyed++;
       }
@@ -777,6 +870,27 @@ canvas { display: block; width: 100%; height: 100%; }
 
     addFloatingText(`💥 BOMB BLAST!`, W / 2, H / 2, "#ff542d");
     score += destroyed * 40;
+    scoreText.innerText = score;
+    dropFloatingBubbles();
+  }
+
+  function triggerLaserBeam(row, col) {
+    playLaserSound();
+    let destroyed = 0;
+    // Clears entire horizontal row + vertical splash
+    for (let c = 0; c < COLS; c++) {
+      if (grid[row][c] !== null) {
+        const p = getBubblePos(row, c);
+        spawnParticles(p.x, p.y, "#00e5ff", 12);
+        grid[row][c] = null;
+        destroyed++;
+      }
+    }
+
+    const pos = getBubblePos(row, col);
+    laserAnimations.push({ y: pos.y, alpha: 1 });
+    addFloatingText(`⚡ LASER BEAM!`, W / 2, pos.y, "#00e5ff");
+    score += destroyed * 45;
     scoreText.innerText = score;
     dropFloatingBubbles();
   }
@@ -806,17 +920,58 @@ canvas { display: block; width: 100%; height: 100%; }
       }
     }
 
-    grid[closestR][closestC] = currentBubble.type;
+    const bData = currentBubble.data;
 
-    if (currentBubble.type === "BOMB") {
+    if (bData.kind === "BOMB") {
+      grid[closestR][closestC] = "BOMB";
       triggerBombExplosion(closestR, closestC);
+    } else if (bData.kind === "LASER") {
+      grid[closestR][closestC] = "LASER";
+      triggerLaserBeam(closestR, closestC);
+    } else if (bData.kind === "DUAL") {
+      grid[closestR][closestC] = { kind: "DUAL", c1: bData.c1, c2: bData.c2 };
+
+      // Match check for both colors
+      const m1 = findConnectedMatches(closestR, closestC, bData.c1);
+      const m2 = findConnectedMatches(closestR, closestC, bData.c2);
+      let combined = [];
+
+      if (m1.length >= 3) combined.push(...m1);
+      if (m2.length >= 3) combined.push(...m2);
+
+      // Unique cell filter
+      const uniqueKeys = new Set();
+      const finalMatches = [];
+      combined.forEach(m => {
+        const k = `${m.r}_${m.c}`;
+        if (!uniqueKeys.has(k)) {
+          uniqueKeys.add(k);
+          finalMatches.push(m);
+        }
+      });
+
+      if (finalMatches.length >= 3) {
+        playPopSound();
+        finalMatches.forEach(m => {
+          const p = getBubblePos(m.r, m.c);
+          spawnParticles(p.x, p.y, "#ffbe00", 12);
+          grid[m.r][m.c] = null;
+        });
+        score += finalMatches.length * 25;
+        scoreText.innerText = score;
+        addFloatingText(`+${finalMatches.length * 25} DUAL MATCH!`, currentBubble.x, currentBubble.y, "#ff007f");
+        dropFloatingBubbles();
+      }
     } else {
-      const matches = checkMatches(closestR, closestC, currentBubble.type);
+      // Single normal color
+      grid[closestR][closestC] = bData.color;
+      const matches = findConnectedMatches(closestR, closestC, bData.color);
+
       if (matches.length >= 3) {
         playPopSound();
         matches.forEach(m => {
           const p = getBubblePos(m.r, m.c);
-          const col = COLOR_PALETTE[grid[m.r][m.c]] || "#fff";
+          const col = COLOR_PALETTE[bData.color] || "#fff";
           spawnParticles(p.x, p.y, col, 12);
           grid[m.r][m.c] = null;
         });
@@ -825,15 +980,16 @@ canvas { display: block; width: 100%; height: 100%; }
         scoreText.innerText = score;
         addFloatingText(`+${matches.length * 20}`, currentBubble.x, currentBubble.y);
 
-        // Check neighboring bombs
+        // Check if bomb or laser was neighbor
         const nbsEven = [[-1, -1], [-1, 0], [0, -1], [0, 1], [1, -1], [1, 0]];
         const nbsOdd  = [[-1, 0], [-1, 1], [0, -1], [0, 1], [1, 0], [1, 1]];
         matches.forEach(m => {
           const nbs = (m.r % 2 === 1) ? nbsOdd : nbsEven;
           nbs.forEach(([dr, dc]) => {
             const nr = m.r + dr, nc = m.c + dc;
-            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && grid[nr][nc] === "BOMB") {
-              triggerBombExplosion(nr, nc);
+            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+              if (grid[nr][nc] === "BOMB") triggerBombExplosion(nr, nc);
+              if (grid[nr][nc] === "LASER") triggerLaserBeam(nr, nc);
             }
           });
         });
@@ -862,19 +1018,15 @@ canvas { display: block; width: 100%; height: 100%; }
       return;
     }
 
-    // Prepare next shot
+    // Setup Next Shot with Solvability Guarantee
     currentBubble = {
       x: W / 2,
       y: H - 50,
-      type: nextBubbleType,
+      data: nextBubbleData,
       moving: false
     };
 
-    if (currentLevelCfg.bombs > 0 && Math.random() < 0.14) {
-      nextBubbleType = "BOMB";
-    } else {
-      nextBubbleType = getRandomPlayableColor();
-    }
+    nextBubbleData = getRandomPlayableBubbleData();
     updateNextPreview();
   }
 
@@ -884,12 +1036,12 @@ canvas { display: block; width: 100%; height: 100%; }
     playWinSound();
 
     let stars = 1;
-    if (shotsRemaining >= Math.floor(currentLevelCfg.shots * 0.35)) stars = 2;
-    if (shotsRemaining >= Math.floor(currentLevelCfg.shots * 0.6)) stars = 3;
+    if (shotsRemaining >= Math.floor(currentLevelCfg.shots * 0.30)) stars = 2;
+    if (shotsRemaining >= Math.floor(currentLevelCfg.shots * 0.55)) stars = 3;
 
     saveProgress(currentLevel, stars);
     winStars.innerText = "⭐".repeat(stars) + "☆".repeat(3 - stars);
-    winDesc.innerHTML = `Level <b>${currentLevel}</b> mukammal!<br>Shots Bachay: <b>${shotsRemaining}</b> | Score: <b>${score}</b>`;
+    winDesc.innerHTML = `Level <b>${currentLevel} (${currentLevelCfg.difficulty})</b> cleared!<br>Shots Bachay: <b>${shotsRemaining}</b> | Score: <b>${score}</b>`;
 
     if (currentLevel >= TOTAL_LEVELS) {
       nextLevelBtn.innerText = "👑 ALL 500 BEATEN!";
@@ -910,25 +1062,29 @@ canvas { display: block; width: 100%; height: 100%; }
   }
 
   /* ---------------- RENDERING ---------------- */
-  function drawBubble(x, y, type) {
+  function drawBubbleItem(x, y, item) {
+    if (!item) return;
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, radius - 1.5, 0, Math.PI * 2);
 
-    if (type === "ROCK") {
-      ctx.fillStyle = "#475569";
+    if (item === "ROCK") {
+      // Stone Bubble
+      ctx.fillStyle = "#334155";
       ctx.fill();
-      ctx.strokeStyle = "#94a3b8";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#64748b";
+      ctx.lineWidth = 2.2;
       ctx.stroke();
 
-      ctx.strokeStyle = "#1e293b";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(x - 5, y - 5);
       ctx.lineTo(x + 2, y + 2);
-      ctx.lineTo(x + 6, y - 2);
+      ctx.lineTo(x + 6, y - 3);
       ctx.stroke();
-    } else if (type === "BOMB") {
+    } else if (item === "BOMB" || (item.kind && item.kind === "BOMB")) {
+      // Bomb Bubble
       ctx.fillStyle = "#111827";
       ctx.fill();
       ctx.strokeStyle = "#ff1744";
@@ -939,8 +1095,52 @@ canvas { display: block; width: 100%; height: 100%; }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("💣", x, y + 1);
+    } else if (item === "LASER" || (item.kind && item.kind === "LASER")) {
+      // Laser Bubble
+      ctx.fillStyle = "#032830";
+      ctx.fill();
+      ctx.strokeStyle = "#00e5ff";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      ctx.font = `${radius * 1.1}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("⚡", x, y + 1);
+    } else if (item.kind === "DUAL") {
+      // 2 COLOR MIX BUBBLE (Half & Half split)
+      const c1 = COLOR_PALETTE[item.c1] || "#fff";
+      const c2 = COLOR_PALETTE[item.c2] || "#fff";
+
+      // Half 1
+      ctx.beginPath();
+      ctx.arc(x, y, radius - 1.5, Math.PI * 0.75, Math.PI * 1.75);
+      ctx.fillStyle = c1;
+      ctx.fill();
+
+      // Half 2
+      ctx.beginPath();
+      ctx.arc(x, y, radius - 1.5, Math.PI * 1.75, Math.PI * 0.75);
+      ctx.fillStyle = c2;
+      ctx.fill();
+
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, radius - 1.5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Center divider glow
+      ctx.beginPath();
+      ctx.moveTo(x - radius + 2, y - radius + 2);
+      ctx.lineTo(x + radius - 2, y + radius - 2);
+      ctx.strokeStyle = "rgba(255,255,255,0.7)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     } else {
-      const baseColor = COLOR_PALETTE[type] || "#ffffff";
+      // Single Color Bubble
+      const colorKey = (typeof item === "string") ? item : item.color;
+      const baseColor = COLOR_PALETTE[colorKey] || "#ffffff";
       ctx.fillStyle = baseColor;
       ctx.fill();
 
@@ -1015,8 +1215,8 @@ canvas { display: block; width: 100%; height: 100%; }
     ctx.restore();
   }
 
-  /* ---------------- 500 LEVELS MODAL WITH PAGINATION ---------------- */
-  let currentTabRange = 0; // 0 = 1-50, 1 = 51-100, etc.
+  /* ---------------- LEVEL SELECT MODAL (500 LEVELS) ---------------- */
+  let currentTabRange = 0;
   const PAGE_SIZE = 50;
 
   function renderPageTabs() {
@@ -1054,7 +1254,7 @@ canvas { display: block; width: 100%; height: 100%; }
       if (isLocked) cardClass += " locked";
       if (isCurrent) cardClass += " active";
       if (cfg.difficulty === "HARD") cardClass += " hard";
-      if (cfg.difficulty === "EXPERT" || cfg.difficulty === "NIGHTMARE" || cfg.difficulty === "BOSS") cardClass += " extreme";
+      if (cfg.difficulty === "BOSS" || cfg.difficulty === "EXTREME" || cfg.difficulty === "NIGHTMARE") cardClass += " extreme";
 
       card.className = cardClass;
       card.innerHTML = `
@@ -1088,7 +1288,7 @@ canvas { display: block; width: 100%; height: 100%; }
     openLevelModal();
   });
 
-  /* ---------------- GAME LOOP & LIFECYCLE ---------------- */
+  /* ---------------- LIFECYCLE ---------------- */
   function startLevel(lvl) {
     initAudio();
     mainMenu.classList.add("hidden");
@@ -1097,6 +1297,7 @@ canvas { display: block; width: 100%; height: 100%; }
     particles = [];
     fallingBubbles = [];
     floatingTexts = [];
+    laserAnimations = [];
     initLevelGrid(lvl);
     running = true;
     if (musicOn) bgMusic.play().catch(()=>{});
@@ -1123,23 +1324,41 @@ canvas { display: block; width: 100%; height: 100%; }
     ctx.stroke();
     ctx.restore();
 
+    // Laser blast beam effect animation
+    for (let i = laserAnimations.length - 1; i >= 0; i--) {
+      const l = laserAnimations[i];
+      ctx.save();
+      ctx.strokeStyle = `rgba(0, 229, 255, ${l.alpha})`;
+      ctx.lineWidth = radius * 1.5;
+      ctx.shadowColor = "#00e5ff";
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.moveTo(0, l.y);
+      ctx.lineTo(W, l.y);
+      ctx.stroke();
+      ctx.restore();
+
+      l.alpha -= 0.05;
+      if (l.alpha <= 0) laserAnimations.splice(i, 1);
+    }
+
     // Board Bubbles
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         if (grid[r][c] !== null) {
           const p = getBubblePos(r, c);
-          drawBubble(p.x, p.y, grid[r][c]);
+          drawBubbleItem(p.x, p.y, grid[r][c]);
         }
       }
     }
 
-    // Falling Bubbles
+    // Falling Bubbles Animation
     for (let i = fallingBubbles.length - 1; i >= 0; i--) {
       const fb = fallingBubbles[i];
       fb.vy += fb.gravity;
       fb.x += fb.vx;
       fb.y += fb.vy;
-      drawBubble(fb.x, fb.y, fb.type);
+      drawBubbleItem(fb.x, fb.y, fb.item);
       if (fb.y > H + 40) fallingBubbles.splice(i, 1);
     }
 
@@ -1157,7 +1376,7 @@ canvas { display: block; width: 100%; height: 100%; }
     ctx.stroke();
     ctx.restore();
 
-    // Current Bubble
+    // Active Shooting Bubble
     if (currentBubble) {
       if (currentBubble.moving) {
         currentBubble.x += currentBubble.vx;
@@ -1184,10 +1403,10 @@ canvas { display: block; width: 100%; height: 100%; }
 
         if (hit) snapBubble();
       }
-      drawBubble(currentBubble.x, currentBubble.y, currentBubble.type);
+      drawBubbleItem(currentBubble.x, currentBubble.y, currentBubble.data);
     }
 
-    // Particles
+    // Particles FX
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.x += p.vx;
@@ -1205,7 +1424,7 @@ canvas { display: block; width: 100%; height: 100%; }
       }
     }
 
-    // Floating text
+    // Floating Combo / Drop Alerts
     for (let i = floatingTexts.length - 1; i >= 0; i--) {
       const ft = floatingTexts[i];
       ft.y += ft.vy;
