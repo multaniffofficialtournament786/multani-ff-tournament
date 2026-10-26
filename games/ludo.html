@@ -21,9 +21,6 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
     }
     body {
       background: radial-gradient(circle at 50% 20%, #152238 0%, var(--bg-dark) 100%);
@@ -34,6 +31,8 @@
       align-items: center;
       color: #fff;
       overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
     }
     header {
       width: 100%;
@@ -67,10 +66,6 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    .icon-btn:active {
-      transform: scale(0.95);
     }
 
     /* GAMEPLAY LAYOUT */
@@ -122,6 +117,7 @@
       background: #ffffff;
       overflow: hidden;
       border: 3px solid #1e2d4a;
+      touch-action: none;
     }
     #ludo-canvas {
       width: 100%;
@@ -191,6 +187,7 @@
       width: 46px;
       height: 46px;
       padding: 4px;
+      pointer-events: none;
     }
     .pip {
       width: 9px;
@@ -209,7 +206,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 99999;
       padding: 16px;
     }
     .modal-box {
@@ -223,6 +220,8 @@
       flex-direction: column;
       gap: 14px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      position: relative;
+      z-index: 100000;
     }
     .modal-title {
       font-size: 19px;
@@ -234,15 +233,20 @@
       background: linear-gradient(135deg, #1e293b, #334155);
       border: 1px solid rgba(255,255,255,0.1);
       color: #fff;
-      padding: 13px 16px;
+      padding: 14px 16px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: transform 0.1s;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 10;
+    }
+    .menu-btn * {
+      pointer-events: none;
     }
     .menu-btn:active {
       transform: scale(0.97);
@@ -312,24 +316,24 @@
     <div class="modal-box">
       <div class="modal-title">CHOOSE GAME MODE</div>
 
-      <button class="menu-btn primary" onclick="startOfflineMode()">
+      <button type="button" class="menu-btn primary" onclick="startOfflineMode()">
         <span>🤖 Play vs Computer</span>
         <small>Free Practice</small>
       </button>
 
-      <button class="menu-btn" onclick="openRoomConfig(0)">
+      <button type="button" class="menu-btn" onclick="openRoomConfig(0)">
         <span>👥 Free Online Game</span>
         <small>Play with Friend</small>
       </button>
 
-      <button class="menu-btn" onclick="openRoomConfig(null)">
+      <button type="button" class="menu-btn" onclick="openRoomConfig(null)">
         <span>💰 Coin Match</span>
         <small>25 - 1000 Coins</small>
       </button>
 
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <input type="text" id="join-code-input" placeholder="Enter Room Code (e.g. LUDO-786)" style="margin-bottom: 8px;">
-        <button class="menu-btn" onclick="joinRoomByCode()" style="justify-content: center; width: 100%; background: #0284c7;">
+        <button type="button" class="menu-btn" onclick="joinRoomByCode()" style="justify-content: center; width: 100%; background: #0284c7;">
           Join Room
         </button>
       </div>
@@ -353,8 +357,8 @@
         </select>
       </div>
 
-      <button class="menu-btn primary" onclick="createRoomOnServer()">Create & Get Link</button>
-      <button class="menu-btn" onclick="closeRoomConfig()" style="justify-content: center; background: #334155;">Back</button>
+      <button type="button" class="menu-btn primary" onclick="createRoomOnServer()">Create & Get Link</button>
+      <button type="button" class="menu-btn" onclick="closeRoomConfig()" style="justify-content: center; background: #334155;">Back</button>
     </div>
   </div>
 
@@ -366,15 +370,15 @@
         Room Code: <b id="display-room-code" style="color: var(--accent-cyan); font-size: 22px;">------</b>
       </div>
 
-      <button class="menu-btn" onclick="shareToWhatsApp()" style="background: #25d366; color: #000;">
+      <button type="button" class="menu-btn" onclick="shareToWhatsApp()" style="background: #25d366; color: #000;">
         <span>📲 Share on WhatsApp</span>
       </button>
 
-      <button class="menu-btn" onclick="copyInviteLink()">
+      <button type="button" class="menu-btn" onclick="copyInviteLink()">
         <span>📋 Copy Game Link</span>
       </button>
 
-      <button class="menu-btn" onclick="shareToChatRoom()" style="background: var(--accent-orange);">
+      <button type="button" class="menu-btn" onclick="shareToChatRoom()" style="background: var(--accent-orange);">
         <span>💬 Send to Multani Chat</span>
       </button>
 
@@ -382,7 +386,7 @@
         ⏳ Waiting for opponent to join...
       </div>
 
-      <button class="menu-btn" onclick="cancelWaitingRoom()" style="background: #dc2626; justify-content: center;">
+      <button type="button" class="menu-btn" onclick="cancelWaitingRoom()" style="background: #dc2626; justify-content: center;">
         Cancel
       </button>
     </div>
@@ -403,43 +407,85 @@
         </div>
       </div>
 
-      <button class="menu-btn primary" onclick="restartMatch()" style="justify-content: center;">Play Again</button>
-      <button class="menu-btn" onclick="showLobby()" style="justify-content: center;">Main Menu</button>
+      <button type="button" class="menu-btn primary" onclick="restartMatch()" style="justify-content: center;">Play Again</button>
+      <button type="button" class="menu-btn" onclick="showLobby()" style="justify-content: center;">Main Menu</button>
     </div>
   </div>
 
   <script>
     /* ==========================================================================
-       1. SUPABASE CLIENT INTEGRATION (CREDENTIALS CONFIGURED)
+       1. GLOBAL FUNCTIONS FIRST (Ensures buttons work even during loading)
+       ========================================================================== */
+    window.startOfflineMode = function() {
+      gameMode = 'offline';
+      document.getElementById('mode-badge').innerText = 'OFFLINE PRACTICE';
+      document.getElementById('blue-name').innerText = 'Computer';
+      document.getElementById('lobby-modal').style.display = 'none';
+      restartMatch();
+    };
+
+    window.openRoomConfig = function(fixedFee) {
+      document.getElementById('lobby-modal').style.display = 'none';
+      document.getElementById('room-modal').style.display = 'flex';
+      const feeGroup = document.getElementById('fee-selection-group');
+      if (fixedFee === 0) {
+        feeGroup.style.display = 'none';
+      } else {
+        feeGroup.style.display = 'block';
+      }
+    };
+
+    window.closeRoomConfig = function() {
+      document.getElementById('room-modal').style.display = 'none';
+      document.getElementById('lobby-modal').style.display = 'flex';
+    };
+
+    window.showLobby = function() {
+      document.getElementById('lobby-modal').style.display = 'flex';
+      document.getElementById('result-modal').style.display = 'none';
+      document.getElementById('room-modal').style.display = 'none';
+      document.getElementById('waiting-modal').style.display = 'none';
+    };
+
+    /* ==========================================================================
+       2. SUPABASE INITIALIZATION
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     
-    const supabase = (typeof window.supabase !== 'undefined') 
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
-      : null;
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.warn("Supabase init error:", err);
+    }
 
     /* ==========================================================================
-       2. SYNTHESIZED SOUND EFFECTS (Web Audio API)
+       3. AUDIO SYNTHESIZER
        ========================================================================== */
     let audioEnabled = true;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let actx = null;
 
     function initAudio() {
-      if (!actx) actx = new AudioCtx();
-      if (actx.state === 'suspended') actx.resume();
+      try {
+        if (!actx) actx = new AudioCtx();
+        if (actx.state === 'suspended') actx.resume();
+      } catch(e){}
     }
 
-    function toggleAudio() {
+    window.toggleAudio = function() {
       audioEnabled = !audioEnabled;
       document.getElementById('audio-toggle-btn').innerText = audioEnabled ? '🔊 Sound' : '🔇 Mute';
-    }
+    };
 
     const Sound = {
       roll() {
         if (!audioEnabled) return;
         initAudio();
+        if (!actx) return;
         const osc = actx.createOscillator();
         const gain = actx.createGain();
         osc.type = 'triangle';
@@ -453,6 +499,7 @@
       step() {
         if (!audioEnabled) return;
         initAudio();
+        if (!actx) return;
         const osc = actx.createOscillator();
         const gain = actx.createGain();
         osc.type = 'sine';
@@ -465,6 +512,7 @@
       capture() {
         if (!audioEnabled) return;
         initAudio();
+        if (!actx) return;
         const osc = actx.createOscillator();
         const gain = actx.createGain();
         osc.type = 'sawtooth';
@@ -478,6 +526,7 @@
       win() {
         if (!audioEnabled) return;
         initAudio();
+        if (!actx) return;
         [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
           const osc = actx.createOscillator();
           const gain = actx.createGain();
@@ -493,12 +542,12 @@
     };
 
     /* ==========================================================================
-       3. LUDO BOARD & TRACK GEOMETRY
+       4. BOARD COORDINATES & GEOMETRY
        ========================================================================== */
     const canvas = document.getElementById('ludo-canvas');
     const ctx = canvas.getContext('2d');
     const BOARD_PX = 360;
-    const CELL = BOARD_PX / 15; // 24px
+    const CELL = BOARD_PX / 15;
 
     const TRACK_COORDS = [
       [6, 1], [6, 2], [6, 3], [6, 4], [6, 5],
@@ -524,9 +573,6 @@
 
     const SAFE_TRACK_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
 
-    /* ==========================================================================
-       4. STATE VARIABLES
-       ========================================================================== */
     let gameMode = 'offline';
     let currentTurn = 'red';
     let diceValue = 0;
@@ -570,7 +616,7 @@
     }
 
     /* ==========================================================================
-       5. BOARD RENDERING
+       5. BOARD DRAWING
        ========================================================================== */
     function renderBoard() {
       ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
@@ -578,7 +624,6 @@
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, BOARD_PX, BOARD_PX);
 
-      // 4 Main corner bases
       ctx.fillStyle = '#ff3344'; ctx.fillRect(0, 0, CELL * 6, CELL * 6);
       ctx.fillStyle = '#00d26a'; ctx.fillRect(CELL * 9, 0, CELL * 6, CELL * 6);
       ctx.fillStyle = '#0088ff'; ctx.fillRect(CELL * 9, CELL * 9, CELL * 6, CELL * 6);
@@ -600,7 +645,6 @@
         ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(BOARD_PX, i * CELL); ctx.stroke();
       }
 
-      // Colored path lines
       for (let i = 1; i <= 5; i++) {
         ctx.fillStyle = '#ff3344'; ctx.fillRect(i * CELL, 7 * CELL, CELL, CELL);
         ctx.fillStyle = '#0088ff'; ctx.fillRect((14 - i) * CELL, 7 * CELL, CELL, CELL);
@@ -611,7 +655,6 @@
       ctx.fillStyle = '#ff3344'; ctx.fillRect(1 * CELL, 6 * CELL, CELL, CELL);
       ctx.fillStyle = '#0088ff'; ctx.fillRect(13 * CELL, 8 * CELL, CELL, CELL);
 
-      // Center Triangles
       const drawTri = (p1, p2, col) => {
         ctx.beginPath();
         ctx.moveTo(p1[0] * CELL, p1[1] * CELL);
@@ -625,7 +668,6 @@
       drawTri([9, 9], [6, 9], '#ffb703');
       drawTri([6, 9], [6, 6], '#ff3344');
 
-      // Safe Stars
       SAFE_TRACK_INDICES.forEach(idx => {
         const coord = TRACK_COORDS[idx];
         drawStar(coord[1] * CELL + CELL / 2, coord[0] * CELL + CELL / 2, 5, 8, 4, '#ffb703');
@@ -708,7 +750,7 @@
     }
 
     /* ==========================================================================
-       6. STEP-BY-STEP MOVEMENT ENGINE
+       6. STEP-BY-STEP MOVEMENT
        ========================================================================== */
     async function animateTokenStepByStep(color, tokenIndex, stepsToMove, syncToServer = true) {
       isTokenAnimating = true;
@@ -752,7 +794,6 @@
       renderBoard();
       isTokenAnimating = false;
 
-      // Online Sync Broadcast
       if (syncToServer && gameMode !== 'offline' && realtimeChannel) {
         realtimeChannel.send({
           type: 'broadcast',
@@ -761,7 +802,6 @@
         });
       }
 
-      // Check Victory
       if (gameState[color].every(s => s >= 56)) {
         handleVictory(color);
         return;
@@ -776,14 +816,14 @@
     }
 
     /* ==========================================================================
-       7. DICE ROLL & TURN HANDLING
+       7. DICE ROLL LOGIC
        ========================================================================== */
-    function handleDiceRollClick() {
+    window.handleDiceRollClick = function() {
       if (isDiceRolled || isTokenAnimating) return;
       if (gameMode !== 'offline' && currentTurn !== localPlayerColor) return;
 
       triggerDiceRoll();
-    }
+    };
 
     function triggerDiceRoll(forcedVal = null) {
       isDiceRolled = true;
@@ -797,7 +837,6 @@
         diceEl.classList.remove('rolling');
         renderDiceDots(diceValue);
 
-        // Broadcast roll to online opponent
         if (!forcedVal && gameMode !== 'offline' && realtimeChannel) {
           realtimeChannel.send({
             type: 'broadcast',
@@ -948,40 +987,9 @@
     }
 
     /* ==========================================================================
-       10. REALTIME MULTIPLAYER & ROOM LOGIC
+       10. ROOM ACTIONS
        ========================================================================== */
-    function showLobby() {
-      document.getElementById('lobby-modal').style.display = 'flex';
-      document.getElementById('result-modal').style.display = 'none';
-      document.getElementById('room-modal').style.display = 'none';
-      document.getElementById('waiting-modal').style.display = 'none';
-    }
-
-    function startOfflineMode() {
-      gameMode = 'offline';
-      document.getElementById('mode-badge').innerText = 'OFFLINE PRACTICE';
-      document.getElementById('blue-name').innerText = 'Computer';
-      document.getElementById('lobby-modal').style.display = 'none';
-      restartMatch();
-    }
-
-    function openRoomConfig(fixedFee) {
-      document.getElementById('lobby-modal').style.display = 'none';
-      document.getElementById('room-modal').style.display = 'flex';
-      const feeGroup = document.getElementById('fee-selection-group');
-      if (fixedFee === 0) {
-        feeGroup.style.display = 'none';
-      } else {
-        feeGroup.style.display = 'block';
-      }
-    }
-
-    function closeRoomConfig() {
-      document.getElementById('room-modal').style.display = 'none';
-      document.getElementById('lobby-modal').style.display = 'flex';
-    }
-
-    async function createRoomOnServer() {
+    window.createRoomOnServer = async function() {
       const feeSelect = document.getElementById('entry-fee-select');
       const fee = document.getElementById('fee-selection-group').style.display === 'none' ? 0 : parseInt(feeSelect.value);
       const generatedCode = 'LUDO-' + Math.floor(1000 + Math.random() * 9000);
@@ -992,23 +1000,27 @@
       document.getElementById('waiting-modal').style.display = 'flex';
 
       if (supabase) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data } = await supabase.from('ludo_rooms').insert({
-            room_code: generatedCode,
-            host_id: user.id,
-            entry_fee: fee,
-            status: 'waiting'
-          }).select().single();
-          if (data) {
-            activeRoom = data;
-            subscribeToRoomChannel(data.room_code);
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data } = await supabase.from('ludo_rooms').insert({
+              room_code: generatedCode,
+              host_id: user.id,
+              entry_fee: fee,
+              status: 'waiting'
+            }).select().single();
+            if (data) {
+              activeRoom = data;
+              subscribeToRoomChannel(data.room_code);
+            }
           }
+        } catch(e) {
+          console.warn("Room insert:", e);
         }
       }
-    }
+    };
 
-    async function joinRoomByCode() {
+    window.joinRoomByCode = async function() {
       const code = document.getElementById('join-code-input').value.trim().toUpperCase();
       if (!code) return alert("Please enter room code!");
 
@@ -1020,10 +1032,8 @@
         if (!room) return alert("Room not found!");
         if (room.status !== 'waiting') return alert("Room is already full or completed!");
 
-        // Set as guest
         await supabase.from('ludo_rooms').update({ guest_id: user.id }).eq('id', room.id);
 
-        // Call atomic RPC
         const { data: startRes } = await supabase.rpc('start_ludo_coin_match', { p_room_id: room.id });
         if (startRes && !startRes.success) {
           return alert(startRes.message);
@@ -1037,7 +1047,7 @@
         subscribeToRoomChannel(code);
         restartMatch();
       }
-    }
+    };
 
     function subscribeToRoomChannel(roomCode) {
       if (!supabase) return;
@@ -1066,29 +1076,29 @@
         });
     }
 
-    function shareToWhatsApp() {
+    window.shareToWhatsApp = function() {
       const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
       const text = `Join my Ludo match on MULTANI FF TOURNAMENT! Code: ${activeRoom.room_code}. Play here: ${link}`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-    }
+    };
 
-    function copyInviteLink() {
+    window.copyInviteLink = function() {
       const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
       navigator.clipboard.writeText(link).then(() => alert("Game Link Copied!"));
-    }
+    };
 
-    function shareToChatRoom() {
+    window.shareToChatRoom = function() {
       const invitePayload = `[LUDO_INVITE:{"code":"${activeRoom.room_code}","fee":${activeRoom.entry_fee},"mode":"${activeRoom.entry_fee > 0 ? 'Coin Match' : 'Free Match'}"}]`;
       navigator.clipboard.writeText(invitePayload);
       alert("Invite card copied! Paste it in MULTANI FF Chat Room.");
-    }
+    };
 
-    function cancelWaitingRoom() {
+    window.cancelWaitingRoom = function() {
       document.getElementById('waiting-modal').style.display = 'none';
       showLobby();
-    }
+    };
 
-    function restartMatch() {
+    window.restartMatch = function() {
       gameState = { red: [-1, -1, -1, -1], blue: [-1, -1, -1, -1] };
       currentTurn = 'red';
       isDiceRolled = false;
@@ -1098,9 +1108,9 @@
       renderDiceDots(1);
       resetDiceStateForNextRoll();
       renderBoard();
-    }
+    };
 
-    // Initial setup
+    // Initial Start
     renderDiceDots(1);
     renderBoard();
 
