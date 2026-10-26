@@ -144,14 +144,14 @@
       padding: 8px 14px;
     }
     .coin-calc-btn {
-      width: 46px; height: 46px; border-radius: 10px;
+      width: 48px; height: 48px; border-radius: 10px;
       background: linear-gradient(135deg, #34495e, #1c2833);
       border: 1.5px solid #5d6d7e;
-      color: #fff; font-size: 22px; font-weight: 900;
+      color: #fff; font-size: 24px; font-weight: 900;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
-    .coin-calc-btn:active { transform: scale(0.92); }
+    .coin-calc-btn:active { transform: scale(0.92); background: #1f2d3d; }
     .coin-amount-display {
       display: flex;
       align-items: center;
@@ -544,7 +544,7 @@
       <div class="panel-card-select">
         <div style="font-size: 13px; font-weight: 800; color:#7fb3d5; text-transform: uppercase;">SELECT MODE</div>
         
-        <!-- Only 1 on 1 (4 players removed) -->
+        <!-- Only 1 on 1 -->
         <div class="mode-single-tab">
           <i class="fa-solid fa-user-group" style="margin-right:6px;"></i> 1 ON 1 BATTLE
         </div>
@@ -784,7 +784,7 @@
     };
 
     /* ==========================================================================
-       3. EXACT STEPPING COINS & LOBBY LOGIC
+       3. EXACT STEPPING COINS & LOBBY LOGIC (25 -> 50 -> 100 -> 250 -> 500 -> 1000)
        ========================================================================== */
     const coinSteps = [25, 50, 100, 250, 500, 1000];
     let selectedCoinIndex = 0; // Starts at 25
@@ -862,8 +862,8 @@
     // Auto-invite to Multani Chat & WhatsApp
     function sendInviteToChatAndWhatsApp() {
       const fee = getSelectedFee();
-      const joinLink = `${window.location.origin}${window.location.pathname}?room=${currentRoomCode}`;
-      const chatPayload = `[LUDO_INVITE:{"code":"${currentRoomCode}","fee":${fee},"mode":"Classic 1v1"}]`;
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
 
       navigator.clipboard.writeText(chatPayload).then(() => {
         alert("Invite Card Copied!\nChat Room mein paste karein: Code " + currentRoomCode);
@@ -876,9 +876,9 @@
     }
 
     function shareInviteLinkDirect() {
-      const joinLink = `${window.location.origin}${window.location.pathname}?room=${currentRoomCode}`;
-      const text = `Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: ${currentRoomCode}\nPlay here: ${joinLink}`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nPlay here: " + joinLink;
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
     }
 
     async function promptJoinByCode(codeToJoin = null) {
@@ -941,7 +941,7 @@
 
     function subscribeToMatchRealtime(code) {
       if (!supabase) return;
-      realtimeChannel = supabase.channel(`ludo_${code}`);
+      realtimeChannel = supabase.channel("ludo_" + code);
 
       realtimeChannel
         .on('broadcast', { event: 'guest_joined' }, payload => {
@@ -1365,7 +1365,7 @@
       SFX.win();
       clearInterval(turnTimerInterval);
       document.getElementById('result-modal').classList.remove('hidden');
-      document.getElementById('result-winner-title').innerText = `${winner.toUpperCase()} WINS!`;
+      document.getElementById('result-winner-title').innerText = winner.toUpperCase() + " WINS!";
 
       if (!isSingleMode && activeRoomData && activeRoomData.entry_fee > 0 && supabase) {
         const winnerId = (winner === 'red' ? activeRoomData.host_id : activeRoomData.guest_id);
@@ -1374,8 +1374,8 @@
           p_winner_id: winnerId
         });
         if (res && res.success) {
-          document.getElementById('res-prize-amount').innerText = `${res.reward} Coins`;
-          document.getElementById('res-fee-amount').innerText = `${res.fee} Coins`;
+          document.getElementById('res-prize-amount').innerText = res.reward + " Coins";
+          document.getElementById('res-fee-amount').innerText = res.fee + " Coins";
         }
       }
     }
