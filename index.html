@@ -575,5 +575,52 @@
   <!-- MULTANI WEBSITE JS MODULE CONNECTION -->
   <script type="module" src="./multaniwebsite/main.js"></script>
 
+<script>
+(function () {
+  function showOffline() {
+    if (document.getElementById("multani-offline-screen")) return;
+
+    var screen = document.createElement("div");
+    screen.id = "multani-offline-screen";
+
+    screen.style.cssText = `
+      position:fixed;inset:0;z-index:999999;
+      background:#07090e;color:white;
+      display:flex;align-items:center;justify-content:center;
+      text-align:center;padding:24px;font-family:Arial,sans-serif;
+    `;
+
+    screen.innerHTML = `
+      <div style="max-width:340px;border:1px solid #ff4624;
+      border-radius:20px;padding:28px;background:#11151d">
+        <div style="font-size:60px">📡</div>
+        <h2 style="color:#ff4624">INTERNET CONNECTION LOST!</h2>
+        <p style="line-height:1.7;color:#ddd">
+          Aapka internet connection band hai.
+          Please apna NET check karein.
+        </p>
+        <button onclick="location.reload()"
+        style="background:#ff4624;color:white;border:0;
+        padding:14px 24px;border-radius:9px;font-weight:bold">
+          RETRY CONNECTION
+        </button>
+      </div>`;
+
+    document.body.appendChild(screen);
+  }
+
+  function checkConnection() {
+    if (!navigator.onLine) showOffline();
+    else {
+      var screen = document.getElementById("multani-offline-screen");
+      if (screen) screen.remove();
+    }
+  }
+
+  window.addEventListener("offline", showOffline);
+  window.addEventListener("online", checkConnection);
+  checkConnection();
+})();
+</script>
 </body>
 </html>
