@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ludo Game (2 Players)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background: radial-gradient(circle at center, #1b263b, #0d1b2a);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+      text-align: center;
+    }
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+    .status-panel {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      opacity: 0.5;
+    }
+    .badge.active {
+      opacity: 1;
+      transform: scale(1.08);
+      box-shadow: 0 0 12px currentColor;
+    }
+    .badge-red {
+      background: #e63946;
+      color: #fff;
+    }
+    .badge-yellow {
+      background: #ffb703;
+      color: #111;
+    }
+    #board-canvas {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      cursor: pointer;
+      touch-action: none;
+    }
+    .control-panel {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+    .info-msg {
+      font-size: 15px;
+      min-height: 22px;
+      color: #e0e1dd;
+      text-align: center;
+      font-weight: 500;
+    }
+    .dice-area {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .dice-box {
+      width: 55px;
+      height: 55px;
+      background: #fff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #111;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .dice-box.rolling {
+      animation: spin 0.4s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1.1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1.1); }
+    }
+    .roll-btn {
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(0, 180, 216, 0.4);
+    }
+    .roll-btn:active {
+      transform: scale(0.96);
+    }
+    .roll-btn:disabled {
+      background: #555;
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎲 LUDO CLASSIC 🎲</h1>
+
+  <div class="game-container">
+    <div class="status-panel">
+      <div id="red-badge" class="badge badge-red active">Red Turn (Player 1)</div>
+      <div id="yellow-badge" class="badge badge-yellow">Yellow Turn (Player 2)</div>
+    </div>
+
+    <canvas id="board-canvas" width="360" height="360"></canvas>
+
+    <div class="control-panel">
+      <div class="info-msg" id="info-text">Red ki bari hai! Dice phenkein.</div>
+      
+      <div class="dice-area">
+        <div class="dice-box" id="dice-display">🎲</div>
+        <button class="roll-btn" id="roll-btn" onclick="rollDice()">ROLL DICE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('board-canvas');
+    const ctx = canvas.getContext('2d');
+    const C_SIZE = 360;
+    const CELL = C_SIZE / 15;
+
+    // Web Audio SFX
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playBeep(freq, duration, type='sine') {
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Colors
+    const COLOR_RED = '#e63946';
+    const COLOR_YELLOW = '#ffb703';
+    const COLOR_GREEN = '#2a9d8f';
+    const COLOR_BLUE = '#457b9d';
+
+    // 52 common path track coordinates (row, col)
+    const trackCells = [
+      [6, 1], [6, 2], [6, 3], [6, 4], [6, 5],
+      [5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6],
+      [0, 7],
+      [0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8],
+      [6, 9], [6, 10], [6, 11], [6, 12], [6, 13], [6, 14],
+      [7, 14],
+      [8, 14], [8, 13], [8, 12], [8, 11], [8, 10], [8, 9],
+      [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8],
+      [14, 7],
+      [14, 6], [13, 6], [12, 6], [11, 6], [10, 6], [9, 6],
+      [8, 5], [8, 4], [8, 3], [8, 2], [8, 1], [8, 0],
+      [7, 0],
+      [6, 0]
+    ];
+
+    // Home runs
+    const redHomeRun = [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]];
+    const yellowHomeRun = [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]];
+
+    // Token base slots
+    const redBases = [[2, 2], [2, 3], [3, 2], [3, 3]];
+    const yellowBases = [[11, 11], [11, 12], [12, 11], [12, 12]];
+
+    let turn = 'red';
+    let diceValue = 0;
+    let isDiceRolled = false;
+    let isAnimating = false;
+
+    // Tokens: step -1 = base, 0-50 = track, 51-55 = home stretch, 56 = finished
+    const tokens = {
+      red: [
+        { id: 0, step: -1 },
+        { id: 1, step: -1 }
+      ],
+      yellow: [
+        { id: 0, step: -1 },
+        { id: 1, step: -1 }
+      ]
+    };
+
+    function getCoords(player, t) {
+      if (t.step === -1) {
+        const base = player === 'red' ? redBases[t.id] : yellowBases[t.id];
+        return { r: base[0], c: base[1] };
+      }
+      if (t.step >= 56) {
+        return { r: 7, c: 7 };
+      }
+
+      if (player === 'red') {
+        if (t.step < 51) {
+          const idx = t.step % 52;
+          return { r: trackCells[idx][0], c: trackCells[idx][1] };
+        } else {
+          const hIdx = t.step - 51;
+          return { r: redHomeRun[hIdx][0], c: redHomeRun[hIdx][1] };
+        }
+      } else {
+        if (t.step < 51) {
+          const idx = (t.step + 26) % 52;
+          return { r: trackCells[idx][0], c: trackCells[idx][1] };
+        } else {
+          const hIdx = t.step - 51;
+          return { r: yellowHomeRun[hIdx][0], c: yellowHomeRun[hIdx][1] };
+        }
+      }
+    }
+
+    function drawBoard() {
+      ctx.clearRect(0, 0, C_SIZE, C_SIZE);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, C_SIZE, C_SIZE);
+
+      ctx.fillStyle = COLOR_RED;
+      ctx.fillRect(0, 0, CELL * 6, CELL * 6);
+
+      ctx.fillStyle = COLOR_GREEN;
+      ctx.fillRect(CELL * 9, 0, CELL * 6, CELL * 6);
+
+      ctx.fillStyle = COLOR_BLUE;
+      ctx.fillRect(0, CELL * 9, CELL * 6, CELL * 6);
+
+      ctx.fillStyle = COLOR_YELLOW;
+      ctx.fillRect(CELL * 9, CELL * 9, CELL * 6, CELL * 6);
+
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(CELL * 1, CELL * 1, CELL * 4, CELL * 4);
+      ctx.fillRect(CELL * 10, CELL * 1, CELL * 4, CELL * 4);
+      ctx.fillRect(CELL * 1, CELL * 10, CELL * 4, CELL * 4);
+      ctx.fillRect(CELL * 10, CELL * 10, CELL * 4, CELL * 4);
+
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 15; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * CELL, 0);
+        ctx.lineTo(i * CELL, C_SIZE);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELL);
+        ctx.lineTo(C_SIZE, i * CELL);
+        ctx.stroke();
+      }
+
+      for (let i = 1; i <= 5; i++) {
+        ctx.fillStyle = COLOR_RED;
+        ctx.fillRect(i * CELL, 7 * CELL, CELL, CELL);
+        ctx.fillStyle = COLOR_YELLOW;
+        ctx.fillRect((14 - i) * CELL, 7 * CELL, CELL, CELL);
+        ctx.fillStyle = COLOR_GREEN;
+        ctx.fillRect(7 * CELL, i * CELL, CELL, CELL);
+        ctx.fillStyle = COLOR_BLUE;
+        ctx.fillRect(7 * CELL, (14 - i) * CELL, CELL, CELL);
+      }
+
+      ctx.fillStyle = COLOR_RED;
+      ctx.fillRect(1 * CELL, 6 * CELL, CELL, CELL);
+      ctx.fillStyle = COLOR_YELLOW;
+      ctx.fillRect(13 * CELL, 8 * CELL, CELL, CELL);
+
+      ctx.beginPath();
+      ctx.moveTo(6 * CELL, 6 * CELL);
+      ctx.lineTo(9 * CELL, 6 * CELL);
+      ctx.lineTo(7.5 * CELL, 7.5 * CELL);
+      ctx.fillStyle = COLOR_GREEN;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(9 * CELL, 6 * CELL);
+      ctx.lineTo(9 * CELL, 9 * CELL);
+      ctx.lineTo(7.5 * CELL, 7.5 * CELL);
+      ctx.fillStyle = COLOR_YELLOW;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(9 * CELL, 9 * CELL);
+      ctx.lineTo(6 * CELL, 9 * CELL);
+      ctx.lineTo(7.5 * CELL, 7.5 * CELL);
+      ctx.fillStyle = COLOR_BLUE;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(6 * CELL, 9 * CELL);
+      ctx.lineTo(6 * CELL, 6 * CELL);
+      ctx.lineTo(7.5 * CELL, 7.5 * CELL);
+      ctx.fillStyle = COLOR_RED;
+      ctx.fill();
+
+      drawStar(CELL * 1.5, CELL * 6.5, 4, 8, 4);
+      drawStar(CELL * 13.5, CELL * 8.5, 4, 8, 4);
+
+      drawTokens();
+    }
+
+    function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function drawTokens() {
+      ['red', 'yellow'].forEach(player => {
+        tokens[player].forEach((t) => {
+          const { r, c } = getCoords(player, t);
+          let px = c * CELL + CELL / 2;
+          let py = r * CELL + CELL / 2;
+
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.38, 0, Math.PI * 2);
+          ctx.fillStyle = player === 'red' ? '#e63946' : '#ffb703';
+          ctx.fill();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.16, 0, Math.PI * 2);
+          ctx.fillStyle = '#111';
+          ctx.fill();
+        });
+      });
+    }
+
+    function rollDice() {
+      if (isDiceRolled || isAnimating) return;
+      playBeep(450, 0.08);
+
+      const diceBox = document.getElementById('dice-display');
+      const rollBtn = document.getElementById('roll-btn');
+      diceBox.classList.add('rolling');
+      rollBtn.disabled = true;
+
+      setTimeout(() => {
+        diceValue = Math.floor(Math.random() * 6) + 1;
+        diceBox.classList.remove('rolling');
+        diceBox.innerText = diceValue;
+        isDiceRolled = true;
+        playBeep(600, 0.15);
+
+        checkMoves();
+      }, 400);
+    }
+
+    function checkMoves() {
+      const currentTokens = tokens[turn];
+      const validTokens = currentTokens.filter(t => canMove(t, diceValue));
+
+      if (validTokens.length === 0) {
+        document.getElementById('info-text').innerText = `Koi move mumkin nahi (${diceValue}). Agli bari!`;
+        setTimeout(switchTurn, 1000);
+      } else if (validTokens.length === 1) {
+        document.getElementById('info-text').innerText = `Goti chal di gayi!`;
+        setTimeout(() => moveToken(validTokens[0]), 400);
+      } else {
+        document.getElementById('info-text').innerText = `Board par apni goti chunein! (${diceValue} aaya)`;
+      }
+    }
+
+    function canMove(t, dice) {
+      if (t.step === -1) {
+        return dice === 6;
+      }
+      return t.step + dice <= 56;
+    }
+
+    function moveToken(t) {
+      isAnimating = true;
+      if (t.step === -1) {
+        t.step = 0;
+        playBeep(700, 0.12);
+      } else {
+        t.step += diceValue;
+        playBeep(520, 0.1);
+      }
+
+      checkCapture(t);
+      drawBoard();
+      isAnimating = false;
+
+      if (tokens[turn].every(tok => tok.step === 56)) {
+        document.getElementById('info-text').innerText = `🎉 Mubarak ho! ${turn.toUpperCase()} jeet gaya! 🎉`;
+        playBeep(900, 0.5, 'triangle');
+        document.getElementById('roll-btn').disabled = true;
+        return;
+      }
+
+      if (diceValue === 6) {
+        document.getElementById('info-text').innerText = `Chhaka (6) aaya! Dobara bari mili hai!`;
+        isDiceRolled = false;
+        document.getElementById('roll-btn').disabled = false;
+      } else {
+        switchTurn();
+      }
+    }
+
+    function checkCapture(activeToken) {
+      if (activeToken.step >= 51) return;
+      const activeCoords = getCoords(turn, activeToken);
+
+      if ((activeCoords.r === 6 && activeCoords.c === 1) || (activeCoords.r === 8 && activeCoords.c === 13)) {
+        return;
+      }
+
+      const opponent = turn === 'red' ? 'yellow' : 'red';
+      tokens[opponent].forEach(oppT => {
+        if (oppT.step >= 0 && oppT.step < 51) {
+          const oppCoords = getCoords(opponent, oppT);
+          if (oppCoords.r === activeCoords.r && oppCoords.c === activeCoords.c) {
+            oppT.step = -1;
+            playBeep(220, 0.35, 'sawtooth');
+            document.getElementById('info-text').innerText = `💥 Goti mar di gayi!`;
+          }
+        }
+      });
+    }
+
+    function switchTurn() {
+      turn = turn === 'red' ? 'yellow' : 'red';
+      isDiceRolled = false;
+      document.getElementById('roll-btn').disabled = false;
+      document.getElementById('info-text').innerText = `${turn === 'red' ? 'Red' : 'Yellow'} ki bari hai. Dice roll karein!`;
+
+      if (turn === 'red') {
+        document.getElementById('red-badge').classList.add('active');
+        document.getElementById('yellow-badge').classList.remove('active');
+      } else {
+        document.getElementById('yellow-badge').classList.add('active');
+        document.getElementById('red-badge').classList.remove('active');
+      }
+    }
+
+    canvas.addEventListener('click', (e) => {
+      if (!isDiceRolled || isAnimating) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      const currentTokens = tokens[turn];
+      for (let t of currentTokens) {
+        if (!canMove(t, diceValue)) continue;
+        const { r, c } = getCoords(turn, t);
+        const px = c * CELL + CELL / 2;
+        const py = r * CELL + CELL / 2;
+        const dist = Math.hypot(x - px, y - py);
+
+        if (dist <= CELL * 0.6) {
+          moveToken(t);
+          break;
+        }
+      }
+    });
+
+    drawBoard();
+  </script>
+</body>
+</html>
