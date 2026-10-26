@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090e">
+  <title>Offline - MULTANI FF OFFICIAL TOURNAMENT</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #07090e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .card {
+      width: 100%;
+      max-width: 350px;
+      padding: 28px 22px;
+      background: #11151d;
+      border: 1px solid #ff4624;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #ff462433;
+    }
+    .logo {
+      color: #ff4624;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+    .signal { font-size: 60px; margin: 22px 0; }
+    h1 { color: #ff4624; font-size: 24px; }
+    p { color: #d0d5df; line-height: 1.8; font-size: 14px; }
+    button {
+      margin-top: 14px;
+      padding: 14px 20px;
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      background: #ff4624;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .footer {
+      margin-top: 22px;
+      color: #8e9bb0;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="logo">MULTANI FF OFFICIAL</div>
+    <div class="signal">📡</div>
+    <h1>INTERNET CONNECTION LOST!</h1>
+    <p>
+      Aapka internet connection band hai ya available nahi hai.
+      Please apna internet check karein aur dobara koshish karein.
+    </p>
+    <button onclick="retryConnection()">RETRY CONNECTION</button>
+    <div class="footer">MULTANI FF OFFICIAL TOURNAMENT</div>
+  </main>
+  <script>
+    function retryConnection() {
+      if (navigator.onLine) {
+        location.href = "./";
+      } else {
+        alert("Internet abhi band hai. Please connection check karein.");
+      }
+    }
+  </script>
+</body>
+</html>
