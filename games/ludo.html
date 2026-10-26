@@ -21,6 +21,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       background: radial-gradient(circle at 50% 20%, #152238 0%, var(--bg-dark) 100%);
@@ -117,7 +118,6 @@
       background: #ffffff;
       overflow: hidden;
       border: 3px solid #1e2d4a;
-      touch-action: none;
     }
     #ludo-canvas {
       width: 100%;
@@ -206,7 +206,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 99999;
+      z-index: 10000;
       padding: 16px;
     }
     .modal-box {
@@ -220,8 +220,6 @@
       flex-direction: column;
       gap: 14px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-      position: relative;
-      z-index: 100000;
     }
     .modal-title {
       font-size: 19px;
@@ -241,21 +239,49 @@
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      pointer-events: auto !important;
-      position: relative;
-      z-index: 10;
-    }
-    .menu-btn * {
-      pointer-events: none;
-    }
-    .menu-btn:active {
-      transform: scale(0.97);
+      width: 100%;
     }
     .menu-btn.primary {
       background: linear-gradient(135deg, var(--accent-orange), #ea580c);
       border: none;
       box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
     }
+
+    /* 2-SLOT ROOM CONTAINER */
+    .slot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #090f1d;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .slot-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slot-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .slot-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 230, 118, 0.2);
+      color: #00e676;
+    }
+
     select, input {
       background: #090f1d;
       border: 1px solid rgba(255,255,255,0.15);
@@ -274,8 +300,8 @@
   <header>
     <div class="brand-title">MULTANI FF LUDO</div>
     <div class="header-actions">
-      <button class="icon-btn" onclick="toggleAudio()" id="audio-toggle-btn">🔊 Sound</button>
-      <button class="icon-btn" onclick="showLobby()">🚪 Lobby</button>
+      <button class="icon-btn" id="btn-audio-toggle">🔊 Sound</button>
+      <button class="icon-btn" id="btn-open-lobby">🚪 Lobby</button>
     </div>
   </header>
 
@@ -303,7 +329,7 @@
         <div class="status-text" id="status-label">Tap dice to roll</div>
       </div>
 
-      <div class="dice-container" onclick="handleDiceRollClick()">
+      <div class="dice-container" id="dice-trigger-box">
         <div class="dice glow-active" id="dice-cube">
           <div class="dice-pips" id="dice-dots"></div>
         </div>
@@ -311,92 +337,112 @@
     </div>
   </div>
 
-  <!-- LOBBY SELECTION MODAL -->
+  <!-- SCREEN 1: MAIN LOBBY -->
   <div class="modal-overlay" id="lobby-modal">
     <div class="modal-box">
       <div class="modal-title">CHOOSE GAME MODE</div>
 
-      <button type="button" class="menu-btn primary" onclick="startOfflineMode()">
+      <button type="button" class="menu-btn primary" id="btn-mode-computer">
         <span>🤖 Play vs Computer</span>
         <small>Free Practice</small>
       </button>
 
-      <button type="button" class="menu-btn" onclick="openRoomConfig(0)">
+      <button type="button" class="menu-btn" id="btn-mode-free">
         <span>👥 Free Online Game</span>
         <small>Play with Friend</small>
       </button>
 
-      <button type="button" class="menu-btn" onclick="openRoomConfig(null)">
+      <button type="button" class="menu-btn" id="btn-mode-coin">
         <span>💰 Coin Match</span>
         <small>25 - 1000 Coins</small>
       </button>
 
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <input type="text" id="join-code-input" placeholder="Enter Room Code (e.g. LUDO-786)" style="margin-bottom: 8px;">
-        <button type="button" class="menu-btn" onclick="joinRoomByCode()" style="justify-content: center; width: 100%; background: #0284c7;">
+        <button type="button" class="menu-btn" id="btn-join-room" style="justify-content: center; background: #0284c7;">
           Join Room
         </button>
       </div>
     </div>
   </div>
 
-  <!-- CREATE ROOM CONFIG MODAL -->
-  <div class="modal-overlay" id="room-modal" style="display: none;">
+  <!-- SCREEN 2: COIN SELECTION SCREEN -->
+  <div class="modal-overlay" id="coin-select-modal" style="display: none;">
     <div class="modal-box">
-      <div class="modal-title">ROOM ENTRY SETTINGS</div>
+      <div class="modal-title">SELECT COIN ENTRY</div>
+      <p style="font-size: 12px; color: #94a3b8; text-align: center;">Dono players barabar coins laga kar khelenge.</p>
       
-      <div id="fee-selection-group">
-        <label style="font-size: 13px; color: #94a3b8; display: block; margin-bottom: 6px;">Select Entry Fee (Per Player):</label>
-        <select id="entry-fee-select">
-          <option value="25">25 Coins (Pool: 50 | Win: 45)</option>
-          <option value="50">50 Coins (Pool: 100 | Win: 90)</option>
-          <option value="100">100 Coins (Pool: 200 | Win: 180)</option>
-          <option value="250">250 Coins (Pool: 500 | Win: 450)</option>
-          <option value="500">500 Coins (Pool: 1000 | Win: 900)</option>
-          <option value="1000">1000 Coins (Pool: 2000 | Win: 1800)</option>
-        </select>
-      </div>
+      <select id="entry-fee-select">
+        <option value="25">25 Coins (Pool: 50 | Winner: 45)</option>
+        <option value="50">50 Coins (Pool: 100 | Winner: 90)</option>
+        <option value="100">100 Coins (Pool: 200 | Winner: 180)</option>
+        <option value="250">250 Coins (Pool: 500 | Winner: 450)</option>
+        <option value="500">500 Coins (Pool: 1000 | Winner: 900)</option>
+        <option value="1000">1000 Coins (Pool: 2000 | Winner: 1800)</option>
+      </select>
 
-      <button type="button" class="menu-btn primary" onclick="createRoomOnServer()">Create & Get Link</button>
-      <button type="button" class="menu-btn" onclick="closeRoomConfig()" style="justify-content: center; background: #334155;">Back</button>
+      <button type="button" class="menu-btn primary" id="btn-confirm-coins" style="justify-content: center;">Next (Create Room)</button>
+      <button type="button" class="menu-btn" id="btn-back-from-coins" style="justify-content: center; background: #334155;">Back</button>
     </div>
   </div>
 
-  <!-- WAITING & SOCIAL SHARING MODAL -->
-  <div class="modal-overlay" id="waiting-modal" style="display: none;">
+  <!-- SCREEN 3: 2-SLOTS ROOM SCREEN (KHUD + INVITE FRIEND) -->
+  <div class="modal-overlay" id="slots-modal" style="display: none;">
     <div class="modal-box">
-      <div class="modal-title">INVITE YOUR FRIEND</div>
-      <div style="text-align: center; color: #cbd5e1; font-size: 14px;">
-        Room Code: <b id="display-room-code" style="color: var(--accent-cyan); font-size: 22px;">------</b>
+      <div class="modal-title" id="room-match-heading">MATCH LOBBY (2 SLOTS)</div>
+      <div style="text-align: center; color: #94a3b8; font-size: 13px;">
+        Room Code: <b id="slot-room-code-tag" style="color: var(--accent-cyan); font-size: 20px;">------</b>
+        <br>Entry: <b id="slot-fee-tag" style="color: #ffbe00;">FREE</b>
       </div>
 
-      <button type="button" class="menu-btn" onclick="shareToWhatsApp()" style="background: #25d366; color: #000;">
-        <span>📲 Share on WhatsApp</span>
-      </button>
-
-      <button type="button" class="menu-btn" onclick="copyInviteLink()">
-        <span>📋 Copy Game Link</span>
-      </button>
-
-      <button type="button" class="menu-btn" onclick="shareToChatRoom()" style="background: var(--accent-orange);">
-        <span>💬 Send to Multani Chat</span>
-      </button>
-
-      <div style="font-size: 13px; color: #38bdf8; text-align: center; margin-top: 6px;">
-        ⏳ Waiting for opponent to join...
+      <!-- SLOT 1: KHUD -->
+      <div class="slot-row" style="border-color: rgba(0, 240, 255, 0.4);">
+        <div class="slot-user">
+          <div class="slot-avatar" style="background:#ef4444;">🔴</div>
+          <div>
+            <div style="font-size: 14px; font-weight: bold;">You (Host)</div>
+            <div style="font-size: 11px; color: #94a3b8;">Player 1</div>
+          </div>
+        </div>
+        <span class="slot-badge">READY</span>
       </div>
 
-      <button type="button" class="menu-btn" onclick="cancelWaitingRoom()" style="background: #dc2626; justify-content: center;">
-        Cancel
+      <!-- SLOT 2: FRIEND -->
+      <div class="slot-row" id="guest-slot-row" style="border-style: dashed;">
+        <div class="slot-user">
+          <div class="slot-avatar" style="background: #334155;">🔵</div>
+          <div>
+            <div style="font-size: 14px; font-weight: bold;" id="guest-slot-name">Empty Slot</div>
+            <div style="font-size: 11px; color: #94a3b8;">Waiting for friend...</div>
+          </div>
+        </div>
+        <span class="slot-badge" style="background: rgba(255, 190, 0, 0.2); color: #ffbe00;" id="guest-slot-status">WAITING</span>
+      </div>
+
+      <!-- INVITE BUTTONS -->
+      <button type="button" class="menu-btn primary" id="btn-send-chatroom" style="background: var(--accent-orange); justify-content: center;">
+        💬 Send Invite to Multani Chat
+      </button>
+
+      <button type="button" class="menu-btn" id="btn-share-whatsapp" style="background: #25d366; color: #000; justify-content: center;">
+        📲 Share on WhatsApp
+      </button>
+
+      <button type="button" class="menu-btn" id="btn-copy-link" style="justify-content: center; background: #0284c7;">
+        📋 Copy Room Code & Link
+      </button>
+
+      <button type="button" class="menu-btn" id="btn-cancel-room" style="background: #dc2626; justify-content: center;">
+        Cancel Room
       </button>
     </div>
   </div>
 
-  <!-- MATCH RESULT SCREEN -->
+  <!-- RESULT SCREEN -->
   <div class="modal-overlay" id="result-modal" style="display: none;">
     <div class="modal-box" style="text-align: center;">
-      <div style="font-size: 26px; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251,191,36,0.6);" id="winner-title">VICTORY!</div>
-      <p id="winner-desc" style="font-size: 14px; color: #94a3b8;">All 4 tokens reached home.</p>
+      <div style="font-size: 26px; font-weight: 900; color: #fbbf24;" id="winner-title">VICTORY!</div>
+      <p id="winner-desc" style="font-size: 14px; color: #94a3b8;">Match complete ho gaya hai.</p>
       
       <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; font-size: 13px;">
         <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
@@ -407,63 +453,29 @@
         </div>
       </div>
 
-      <button type="button" class="menu-btn primary" onclick="restartMatch()" style="justify-content: center;">Play Again</button>
-      <button type="button" class="menu-btn" onclick="showLobby()" style="justify-content: center;">Main Menu</button>
+      <button type="button" class="menu-btn primary" id="btn-restart-game" style="justify-content: center;">Play Again</button>
+      <button type="button" class="menu-btn" id="btn-result-lobby" style="justify-content: center;">Main Menu</button>
     </div>
   </div>
 
   <script>
     /* ==========================================================================
-       1. GLOBAL FUNCTIONS FIRST (Ensures buttons work even during loading)
-       ========================================================================== */
-    window.startOfflineMode = function() {
-      gameMode = 'offline';
-      document.getElementById('mode-badge').innerText = 'OFFLINE PRACTICE';
-      document.getElementById('blue-name').innerText = 'Computer';
-      document.getElementById('lobby-modal').style.display = 'none';
-      restartMatch();
-    };
-
-    window.openRoomConfig = function(fixedFee) {
-      document.getElementById('lobby-modal').style.display = 'none';
-      document.getElementById('room-modal').style.display = 'flex';
-      const feeGroup = document.getElementById('fee-selection-group');
-      if (fixedFee === 0) {
-        feeGroup.style.display = 'none';
-      } else {
-        feeGroup.style.display = 'block';
-      }
-    };
-
-    window.closeRoomConfig = function() {
-      document.getElementById('room-modal').style.display = 'none';
-      document.getElementById('lobby-modal').style.display = 'flex';
-    };
-
-    window.showLobby = function() {
-      document.getElementById('lobby-modal').style.display = 'flex';
-      document.getElementById('result-modal').style.display = 'none';
-      document.getElementById('room-modal').style.display = 'none';
-      document.getElementById('waiting-modal').style.display = 'none';
-    };
-
-    /* ==========================================================================
-       2. SUPABASE INITIALIZATION
+       1. SUPABASE CLIENT (SAFE INITIALIZATION)
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     
     let supabase = null;
     try {
-      if (window.supabase) {
+      if (typeof window.supabase !== 'undefined') {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
-      console.warn("Supabase init error:", err);
+      console.warn("Supabase load pending or error:", err);
     }
 
     /* ==========================================================================
-       3. AUDIO SYNTHESIZER
+       2. WEB AUDIO SFX ENGINE
        ========================================================================== */
     let audioEnabled = true;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -475,11 +487,6 @@
         if (actx.state === 'suspended') actx.resume();
       } catch(e){}
     }
-
-    window.toggleAudio = function() {
-      audioEnabled = !audioEnabled;
-      document.getElementById('audio-toggle-btn').innerText = audioEnabled ? '🔊 Sound' : '🔇 Mute';
-    };
 
     const Sound = {
       roll() {
@@ -542,7 +549,7 @@
     };
 
     /* ==========================================================================
-       4. BOARD COORDINATES & GEOMETRY
+       3. BOARD GEOMETRY & TRACK SETUP
        ========================================================================== */
     const canvas = document.getElementById('ludo-canvas');
     const ctx = canvas.getContext('2d');
@@ -567,10 +574,8 @@
 
     const RED_HOMERUN = [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]];
     const BLUE_HOMERUN = [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]];
-
     const RED_BASES = [[2, 2], [2, 3], [3, 2], [3, 3]];
     const BLUE_BASES = [[11, 11], [11, 12], [12, 11], [12, 12]];
-
     const SAFE_TRACK_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
 
     let gameMode = 'offline';
@@ -616,7 +621,7 @@
     }
 
     /* ==========================================================================
-       5. BOARD DRAWING
+       4. BOARD DRAWING
        ========================================================================== */
     function renderBoard() {
       ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
@@ -750,7 +755,7 @@
     }
 
     /* ==========================================================================
-       6. STEP-BY-STEP MOVEMENT
+       5. STEP-BY-STEP MOVEMENT
        ========================================================================== */
     async function animateTokenStepByStep(color, tokenIndex, stepsToMove, syncToServer = true) {
       isTokenAnimating = true;
@@ -816,16 +821,12 @@
     }
 
     /* ==========================================================================
-       7. DICE ROLL LOGIC
+       6. DICE ROLL LOGIC
        ========================================================================== */
-    window.handleDiceRollClick = function() {
-      if (isDiceRolled || isTokenAnimating) return;
-      if (gameMode !== 'offline' && currentTurn !== localPlayerColor) return;
-
-      triggerDiceRoll();
-    };
-
     function triggerDiceRoll(forcedVal = null) {
+      if (isDiceRolled || isTokenAnimating) return;
+      if (gameMode !== 'offline' && currentTurn !== localPlayerColor && !forcedVal) return;
+
       isDiceRolled = true;
       const diceEl = document.getElementById('dice-cube');
       diceEl.classList.remove('glow-active');
@@ -938,7 +939,7 @@
     }
 
     /* ==========================================================================
-       8. CANVAS CLICK & TOKEN SELECTION LISTENER
+       7. CANVAS CLICK & TOKEN SELECTION LISTENER
        ========================================================================== */
     canvas.addEventListener('click', (e) => {
       if (!isDiceRolled || isTokenAnimating) return;
@@ -966,7 +967,7 @@
     });
 
     /* ==========================================================================
-       9. VICTORY & SETTLEMENT FLOW
+       8. VICTORY & SETTLEMENT FLOW
        ========================================================================== */
     async function handleVictory(winner) {
       Sound.win();
@@ -987,18 +988,62 @@
     }
 
     /* ==========================================================================
-       10. ROOM ACTIONS
+       9. MODAL NAVIGATION & BUTTON ACTIONS (DIRECT EVENT LISTENERS)
        ========================================================================== */
-    window.createRoomOnServer = async function() {
-      const feeSelect = document.getElementById('entry-fee-select');
-      const fee = document.getElementById('fee-selection-group').style.display === 'none' ? 0 : parseInt(feeSelect.value);
+    const lobbyModal = document.getElementById('lobby-modal');
+    const coinSelectModal = document.getElementById('coin-select-modal');
+    const slotsModal = document.getElementById('slots-modal');
+    const resultModal = document.getElementById('result-modal');
+
+    // 1. Play vs Computer Button
+    document.getElementById('btn-mode-computer').addEventListener('click', () => {
+      gameMode = 'offline';
+      document.getElementById('mode-badge').innerText = 'OFFLINE PRACTICE';
+      document.getElementById('blue-name').innerText = 'Computer';
+      lobbyModal.style.display = 'none';
+      restartMatch();
+    });
+
+    // 2. Free Online Game Button -> Direct 2 Slots Screen
+    document.getElementById('btn-mode-free').addEventListener('click', () => {
+      lobbyModal.style.display = 'none';
+      setupAndOpenRoomSlots(0);
+    });
+
+    // 3. Coin Match Button -> Open Coin Selection First
+    document.getElementById('btn-mode-coin').addEventListener('click', () => {
+      lobbyModal.style.display = 'none';
+      coinSelectModal.style.display = 'flex';
+    });
+
+    // Back from Coin Selection
+    document.getElementById('btn-back-from-coins').addEventListener('click', () => {
+      coinSelectModal.style.display = 'none';
+      lobbyModal.style.display = 'flex';
+    });
+
+    // Confirm Coins -> Open 2 Slots Screen
+    document.getElementById('btn-confirm-coins').addEventListener('click', () => {
+      const fee = parseInt(document.getElementById('entry-fee-select').value);
+      coinSelectModal.style.display = 'none';
+      setupAndOpenRoomSlots(fee);
+    });
+
+    // Setup 2-Slots Screen with Code & Supabase Room
+    async function setupAndOpenRoomSlots(fee) {
       const generatedCode = 'LUDO-' + Math.floor(1000 + Math.random() * 9000);
-
       activeRoom = { room_code: generatedCode, entry_fee: fee };
-      document.getElementById('display-room-code').innerText = generatedCode;
-      document.getElementById('room-modal').style.display = 'none';
-      document.getElementById('waiting-modal').style.display = 'flex';
 
+      document.getElementById('slot-room-code-tag').innerText = generatedCode;
+      document.getElementById('slot-fee-tag').innerText = fee > 0 ? `${fee} COINS` : 'FREE';
+      document.getElementById('room-match-heading').innerText = fee > 0 ? `COIN MATCH (${fee} COINS)` : 'FREE ONLINE MATCH';
+      
+      document.getElementById('guest-slot-name').innerText = 'Empty Slot';
+      document.getElementById('guest-slot-status').innerText = 'WAITING';
+
+      slotsModal.style.display = 'flex';
+
+      // Insert room in Supabase
       if (supabase) {
         try {
           const { data: { user } } = await supabase.auth.getUser();
@@ -1015,22 +1060,61 @@
             }
           }
         } catch(e) {
-          console.warn("Room insert:", e);
+          console.warn("Room creation:", e);
         }
       }
-    };
+    }
 
-    window.joinRoomByCode = async function() {
+    // Cancel Room
+    document.getElementById('btn-cancel-room').addEventListener('click', () => {
+      slotsModal.style.display = 'none';
+      lobbyModal.style.display = 'flex';
+    });
+
+    // Send Invite to Multani Chat Room
+    document.getElementById('btn-send-chatroom').addEventListener('click', () => {
+      if (!activeRoom) return;
+      const gameLink = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
+      const chatMessage = `🎲 LUDO CHALLENGE!\nRoom Code: ${activeRoom.room_code}\nEntry Fee: ${activeRoom.entry_fee > 0 ? activeRoom.entry_fee + ' Coins' : 'FREE'}\nJoin Link: ${gameLink}`;
+      
+      navigator.clipboard.writeText(chatMessage).then(() => {
+        alert("Invite Card Copied!\nAb Chat Room mein paste kar dein: " + activeRoom.room_code);
+        // Agar parent window mein Chat Room open ho sakta hai ya direct navigate:
+        if (window.parent && window.parent.Router) {
+          window.parent.location.href = 'chat.html';
+        }
+      });
+    });
+
+    // Share to WhatsApp
+    document.getElementById('btn-share-whatsapp').addEventListener('click', () => {
+      if (!activeRoom) return;
+      const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
+      const text = `Join my Ludo match on MULTANI FF TOURNAMENT!\nRoom Code: ${activeRoom.room_code}\nEntry: ${activeRoom.entry_fee > 0 ? activeRoom.entry_fee + ' Coins' : 'FREE'}\nClick to Play: ${link}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    });
+
+    // Copy Code & Link
+    document.getElementById('btn-copy-link').addEventListener('click', () => {
+      if (!activeRoom) return;
+      const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
+      navigator.clipboard.writeText(`Room Code: ${activeRoom.room_code}\nLink: ${link}`).then(() => {
+        alert("Room Code aur Link copy ho gaya!");
+      });
+    });
+
+    // Join Room by Code
+    document.getElementById('btn-join-room').addEventListener('click', async () => {
       const code = document.getElementById('join-code-input').value.trim().toUpperCase();
       if (!code) return alert("Please enter room code!");
 
       if (supabase) {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return alert("Please login first to join match!");
+        if (!user) return alert("Match join karne ke liye pehle login karein!");
 
         const { data: room } = await supabase.from('ludo_rooms').select('*').eq('room_code', code).single();
-        if (!room) return alert("Room not found!");
-        if (room.status !== 'waiting') return alert("Room is already full or completed!");
+        if (!room) return alert("Room nahi mila!");
+        if (room.status !== 'waiting') return alert("Room full ho chuka hai ya match khatam ho gaya!");
 
         await supabase.from('ludo_rooms').update({ guest_id: user.id }).eq('id', room.id);
 
@@ -1043,11 +1127,11 @@
         localPlayerColor = 'blue';
         gameMode = 'online_match';
         document.getElementById('mode-badge').innerText = (room.entry_fee > 0) ? `${room.entry_fee} COIN MATCH` : 'FREE MATCH';
-        document.getElementById('lobby-modal').style.display = 'none';
+        lobbyModal.style.display = 'none';
         subscribeToRoomChannel(code);
         restartMatch();
       }
-    };
+    });
 
     function subscribeToRoomChannel(roomCode) {
       if (!supabase) return;
@@ -1055,7 +1139,7 @@
 
       realtimeChannel
         .on('broadcast', { event: 'match_start' }, () => {
-          document.getElementById('waiting-modal').style.display = 'none';
+          slotsModal.style.display = 'none';
           document.getElementById('mode-badge').innerText = (activeRoom.entry_fee > 0) ? `${activeRoom.entry_fee} COINS` : 'FREE MATCH';
           restartMatch();
         })
@@ -1076,41 +1160,46 @@
         });
     }
 
-    window.shareToWhatsApp = function() {
-      const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
-      const text = `Join my Ludo match on MULTANI FF TOURNAMENT! Code: ${activeRoom.room_code}. Play here: ${link}`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-    };
+    // Top Header Buttons
+    document.getElementById('btn-audio-toggle').addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btn-audio-toggle').innerText = audioEnabled ? '🔊 Sound' : '🔇 Mute';
+    });
 
-    window.copyInviteLink = function() {
-      const link = `${window.location.origin}${window.location.pathname}?room=${activeRoom.room_code}`;
-      navigator.clipboard.writeText(link).then(() => alert("Game Link Copied!"));
-    };
+    document.getElementById('btn-open-lobby').addEventListener('click', () => {
+      lobbyModal.style.display = 'flex';
+      slotsModal.style.display = 'none';
+      coinSelectModal.style.display = 'none';
+      resultModal.style.display = 'none';
+    });
 
-    window.shareToChatRoom = function() {
-      const invitePayload = `[LUDO_INVITE:{"code":"${activeRoom.room_code}","fee":${activeRoom.entry_fee},"mode":"${activeRoom.entry_fee > 0 ? 'Coin Match' : 'Free Match'}"}]`;
-      navigator.clipboard.writeText(invitePayload);
-      alert("Invite card copied! Paste it in MULTANI FF Chat Room.");
-    };
+    document.getElementById('btn-restart-game').addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      restartMatch();
+    });
 
-    window.cancelWaitingRoom = function() {
-      document.getElementById('waiting-modal').style.display = 'none';
-      showLobby();
-    };
+    document.getElementById('btn-result-lobby').addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      lobbyModal.style.display = 'flex';
+    });
 
-    window.restartMatch = function() {
+    document.getElementById('dice-trigger-box').addEventListener('click', () => {
+      triggerDiceRoll();
+    });
+
+    function restartMatch() {
       gameState = { red: [-1, -1, -1, -1], blue: [-1, -1, -1, -1] };
       currentTurn = 'red';
       isDiceRolled = false;
       isTokenAnimating = false;
       consecutiveSixes = 0;
-      document.getElementById('result-modal').style.display = 'none';
+      resultModal.style.display = 'none';
       renderDiceDots(1);
       resetDiceStateForNextRoll();
       renderBoard();
-    };
+    }
 
-    // Initial Start
+    // Start setup
     renderDiceDots(1);
     renderBoard();
 
