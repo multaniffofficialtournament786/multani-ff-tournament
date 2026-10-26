@@ -4,8 +4,170 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>MULTANI FF LUDO CHAMPIONSHIP</title>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- ZERO-LAG FAST FUNCTIONS IN HEAD -->
+  <script>
+    const coinSteps = [25, 50, 100, 250, 500, 1000];
+    let selectedCoinIndex = 0; // Starts at 25
+    let currentRoomCode = "000000";
+    let activeRoomData = null;
+    let isSingleMode = false;
+    let realtimeChannel = null;
+
+    window.adjustCoinAmount = function(delta) {
+      selectedCoinIndex = Math.max(0, Math.min(coinSteps.length - 1, selectedCoinIndex + delta));
+      const val = coinSteps[selectedCoinIndex];
+      const el = document.getElementById('selected-coins-val');
+      if (el) el.innerText = val;
+    };
+
+    window.getSelectedFee = function() {
+      return coinSteps[selectedCoinIndex];
+    };
+
+    window.showRulesPopup = function() {
+      const modal = document.getElementById('rules-modal-overlay');
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeRulesPopup = function() {
+      const modal = document.getElementById('rules-modal-overlay');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.backToModeSelect = function() {
+      document.getElementById('screen-lobby-slots').style.display = 'none';
+      document.getElementById('screen-mode-select').style.display = 'flex';
+    };
+
+    window.startSinglePracticeMode = function() {
+      isSingleMode = true;
+      activeRoomData = { entry_fee: 0, room_code: "OFFLINE_PRACTICE" };
+      document.getElementById('screen-mode-select').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'flex';
+      document.getElementById('opp-name-tag').innerText = "Computer";
+      if (window.initGameplayArena) window.initGameplayArena();
+    };
+
+    window.goToLobbyAndCreateRoom = async function() {
+      isSingleMode = false;
+      const fee = window.getSelectedFee();
+      const prize = Math.floor((fee * 2) * 0.9);
+      currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      document.getElementById('display-rank1-prize').innerText = prize;
+      document.getElementById('lobby-team-code').innerText = currentRoomCode;
+      document.getElementById('guest-slot-tag').innerText = "+ Invite";
+      document.getElementById('guest-slot-tag').style.color = "#f1c40f";
+
+      const startBtn = document.getElementById('btn-start-match');
+      startBtn.classList.remove('active-ready');
+      startBtn.innerText = "WAITING FOR FRIEND...";
+
+      document.getElementById('screen-mode-select').style.display = 'none';
+      document.getElementById('screen-lobby-slots').style.display = 'flex';
+
+      if (window.supabaseClient) {
+        try {
+          const { data: { user } } = await window.supabaseClient.auth.getUser();
+          if (user) {
+            const { data } = await window.supabaseClient.from('ludo_rooms').insert({
+              room_code: currentRoomCode,
+              host_id: user.id,
+              entry_fee: fee,
+              status: 'waiting'
+            }).select().single();
+            if (data) {
+              activeRoomData = data;
+              if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(currentRoomCode);
+            }
+          }
+        } catch(e) {}
+      }
+    };
+
+    window.sendInviteToChatAndWhatsApp = function() {
+      const fee = window.getSelectedFee();
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
+
+      navigator.clipboard.writeText(chatPayload).then(() => {
+        alert("Invite Card Copied!\nChat Room mein paste karein: Code " + currentRoomCode);
+        if (window.parent && window.parent.Router) {
+          window.parent.location.href = 'chat.html';
+        }
+      }).catch(() => {
+        prompt("Copy this invite code for Multani Chat:", chatPayload);
+      });
+    };
+
+    window.shareInviteLinkDirect = function() {
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nPlay here: " + joinLink;
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+    };
+
+    window.promptJoinByCode = async function(codeToJoin = null) {
+      const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
+      if (!code) return;
+
+      if (window.supabaseClient) {
+        try {
+          const { data: { user } } = await window.supabaseClient.auth.getUser();
+          if (!user) return alert("Match join karne ke liye pehle login karein!");
+
+          const { data: room } = await window.supabaseClient.from('ludo_rooms').select('*').eq('room_code', code.trim()).single();
+          if (!room) return alert("Room nahi mila!");
+          if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
+
+          await window.supabaseClient.from('ludo_rooms').update({ guest_id: user.id }).eq('id', room.id);
+
+          activeRoomData = room;
+          localPlayerColor = 'blue';
+          document.getElementById('screen-mode-select').style.display = 'none';
+          document.getElementById('screen-lobby-slots').style.display = 'flex';
+          document.getElementById('lobby-team-code').innerText = code;
+          document.getElementById('guest-slot-tag').innerText = "Connected";
+          document.getElementById('guest-slot-tag').style.color = "#2ecc71";
+
+          const startBtn = document.getElementById('btn-start-match');
+          startBtn.classList.add('active-ready');
+          startBtn.innerText = "READY TO START";
+
+          if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(code.trim());
+        } catch(e) {
+          alert("Join error: " + e.message);
+        }
+      }
+    };
+
+    window.handleStartMatchClick = async function() {
+      const startBtn = document.getElementById('btn-start-match');
+      if (!startBtn.classList.contains('active-ready')) {
+        alert("Pehle apne dost ko invite karein!");
+        return;
+      }
+
+      if (window.supabaseClient && activeRoomData) {
+        const { data: res } = await window.supabaseClient.rpc('start_ludo_coin_match', { p_room_id: activeRoomData.id });
+        if (res && !res.success) {
+          return alert(res.message);
+        }
+
+        if (realtimeChannel) {
+          realtimeChannel.send({ type: 'broadcast', event: 'game_started', payload: {} });
+        }
+      }
+
+      document.getElementById('screen-lobby-slots').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'flex';
+      if (window.initGameplayArena) window.initGameplayArena();
+    };
+  </script>
+
   <style>
     :root {
       --bg-sky: #4aa3df;
@@ -16,7 +178,13 @@
       --gold: #ffbe00;
       --cyan: #00f2fe;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
     html, body {
       width: 100%; height: 100%; overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -42,6 +210,7 @@
       inset: 0;
       background: radial-gradient(circle at 50% 40%, rgba(52, 152, 219, 0.45) 0%, rgba(10, 25, 47, 0.85) 100%);
       z-index: 0;
+      pointer-events: none;
     }
 
     .screen-view {
@@ -54,8 +223,8 @@
       justify-content: space-between;
       padding: 16px;
       overflow-y: auto;
+      pointer-events: auto;
     }
-    .hidden { display: none !important; }
 
     /* HEADER */
     .top-header-bar {
@@ -63,7 +232,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 2;
+      z-index: 20;
     }
     .round-btn-top {
       width: 40px; height: 40px; border-radius: 50%;
@@ -72,12 +241,14 @@
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       cursor: pointer;
+      pointer-events: auto !important;
     }
 
-    /* SCREEN 1: MODE & COIN SELECT */
+    /* SCREEN 1 */
     .mascot-hero-wrap {
       text-align: center;
       margin-top: 10px;
+      pointer-events: none;
     }
     .mascot-ludo-img {
       width: 110px;
@@ -94,6 +265,8 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      z-index: 25;
+      pointer-events: auto;
     }
 
     .mode-single-tab {
@@ -133,14 +306,17 @@
       border: 1.5px solid #1a3a60;
       border-radius: 14px;
       padding: 8px 14px;
+      pointer-events: auto;
     }
     .coin-calc-btn {
-      width: 48px; height: 48px; border-radius: 10px;
+      width: 50px; height: 50px; border-radius: 10px;
       background: linear-gradient(135deg, #34495e, #1c2833);
       border: 1.5px solid #5d6d7e;
-      color: #fff; font-size: 24px; font-weight: 900;
+      color: #fff; font-size: 26px; font-weight: 900;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
+      pointer-events: auto !important;
+      outline: none;
     }
     .coin-calc-btn:active { transform: scale(0.92); background: #1f2d3d; }
     .coin-amount-display {
@@ -156,6 +332,7 @@
       display: flex;
       gap: 12px;
       margin-top: 4px;
+      pointer-events: auto;
     }
     .btn-main-yellow {
       flex: 1;
@@ -173,6 +350,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      pointer-events: auto !important;
+      outline: none;
     }
     .btn-main-yellow:active { transform: scale(0.96); }
 
@@ -182,6 +361,7 @@
       justify-content: space-between;
       width: 100%;
       margin-top: 10px;
+      pointer-events: auto;
     }
     .btn-join-pill {
       background: linear-gradient(135deg, #1abc9c, #16a085);
@@ -192,9 +372,10 @@
       font-size: 14px;
       color: #fff;
       cursor: pointer;
+      pointer-events: auto !important;
     }
 
-    /* SCREEN 2: EXACT LOBBY 2-SLOTS */
+    /* SCREEN 2 */
     .lobby-header-box {
       width: 100%;
       text-align: center;
@@ -263,6 +444,7 @@
       font-size: 34px; color: #fff;
       box-shadow: 0 0 18px rgba(255, 190, 0, 0.5);
       cursor: pointer;
+      pointer-events: auto !important;
       animation: pulseInvite 1.5s infinite alternate;
     }
     @keyframes pulseInvite {
@@ -297,6 +479,7 @@
       color: #d5dbdb;
       cursor: not-allowed;
       box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      pointer-events: auto !important;
     }
     .btn-start-game.active-ready {
       background: linear-gradient(180deg, #2ecc71, #27ae60);
@@ -305,7 +488,7 @@
       box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
     }
 
-    /* SCREEN 3: GAMEPLAY ARENA */
+    /* SCREEN 3 */
     .arena-top-bar {
       width: 100%;
       display: flex;
@@ -320,9 +503,9 @@
       border: 1px solid rgba(255,255,255,0.3);
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 18px; cursor: pointer;
+      pointer-events: auto !important;
     }
 
-    /* OPPONENT HUD (TOP RIGHT) */
     .opponent-hud-box {
       position: absolute;
       top: 14px;
@@ -346,7 +529,6 @@
       border: 2px solid var(--gold); object-fit: cover;
     }
 
-    /* BOARD CANVAS */
     .board-island-container {
       position: relative;
       width: 350px;
@@ -370,7 +552,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* HOST HUD (BOTTOM LEFT) */
     .host-hud-box {
       position: absolute;
       bottom: 20px;
@@ -381,7 +562,6 @@
       z-index: 20;
     }
 
-    /* DICE WIDGET & TIMER */
     .dice-hud-container {
       position: relative;
       width: 60px;
@@ -425,6 +605,7 @@
       cursor: pointer;
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       transition: transform 0.1s, box-shadow 0.2s;
+      pointer-events: auto !important;
     }
     .real-dice-cube.turn-active {
       animation: pulseDiceRing 1.1s infinite alternate;
@@ -459,7 +640,6 @@
     }
     .pip-dot.red-pip { background: #e74c3c; }
 
-    /* IN-GAME MENU */
     .ingame-popup-menu {
       position: absolute;
       top: 60px;
@@ -468,7 +648,7 @@
       border: 1.5px solid #2980b9;
       border-radius: 14px;
       padding: 10px;
-      display: flex;
+      display: none;
       gap: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
       z-index: 100;
@@ -482,6 +662,7 @@
       font-weight: 700;
       color: #fff;
       cursor: pointer;
+      pointer-events: auto !important;
     }
     .popup-icon-sq {
       width: 40px; height: 40px; border-radius: 10px;
@@ -490,7 +671,19 @@
       font-size: 16px;
     }
 
-    /* DEDICATED RULES MODAL */
+    /* RULES MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      pointer-events: auto;
+    }
     .rules-card-dialog {
       background: #0d2238;
       border: 2px solid #00f2fe;
@@ -502,6 +695,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      pointer-events: auto;
     }
     .rules-list-item {
       display: flex;
@@ -519,17 +713,6 @@
     }
 
     /* RESULT MODAL */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
     .result-sheet {
       background: #0d2238;
       border: 2px solid #2980b9;
@@ -539,6 +722,7 @@
       padding: 24px 20px;
       text-align: center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      pointer-events: auto;
     }
   </style>
 </head>
@@ -546,12 +730,10 @@
 
   <div id="app-wrapper">
 
-    <!-- ==========================================================================
-         SCREEN 1: 1 ON 1 & STEP COIN SELECT (RED CLOSE BUTTON REMOVED)
-         ========================================================================== -->
+    <!-- SCREEN 1: 1 ON 1 & COIN SELECTION -->
     <div id="screen-mode-select" class="screen-view">
       <div class="top-header-bar">
-        <div class="round-btn-top" onclick="window.showRulesPopup()"><i class="fa-solid fa-question"></i></div>
+        <button type="button" class="round-btn-top" onclick="window.showRulesPopup()"><i class="fa-solid fa-question"></i></button>
         <div style="width: 40px;"></div>
       </div>
 
@@ -563,45 +745,41 @@
       <div class="panel-card-select">
         <div style="font-size: 13px; font-weight: 800; color:#7fb3d5; text-transform: uppercase;">SELECT MODE</div>
         
-        <!-- Only 1 on 1 -->
         <div class="mode-single-tab">
           <i class="fa-solid fa-user-group" style="margin-right:6px;"></i> 1 ON 1 BATTLE
         </div>
 
-        <!-- Classic Mode Only -->
         <div class="classic-only-badge">
           <i class="fa-solid fa-crown" style="color:var(--gold);"></i> CLASSIC MODE
         </div>
 
         <!-- Coin Selector (- / +) Steps: 25, 50, 100, 250, 500, 1000 -->
         <div class="coin-selector-container">
-          <div class="coin-calc-btn" onclick="window.adjustCoinAmount(-1)">-</div>
+          <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(-1)">-</button>
           <div class="coin-amount-display">
             <i class="fa-solid fa-coins"></i>
             <span id="selected-coins-val">25</span>
           </div>
-          <div class="coin-calc-btn" onclick="window.adjustCoinAmount(1)">+</div>
+          <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(1)">+</button>
         </div>
 
-        <!-- Action Buttons: Single (Offline) & Invite Friends -->
+        <!-- Buttons: Single & Invite Friends -->
         <div class="action-duo-buttons">
-          <button class="btn-main-yellow" onclick="window.startSinglePracticeMode()">Single (Offline)</button>
-          <button class="btn-main-yellow" onclick="window.goToLobbyAndCreateRoom()">Invite Friends</button>
+          <button type="button" class="btn-main-yellow" onclick="window.startSinglePracticeMode()">Single (Offline)</button>
+          <button type="button" class="btn-main-yellow" onclick="window.goToLobbyAndCreateRoom()">Invite Friends</button>
         </div>
       </div>
 
       <div class="team-code-footer-row">
         <span style="font-size: 13px; font-weight: 700; color:#cbd5e1;">Have a team code?</span>
-        <button class="btn-join-pill" onclick="window.promptJoinByCode()">Join</button>
+        <button type="button" class="btn-join-pill" onclick="window.promptJoinByCode()">Join</button>
       </div>
     </div>
 
-    <!-- ==========================================================================
-         SCREEN 2: LOBBY & 2-SLOTS (MATCHES SCREENSHOT 2)
-         ========================================================================== -->
-    <div id="screen-lobby-slots" class="screen-view hidden">
+    <!-- SCREEN 2: 2-SLOTS LOBBY -->
+    <div id="screen-lobby-slots" class="screen-view" style="display: none;">
       <div class="top-header-bar">
-        <div class="round-btn-top" onclick="window.backToModeSelect()"><i class="fa-solid fa-arrow-left"></i></div>
+        <button type="button" class="round-btn-top" onclick="window.backToModeSelect()"><i class="fa-solid fa-arrow-left"></i></button>
         <div style="width: 40px;"></div>
       </div>
 
@@ -618,9 +796,7 @@
         </div>
       </div>
 
-      <!-- EXACT 2 SLOTS CONTAINER -->
       <div class="slots-grid-container" id="slots-render-wrap">
-        <!-- Slot 1: Host -->
         <div class="slot-player-card">
           <div class="avatar-wrapper-ring">
             <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" id="host-slot-avatar" alt="Host" />
@@ -628,40 +804,34 @@
           <div class="slot-label-ribbon" id="host-slot-name">You (Host)</div>
         </div>
 
-        <!-- Slot 2: Guest / Friend -->
         <div class="slot-player-card" id="slot-guest-card">
-          <div class="invite-circle-btn" onclick="window.sendInviteToChatAndWhatsApp()">
+          <button type="button" class="invite-circle-btn" onclick="window.sendInviteToChatAndWhatsApp()">
             <i class="fa-solid fa-plus"></i>
-          </div>
+          </button>
           <div class="slot-label-ribbon" id="guest-slot-tag" style="border-style:dashed; color:#f1c40f;">+ Invite</div>
         </div>
       </div>
 
-      <!-- START MATCH BUTTON -->
       <div style="width:100%; text-align:center;">
-        <button class="btn-start-game" id="btn-start-match" onclick="window.handleStartMatchClick()">WAITING FOR FRIEND...</button>
+        <button type="button" class="btn-start-game" id="btn-start-match" onclick="window.handleStartMatchClick()">WAITING FOR FRIEND...</button>
       </div>
     </div>
 
-    <!-- ==========================================================================
-       SCREEN 3: GAMEPLAY ARENA (MATCHES VIDEO & PHOTO - CLEAN NO MIC/CHAT/SPEC)
-       ========================================================================== -->
-    <div id="screen-game-arena" class="screen-view hidden" style="padding:0;">
-      <!-- TOP CONTROL BAR -->
+    <!-- SCREEN 3: GAMEPLAY ARENA -->
+    <div id="screen-game-arena" class="screen-view" style="display: none; padding:0;">
       <div class="arena-top-bar">
-        <div class="arena-gear-btn" onclick="window.toggleIngameMenu()"><i class="fa-solid fa-gear"></i></div>
+        <button type="button" class="arena-gear-btn" onclick="window.toggleIngameMenu()"><i class="fa-solid fa-gear"></i></button>
         <div style="font-size:12px; font-weight:800; color:#fff; background:rgba(0,0,0,0.3); padding:4px 12px; border-radius:12px;" id="arena-status-badge">CLASSIC 1v1</div>
         <div style="width:38px;"></div>
       </div>
 
-      <!-- IN-GAME DROPDOWN MENU -->
-      <div class="ingame-popup-menu hidden" id="ingame-menu-dropdown">
+      <div class="ingame-popup-menu" id="ingame-menu-dropdown">
         <div class="popup-menu-item" onclick="window.toggleAudio()"><div class="popup-icon-sq"><i class="fa-solid fa-volume-high" id="menu-sound-icon"></i></div><span id="menu-sound-label">ON</span></div>
         <div class="popup-menu-item" onclick="window.showRulesPopup()"><div class="popup-icon-sq"><i class="fa-solid fa-book"></i></div><span>Rules</span></div>
         <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
       </div>
 
-      <!-- OPPONENT HUD (TOP RIGHT) -->
+      <!-- OPPONENT (TOP RIGHT) -->
       <div class="opponent-hud-box">
         <div class="dice-hud-container" id="dice-container-blue">
           <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="34" cy="34" r="30"></circle><circle class="timer-circle-progress" id="timer-blue" cx="34" cy="34" r="30"></circle></svg>
@@ -683,7 +853,7 @@
         <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
       </div>
 
-      <!-- HOST HUD (BOTTOM LEFT) -->
+      <!-- HOST (BOTTOM LEFT) -->
       <div class="host-hud-box">
         <div class="player-hud-card" style="border-color:#e74c3c;">
           <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
@@ -702,12 +872,12 @@
       </div>
     </div>
 
-    <!-- RULES MODAL LIST -->
-    <div id="rules-modal-overlay" class="modal-backdrop hidden">
+    <!-- RULES MODAL -->
+    <div id="rules-modal-overlay" class="modal-backdrop">
       <div class="rules-card-dialog">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:8px;">
           <h3 style="font-size:18px; font-weight:900; color:var(--cyan);"><i class="fa-solid fa-book-bookmark" style="color:var(--gold); margin-right:6px;"></i> GAME RULES</h3>
-          <button onclick="window.closeRulesPopup()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" onclick="window.closeRulesPopup()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         
         <div class="rules-list-item">
@@ -731,12 +901,12 @@
           <div><b>Winner Pool:</b> Chaaron gotiyan pehle home pohanchane wala player 90% prize pool jeet jata hai.</div>
         </div>
 
-        <button class="btn-main-yellow" onclick="window.closeRulesPopup()" style="width:100%; margin-top:6px;">Got It</button>
+        <button type="button" class="btn-main-yellow" onclick="window.closeRulesPopup()" style="width:100%; margin-top:6px;">Got It</button>
       </div>
     </div>
 
     <!-- RESULT MODAL -->
-    <div id="result-modal" class="modal-backdrop hidden">
+    <div id="result-modal" class="modal-backdrop">
       <div class="result-sheet">
         <div style="font-size: 28px; font-weight: 900; color:var(--gold);" id="result-winner-title">VICTORY!</div>
         <p style="font-size: 13px; color: #cbd5e1; margin: 8px 0 16px 0;" id="result-winner-desc">Match complete!</p>
@@ -750,7 +920,7 @@
           </div>
         </div>
 
-        <button class="btn-main-yellow" onclick="window.openLobbyFromResults()" style="width:100%;">Play Again</button>
+        <button type="button" class="btn-main-yellow" onclick="window.openLobbyFromResults()" style="width:100%;">Play Again</button>
       </div>
     </div>
 
@@ -758,187 +928,22 @@
 
   <script>
     /* ==========================================================================
-       1. GLOBAL FUNCTIONS FIRST - GUARANTEED INSTANT CLICK EXECUTION
-       ========================================================================== */
-    const coinSteps = [25, 50, 100, 250, 500, 1000];
-    let selectedCoinIndex = 0; // Starts at 25
-    let currentRoomCode = "000000";
-    let activeRoomData = null;
-    let isSingleMode = false;
-    let realtimeChannel = null;
-
-    window.adjustCoinAmount = function(delta) {
-      selectedCoinIndex = Math.max(0, Math.min(coinSteps.length - 1, selectedCoinIndex + delta));
-      const val = coinSteps[selectedCoinIndex];
-      const el = document.getElementById('selected-coins-val');
-      if (el) el.innerText = val;
-    };
-
-    window.getSelectedFee = function() {
-      return coinSteps[selectedCoinIndex];
-    };
-
-    window.showRulesPopup = function() {
-      const modal = document.getElementById('rules-modal-overlay');
-      if (modal) modal.classList.remove('hidden');
-    };
-
-    window.closeRulesPopup = function() {
-      const modal = document.getElementById('rules-modal-overlay');
-      if (modal) modal.classList.add('hidden');
-    };
-
-    window.backToModeSelect = function() {
-      document.getElementById('screen-lobby-slots').classList.add('hidden');
-      document.getElementById('screen-mode-select').classList.remove('hidden');
-    };
-
-    // SINGLE OFFLINE: Direct Launch without coins or deductions
-    window.startSinglePracticeMode = function() {
-      isSingleMode = true;
-      activeRoomData = { entry_fee: 0, room_code: "OFFLINE_PRACTICE" };
-      document.getElementById('screen-mode-select').classList.add('hidden');
-      document.getElementById('screen-game-arena').classList.remove('hidden');
-      document.getElementById('opp-name-tag').innerText = "Computer";
-      initGameplayArena();
-    };
-
-    // INVITE FRIENDS: Opens Screen 2 (Exact screenshot 2)
-    window.goToLobbyAndCreateRoom = async function() {
-      isSingleMode = false;
-      const fee = window.getSelectedFee();
-      const prize = Math.floor((fee * 2) * 0.9);
-      currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      document.getElementById('display-rank1-prize').innerText = prize;
-      document.getElementById('lobby-team-code').innerText = currentRoomCode;
-      document.getElementById('guest-slot-tag').innerText = "+ Invite";
-      document.getElementById('guest-slot-tag').style.color = "#f1c40f";
-
-      const startBtn = document.getElementById('btn-start-match');
-      startBtn.classList.remove('active-ready');
-      startBtn.innerText = "WAITING FOR FRIEND...";
-
-      document.getElementById('screen-mode-select').classList.add('hidden');
-      document.getElementById('screen-lobby-slots').classList.remove('hidden');
-
-      if (supabase) {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { data } = await supabase.from('ludo_rooms').insert({
-              room_code: currentRoomCode,
-              host_id: user.id,
-              entry_fee: fee,
-              status: 'waiting'
-            }).select().single();
-            if (data) {
-              activeRoomData = data;
-              subscribeToMatchRealtime(currentRoomCode);
-            }
-          }
-        } catch(e) {
-          console.warn("Supabase create room:", e);
-        }
-      }
-    };
-
-    window.sendInviteToChatAndWhatsApp = function() {
-      const fee = window.getSelectedFee();
-      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
-      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
-
-      navigator.clipboard.writeText(chatPayload).then(() => {
-        alert("Invite Card Copied!\nChat Room mein paste karein: Code " + currentRoomCode);
-        if (window.parent && window.parent.Router) {
-          window.parent.location.href = 'chat.html';
-        }
-      }).catch(() => {
-        prompt("Copy this invite code for Multani Chat:", chatPayload);
-      });
-    };
-
-    window.shareInviteLinkDirect = function() {
-      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
-      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nPlay here: " + joinLink;
-      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
-    };
-
-    window.promptJoinByCode = async function(codeToJoin = null) {
-      const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
-      if (!code) return;
-
-      if (supabase) {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return alert("Match join karne ke liye pehle login karein!");
-
-          const { data: room } = await supabase.from('ludo_rooms').select('*').eq('room_code', code.trim()).single();
-          if (!room) return alert("Room nahi mila!");
-          if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
-
-          await supabase.from('ludo_rooms').update({ guest_id: user.id }).eq('id', room.id);
-
-          activeRoomData = room;
-          localPlayerColor = 'blue';
-          document.getElementById('screen-mode-select').classList.add('hidden');
-          document.getElementById('screen-lobby-slots').classList.remove('hidden');
-          document.getElementById('lobby-team-code').innerText = code;
-          document.getElementById('guest-slot-tag').innerText = "Connected";
-          document.getElementById('guest-slot-tag').style.color = "#2ecc71";
-
-          const startBtn = document.getElementById('btn-start-match');
-          startBtn.classList.add('active-ready');
-          startBtn.innerText = "READY TO START";
-
-          subscribeToMatchRealtime(code.trim());
-        } catch(e) {
-          alert("Join error: " + e.message);
-        }
-      }
-    };
-
-    window.handleStartMatchClick = async function() {
-      const startBtn = document.getElementById('btn-start-match');
-      if (!startBtn.classList.contains('active-ready')) {
-        alert("Pehle apne dost ko invite karein!");
-        return;
-      }
-
-      if (supabase && activeRoomData) {
-        const { data: res } = await supabase.rpc('start_ludo_coin_match', { p_room_id: activeRoomData.id });
-        if (res && !res.success) {
-          return alert(res.message);
-        }
-
-        if (realtimeChannel) {
-          realtimeChannel.send({ type: 'broadcast', event: 'game_started', payload: {} });
-        }
-      }
-
-      document.getElementById('screen-lobby-slots').classList.add('hidden');
-      document.getElementById('screen-game-arena').classList.remove('hidden');
-      initGameplayArena();
-    };
-
-    /* ==========================================================================
-       2. SUPABASE INITIALIZATION
+       SUPABASE CLIENT INITIALIZATION
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     
-    let supabase = null;
     try {
       if (typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
       console.warn("Supabase init error:", err);
     }
 
     function subscribeToMatchRealtime(code) {
-      if (!supabase) return;
-      realtimeChannel = supabase.channel("ludo_" + code);
+      if (!window.supabaseClient) return;
+      realtimeChannel = window.supabaseClient.channel("ludo_" + code);
 
       realtimeChannel
         .on('broadcast', { event: 'guest_joined' }, payload => {
@@ -949,8 +954,8 @@
           startBtn.innerText = "START MATCH";
         })
         .on('broadcast', { event: 'game_started' }, () => {
-          document.getElementById('screen-lobby-slots').classList.add('hidden');
-          document.getElementById('screen-game-arena').classList.remove('hidden');
+          document.getElementById('screen-lobby-slots').style.display = 'none';
+          document.getElementById('screen-game-arena').style.display = 'flex';
           initGameplayArena();
         })
         .on('broadcast', { event: 'dice_roll' }, payload => {
@@ -971,7 +976,7 @@
     }
 
     /* ==========================================================================
-       3. WEB AUDIO SYNTHESIZER (SOUND EFFECTS)
+       WEB AUDIO SYNTHESIZER
        ========================================================================== */
     let audioEnabled = true;
     let actx = null;
@@ -1033,7 +1038,7 @@
     };
 
     /* ==========================================================================
-       4. GAMEPLAY ARENA ENGINE (BOARD, ANIMATIONS, REALISTIC TOKENS)
+       GAMEPLAY ENGINE
        ========================================================================== */
     const canvas = document.getElementById('ludo-main-canvas');
     const ctx = canvas.getContext('2d');
@@ -1074,7 +1079,7 @@
       blue: [-1, -1, -1, -1]
     };
 
-    function initGameplayArena() {
+    window.initGameplayArena = function() {
       gameState = { red: [-1, -1, -1, -1], blue: [-1, -1, -1, -1] };
       currentTurn = 'red';
       isDiceRolled = false;
@@ -1085,7 +1090,7 @@
       updateDiceTurnVisuals();
       renderBoard();
       startTurnTimer();
-    }
+    };
 
     function getTokenVisualCoords(color, index, step) {
       if (step === -1) {
@@ -1204,7 +1209,6 @@
       });
     }
 
-    /* STEP BY STEP MOVEMENT */
     async function animateTokenStepByStep(color, tokenIndex, steps, syncToPeer = true) {
       isTokenAnimating = true;
       clearInterval(turnTimerInterval);
@@ -1273,7 +1277,6 @@
       return (step + roll) <= 56;
     }
 
-    /* 3D DICE & TIMERS */
     window.handleDiceRollClick = function() {
       if (isDiceRolled || isTokenAnimating) return;
       if (!isSingleMode && currentTurn !== localPlayerColor) return;
@@ -1423,12 +1426,12 @@
     async function handleVictory(winner) {
       SFX.win();
       clearInterval(turnTimerInterval);
-      document.getElementById('result-modal').classList.remove('hidden');
+      document.getElementById('result-modal').style.display = 'flex';
       document.getElementById('result-winner-title').innerText = winner.toUpperCase() + " WINS!";
 
-      if (!isSingleMode && activeRoomData && activeRoomData.entry_fee > 0 && supabase) {
+      if (!isSingleMode && activeRoomData && activeRoomData.entry_fee > 0 && window.supabaseClient) {
         const winnerId = (winner === 'red' ? activeRoomData.host_id : activeRoomData.guest_id);
-        const { data: res } = await supabase.rpc('settle_ludo_winner', {
+        const { data: res } = await window.supabaseClient.rpc('settle_ludo_winner', {
           p_room_id: activeRoomData.id,
           p_winner_id: winnerId
         });
@@ -1441,29 +1444,21 @@
 
     window.toggleIngameMenu = function() {
       const menu = document.getElementById('ingame-menu-dropdown');
-      menu.classList.toggle('hidden');
+      menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
     };
 
     window.exitMatchSafely = function() {
       if (confirm("Match se exit karna chahte hain?")) {
         clearInterval(turnTimerInterval);
-        document.getElementById('screen-game-arena').classList.add('hidden');
-        document.getElementById('screen-mode-select').classList.remove('hidden');
-      }
-    };
-
-    window.exitToPlatform = function() {
-      if (window.parent && window.parent.closeGamePlayer) {
-        window.parent.closeGamePlayer();
-      } else {
-        window.location.href = '../index.html';
+        document.getElementById('screen-game-arena').style.display = 'none';
+        document.getElementById('screen-mode-select').style.display = 'flex';
       }
     };
 
     window.openLobbyFromResults = function() {
-      document.getElementById('result-modal').classList.add('hidden');
-      document.getElementById('screen-game-arena').classList.add('hidden');
-      document.getElementById('screen-mode-select').classList.remove('hidden');
+      document.getElementById('result-modal').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'none';
+      document.getElementById('screen-mode-select').style.display = 'flex';
     };
 
     window.addEventListener('DOMContentLoaded', () => {
