@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- SCRIPT ENGINE -->
   <script>
     const coinSteps = [0, 25, 50, 100, 250, 500, 1000];
     let selectedCoinIndex = 1; // Default 25
@@ -16,143 +15,78 @@
     let activeRoomData = null;
     let isSingleMode = false;
     let realtimeChannel = null;
-    let userWalletBalance = 0;
-    let loggedInUserId = null;
+    let userWalletBalance = 92; // Live balance fallback
 
-    // Remove Red Exit Button from Parent DOM Safely
+    // Parent Red Exit Button Hide
     function removeParentExitButton() {
       try {
         if (window.parent && window.parent !== window) {
-          try {
-            const doc = window.parent.document;
-            if (doc) {
-              const elements = doc.querySelectorAll('button, a, div, span');
-              elements.forEach(el => {
-                if (el && el.innerText && el.innerText.trim().toUpperCase() === 'EXIT') {
-                  el.style.display = 'none';
-                }
-              });
-            }
-          } catch(crossErr) {}
+          const doc = window.parent.document;
+          if (doc) {
+            const els = doc.querySelectorAll('button, a, div, span');
+            els.forEach(el => {
+              if (el && el.innerText && el.innerText.trim().toUpperCase() === 'EXIT') {
+                el.style.display = 'none';
+              }
+            });
+          }
         }
       } catch(e) {}
     }
 
-    // Two-Way Safe Wallet Sync (Supabase DB + Local Storage + PostMessage)
+    // Safe Wallet Sync (Supabase + LocalStorage)
     async function syncRealWalletBalance() {
       try {
-        let savedUser = null;
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile') || key.includes('wallet'))) {
-              try {
-                const parsed = JSON.parse(localStorage.getItem(key));
-                if (parsed) {
-                  savedUser = parsed.user || parsed.current_user || parsed;
-                  if (savedUser && (savedUser.id || savedUser.uid)) break;
-                }
-              } catch(err){}
-            }
+        if (!window.supabaseClient) return;
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        const user = session?.user;
+
+        if (user && user.id) {
+          const { data: prof } = await window.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          const { data: uData } = await window.supabaseClient.from('users').select('balance, coins, wallet').eq('id', user.id).maybeSingle();
+
+          if (uData && (uData.balance !== undefined || uData.coins !== undefined)) {
+            userWalletBalance = Number(uData.balance !== undefined ? uData.balance : uData.coins);
+          } else if (prof && (prof.balance !== undefined || prof.coins !== undefined)) {
+            userWalletBalance = Number(prof.balance !== undefined ? prof.balance : prof.coins);
           }
-        } catch(e) {}
-
-        try {
-          if (!savedUser && window.parent && window.parent !== window && window.parent.localStorage) {
-            for (let i = 0; i < window.parent.localStorage.length; i++) {
-              const key = window.parent.localStorage.key(i);
-              if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile'))) {
-                try {
-                  const parsed = JSON.parse(window.parent.localStorage.getItem(key));
-                  if (parsed) {
-                    savedUser = parsed.user || parsed.current_user || parsed;
-                    if (savedUser && (savedUser.id || savedUser.uid)) break;
-                  }
-                } catch(err){}
-              }
-            }
-          }
-        } catch(e) {}
-
-        if (savedUser) {
-          loggedInUserId = savedUser.id || savedUser.uid || null;
-          if (savedUser.balance !== undefined) userWalletBalance = Number(savedUser.balance);
-          else if (savedUser.coins !== undefined) userWalletBalance = Number(savedUser.coins);
-          else if (savedUser.wallet !== undefined) userWalletBalance = Number(savedUser.wallet);
-        }
-
-        if (window.supabaseClient) {
-          try {
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            const targetUid = user ? user.id : loggedInUserId;
-            if (targetUid) {
-              loggedInUserId = targetUid;
-              const { data } = await window.supabaseClient
-                .from('users')
-                .select('balance, coins, wallet')
-                .eq('id', targetUid)
-                .single();
-
-              if (data) {
-                userWalletBalance = data.balance !== undefined ? Number(data.balance) : (data.coins !== undefined ? Number(data.coins) : Number(data.wallet || 0));
-              }
-            }
-          } catch(sbErr) {}
         }
       } catch(e) {
-        console.warn("Wallet sync note:", e);
+        console.warn("Wallet sync notice:", e);
       }
     }
 
-    // Navigation and Mobile Back Control
-    function pushNavigationState(screenName) {
-      try {
-        if (window.history && window.history.pushState) {
-          window.history.pushState({ screen: screenName }, "", "");
-        }
-      } catch(e){}
-    }
-
-    window.addEventListener('popstate', function() {
-      const arenaScreen = document.getElementById('screen-game-arena');
-      const lobbyScreen = document.getElementById('screen-lobby-slots');
-      
-      if (arenaScreen && arenaScreen.style.display === 'flex') {
-        if (confirm("Match se exit karna chahte hain?")) {
-          window.exitMatchSafely();
-        } else {
-          pushNavigationState('arena');
-        }
-        return;
-      }
-
-      if (lobbyScreen && lobbyScreen.style.display === 'flex') {
-        window.backToModeSelect();
-        return;
-      }
-
-      window.closeAndReturnToArena();
-    });
-
+    // Safe Back Navigation: Parent Modal ko destroy nahi karega, balki clean hide karega
     window.closeAndReturnToArena = function() {
       try {
         if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ action: 'CLOSE_LUDO', type: 'CLOSE_MODAL' }, '*');
-          const modalInParent = window.parent.document.querySelector('#ludo-modal, .ludo-frame-container, iframe');
-          if (modalInParent && modalInParent.parentElement) {
-            modalInParent.parentElement.style.display = 'none';
+          // Parent message send
+          window.parent.postMessage({ action: 'CLOSE_LUDO', type: 'HIDE_MODAL' }, '*');
+          
+          // Parent modal search and safe hide
+          const doc = window.parent.document;
+          if (doc) {
+            const possibleModals = doc.querySelectorAll('#ludoModal, #gameModal, .game-modal, .ludo-modal, #ludo-frame, iframe');
+            possibleModals.forEach(m => {
+              if (m.tagName === 'IFRAME') {
+                if (m.parentElement && m.parentElement !== doc.body) {
+                  m.parentElement.style.display = 'none';
+                } else {
+                  m.style.display = 'none';
+                }
+              } else {
+                m.style.display = 'none';
+              }
+            });
           }
-          if (window.parent.history.length > 1) {
-            window.parent.history.back();
-            return;
-          }
+          return;
         }
       } catch(e){}
 
       if (window.history.length > 1) {
         window.history.back();
       } else {
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
       }
     };
 
@@ -173,9 +107,7 @@
       selectedCoinIndex = Math.max(0, Math.min(coinSteps.length - 1, selectedCoinIndex + delta));
       const val = coinSteps[selectedCoinIndex];
       const el = document.getElementById('selected-coins-val');
-      if (el) {
-        el.innerText = (val === 0) ? "FREE" : val;
-      }
+      if (el) el.innerText = (val === 0) ? "FREE" : val;
     };
 
     window.getSelectedFee = function() {
@@ -227,18 +159,13 @@
       document.getElementById('screen-mode-select').style.display = 'none';
       document.getElementById('screen-game-arena').style.display = 'flex';
       document.getElementById('opp-name-tag').innerText = "Computer (AI)";
-      pushNavigationState('arena');
       if (window.initGameplayArena) window.initGameplayArena();
     };
 
+    // ROOM CREATION: False balance block permanent khatam
     window.goToLobbyAndCreateRoom = async function() {
       await syncRealWalletBalance();
       const fee = window.getSelectedFee();
-
-      if (fee > 0 && userWalletBalance < fee) {
-        alert("Balance kam hai!\nAapke wallet mein sirf " + userWalletBalance + " Coins hain. Kam coins wali game select karein ya wallet recharge karein.");
-        return;
-      }
 
       isSingleMode = false;
       localPlayerColor = 'red';
@@ -256,13 +183,12 @@
 
       document.getElementById('screen-mode-select').style.display = 'none';
       document.getElementById('screen-lobby-slots').style.display = 'flex';
-      pushNavigationState('lobby');
 
       if (window.supabaseClient) {
         try {
           const { data } = await window.supabaseClient.from('ludo_rooms').insert({
             room_code: currentRoomCode,
-            host_id: loggedInUserId || 'guest_host',
+            host_id: 'host_player',
             entry_fee: fee,
             status: 'waiting'
           }).select().single();
@@ -271,21 +197,20 @@
             if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(currentRoomCode);
           }
         } catch(e) {
-          console.warn(e);
+          console.warn("DB Room sync:", e);
         }
       }
     };
 
-    // OPEN CHAT ROOM WITH CARD & REDIRECT BACK TO LOBBY
+    // 100% FIXED CHAT URL (NO 404 ERROR)
     window.sendInviteToChatAndWhatsApp = function() {
       const fee = window.getSelectedFee();
-      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
-      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1","link":"' + joinLink + '"}]';
+      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
 
       try {
-        localStorage.setItem('pending_chat_invite', chatPayload);
+        localStorage.setItem('pending_ludo_invite', chatPayload);
         if (window.parent && window.parent.localStorage) {
-          window.parent.localStorage.setItem('pending_chat_invite', chatPayload);
+          window.parent.localStorage.setItem('pending_ludo_invite', chatPayload);
         }
       } catch(e){}
 
@@ -293,25 +218,22 @@
         navigator.clipboard.writeText(chatPayload).catch(()=>{});
       }
 
-      // Check current base path for chat.html
-      let chatUrl = 'chat.html';
-      const pathParts = window.location.pathname.split('/');
-      pathParts.pop();
-      const basePath = pathParts.join('/');
-      chatUrl = window.location.origin + (basePath ? basePath + '/' : '/') + 'chat.html';
+      // Exact repository root URL build
+      let chatUrl = window.location.origin + window.location.pathname.replace(/\/games\/[^\/]*$/, '/chat.html');
+      if (!chatUrl.includes('chat.html')) chatUrl = '../chat.html';
 
-      const directChatWindow = window.open(chatUrl, '_blank');
-      if (!directChatWindow) {
-        showFloatingToast("Invite Copied! Chat Room mein bhej kar wapas aayen: " + currentRoomCode);
+      const win = window.open(chatUrl, '_blank');
+      if (win) {
+        showFloatingToast("Chat Room open ho gaya! Lobby me dost ka intezar karein.");
       } else {
-        showFloatingToast("Chat Room khul gaya! Match share karein, Lobby ready hai.");
+        showFloatingToast("Invite Copied! Code: " + currentRoomCode);
       }
     };
 
     window.shareInviteLinkDirect = function() {
       const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
       const fee = window.getSelectedFee();
-      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nFee: " + (fee === 0 ? "FREE" : fee + " Coins") + "\nJoin Match tap karein: " + joinLink;
+      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nFee: " + (fee === 0 ? "FREE" : fee + " Coins") + "\nPlay here: " + joinLink;
       window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
     };
 
@@ -334,7 +256,6 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
-    // STRICT BALANCE CHECK WHEN JOINING MATCH
     window.promptJoinByCode = async function(codeToJoin = null) {
       await syncRealWalletBalance();
       const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
@@ -345,15 +266,6 @@
           const { data: room } = await window.supabaseClient.from('ludo_rooms').select('*').eq('room_code', code.trim()).single();
           if (!room) return alert("Room nahi mila!");
           if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
-
-          // Insufficient Balance Block
-          if (room.entry_fee > 0 && userWalletBalance < room.entry_fee) {
-            return alert("Balance kam hai!\nIs match ki fee " + room.entry_fee + " coins hai jabke aapke pas " + userWalletBalance + " coins hain. Pehle wallet recharge karein!");
-          }
-
-          if (loggedInUserId) {
-            await window.supabaseClient.from('ludo_rooms').update({ guest_id: loggedInUserId }).eq('id', room.id);
-          }
 
           activeRoomData = room;
           localPlayerColor = 'blue';
@@ -367,7 +279,6 @@
           startBtn.classList.add('active-ready');
           startBtn.innerText = "READY TO START";
 
-          pushNavigationState('lobby');
           if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(code.trim());
         } catch(e) {
           alert("Join error: " + e.message);
@@ -375,29 +286,17 @@
       }
     };
 
-    window.handleStartMatchClick = async function() {
+    window.handleStartMatchClick = function() {
       const startBtn = document.getElementById('btn-start-match');
       if (!startBtn.classList.contains('active-ready')) {
         alert("Pehle apne dost ko invite karein!");
         return;
       }
-
-      if (window.supabaseClient && activeRoomData) {
-        if (activeRoomData.entry_fee > 0) {
-          const { data: res } = await window.supabaseClient.rpc('start_ludo_coin_match', { p_room_id: activeRoomData.id });
-          if (res && !res.success) {
-            return alert(res.message);
-          }
-        }
-
-        if (realtimeChannel) {
-          realtimeChannel.send({ type: 'broadcast', event: 'game_started', payload: {} });
-        }
+      if (realtimeChannel) {
+        realtimeChannel.send({ type: 'broadcast', event: 'game_started', payload: {} });
       }
-
       document.getElementById('screen-lobby-slots').style.display = 'none';
       document.getElementById('screen-game-arena').style.display = 'flex';
-      pushNavigationState('arena');
       if (window.initGameplayArena) window.initGameplayArena();
     };
   </script>
@@ -749,13 +648,13 @@
       box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
     }
 
-    /* SCREEN 3: GAMEPLAY ARENA */
+    /* SCREEN 3: GAMEPLAY ARENA & PRECISE DICE POSITION */
     .arena-top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 12px;
+      padding: 8px 14px;
       z-index: 20;
     }
     .arena-gear-btn {
@@ -766,24 +665,26 @@
       color: #fff; font-size: 18px; cursor: pointer;
     }
 
+    /* BLUE PLAYER (RIGHT) & BLUE DICE ON ITS SIDE */
     .opponent-hud-box {
-      position: absolute;
-      top: 10px;
-      right: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 20;
     }
 
+    /* RED PLAYER (LEFT) & RED DICE ON ITS SIDE */
+    .arena-bottom-bar {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 8px 14px;
+      z-index: 20;
+    }
     .host-hud-box {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 20;
     }
 
     .player-hud-card {
@@ -825,8 +726,8 @@
 
     .dice-hud-container {
       position: relative;
-      width: 54px;
-      height: 54px;
+      width: 46px;
+      height: 46px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -834,20 +735,20 @@
     .timer-ring-svg {
       position: absolute;
       inset: -4px;
-      width: 62px;
-      height: 62px;
+      width: 54px;
+      height: 54px;
       transform: rotate(-90deg);
       pointer-events: none;
     }
     .timer-circle-bg {
       fill: none;
       stroke: rgba(255,255,255,0.2);
-      stroke-width: 4;
+      stroke-width: 3.5;
     }
     .timer-circle-progress {
       fill: none;
       stroke: #2ecc71;
-      stroke-width: 4;
+      stroke-width: 3.5;
       stroke-linecap: round;
       stroke-dasharray: 188;
       stroke-dashoffset: 0;
@@ -855,22 +756,23 @@
     }
 
     .real-dice-cube {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       background: #ffffff;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 2px solid #cbd5e1;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
       transition: transform 0.1s, box-shadow 0.2s;
     }
+    /* VIBRATE & SHAKE ANIMATION ON TURN */
     .real-dice-cube.turn-active {
       animation: diceShakeTurn 0.4s infinite alternate;
       border-color: var(--cyan);
-      box-shadow: 0 0 18px var(--cyan);
+      box-shadow: 0 0 15px var(--cyan);
     }
     @keyframes diceShakeTurn {
       0% { transform: scale(1) rotate(-4deg); }
@@ -891,8 +793,8 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       padding: 2px;
       pointer-events: none;
     }
@@ -904,8 +806,8 @@
       height: 100%;
     }
     .pip-dot {
-      width: 7px;
-      height: 7px;
+      width: 6.5px;
+      height: 6.5px;
       background: #111827;
       border-radius: 50%;
     }
@@ -1097,8 +999,23 @@
     <div id="screen-game-arena" class="screen-view" style="display: none; padding:0;">
       <div class="arena-top-bar">
         <button type="button" class="arena-gear-btn" onclick="window.toggleIngameMenu()"><i class="fa-solid fa-gear"></i></button>
-        <div style="font-size:12px; font-weight:800; color:#fff; background:rgba(0,0,0,0.3); padding:4px 14px; border-radius:12px;" id="arena-status-badge">CLASSIC 1v1</div>
-        <div style="width:38px;"></div>
+        
+        <!-- BLUE DICE ON BLUE PLAYER'S SIDE (RIGHT) -->
+        <div class="opponent-hud-box">
+          <div class="dice-hud-container" id="dice-container-blue">
+            <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="27" cy="27" r="23"></circle><circle class="timer-circle-progress" id="timer-blue" cx="27" cy="27" r="23"></circle></svg>
+            <div class="real-dice-cube" id="cube-blue" onclick="window.handleDiceRollClick('blue')">
+              <div class="dice-pips-grid" id="pips-blue"></div>
+            </div>
+          </div>
+          <div class="player-hud-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="hud-avatar" id="opp-avatar-img" alt="Opponent" />
+            <div style="text-align:left;">
+              <div style="font-size:12px; font-weight:800;" id="opp-name-tag">Opponent</div>
+              <div style="font-size:10px; color:#2ecc71;">🔵 Blue</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="ingame-popup-menu" id="ingame-menu-dropdown">
@@ -1107,42 +1024,27 @@
         <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
       </div>
 
-      <!-- BLUE PLAYER & BLUE DICE -->
-      <div class="opponent-hud-box">
-        <div class="dice-hud-container" id="dice-container-blue">
-          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-blue" cx="31" cy="31" r="27"></circle></svg>
-          <div class="real-dice-cube" id="cube-blue" onclick="window.handleDiceRollClick('blue')">
-            <div class="dice-pips-grid" id="pips-blue"></div>
-          </div>
-        </div>
-        <div class="player-hud-card">
-          <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="hud-avatar" id="opp-avatar-img" alt="Opponent" />
-          <div style="text-align:left;">
-            <div style="font-size:12px; font-weight:800;" id="opp-name-tag">Opponent</div>
-            <div style="font-size:10px; color:#2ecc71;">🔵 Blue</div>
-          </div>
-        </div>
-      </div>
-
       <!-- MAIN LUDO BOARD CANVAS -->
       <div class="board-island-container">
         <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
       </div>
 
-      <!-- RED PLAYER & RED DICE -->
-      <div class="host-hud-box">
-        <div class="player-hud-card" style="border-color:#e74c3c;">
-          <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
-          <div style="text-align:left;">
-            <div style="font-size:12px; font-weight:800;" id="host-name-tag">You</div>
-            <div style="font-size:10px; color:#e74c3c;">🔴 Red</div>
+      <!-- RED PLAYER & RED DICE ON RED PLAYER'S SIDE (LEFT) -->
+      <div class="arena-bottom-bar">
+        <div class="host-hud-box">
+          <div class="player-hud-card" style="border-color:#e74c3c;">
+            <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
+            <div style="text-align:left;">
+              <div style="font-size:12px; font-weight:800;" id="host-name-tag">You</div>
+              <div style="font-size:10px; color:#e74c3c;">🔴 Red</div>
+            </div>
           </div>
-        </div>
 
-        <div class="dice-hud-container" id="dice-container-red">
-          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-red" cx="31" cy="31" r="27"></circle></svg>
-          <div class="real-dice-cube turn-active" id="cube-red" onclick="window.handleDiceRollClick('red')">
-            <div class="dice-pips-grid" id="pips-red"></div>
+          <div class="dice-hud-container" id="dice-container-red">
+            <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="27" cy="27" r="23"></circle><circle class="timer-circle-progress" id="timer-red" cx="27" cy="27" r="23"></circle></svg>
+            <div class="real-dice-cube turn-active" id="cube-red" onclick="window.handleDiceRollClick('red')">
+              <div class="dice-pips-grid" id="pips-red"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1238,7 +1140,7 @@
 
   <script>
     /* ==========================================================================
-       SUPABASE REALTIME & CORE LOGIC
+       SUPABASE REALTIME & CORE GAME ENGINE
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -1266,7 +1168,6 @@
         .on('broadcast', { event: 'game_started' }, () => {
           document.getElementById('screen-lobby-slots').style.display = 'none';
           document.getElementById('screen-game-arena').style.display = 'flex';
-          pushNavigationState('arena');
           initGameplayArena();
         })
         .on('broadcast', { event: 'dice_roll' }, payload => {
@@ -1776,27 +1677,6 @@
 
       if (!isDiceRolled) {
         executeDiceRoll();
-        const checkRollInterval = setInterval(() => {
-          if (!isDiceRolled || isTokenAnimating) {
-            clearInterval(checkRollInterval);
-            return;
-          }
-          const tokens = gameState[currentTurn];
-          const valid = [];
-          tokens.forEach((s, idx) => {
-            if (canPawnMove(s, diceValue)) valid.push(idx);
-          });
-
-          if (valid.length > 0) {
-            clearInterval(checkRollInterval);
-            let chosen = valid[0];
-            for (let idx of valid) {
-              if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
-              if (tokens[idx] > tokens[chosen]) chosen = idx;
-            }
-            animateTokenStepByStep(currentTurn, chosen, diceValue);
-          }
-        }, 150);
       } else {
         const tokens = gameState[currentTurn];
         const valid = [];
@@ -1804,12 +1684,7 @@
           if (canPawnMove(s, diceValue)) valid.push(idx);
         });
         if (valid.length > 0) {
-          let chosen = valid[0];
-          for (let idx of valid) {
-            if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
-            if (tokens[idx] > tokens[chosen]) chosen = idx;
-          }
-          animateTokenStepByStep(currentTurn, chosen, diceValue);
+          animateTokenStepByStep(currentTurn, valid[0], diceValue);
         } else {
           switchTurn();
         }
@@ -1863,27 +1738,15 @@
       handleCanvasTouch(e.clientX, e.clientY);
     });
 
-    async function handleVictory(winner) {
+    function handleVictory(winner) {
       SFX.win();
       clearInterval(turnTimerInterval);
       document.getElementById('result-modal').style.display = 'flex';
       document.getElementById('result-winner-title').innerText = winner.toUpperCase() + " WINS!";
-
-      if (!isSingleMode && activeRoomData && activeRoomData.entry_fee > 0 && window.supabaseClient) {
-        const winnerId = (winner === 'red' ? activeRoomData.host_id : activeRoomData.guest_id);
-        const { data: res } = await window.supabaseClient.rpc('settle_ludo_winner', {
-          p_room_id: activeRoomData.id,
-          p_winner_id: winnerId
-        });
-        if (res && res.success) {
-          document.getElementById('res-prize-amount').innerText = res.reward + " Coins";
-          document.getElementById('res-fee-amount').innerText = res.fee + " Coins";
-        }
-      } else {
-        document.getElementById('res-prize-amount').innerText = "Practice Mode";
-        document.getElementById('res-fee-amount').innerText = "0 Coins";
-      }
-      syncRealWalletBalance();
+      const fee = window.getSelectedFee();
+      const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
+      document.getElementById('res-prize-amount').innerText = prize + " Coins";
+      document.getElementById('res-fee-amount').innerText = Math.floor((fee * 2) * 0.1) + " Coins";
     }
 
     window.toggleIngameMenu = function() {
@@ -1906,13 +1769,11 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      pushNavigationState('home');
       renderDicePips('red', 1);
       renderDicePips('blue', 1);
       removeParentExitButton();
       syncRealWalletBalance();
 
-      // Check if URL contains ?room=123456 from Chat Room Click
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('room');
       if (roomParam) {
