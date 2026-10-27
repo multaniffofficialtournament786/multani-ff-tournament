@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- ZERO-LAG FAST FUNCTIONS IN HEAD -->
+  <!-- SCRIPT ENGINE -->
   <script>
     const coinSteps = [0, 25, 50, 100, 250, 500, 1000];
     let selectedCoinIndex = 1; // Default 25
@@ -17,15 +17,81 @@
     let isSingleMode = false;
     let realtimeChannel = null;
     let userWalletBalance = 0;
+    let loggedInUserId = null;
 
-    // Mobile Back Button / Navigation History State Management
+    // Remove Red Exit Button from Parent DOM if in iframe
+    function removeParentExitButton() {
+      try {
+        if (window.parent && window.parent.document) {
+          const parentButtons = window.parent.document.querySelectorAll('button, a, div');
+          parentButtons.forEach(el => {
+            if (el.innerText && el.innerText.trim().toUpperCase().includes('EXIT')) {
+              el.style.display = 'none';
+            }
+          });
+        }
+      } catch(e) {}
+    }
+
+    // Real Wallet Balance Fetcher from Supabase & Storage
+    async function syncRealWalletBalance() {
+      try {
+        let savedUser = null;
+        // Check local storage and parent storage
+        const storages = [localStorage];
+        try { if (window.parent && window.parent.localStorage) storages.push(window.parent.localStorage); } catch(e){}
+
+        for (let st of storages) {
+          for (let key of Object.keys(st)) {
+            if (key.includes('supabase.auth.token') || key.includes('user') || key.includes('profile')) {
+              try {
+                const parsed = JSON.parse(st.getItem(key));
+                if (parsed && (parsed.user || parsed.id || parsed.current_user)) {
+                  savedUser = parsed.user || parsed.current_user || parsed;
+                  break;
+                }
+              } catch(err){}
+            }
+          }
+          if (savedUser) break;
+        }
+
+        if (window.supabaseClient) {
+          const { data: { user } } = await window.supabaseClient.auth.getUser();
+          const targetUid = user ? user.id : (savedUser ? (savedUser.id || savedUser.uid) : null);
+          
+          if (targetUid) {
+            loggedInUserId = targetUid;
+            const { data } = await window.supabaseClient
+              .from('users')
+              .select('balance, coins, wallet')
+              .eq('id', targetUid)
+              .single();
+
+            if (data) {
+              userWalletBalance = data.balance !== undefined ? Number(data.balance) : (data.coins !== undefined ? Number(data.coins) : Number(data.wallet || 0));
+              return;
+            }
+          }
+        }
+
+        // Fallback from raw parent elements or storages
+        if (savedUser && (savedUser.balance !== undefined || savedUser.coins !== undefined)) {
+          userWalletBalance = Number(savedUser.balance || savedUser.coins || 0);
+        }
+      } catch(e) {
+        console.warn("Wallet sync note:", e);
+      }
+    }
+
+    // Mobile Back Button Navigation Management
     function pushNavigationState(screenName) {
       if (window.history && window.history.pushState) {
         window.history.pushState({ screen: screenName }, "", "");
       }
     }
 
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', function() {
       const arenaScreen = document.getElementById('screen-game-arena');
       const lobbyScreen = document.getElementById('screen-lobby-slots');
       
@@ -84,15 +150,21 @@
       if (modal) modal.style.display = 'none';
     };
 
-    window.showMatchDetailsPopup = function() {
+    window.showMatchDetailsPopup = async function() {
+      await syncRealWalletBalance();
       const modal = document.getElementById('match-details-modal');
       const fee = window.getSelectedFee();
       const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
 
-      document.getElementById('detail-match-fee').innerText = (fee === 0) ? "FREE (0 Coins)" : (fee + " Coins");
-      document.getElementById('detail-match-prize').innerText = (fee === 0) ? "Fun Match" : (prize + " Coins");
-      document.getElementById('detail-user-wallet').innerText = userWalletBalance + " Coins";
+      if (isSingleMode || fee === 0) {
+        document.getElementById('detail-match-fee').innerText = "Free (Practice)";
+        document.getElementById('detail-match-prize').innerText = "Practice Mode (0 Coins)";
+      } else {
+        document.getElementById('detail-match-fee').innerText = fee + " Coins";
+        document.getElementById('detail-match-prize').innerText = prize + " Coins";
+      }
 
+      document.getElementById('detail-user-wallet').innerText = userWalletBalance + " Coins";
       if (modal) modal.style.display = 'flex';
     };
 
@@ -118,9 +190,17 @@
     };
 
     window.goToLobbyAndCreateRoom = async function() {
+      await syncRealWalletBalance();
+      const fee = window.getSelectedFee();
+
+      // STRICT WALLET BALANCE CHECK
+      if (fee > 0 && userWalletBalance < fee) {
+        alert("Balance kam hai!\nAapke wallet mein sirf " + userWalletBalance + " Coins hain. Kam coins wali game select karein ya wallet recharge karein.");
+        return;
+      }
+
       isSingleMode = false;
       localPlayerColor = 'red';
-      const fee = window.getSelectedFee();
       const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
       currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -137,20 +217,17 @@
       document.getElementById('screen-lobby-slots').style.display = 'flex';
       pushNavigationState('lobby');
 
-      if (window.supabaseClient) {
+      if (window.supabaseClient && loggedInUserId) {
         try {
-          const { data: { user } } = await window.supabaseClient.auth.getUser();
-          if (user) {
-            const { data } = await window.supabaseClient.from('ludo_rooms').insert({
-              room_code: currentRoomCode,
-              host_id: user.id,
-              entry_fee: fee,
-              status: 'waiting'
-            }).select().single();
-            if (data) {
-              activeRoomData = data;
-              if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(currentRoomCode);
-            }
+          const { data } = await window.supabaseClient.from('ludo_rooms').insert({
+            room_code: currentRoomCode,
+            host_id: loggedInUserId,
+            entry_fee: fee,
+            status: 'waiting'
+          }).select().single();
+          if (data) {
+            activeRoomData = data;
+            if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(currentRoomCode);
           }
         } catch(e) {
           console.warn(e);
@@ -158,18 +235,20 @@
       }
     };
 
+    // FIXED INVITE WITHOUT 404 REDIRECT
     window.sendInviteToChatAndWhatsApp = function() {
       const fee = window.getSelectedFee();
       const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
 
-      navigator.clipboard.writeText(chatPayload).then(() => {
-        alert("Invite Card Copied!\nChat Room mein paste karein: Code " + currentRoomCode);
-        if (window.parent && window.parent.Router) {
-          window.parent.location.href = 'chat.html';
-        }
-      }).catch(() => {
-        prompt("Copy this invite code for Multani Chat:", chatPayload);
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(chatPayload).then(() => {
+          showFloatingToast("Invite Code Copied! Code: " + currentRoomCode);
+        }).catch(() => {
+          prompt("Copy this code for your friend:", currentRoomCode);
+        });
+      } else {
+        prompt("Copy this code for your friend:", currentRoomCode);
+      }
     };
 
     window.shareInviteLinkDirect = function() {
@@ -178,20 +257,43 @@
       window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
     };
 
+    function showFloatingToast(msg) {
+      const toast = document.createElement('div');
+      toast.innerText = msg;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '80px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = '#0284c7';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 20px';
+      toast.style.borderRadius = '25px';
+      toast.style.fontWeight = '800';
+      toast.style.fontSize = '13px';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.5)';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
     window.promptJoinByCode = async function(codeToJoin = null) {
+      await syncRealWalletBalance();
       const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
       if (!code) return;
 
       if (window.supabaseClient) {
         try {
-          const { data: { user } } = await window.supabaseClient.auth.getUser();
-          if (!user) return alert("Match join karne ke liye pehle login karein!");
-
           const { data: room } = await window.supabaseClient.from('ludo_rooms').select('*').eq('room_code', code.trim()).single();
           if (!room) return alert("Room nahi mila!");
           if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
 
-          await window.supabaseClient.from('ludo_rooms').update({ guest_id: user.id }).eq('id', room.id);
+          if (room.entry_fee > 0 && userWalletBalance < room.entry_fee) {
+            return alert("Balance kam hai! Is match ke liye " + room.entry_fee + " coins darkar hain.");
+          }
+
+          if (loggedInUserId) {
+            await window.supabaseClient.from('ludo_rooms').update({ guest_id: loggedInUserId }).eq('id', room.id);
+          }
 
           activeRoomData = room;
           localPlayerColor = 'blue';
@@ -286,7 +388,7 @@
       pointer-events: none;
     }
 
-    /* TOP GLOBAL HEADER */
+    /* TOP HEADER: CLEAN TITLE & DETAIL BUTTON */
     .top-global-header {
       width: 100%;
       height: 48px;
@@ -305,7 +407,6 @@
       font-size: 15px;
       font-weight: 900;
       color: #fff;
-      letter-spacing: 0.5px;
     }
     .btn-detail-pill {
       background: linear-gradient(135deg, #0284c7, #0369a1);
@@ -322,9 +423,7 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.4);
       outline: none;
     }
-    .btn-detail-pill:active {
-      transform: scale(0.95);
-    }
+    .btn-detail-pill:active { transform: scale(0.95); }
 
     .screen-view {
       position: absolute;
@@ -591,7 +690,7 @@
       box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
     }
 
-    /* SCREEN 3 */
+    /* SCREEN 3: GAMEPLAY ARENA & DICE FIXED POSITIONS */
     .arena-top-bar {
       width: 100%;
       display: flex;
@@ -608,15 +707,28 @@
       color: #fff; font-size: 18px; cursor: pointer;
     }
 
+    /* BLUE PLAYER (TOP RIGHT) & BLUE DICE NEXT TO BLUE AVATAR */
     .opponent-hud-box {
       position: absolute;
-      top: 12px;
+      top: 10px;
       right: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
       z-index: 20;
     }
+
+    /* RED PLAYER (BOTTOM LEFT) & RED DICE NEXT TO RED AVATAR */
+    .host-hud-box {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+    }
+
     .player-hud-card {
       display: flex;
       align-items: center;
@@ -654,20 +766,10 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    .host-hud-box {
-      position: absolute;
-      bottom: 16px;
-      left: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 20;
-    }
-
     .dice-hud-container {
       position: relative;
-      width: 60px;
-      height: 60px;
+      width: 54px;
+      height: 54px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -675,8 +777,8 @@
     .timer-ring-svg {
       position: absolute;
       inset: -4px;
-      width: 68px;
-      height: 68px;
+      width: 62px;
+      height: 62px;
       transform: rotate(-90deg);
       pointer-events: none;
     }
@@ -696,8 +798,8 @@
     }
 
     .real-dice-cube {
-      width: 50px;
-      height: 50px;
+      width: 46px;
+      height: 46px;
       background: #ffffff;
       border-radius: 12px;
       border: 2px solid #cbd5e1;
@@ -708,16 +810,18 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       transition: transform 0.1s, box-shadow 0.2s;
     }
+    /* VIBRATE / SHAKE ANIMATION ON ACTIVE TURN */
     .real-dice-cube.turn-active {
-      animation: pulseDiceRing 1.1s infinite alternate;
+      animation: diceShakeTurn 0.4s infinite alternate;
       border-color: var(--cyan);
+      box-shadow: 0 0 18px var(--cyan);
     }
-    @keyframes pulseDiceRing {
-      from { transform: scale(1); box-shadow: 0 0 10px var(--cyan); }
-      to { transform: scale(1.08); box-shadow: 0 0 25px var(--cyan); }
+    @keyframes diceShakeTurn {
+      0% { transform: scale(1) rotate(-4deg); }
+      100% { transform: scale(1.08) rotate(4deg); }
     }
     .real-dice-cube.rolling-anim {
-      animation: dice3DTumble 0.65s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+      animation: dice3DTumble 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.2);
     }
     @keyframes dice3DTumble {
       0% { transform: rotate(0deg) scale(0.9); }
@@ -732,9 +836,9 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      width: 36px;
-      height: 36px;
-      padding: 3px;
+      width: 34px;
+      height: 34px;
+      padding: 2px;
       pointer-events: none;
     }
     .pip-slot {
@@ -745,15 +849,12 @@
       height: 100%;
     }
     .pip-dot {
-      width: 7.5px;
-      height: 7.5px;
+      width: 7px;
+      height: 7px;
       background: #111827;
       border-radius: 50%;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
     }
-    .pip-dot.red-pip {
-      background: #e74c3c;
-    }
+    .pip-dot.red-pip { background: #e74c3c; }
 
     .ingame-popup-menu {
       position: absolute;
@@ -839,7 +940,7 @@
 
   <div id="app-wrapper">
 
-    <!-- TOP PERMANENT HEADER: EXIT BUTTON REMOVED, DETAIL BUTTON ADDED -->
+    <!-- TOP HEADER: DETAIL BUTTON -->
     <div class="top-global-header">
       <div class="header-logo-title">
         <i class="fa-solid fa-gamepad" style="color:var(--gold);"></i>
@@ -953,10 +1054,10 @@
         <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
       </div>
 
-      <!-- OPPONENT (TOP RIGHT - BLUE) -->
+      <!-- BLUE PLAYER & BLUE DICE (TOP RIGHT CORNER) -->
       <div class="opponent-hud-box">
         <div class="dice-hud-container" id="dice-container-blue">
-          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="34" cy="34" r="30"></circle><circle class="timer-circle-progress" id="timer-blue" cx="34" cy="34" r="30"></circle></svg>
+          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-blue" cx="31" cy="31" r="27"></circle></svg>
           <div class="real-dice-cube" id="cube-blue" onclick="window.handleDiceRollClick('blue')">
             <div class="dice-pips-grid" id="pips-blue"></div>
           </div>
@@ -975,7 +1076,7 @@
         <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
       </div>
 
-      <!-- HOST (BOTTOM LEFT - RED) -->
+      <!-- RED PLAYER & RED DICE (BOTTOM LEFT CORNER) -->
       <div class="host-hud-box">
         <div class="player-hud-card" style="border-color:#e74c3c;">
           <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
@@ -986,7 +1087,7 @@
         </div>
 
         <div class="dice-hud-container" id="dice-container-red">
-          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="34" cy="34" r="30"></circle><circle class="timer-circle-progress" id="timer-red" cx="34" cy="34" r="30"></circle></svg>
+          <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-red" cx="31" cy="31" r="27"></circle></svg>
           <div class="real-dice-cube turn-active" id="cube-red" onclick="window.handleDiceRollClick('red')">
             <div class="dice-pips-grid" id="pips-red"></div>
           </div>
@@ -1084,7 +1185,7 @@
 
   <script>
     /* ==========================================================================
-       SUPABASE CLIENT INITIALIZATION & WALLET FETCH
+       SUPABASE CLIENT INITIALIZATION
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -1095,21 +1196,6 @@
       }
     } catch(err) {
       console.warn("Supabase init error:", err);
-    }
-
-    async function fetchUserWallet() {
-      if (!window.supabaseClient) return;
-      try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (user) {
-          const { data } = await window.supabaseClient.from('users').select('coins, balance').eq('id', user.id).single();
-          if (data) {
-            userWalletBalance = data.coins !== undefined ? data.coins : (data.balance || 0);
-          }
-        }
-      } catch(e) {
-        console.warn("Wallet fetch error:", e);
-      }
     }
 
     function subscribeToMatchRealtime(code) {
@@ -1148,7 +1234,7 @@
     }
 
     /* ==========================================================================
-       WEB AUDIO SYNTHESIZER
+       AUDIO SYNTHESIZER
        ========================================================================== */
     let audioEnabled = true;
     let actx = null;
@@ -1210,7 +1296,7 @@
     };
 
     /* ==========================================================================
-       GAMEPLAY ENGINE
+       BOARD COORDINATES & 5 HOME BOXES
        ========================================================================== */
     const canvas = document.getElementById('ludo-main-canvas');
     const ctx = canvas.getContext('2d');
@@ -1232,8 +1318,12 @@
       [7, 0],
       [6, 0]
     ];
+    
+    // 5 Individual Home Run Boxes (Row, Col)
     const RED_HOMERUN = [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]];
     const BLUE_HOMERUN = [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]];
+
+    // Base positions
     const RED_BASES = [[2, 2], [2, 3], [3, 2], [3, 3]];
     const BLUE_BASES = [[11, 11], [11, 12], [12, 11], [12, 12]];
     const SAFE_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
@@ -1245,6 +1335,7 @@
     let isTokenAnimating = false;
     let consecutiveSixes = 0;
     let turnTimerInterval = null;
+    let pulseAnimFrame = 0;
 
     let gameState = {
       red: [-1, -1, -1, -1],
@@ -1262,14 +1353,24 @@
       updateDiceTurnVisuals();
       renderBoard();
       startTurnTimer();
+      startGlowLoop();
     };
 
+    // FIXED TOKEN HOME PLACEMENT: Red stays strictly in Red triangle (Left), Blue in Blue (Right)
     function getTokenVisualCoords(color, index, step) {
       if (step === -1) {
         const b = (color === 'red') ? RED_BASES[index] : BLUE_BASES[index];
         return { r: b[0], c: b[1] };
       }
-      if (step >= 56) return { r: 7.5, c: 7.5 };
+      if (step >= 56) {
+        // Red home inside left red triangle
+        if (color === 'red') {
+          return { r: 7.5, c: 6.8 };
+        } else {
+          // Blue home inside right blue triangle
+          return { r: 7.5, c: 8.2 };
+        }
+      }
       if (color === 'red') {
         if (step < 51) return { r: TRACK_COORDS[step % 52][0], c: TRACK_COORDS[step % 52][1] };
         return { r: RED_HOMERUN[step - 51][0], c: RED_HOMERUN[step - 51][1] };
@@ -1279,6 +1380,7 @@
       }
     }
 
+    // DRAW BOARD WITH 5 INDIVIDUAL BOXES ON HOME RUN
     function renderBoard() {
       ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
       ctx.fillStyle = "#ffffff";
@@ -1297,6 +1399,7 @@
       drawBase(9, 9, '#3498db');
       drawBase(9, 0, '#f1c40f');
 
+      // Grid Lines
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 1;
       for (let i = 0; i <= 15; i++) {
@@ -1304,21 +1407,45 @@
         ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(BOARD_PX, i * CELL); ctx.stroke();
       }
 
+      // 5 SEPARATE HOME BOXES WITH VISIBLE BORDERS
       for (let i = 1; i <= 5; i++) {
-        ctx.fillStyle = '#e74c3c'; ctx.fillRect(i * CELL, 7 * CELL, CELL, CELL);
-        ctx.fillStyle = '#3498db'; ctx.fillRect((14 - i) * CELL, 7 * CELL, CELL, CELL);
-        ctx.fillStyle = '#2ecc71'; ctx.fillRect(7 * CELL, i * CELL, CELL, CELL);
-        ctx.fillStyle = '#f1c40f'; ctx.fillRect(7 * CELL, (14 - i) * CELL, CELL, CELL);
+        // RED 5 Boxes
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+
+        // BLUE 5 Boxes
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#2980b9'; ctx.lineWidth = 1.5;
+        ctx.strokeRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+
+        // GREEN 5 Boxes
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
+
+        // YELLOW 5 Boxes
+        ctx.fillStyle = '#f1c40f';
+        ctx.fillRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
       }
+
+      // Starting Entry Arrow Boxes
       ctx.fillStyle = '#e74c3c'; ctx.fillRect(1 * CELL, 6 * CELL, CELL, CELL);
       ctx.fillStyle = '#3498db'; ctx.fillRect(13 * CELL, 8 * CELL, CELL, CELL);
 
+      // Center Triangles
       const drawTri = (p1, p2, col) => {
         ctx.beginPath();
         ctx.moveTo(p1[0] * CELL, p1[1] * CELL);
         ctx.lineTo(p2[0] * CELL, p2[1] * CELL);
         ctx.lineTo(7.5 * CELL, 7.5 * CELL);
         ctx.fillStyle = col; ctx.fill();
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1; ctx.stroke();
       };
       drawTri([6, 6], [9, 6], '#2ecc71');
       drawTri([9, 6], [9, 9], '#3498db');
@@ -1344,13 +1471,22 @@
       ctx.fillStyle = color; ctx.fill();
     }
 
+    // CONTINUOUS GLOW ANIMATION FOR MOVABLE PAWNS
+    function startGlowLoop() {
+      pulseAnimFrame = (pulseAnimFrame + 0.1) % (Math.PI * 2);
+      if (isDiceRolled) {
+        renderBoard();
+      }
+      requestAnimationFrame(startGlowLoop);
+    }
+
     function renderRealisticPawns() {
       const occupiedMap = {};
 
       ['red', 'blue'].forEach(color => {
         gameState[color].forEach((step, idx) => {
           const coords = getTokenVisualCoords(color, idx, step);
-          const key = (step === -1) ? `${color}_base_${idx}` : `${coords.r.toFixed(1)}_${coords.c.toFixed(1)}`;
+          const key = (step === -1) ? `${color}_base_${idx}` : (step >= 56 ? `${color}_home_${idx}` : `${coords.r.toFixed(1)}_${coords.c.toFixed(1)}`);
           if (!occupiedMap[key]) occupiedMap[key] = [];
           occupiedMap[key].push({ color, idx, step, coords });
         });
@@ -1371,11 +1507,16 @@
           const py = pawn.coords.r * CELL + CELL / 2 + offsetY;
           const isMovable = isDiceRolled && (pawn.color === currentTurn) && canPawnMove(pawn.step, diceValue);
 
+          // PULSING BLINKING GLOW BORDER ON MOVABLE PAWNS
           if (isMovable) {
+            const glowSize = CELL * (0.46 + Math.sin(pulseAnimFrame) * 0.08);
             ctx.beginPath();
-            ctx.arc(px, py, CELL * 0.46, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 235, 59, 0.7)';
+            ctx.arc(px, py, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 235, 59, 0.75)';
             ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffea00';
+            ctx.stroke();
           }
 
           ctx.beginPath();
@@ -1479,6 +1620,7 @@
       clearInterval(turnTimerInterval);
 
       const activeCube = document.getElementById(currentTurn === 'red' ? 'cube-red' : 'cube-blue');
+      activeCube.classList.remove('turn-active');
       activeCube.classList.add('rolling-anim');
       SFX.roll();
 
@@ -1506,7 +1648,7 @@
       }, 550);
     }
 
-    /* REALISTIC 3X3 DICE PIPS RENDERER */
+    /* REALISTIC 3X3 DICE DOTS */
     function renderDicePips(playerColor, val) {
       const container = document.getElementById(playerColor === 'red' ? 'pips-red' : 'pips-blue');
       container.innerHTML = '';
@@ -1549,7 +1691,6 @@
         animateTokenStepByStep(currentTurn, valid[0], diceValue);
       } else {
         if (isSingleMode && currentTurn === 'blue') {
-          // FAST AI AUTO-MOVE UNDER 1.5 SECONDS TOTAL
           setTimeout(() => {
             let chosen = valid[0];
             for (let idx of valid) {
@@ -1568,33 +1709,31 @@
       updateDiceTurnVisuals();
       startTurnTimer();
 
-      // COMPUTER (AI) ROLLS IN UNDER 1 SECOND (MAX 2 SECONDS TOTAL TURN)
       if (isSingleMode && currentTurn === 'blue') {
         setTimeout(executeDiceRoll, 600);
       }
     }
 
+    // UPDATE DICE TURN VISUALS & ACTIVATE SHAKE ANIMATION
     function updateDiceTurnVisuals() {
       const redCube = document.getElementById('cube-red');
       const blueCube = document.getElementById('cube-blue');
-      redCube.classList.toggle('turn-active', currentTurn === 'red' && (isSingleMode || localPlayerColor === 'red'));
-      blueCube.classList.toggle('turn-active', currentTurn === 'blue' && (!isSingleMode && localPlayerColor === 'blue'));
+      redCube.classList.toggle('turn-active', currentTurn === 'red');
+      blueCube.classList.toggle('turn-active', currentTurn === 'blue');
     }
 
-    // AUTO ROLL & AUTO MOVE WHEN TIMER EXPIRES (NO TURN SKIP)
+    // AUTO-ROLL & AUTO-MOVE ON TIMER EXPIRATION
     function handleTimerExpiredAutoPlay() {
       clearInterval(turnTimerInterval);
       if (isTokenAnimating) return;
 
       if (!isDiceRolled) {
-        // Auto-roll dice on timer completion
         executeDiceRoll();
         const checkRollInterval = setInterval(() => {
           if (!isDiceRolled || isTokenAnimating) {
             clearInterval(checkRollInterval);
             return;
           }
-          // After roll, auto-pick best pawn
           const tokens = gameState[currentTurn];
           const valid = [];
           tokens.forEach((s, idx) => {
@@ -1612,7 +1751,6 @@
           }
         }, 150);
       } else {
-        // If dice was already rolled but token wasn't clicked, auto-pick token
         const tokens = gameState[currentTurn];
         const valid = [];
         tokens.forEach((s, idx) => {
@@ -1695,10 +1833,10 @@
           document.getElementById('res-fee-amount').innerText = res.fee + " Coins";
         }
       } else {
-        document.getElementById('res-prize-amount').innerText = "Fun / Practice";
+        document.getElementById('res-prize-amount').innerText = "Practice Mode";
         document.getElementById('res-fee-amount').innerText = "0 Coins";
       }
-      fetchUserWallet();
+      syncRealWalletBalance();
     }
 
     window.toggleIngameMenu = function() {
@@ -1724,7 +1862,8 @@
       pushNavigationState('home');
       renderDicePips('red', 1);
       renderDicePips('blue', 1);
-      fetchUserWallet();
+      removeParentExitButton();
+      syncRealWalletBalance();
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('room');
       if (roomParam) {
