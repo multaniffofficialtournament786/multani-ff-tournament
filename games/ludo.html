@@ -19,7 +19,7 @@
     let userWalletBalance = 0;
     let loggedInUserId = null;
 
-    // 100% Safe Parent Exit Button Removal (Zero Crash)
+    // Remove Red Exit Button from Parent DOM Safely
     function removeParentExitButton() {
       try {
         if (window.parent && window.parent !== window) {
@@ -38,16 +38,14 @@
       } catch(e) {}
     }
 
-    // 100% Safe Real Wallet Balance Fetcher (Zero Crash)
+    // Two-Way Safe Wallet Sync (Supabase DB + Local Storage + PostMessage)
     async function syncRealWalletBalance() {
       try {
         let savedUser = null;
-
-        // Safe storage scan
         try {
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile'))) {
+            if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile') || key.includes('wallet'))) {
               try {
                 const parsed = JSON.parse(localStorage.getItem(key));
                 if (parsed) {
@@ -59,7 +57,6 @@
           }
         } catch(e) {}
 
-        // Safe parent storage scan
         try {
           if (!savedUser && window.parent && window.parent !== window && window.parent.localStorage) {
             for (let i = 0; i < window.parent.localStorage.length; i++) {
@@ -81,9 +78,9 @@
           loggedInUserId = savedUser.id || savedUser.uid || null;
           if (savedUser.balance !== undefined) userWalletBalance = Number(savedUser.balance);
           else if (savedUser.coins !== undefined) userWalletBalance = Number(savedUser.coins);
+          else if (savedUser.wallet !== undefined) userWalletBalance = Number(savedUser.wallet);
         }
 
-        // Supabase DB fetch
         if (window.supabaseClient) {
           try {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
@@ -107,7 +104,7 @@
       }
     }
 
-    // Mobile Back Button Navigation Management
+    // Navigation and Mobile Back Control
     function pushNavigationState(screenName) {
       try {
         if (window.history && window.history.pushState) {
@@ -133,7 +130,31 @@
         window.backToModeSelect();
         return;
       }
+
+      window.closeAndReturnToArena();
     });
+
+    window.closeAndReturnToArena = function() {
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: 'CLOSE_LUDO', type: 'CLOSE_MODAL' }, '*');
+          const modalInParent = window.parent.document.querySelector('#ludo-modal, .ludo-frame-container, iframe');
+          if (modalInParent && modalInParent.parentElement) {
+            modalInParent.parentElement.style.display = 'none';
+          }
+          if (window.parent.history.length > 1) {
+            window.parent.history.back();
+            return;
+          }
+        }
+      } catch(e){}
+
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html';
+      }
+    };
 
     window.handleHeaderBack = function() {
       const arenaScreen = document.getElementById('screen-game-arena');
@@ -144,15 +165,7 @@
       } else if (lobbyScreen && lobbyScreen.style.display === 'flex') {
         window.backToModeSelect();
       } else {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          try {
-            if (window.parent && window.parent !== window && window.parent.location) {
-              window.parent.location.href = 'index.html';
-            }
-          } catch(e){}
-        }
+        window.closeAndReturnToArena();
       }
     };
 
@@ -245,11 +258,11 @@
       document.getElementById('screen-lobby-slots').style.display = 'flex';
       pushNavigationState('lobby');
 
-      if (window.supabaseClient && loggedInUserId) {
+      if (window.supabaseClient) {
         try {
           const { data } = await window.supabaseClient.from('ludo_rooms').insert({
             room_code: currentRoomCode,
-            host_id: loggedInUserId,
+            host_id: loggedInUserId || 'guest_host',
             entry_fee: fee,
             status: 'waiting'
           }).select().single();
@@ -263,24 +276,42 @@
       }
     };
 
+    // OPEN CHAT ROOM WITH CARD & REDIRECT BACK TO LOBBY
     window.sendInviteToChatAndWhatsApp = function() {
       const fee = window.getSelectedFee();
-      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1","link":"' + joinLink + '"}]';
+
+      try {
+        localStorage.setItem('pending_chat_invite', chatPayload);
+        if (window.parent && window.parent.localStorage) {
+          window.parent.localStorage.setItem('pending_chat_invite', chatPayload);
+        }
+      } catch(e){}
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(chatPayload).then(() => {
-          showFloatingToast("Invite Code Copied! Code: " + currentRoomCode);
-        }).catch(() => {
-          prompt("Copy this code for your friend:", currentRoomCode);
-        });
+        navigator.clipboard.writeText(chatPayload).catch(()=>{});
+      }
+
+      // Check current base path for chat.html
+      let chatUrl = 'chat.html';
+      const pathParts = window.location.pathname.split('/');
+      pathParts.pop();
+      const basePath = pathParts.join('/');
+      chatUrl = window.location.origin + (basePath ? basePath + '/' : '/') + 'chat.html';
+
+      const directChatWindow = window.open(chatUrl, '_blank');
+      if (!directChatWindow) {
+        showFloatingToast("Invite Copied! Chat Room mein bhej kar wapas aayen: " + currentRoomCode);
       } else {
-        prompt("Copy this code for your friend:", currentRoomCode);
+        showFloatingToast("Chat Room khul gaya! Match share karein, Lobby ready hai.");
       }
     };
 
     window.shareInviteLinkDirect = function() {
       const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
-      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nPlay here: " + joinLink;
+      const fee = window.getSelectedFee();
+      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nFee: " + (fee === 0 ? "FREE" : fee + " Coins") + "\nJoin Match tap karein: " + joinLink;
       window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
     };
 
@@ -300,9 +331,10 @@
       toast.style.zIndex = '9999';
       toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.5)';
       document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+      setTimeout(() => toast.remove(), 3000);
     }
 
+    // STRICT BALANCE CHECK WHEN JOINING MATCH
     window.promptJoinByCode = async function(codeToJoin = null) {
       await syncRealWalletBalance();
       const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
@@ -314,8 +346,9 @@
           if (!room) return alert("Room nahi mila!");
           if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
 
+          // Insufficient Balance Block
           if (room.entry_fee > 0 && userWalletBalance < room.entry_fee) {
-            return alert("Balance kam hai! Is match ke liye " + room.entry_fee + " coins darkar hain.");
+            return alert("Balance kam hai!\nIs match ki fee " + room.entry_fee + " coins hai jabke aapke pas " + userWalletBalance + " coins hain. Pehle wallet recharge karein!");
           }
 
           if (loggedInUserId) {
@@ -605,7 +638,7 @@
       cursor: pointer;
     }
 
-    /* SCREEN 2 */
+    /* SCREEN 2: LOBBY */
     .lobby-header-box {
       width: 100%;
       text-align: center;
@@ -716,7 +749,7 @@
       box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
     }
 
-    /* SCREEN 3: GAMEPLAY ARENA & DICE FIXED POSITIONS */
+    /* SCREEN 3: GAMEPLAY ARENA */
     .arena-top-bar {
       width: 100%;
       display: flex;
@@ -962,7 +995,7 @@
 
   <div id="app-wrapper">
 
-    <!-- TOP HEADER -->
+    <!-- TOP GLOBAL HEADER -->
     <div class="top-global-header">
       <div class="header-logo-title">
         <i class="fa-solid fa-gamepad" style="color:var(--gold);"></i>
@@ -997,7 +1030,6 @@
           <i class="fa-solid fa-crown" style="color:var(--gold);"></i> CLASSIC MODE
         </div>
 
-        <!-- Coin Selector -->
         <div class="coin-selector-container">
           <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(-1)">-</button>
           <div class="coin-amount-display">
@@ -1007,7 +1039,6 @@
           <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(1)">+</button>
         </div>
 
-        <!-- Buttons: Single & Invite Friends -->
         <div class="action-duo-buttons">
           <button type="button" class="btn-main-yellow" onclick="window.startSinglePracticeMode()">Single (Offline)</button>
           <button type="button" class="btn-main-yellow" onclick="window.goToLobbyAndCreateRoom()">Invite Friends</button>
@@ -1076,7 +1107,7 @@
         <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
       </div>
 
-      <!-- BLUE PLAYER & BLUE DICE (TOP RIGHT) -->
+      <!-- BLUE PLAYER & BLUE DICE -->
       <div class="opponent-hud-box">
         <div class="dice-hud-container" id="dice-container-blue">
           <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-blue" cx="31" cy="31" r="27"></circle></svg>
@@ -1098,7 +1129,7 @@
         <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
       </div>
 
-      <!-- RED PLAYER & RED DICE (BOTTOM LEFT) -->
+      <!-- RED PLAYER & RED DICE -->
       <div class="host-hud-box">
         <div class="player-hud-card" style="border-color:#e74c3c;">
           <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
@@ -1207,7 +1238,7 @@
 
   <script>
     /* ==========================================================================
-       SUPABASE CLIENT INITIALIZATION
+       SUPABASE REALTIME & CORE LOGIC
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -1326,7 +1357,7 @@
     };
 
     /* ==========================================================================
-       BOARD ENGINE & 5 HOME BOXES
+       CANVAS & GAMEPLAY ENGINE
        ========================================================================== */
     const canvas = document.getElementById('ludo-main-canvas');
     const ctx = canvas.getContext('2d');
@@ -1880,6 +1911,8 @@
       renderDicePips('blue', 1);
       removeParentExitButton();
       syncRealWalletBalance();
+
+      // Check if URL contains ?room=123456 from Chat Room Click
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('room');
       if (roomParam) {
