@@ -1,471 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Zombie Road Rush - Action Game</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    body {
-      background: #111;
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-    #game-container {
-      position: relative;
-      width: 100%;
-      max-width: 420px;
-      height: 90vh;
-      max-height: 720px;
-      background: #222;
-      border: 2px solid #ff4444;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(255, 68, 68, 0.4);
-    }
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: #1e1e1e;
-    }
-    .hud {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      font-weight: bold;
-      pointer-events: none;
-      z-index: 5;
-    }
-    .hud-box {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #444;
-    }
-    .hud-hp {
-      color: #00ff88;
-    }
-    .hud-score {
-      color: #ffbb00;
-    }
-    .mobile-controls {
-      position: absolute;
-      bottom: 12px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 5;
-    }
-    .ctrl-group {
-      display: flex;
-      gap: 12px;
-    }
-    .btn {
-      width: 60px;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 2px solid #ff4444;
-      color: #fff;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: manipulation;
-    }
-    .btn:active {
-      background: #ff4444;
-      transform: scale(0.95);
-    }
-    .btn-fire {
-      width: 70px;
-      height: 70px;
-      border-color: #ffbb00;
-      background: rgba(255, 187, 0, 0.2);
-    }
-    .btn-fire:active {
-      background: #ffbb00;
-      color: #000;
-    }
-    #game-over-screen {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      text-align: center;
-      padding: 20px;
-    }
-    #game-over-screen h2 {
-      font-size: 32px;
-      color: #ff3333;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    #game-over-screen p {
-      font-size: 18px;
-      margin-bottom: 20px;
-      color: #ddd;
-    }
-    .restart-btn {
-      padding: 12px 28px;
-      background: #ff4444;
-      color: #fff;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-    .restart-btn:active {
-      transform: scale(0.96);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>MULTANI FF AIR FORCE</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+ margin:0;width:100%;height:100%;overflow:hidden;
+ background:#050912;color:white;
+ font-family:Arial,sans-serif;touch-action:none;
+}
+#game{
+ position:relative;width:100%;height:100%;
+ height:100dvh;overflow:hidden;
+ background:#071c35;
+}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+.hud{
+ position:absolute;top:env(safe-area-inset-top,8px);
+ left:10px;right:10px;display:flex;
+ justify-content:space-between;pointer-events:none;
+ gap:10px;z-index:3;
+}
+.panel{
+ min-width:115px;padding:9px 13px;
+ background:linear-gradient(145deg,#111a2c,#030710);
+ border:2px solid #687b9d;border-radius:12px;
+ box-shadow:0 0 12px #00baff55,inset 0 0 8px #ffffff15;
+}
+.panel small{
+ display:block;color:#aabbd7;font-size:10px;
+ letter-spacing:2px;font-weight:bold;margin-bottom:4px
+}
+.panel strong{font-size:clamp(19px,5vw,27px);letter-spacing:1px}
+#hpText{color:#32ffc0;text-shadow:0 0 10px #00ffab}
+#scoreText{color:#ffc64c;text-shadow:0 0 10px #ff9a00}
+#hpBar{
+ height:4px;background:#29334a;margin-top:6px;
+ border-radius:5px;overflow:hidden
+}
+#hpFill{height:100%;width:100%;background:#32ffc0}
+.brand{
+ position:absolute;top:80px;left:0;right:0;
+ text-align:center;pointer-events:none;
+ color:#ffffff55;font-size:11px;letter-spacing:4px;
+ font-weight:900
+}
+.controls{
+ position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+ left:0;right:0;display:flex;align-items:flex-end;
+ justify-content:space-between;padding:0 16px;z-index:4;
+ pointer-events:none
+}
+.side{display:flex;gap:12px;pointer-events:auto}
+.control{
+ width:clamp(65px,18vw,94px);
+ height:clamp(65px,18vw,94px);
+ border-radius:50%;display:flex;align-items:center;
+ justify-content:center;user-select:none;
+ -webkit-user-select:none;touch-action:none;
+ background:radial-gradient(circle at 35% 25%,#9aafc9,#28384f 55%,#101827 75%);
+ border:5px solid #ff6577;
+ box-shadow:0 0 8px #ff415c,0 0 22px #ff304455,
+ inset 0 0 0 3px #ffffff55;
+ color:white;font-size:36px;font-weight:900;
+ text-shadow:0 2px 5px #000;
+}
+.control:active{transform:scale(.91);filter:brightness(1.4)}
+#fire{
+ width:clamp(88px,23vw,116px);
+ height:clamp(88px,23vw,116px);
+ flex-direction:column;gap:3px;
+ font-size:15px;font-weight:900;color:#ffdc72;
+ border:5px solid #ffbc38;
+ background:radial-gradient(circle at 35% 25%,#765b39,#251a16 65%,#0b0d12);
+ box-shadow:0 0 12px #ffb52b,0 0 26px #ff8d2455,
+ inset 0 0 0 3px #ffffff55;
+}
+#fire span{font-size:36px}
+#message{
+ position:absolute;inset:0;z-index:10;
+ display:flex;align-items:center;justify-content:center;
+ background:#020713b8;backdrop-filter:blur(5px);
+ padding:20px;
+}
+.card{
+ width:min(360px,100%);padding:26px 20px;
+ border-radius:20px;text-align:center;
+ background:linear-gradient(155deg,#17243a,#060b16);
+ border:1px solid #ffb93e;
+ box-shadow:0 0 35px #ff9c2440;
+}
+.card h1{font-size:26px;color:#ffc14d;margin:0 0 8px}
+.card p{color:#c2d0e6;line-height:1.6;font-size:13px}
+.action{
+ width:100%;padding:15px;margin-top:10px;
+ border:0;border-radius:12px;font-weight:900;
+ font-size:16px;color:#101018;
+ background:linear-gradient(90deg,#ffd875,#ff922b);
+ box-shadow:0 0 18px #ffae3344;
+}
+.hidden{display:none!important}
+#pause{
+ position:absolute;right:12px;top:100px;z-index:5;
+ width:38px;height:38px;border-radius:50%;
+ background:#0b1424dd;border:1px solid #8ca9d5;
+ color:white;font-size:17px;
+}
+@media(max-height:520px){
+ .control{width:58px;height:58px}
+ #fire{width:70px;height:70px}
+ #fire span{font-size:25px}
+ .controls{bottom:8px}
+ .brand{top:58px}
+ .panel{padding:5px 9px}
+}
+</style>
 </head>
+
 <body>
+<div id="game">
+ <canvas id="screen"></canvas>
 
-  <div id="game-container">
-    <div class="hud">
-      <div class="hud-box">HP: <span id="hp-val" class="hud-hp">100</span>%</div>
-      <div class="hud-box">SCORE: <span id="score-val" class="hud-score">0</span></div>
-    </div>
-
-    <canvas id="gameCanvas"></canvas>
-
-    <div class="mobile-controls">
-      <div class="ctrl-group">
-        <div class="btn" id="btn-left">&#8592;</div>
-        <div class="btn" id="btn-right">&#8594;</div>
-      </div>
-      <div class="btn btn-fire" id="btn-fire">&#128293;</div>
-    </div>
-
-    <div id="game-over-screen">
-      <h2>MISSION FAILED</h2>
-      <p>Final Score: <span id="final-score">0</span></p>
-      <button class="restart-btn" id="restart-btn">Play Again</button>
-    </div>
+ <div class="hud">
+  <div class="panel">
+   <small>HULL / HP</small>
+   <strong id="hpText">100%</strong>
+   <div id="hpBar"><div id="hpFill"></div></div>
   </div>
+  <div class="panel" style="text-align:right">
+   <small>MISSION SCORE</small>
+   <strong id="scoreText">0000</strong>
+  </div>
+ </div>
 
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const hpVal = document.getElementById('hp-val');
-    const scoreVal = document.getElementById('score-val');
-    const finalScore = document.getElementById('final-score');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const restartBtn = document.getElementById('restart-btn');
+ <div class="brand">MULTANI FF • AIR FORCE</div>
+ <button id="pause">Ⅱ</button>
 
-    const btnLeft = document.getElementById('btn-left');
-    const btnRight = document.getElementById('btn-right');
-    const btnFire = document.getElementById('btn-fire');
+ <div class="controls">
+  <div class="side">
+   <button class="control" id="left" aria-label="Move left">◀</button>
+   <button class="control" id="right" aria-label="Move right">▶</button>
+  </div>
+  <button class="control" id="fire"><span>🔥</span>FIRE</button>
+ </div>
 
-    function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
+ <div id="message">
+  <div class="card">
+   <h1>✈ AIR FORCE BATTLE</h1>
+   <p>MULTANI FF OFFICIAL<br>
+   <b>ELITE FIGHTER MISSION</b><br><br>
+   Dushman jets ko destroy karein.<br>
+   Left / Right se jet move karein aur FIRE dabayein.</p>
+   <button class="action" id="start">START MISSION ▶</button>
+  </div>
+ </div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+const canvas=document.getElementById("screen");
+const ctx=canvas.getContext("2d");
+const $=id=>document.getElementById(id);
+
+let W=0,H=0,DPR=1;
+let running=false,paused=false,gameOver=false;
+let score=0,hp=100,last=0,elapsed=0,spawn=0,shot=0;
+let enemies=[],bullets=[],sparks=[],clouds=[];
+const keys={left:false,right:false,fire:false};
+
+const player={x:0,y:0,w:65,h:100,speed:330,inv:0};
+
+function resize(){
+ DPR=Math.min(window.devicePixelRatio||1,1.6);
+ W=canvas.clientWidth;H=canvas.clientHeight;
+ canvas.width=Math.round(W*DPR);
+ canvas.height=Math.round(H*DPR);
+ ctx.setTransform(DPR,0,0,DPR,0,0);
+ player.x=Math.max(35,Math.min(W-35,player.x||W/2));
+ player.y=H*.72;
+ if(!clouds.length){
+  for(let i=0;i<15;i++)clouds.push({
+   x:Math.random()*W,y:Math.random()*H,
+   s:30+Math.random()*90,v:15+Math.random()*40
+  });
+ }
+}
+window.addEventListener("resize",resize);
+resize();
+
+function polygon(points,fill,stroke="#d4e6ff",line=1){
+ ctx.beginPath();
+ ctx.moveTo(points[0][0],points[0][1]);
+ for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
+ ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+ if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}
+}
+
+function jet(x,y,w,h,color,enemy=false){
+ ctx.save();ctx.translate(x,y);ctx.scale(w/70,h/100);
+ if(enemy)ctx.rotate(Math.PI);
+
+ // engine glow
+ const flame=ctx.createRadialGradient(35,90,2,35,90,22);
+ flame.addColorStop(0,"#fff6a1");
+ flame.addColorStop(.35,"#ff9c24");
+ flame.addColorStop(1,"#ff3c0900");
+ ctx.fillStyle=flame;ctx.fillRect(8,72,54,38);
+
+ // Wings
+ const metal=ctx.createLinearGradient(0,10,70,70);
+ metal.addColorStop(0,"#b5c9df");
+ metal.addColorStop(.35,color);
+ metal.addColorStop(.7,"#324e7b");
+ metal.addColorStop(1,"#101b30");
+ polygon([[31,24],[3,43],[10,57],[27,49],[32,73],
+          [38,73],[43,49],[60,57],[67,43],[39,24]],metal);
+
+ // Tail wings
+ polygon([[29,61],[15,72],[25,75],[32,69]],"#536985");
+ polygon([[41,61],[55,72],[45,75],[38,69]],"#536985");
+
+ // Main fuselage
+ polygon([[35,0],[39,20],[44,52],[40,77],[35,92],
+          [30,77],[26,52],[31,20]],"#c5d4e7","#eef5ff",1.3);
+
+ // Cockpit
+ const glass=ctx.createLinearGradient(27,25,40,56);
+ glass.addColorStop(0,"#b6f6ff");
+ glass.addColorStop(.4,"#3978b8");
+ glass.addColorStop(1,"#071528");
+ polygon([[35,20],[39,37],[36,49],[32,39]],glass,"#d5edff",.8);
+
+ // Panel details
+ ctx.strokeStyle="#263b59";ctx.lineWidth=1;
+ ctx.beginPath();ctx.moveTo(35,50);ctx.lineTo(35,81);
+ ctx.moveTo(28,53);ctx.lineTo(32,62);
+ ctx.moveTo(42,53);ctx.lineTo(38,62);ctx.stroke();
+
+ // Engines
+ for(const ex of [28,42]){
+  ctx.fillStyle="#111a2b";ctx.fillRect(ex-3,72,6,13);
+  ctx.fillStyle="#ffc747";ctx.fillRect(ex-2,84,4,9);
+ }
+ // insignia
+ ctx.fillStyle=enemy?"#ff514d":"#8bf7ff";
+ ctx.beginPath();ctx.arc(19,49,2.5,0,Math.PI*2);ctx.fill();
+ ctx.restore();
+}
+
+function background(dt){
+ const sky=ctx.createLinearGradient(0,0,0,H);
+ sky.addColorStop(0,"#7c9eaf");
+ sky.addColorStop(.35,"#23618a");
+ sky.addColorStop(1,"#061b36");
+ ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+ // Ocean and islands
+ ctx.fillStyle="#174963";
+ ctx.beginPath();ctx.moveTo(0,H*.18);
+ for(let y=0;y<=H+80;y+=80){
+  ctx.lineTo(W*.43+Math.sin(y*.009+elapsed*.08)*W*.2,y);
+ }
+ ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+
+ for(let i=0;i<5;i++){
+  const yy=((i*H/4+elapsed*20)%(H+160))-80;
+  ctx.fillStyle="#517c66";
+  ctx.beginPath();
+  ctx.ellipse(W*(.15+(i%3)*.36)+Math.sin(i*5)*20,
+   yy, W*.12,25+i%3*12,i*.8,0,Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle="#8da28a44";ctx.stroke();
+ }
+
+ // Clouds
+ clouds.forEach(c=>{
+  c.y+=c.v*dt;
+  if(c.y>H+100){c.y=-100;c.x=Math.random()*W}
+  ctx.fillStyle="#e5f2ff12";
+  ctx.beginPath();
+  ctx.ellipse(c.x,c.y,c.s,c.s*.42,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle="#ffffff0b";
+  ctx.beginPath();
+  ctx.ellipse(c.x-c.s*.25,c.y-5,c.s*.45,c.s*.28,0,0,Math.PI*2);
+  ctx.fill();
+ });
+
+ // Neon flight-lane lines
+ ctx.strokeStyle="#ff704055";ctx.lineWidth=3;
+ ctx.beginPath();ctx.moveTo(W*.31,0);ctx.lineTo(W*.31,H);
+ ctx.moveTo(W*.69,0);ctx.lineTo(W*.69,H);ctx.stroke();
+}
+
+function shoot(){
+ bullets.push({x:player.x,y:player.y-43,v:610,r:3});
+ bullets.push({x:player.x-10,y:player.y-30,v:560,r:2});
+ bullets.push({x:player.x+10,y:player.y-30,v:560,r:2});
+}
+
+function enemy(){
+ const size=44+Math.random()*15;
+ enemies.push({
+  x:30+Math.random()*(W-60),y:-65,
+  w:size,h:size*1.35,
+  v:100+Math.random()*70+Math.min(score*.08,150),
+  hp:1,phase:Math.random()*6.28
+ });
+}
+
+function explosion(x,y,big=false){
+ const count=big?34:14;
+ for(let i=0;i<count;i++){
+  const a=Math.random()*Math.PI*2;
+  const speed=40+Math.random()*(big?240:130);
+  sparks.push({
+   x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
+   life:.3+Math.random()*.65,max:.95,
+   size:2+Math.random()*5,
+   color:["#fff6a1","#ffb52f","#ff6a21","#ffffff"][i%4]
+  });
+ }
+}
+
+function update(dt){
+ elapsed+=dt;
+ background(dt);
+
+ if(running&&!paused&&!gameOver){
+  if(keys.left)player.x-=player.speed*dt;
+  if(keys.right)player.x+=player.speed*dt;
+  player.x=Math.max(30,Math.min(W-30,player.x));
+
+  shot-=dt;
+  if(keys.fire&&shot<=0){shoot();shot=.13}
+
+  spawn-=dt;
+  if(spawn<=0){
+   enemy();
+   spawn=Math.max(.32,1.05-score/4500);
+  }
+
+  bullets.forEach(b=>b.y-=b.v*dt);
+  bullets=bullets.filter(b=>b.y>-20);
+
+  enemies.forEach(e=>{
+   e.y+=e.v*dt;
+   e.x+=Math.sin(elapsed*1.7+e.phase)*22*dt;
+   if(e.y>player.y-45&&e.y<player.y+45&&
+      Math.abs(e.x-player.x)<(e.w+player.w)*.31){
+    e.hit=true;
+    if(player.inv<=0){
+     hp=Math.max(0,hp-12);
+     player.inv=.65;
+     explosion(player.x,player.y,true);
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+   }
+  });
+  player.inv=Math.max(0,player.inv-dt);
 
-    let lanes = 3;
-    let currentLane = 1;
-    let player = {
-      x: 0,
-      y: 0,
-      width: 44,
-      height: 70,
-      hp: 100,
-      speed: 12
-    };
-
-    let score = 0;
-    let isGameOver = false;
-    let bullets = [];
-    let enemies = [];
-    let particles = [];
-    let roadStripeOffset = 0;
-    let spawnTimer = 0;
-    let fireCooldown = 0;
-
-    function getLaneX(laneIndex) {
-      const laneWidth = canvas.width / lanes;
-      return laneWidth * laneIndex + laneWidth / 2;
+  enemies=enemies.filter(e=>{
+   if(e.hit){explosion(e.x,e.y);return false}
+   for(const b of bullets){
+    if(!b.used&&Math.abs(b.x-e.x)<e.w*.45&&
+       Math.abs(b.y-e.y)<e.h*.45){
+     b.used=true;score+=100;
+     explosion(e.x,e.y);return false;
     }
+   }
+   if(e.y>H+100)return false;
+   return true;
+  });
+  bullets=bullets.filter(b=>!b.used);
 
-    function initGame() {
-      player.hp = 100;
-      score = 0;
-      currentLane = 1;
-      player.x = getLaneX(currentLane);
-      player.y = canvas.height - 150;
-      bullets = [];
-      enemies = [];
-      particles = [];
-      isGameOver = false;
-      hpVal.textContent = player.hp;
-      scoreVal.textContent = score;
-      gameOverScreen.style.display = 'none';
-      requestAnimationFrame(gameLoop);
-    }
+  if(hp<=0)endGame();
+ }
 
-    function shootBullet() {
-      if (isGameOver || fireCooldown > 0) return;
-      bullets.push({
-        x: player.x - 12,
-        y: player.y - 10,
-        speed: 14,
-        radius: 4
-      });
-      bullets.push({
-        x: player.x + 12,
-        y: player.y - 10,
-        speed: 14,
-        radius: 4
-      });
-      fireCooldown = 10;
-    }
+ sparks.forEach(s=>{
+  s.x+=s.vx*dt;s.y+=s.vy*dt;
+  s.vx*=.98;s.vy*=.98;s.life-=dt;
+ });
+ sparks=sparks.filter(s=>s.life>0);
 
-    function spawnEnemy() {
-      const lane = Math.floor(Math.random() * lanes);
-      const isBarricade = Math.random() > 0.65;
-      enemies.push({
-        x: getLaneX(lane),
-        y: -60,
-        width: isBarricade ? 50 : 36,
-        height: isBarricade ? 35 : 55,
-        type: isBarricade ? 'barricade' : 'zombie',
-        hp: isBarricade ? 4 : 2,
-        speed: isBarricade ? 3 : 4 + Math.random() * 2
-      });
-    }
+ // Bullets
+ bullets.forEach(b=>{
+  ctx.shadowBlur=12;ctx.shadowColor="#ffe85c";
+  ctx.fillStyle="#fff8a0";
+  ctx.fillRect(b.x-2,b.y-12,4,17);
+  ctx.shadowBlur=0;
+ });
 
-    function createExplosion(x, y, color, count = 8) {
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 6,
-          vy: (Math.random() - 0.5) * 6,
-          radius: Math.random() * 3 + 2,
-          color: color,
-          alpha: 1
-        });
-      }
-    }
+ // Enemies and damage flashes
+ enemies.forEach(e=>{
+  jet(e.x,e.y,e.w,e.h,"#8b9fb9",true);
+ });
 
-    function update() {
-      if (isGameOver) return;
+ // Explosion particles
+ sparks.forEach(s=>{
+  ctx.globalAlpha=Math.min(1,s.life*2);
+  ctx.fillStyle=s.color;ctx.shadowBlur=9;ctx.shadowColor=s.color;
+  ctx.beginPath();ctx.arc(s.x,s.y,s.size*Math.min(1,s.life*2),0,Math.PI*2);ctx.fill();
+ });
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
 
-      const targetX = getLaneX(currentLane);
-      player.x += (targetX - player.x) * 0.2;
+ // Player jet
+ if(player.inv<=0||Math.floor(elapsed*18)%2===0){
+  jet(player.x,player.y,player.w,player.h,"#397bc8",false);
+ }
 
-      roadStripeOffset = (roadStripeOffset + 6) % 40;
+ $("hpText").textContent=hp+"%";
+ $("hpFill").style.width=hp+"%";
+ $("hpFill").style.background=hp<30?"#ff4e59":"#32ffc0";
+ $("scoreText").textContent=String(score).padStart(4,"0");
+}
 
-      if (fireCooldown > 0) fireCooldown--;
+function endGame(){
+ running=false;gameOver=true;
+ $("message").classList.remove("hidden");
+ $("message").querySelector("h1").textContent="MISSION FAILED";
+ $("message").querySelector("p").innerHTML=
+  "Aapka fighter jet destroy ho gaya.<br><b>FINAL SCORE: "+score+"</b><br>Dobara mission shuru karein!";
+ $("start").textContent="↻ RESTART MISSION";
+}
 
-      spawnTimer++;
-      if (spawnTimer > 45) {
-        spawnEnemy();
-        spawnTimer = 0;
-      }
+function reset(){
+ score=0;hp=100;elapsed=0;spawn=.5;shot=0;
+ enemies=[];bullets=[];sparks=[];
+ player.x=W/2;player.y=H*.72;player.inv=0;
+ gameOver=false;paused=false;running=true;
+ Object.keys(keys).forEach(k=>keys[k]=false);
+ $("pause").textContent="Ⅱ";
+ $("message").classList.add("hidden");
+ $("hpText").textContent="100%";
+ $("hpFill").style.width="100%";
+ $("scoreText").textContent="0000";
+ last=performance.now();
+}
 
-      for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].y -= bullets[i].speed;
-        if (bullets[i].y < -10) {
-          bullets.splice(i, 1);
-        }
-      }
+$("start").addEventListener("click",reset);
+$("pause").addEventListener("click",()=>{
+ if(!running||gameOver)return;
+ paused=!paused;
+ $("pause").textContent=paused?"▶":"Ⅱ";
+ if(paused){
+  $("message").classList.remove("hidden");
+  $("message").querySelector("h1").textContent="MISSION PAUSED";
+  $("message").querySelector("p").textContent="Aapka mission ruka hua hai.";
+  $("start").textContent="RESUME MISSION ▶";
+  $("start").onclick=()=>{
+   $("start").onclick=null;
+   $("message").classList.add("hidden");
+   paused=false;$("pause").textContent="Ⅱ";
+  };
+ }else{
+  $("message").classList.add("hidden");
+ }
+});
 
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        let e = enemies[i];
-        e.y += e.speed;
+function bindHold(id,key){
+ const el=$(id);
+ el.addEventListener("pointerdown",e=>{
+  e.preventDefault();keys[key]=true;
+  try{el.setPointerCapture(e.pointerId)}catch(_){}
+ });
+ const release=e=>{e.preventDefault();keys[key]=false};
+ el.addEventListener("pointerup",release);
+ el.addEventListener("pointercancel",release);
+ el.addEventListener("lostpointercapture",()=>keys[key]=false);
+}
+bindHold("left","left");
+bindHold("right","right");
+bindHold("fire","fire");
 
-        for (let j = bullets.length - 1; j >= 0; j--) {
-          let b = bullets[j];
-          if (
-            b.x > e.x - e.width / 2 &&
-            b.x < e.x + e.width / 2 &&
-            b.y > e.y - e.height / 2 &&
-            b.y < e.y + e.height / 2
-          ) {
-            bullets.splice(j, 1);
-            e.hp--;
-            createExplosion(b.x, b.y, '#ffaa00', 4);
+window.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft"||e.key==="a")keys.left=true;
+ if(e.key==="ArrowRight"||e.key==="d")keys.right=true;
+ if(e.code==="Space")keys.fire=true;
+});
+window.addEventListener("keyup",e=>{
+ if(e.key==="ArrowLeft"||e.key==="a")keys.left=false;
+ if(e.key==="ArrowRight"||e.key==="d")keys.right=false;
+ if(e.code==="Space")keys.fire=false;
+});
 
-            if (e.hp <= 0) {
-              createExplosion(e.x, e.y, e.type === 'zombie' ? '#44ff44' : '#ff4444', 12);
-              enemies.splice(i, 1);
-              score += e.type === 'zombie' ? 10 : 25;
-              scoreVal.textContent = score;
-              break;
-            }
-          }
-        }
-
-        if (enemies[i]) {
-          const pLeft = player.x - player.width / 2;
-          const pRight = player.x + player.width / 2;
-          const pTop = player.y - player.height / 2;
-          const pBottom = player.y + player.height / 2;
-
-          const eLeft = e.x - e.width / 2;
-          const eRight = e.x + e.width / 2;
-          const eTop = e.y - e.height / 2;
-          const eBottom = e.y + e.height / 2;
-
-          if (pRight > eLeft && pLeft < eRight && pBottom > eTop && pTop < eBottom) {
-            player.hp -= e.type === 'zombie' ? 20 : 35;
-            hpVal.textContent = Math.max(0, player.hp);
-            createExplosion(e.x, e.y, '#ff0000', 15);
-            enemies.splice(i, 1);
-
-            if (player.hp <= 0) {
-              isGameOver = true;
-              finalScore.textContent = score;
-              gameOverScreen.style.display = 'flex';
-            }
-          } else if (e.y > canvas.height + 60) {
-            enemies.splice(i, 1);
-          }
-        }
-      }
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.04;
-        if (p.alpha <= 0) {
-          particles.splice(i, 1);
-        }
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#1c1c1c';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.strokeStyle = '#444';
-      ctx.lineWidth = 4;
-      ctx.setLineDash([20, 20]);
-      ctx.lineDashOffset = -roadStripeOffset;
-
-      const laneW = canvas.width / lanes;
-      for (let i = 1; i < lanes; i++) {
-        ctx.beginPath();
-        ctx.moveTo(laneW * i, 0);
-        ctx.lineTo(laneW * i, canvas.height);
-        ctx.stroke();
-      }
-      ctx.setLineDash([]);
-
-      ctx.fillStyle = '#ffcc00';
-      for (let b of bullets) {
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      for (let e of enemies) {
-        ctx.save();
-        ctx.translate(e.x, e.y);
-        if (e.type === 'zombie') {
-          ctx.fillStyle = '#2e7d32';
-          ctx.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
-          ctx.fillStyle = '#c62828';
-          ctx.fillRect(-8, -e.height / 2 + 6, 4, 4);
-          ctx.fillRect(4, -e.height / 2 + 6, 4, 4);
-        } else {
-          ctx.fillStyle = '#d84315';
-          ctx.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(-e.width / 2, -4, e.width, 8);
-        }
-        ctx.restore();
-      }
-
-      ctx.save();
-      ctx.translate(player.x, player.y);
-      ctx.fillStyle = '#1565c0';
-      ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
-      ctx.fillStyle = '#90caf9';
-      ctx.fillRect(-player.width / 2 + 4, -player.height / 2 + 12, player.width - 8, 16);
-      ctx.fillStyle = '#ffeb3b';
-      ctx.fillRect(-player.width / 2 + 2, -player.height / 2, 8, 4);
-      ctx.fillRect(player.width / 2 - 10, -player.height / 2, 8, 4);
-      ctx.restore();
-
-      for (let p of particles) {
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    function gameLoop() {
-      update();
-      draw();
-      if (!isGameOver) {
-        requestAnimationFrame(gameLoop);
-      }
-    }
-
-    function moveLeft() {
-      if (currentLane > 0) currentLane--;
-    }
-    function moveRight() {
-      if (currentLane < lanes - 1) currentLane++;
-    }
-
-    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft(); });
-    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); moveRight(); });
-    btnFire.addEventListener('touchstart', (e) => { e.preventDefault(); shootBullet(); });
-
-    btnLeft.addEventListener('click', moveLeft);
-    btnRight.addEventListener('click', moveRight);
-    btnFire.addEventListener('click', shootBullet);
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
-      if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
-      if (e.key === ' ' || e.key === 'ArrowUp') shootBullet();
-    });
-
-    restartBtn.addEventListener('click', initGame);
-
-    initGame();
-  </script>
+function loop(now){
+ const dt=Math.min((now-last)/1000||0,.035);
+ last=now;
+ if(!paused)update(dt);
+ else background(dt);
+ requestAnimationFrame(loop);
+}
+requestAnimationFrame(t=>{
+ last=t;
+ requestAnimationFrame(loop);
+});
+})();
+</script>
 </body>
 </html>
