@@ -1,632 +1,1925 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>MULTANI FF • Player Chat</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#070910;--panel:#101521;--panel2:#151c2a;--text:#f3f6ff;--muted:#94a0b5;--orange:#ff4b27;--cyan:#20e7f4;--border:#293244;--size:14px}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#18202e 0,transparent 40%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:var(--size);min-height:100dvh}.app{max-width:520px;margin:auto;height:100dvh;display:flex;flex-direction:column;background:rgba(7,9,16,.94);border-left:1px solid #ffffff08;border-right:1px solid #ffffff08}.top{padding:14px 15px 12px;position:relative;background:linear-gradient(120deg,#101521,#0a0d16);border-bottom:1px solid var(--border);box-shadow:0 5px 28px #0008;overflow:hidden}.top:before{content:"";position:absolute;left:-40%;top:0;width:35%;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--orange),transparent);animation:scan 3s linear infinite}@keyframes scan{to{left:120%}}.brandrow{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#111d2a;border:1px solid var(--cyan);box-shadow:0 0 10px #20e7f455,0 0 18px #ff4b2730;font-size:21px}.brand{flex:1;min-width:0}.brand h1{font-family:Rajdhani,Inter,sans-serif;font-size:21px;letter-spacing:1px;line-height:1.05;margin:0;font-weight:700}.brand h1 span{color:var(--cyan);text-shadow:0 0 12px #20e7f477}.sub{font-size:11px;color:var(--muted);margin-top:5px}.online{white-space:nowrap;font-size:11px;color:#9af9c0;border:1px solid #2c7650;background:#10241d;padding:7px 9px;border-radius:20px}
-
-/* Chat Rules Accordion */
-.rule-card{margin-top:12px;border-radius:12px;border:1px solid #ff4b2755;background:linear-gradient(90deg,#ff4b2710,#20e7f40c);padding:10px 12px;font-size:12px;color:#c8d0de}
-.rule-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
-.rule-header strong{color:var(--orange);letter-spacing:0.5px}
-.rule-arrow{font-size:13px;color:var(--cyan);transition:transform 0.3s ease;display:inline-block}
-.rule-card.expanded .rule-arrow{transform:rotate(180deg)}
-.rule-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease-out;font-size:11px;line-height:1.55}
-.rule-card.expanded .rule-body{max-height:360px;overflow-y:auto;margin-top:10px;padding-top:8px;border-top:1px dashed #ffffff20}
-.rule-body ol{margin:0;padding-left:18px}
-.rule-body li{margin-bottom:6px}
-
-.toolbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:#0c1019}.toolbar .room{font-weight:800;letter-spacing:.3px;flex:1}.iconbtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:10px;width:38px;height:36px;font-size:17px;cursor:pointer}.iconbtn:active,.send:active{transform:scale(.96)}.menuwrap{position:relative}.dropdown{display:none;position:absolute;right:0;top:43px;width:230px;background:#111724;border:1px solid #354055;border-radius:14px;padding:7px;z-index:10;box-shadow:0 15px 40px #000c}.dropdown.show{display:block}.dropdown button{width:100%;border:0;background:transparent;color:var(--text);padding:11px 10px;text-align:left;border-radius:9px;font-size:12px;cursor:pointer}.dropdown button:hover{background:#ffffff0d}
-
-.messages{flex:1;overflow-y:auto;padding:15px 12px 18px;scroll-behavior:smooth;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}.day{text-align:center;color:var(--muted);font-size:10px;margin:0 auto 15px;background:#111723cc;border:1px solid var(--border);padding:6px 10px;border-radius:20px;width:max-content;backdrop-filter:blur(4px)}.empty{text-align:center;color:var(--muted);padding:45px 20px}.empty .big{font-size:38px;margin-bottom:10px}
-
-/* Transparent Chat Bubbles with Border Only */
-.msgrow{display:flex;gap:8px;margin:8px 0;align-items:flex-end;width:100%}
-.msgrow.mine{flex-direction:row-reverse}
-.avatar{width:30px;height:30px;flex:0 0 30px;border-radius:50%;object-fit:cover;background:#202b3b;border:1px solid #ffffff24;display:grid;place-items:center;font-size:12px;color:var(--cyan);overflow:hidden}
-.bubblewrap{max-width:78%;min-width:0;display:flex;flex-direction:column}
-.msgrow.mine .bubblewrap{align-items:flex-end}
-.meta{font-size:10.5px;color:var(--muted);margin:0 4px 3px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;text-shadow:0 1px 3px #000}
-.meta .name{color:var(--cyan);font-weight:700}
-.mine .meta{justify-content:flex-end}
-.uid{color:#9fb0cc;font-size:9.5px}
-
-.bubble{display:inline-block;width:fit-content;max-width:100%;background:transparent!important;border:1.5px solid rgba(255,255,255,0.28);border-radius:14px 14px 14px 2px;padding:6px 11px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap;color:#ffffff;text-shadow:0 1px 3px rgba(0,0,0,0.85);backdrop-filter:blur(2px)}
-.mine .bubble{border-color:var(--cyan);border-radius:14px 14px 2px 14px;box-shadow:0 0 8px rgba(32,231,244,0.2)}
-
-/* Admin Transparent VIP Bubble with Gold Border Only */
-.admin-badge{background:linear-gradient(135deg,#ffd700,#ff8800);color:#0a0c10;font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;box-shadow:0 0 8px rgba(255,215,0,0.6);margin-left:4px;display:inline-block}
-.msgrow.admin .name{color:#ffd700!important;text-shadow:0 0 8px rgba(255,215,0,0.7)}
-.msgrow.admin .bubble{background:transparent!important;border:1.5px solid #ffd700!important;box-shadow:0 0 10px rgba(255,215,0,0.35)!important;color:#fffdf5!important}
-.msgrow.admin.mine .bubble{border-color:#ffd700!important}
-
-.bubble.sticker{background:transparent!important;border:0!important;padding:2px!important;box-shadow:none!important;backdrop-filter:none!important}
-.bubble.sticker img{max-width:125px;max-height:125px;display:block;border-radius:10px}
-.replyquote{border-left:3px solid var(--orange);background:rgba(0,0,0,0.45);border-radius:5px;padding:4px 7px;margin-bottom:5px;font-size:10.5px;color:#d8e2f0}
-.time{font-size:9px;color:#cbd5e1;margin-top:3px;padding:0 2px;text-shadow:0 1px 3px #000}
-.mine .time{text-align:right}
-
-.composerarea{border-top:1px solid var(--border);padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:#0c1019}.replybar{display:none;background:#151c2a;border-left:3px solid var(--orange);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#d4dbea}.replybar.show{display:flex;justify-content:space-between;align-items:center;gap:8px}.replybar button{border:0;background:transparent;color:var(--text);font-size:17px}.composer{display:flex;align-items:flex-end;gap:7px}.inputwrap{flex:1;display:flex;align-items:flex-end;gap:7px;border:1px solid #344055;background:#131a27;border-radius:17px;padding:7px 9px;min-width:0}.inputwrap textarea{flex:1;min-width:0;resize:none;max-height:100px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:var(--size);line-height:1.4;padding:4px 0}.smallbtn{background:transparent;border:0;color:#c7d2e4;font-size:21px;padding:2px;cursor:pointer}.send{width:43px;height:43px;border:0;border-radius:14px;color:#061015;background:linear-gradient(135deg,var(--cyan),#71f6d2);font-size:19px;font-weight:900;box-shadow:0 0 16px #20e7f42a;cursor:pointer}.send:disabled{opacity:.4}.hint{font-size:10px;color:#657187;text-align:center;margin-top:7px}.overlay{display:none;position:fixed;inset:0;background:#0009;z-index:30;align-items:flex-end;justify-content:center}.overlay.show{display:flex}.sheet{width:min(520px,100%);max-height:80dvh;overflow:auto;background:#111724;border:1px solid #344055;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -15px 45px #0008}.sheet h2{margin:0 0 14px;font-size:17px}.sheet button.opt{display:block;width:100%;padding:12px;border:1px solid #293548;background:#151d2b;color:var(--text);border-radius:11px;text-align:left;margin:7px 0;font-size:13px}.sheet button.danger{border-color:#8d342d;color:#ff9587}.sheet .close{float:right;background:transparent;border:0;color:var(--muted);font-size:22px}.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.themes button{height:65px;border-radius:12px;border:2px solid transparent;color:white;font-weight:700}.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#182333;border:1px solid #34445a;padding:10px 14px;border-radius:12px;font-size:12px;z-index:50;box-shadow:0 5px 25px #0008;display:none;max-width:90%;text-align:center}.toast.show{display:block}
-
-/* Sticker Grid Sheet */
-.stickergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:6px 0}
-.stickergrid button{background:#151d2c;border:1px solid #2d3a50;border-radius:12px;padding:8px;display:grid;place-items:center;cursor:pointer;aspect-ratio:1;transition:transform 0.15s ease}
-.stickergrid button:active{transform:scale(0.92)}
-.stickergrid button img{width:100%;height:100%;object-fit:contain}
-.muted{color:var(--muted);font-size:11px;line-height:1.5}.signin{margin:auto;text-align:center;padding:28px;max-width:340px}.signin h2{font-family:Rajdhani;font-size:25px}.signin button{background:var(--orange);border:0;border-radius:10px;padding:12px 18px;color:#fff;font-weight:700}
-body.theme-purple{--orange:#c18aff;--cyan:#72a7ff}body.theme-green{--orange:#b8f56b;--cyan:#42f5b3}body.theme-rose{--orange:#ff78a8;--cyan:#ffb4d0}body.theme-light{--bg:#e8edf5;--panel:#fff;--panel2:#e9eef6;--text:#182132;--muted:#68758a;--border:#cbd4e2;background:#e8edf5}.theme-light .app{background:#f7f9fc}.theme-light .top,.theme-light .toolbar,.theme-light .composerarea{background:#f0f4fa}.theme-light .inputwrap,.theme-light .dropdown,.theme-light .sheet{background:#fff}.theme-light .dropdown button{color:#182132}.theme-light .bubble{color:#182132;text-shadow:none;border-color:#71829e}
-</style></head>
-<body><main class="app" id="app">
-<header class="top">
-  <div class="brandrow">
-    <div class="logo">💬</div>
-    <div class="brand">
-      <h1>MULTANI FF <span>CHAT</span></h1>
-      <div class="sub">OFFICIAL TOURNAMENT • PLAYER COMMUNITY</div>
-    </div>
-    <div class="online" id="onlineCount">🟢 Connecting…</div>
-  </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MULTANI FF LUDO CHAMPIONSHIP</title>
   
-  <!-- Accordion Rules with Down Arrow -->
-  <div class="rule-card" id="rulesBox">
-    <div class="rule-header" id="rulesToggle">
-      <span><strong>CHAT RULES</strong> • Respect & Security Guide</span>
-      <span class="rule-arrow" id="ruleArrow">▼</span>
-    </div>
-    <div class="rule-body" id="rulesContent">
-      <ol>
-        <li><strong>Sabhi Players Ki Izzat Karein:</strong> Badtameezi, gaali-galoch ya toxic behaviour par foran ban milega.</li>
-        <li><strong>Room ID & Pass Kahi Bhi Share Karna Sakht Mana Hai:</strong> Custom room ki details kisi se bhi share na karein. Leak karne par tournament se permanent ban kiya jayega.</li>
-        <li><strong>Time Par Room Join Karein:</strong> ID aur Password aate hi waqt par apni slot join karein. Ghalat slot me baithne par kick kar diya jayega.</li>
-        <li><strong>Spamming Par Pabandi:</strong> Ek hi message baar baar bhejna ya lambe copy-paste karna mana hai.</li>
-        <li><strong>Private Details Safe Rakhein:</strong> Apna phone number, password, OTP ya koi private info chat me na bhejein.</li>
-        <li><strong>No Scamming & Fraud:</strong> ID buy/sell, fake diamonds ya fake giveaways par zero tolerance hai.</li>
-        <li><strong>No Promotion / Links:</strong> Kisi WhatsApp group, doosre tournament ya YouTube link ki ijazat nahi hai.</li>
-        <li><strong>No Third-Party Tools / Hacks:</strong> Kisi bhi illegal tool ya script ka use permanent ban karega.</li>
-        <li><strong>Siyasi / Mazhabi Behas Band:</strong> Chat sirf gaming ke liye hai; doosri behas se parhez karein.</li>
-        <li><strong>Admin Ka Faisla Final:</strong> Room rematch ya points issue par official admins ka faisla aakhri hoga.</li>
-        <li><strong>12-Hour Message Life:</strong> Chat ka data fresh rakhne ke liye har message 12 ghante me gayab ho jata hai.</li>
-        <li><strong>Rules Violation:</strong> Violation par chat block aur team tournament se disqualify ho sakti hai.</li>
-      </ol>
-    </div>
-  </div>
-</header>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<div class="toolbar">
-  <button class="iconbtn" id="backBtn" title="Back">‹</button>
-  <div class="room">🌐 Public Chat Room</div>
-  <button class="iconbtn" id="stickerTop" title="Stickers">🏷️</button>
-  <div class="menuwrap">
-    <button class="iconbtn" id="menuBtn" title="Chat settings">⋮</button>
-    <div class="dropdown" id="dropdown">
-      <button data-action="themes">🎨 Change Chat Theme</button>
-      <button data-action="background">🖼️ Change Background</button>
-      <button data-action="style">✍️ Message Style</button>
-      <button data-action="notify">🔔 Notification Settings</button>
-      <button data-action="sound">🔊 Chat Sound: On/Off</button>
-      <button data-action="size">🔠 Chat Text Size</button>
-      <button data-action="clear">🧹 Clear Chat for Me</button>
-      <button data-action="info">ℹ️ Chat Information</button>
-    </div>
-  </div>
-</div>
+  <script>
+    const coinSteps = [0, 25, 50, 100, 250, 500, 1000];
+    let selectedCoinIndex = 1; // Default 25
+    let currentRoomCode = "000000";
+    let activeRoomData = null;
+    let isSingleMode = false;
+    let realtimeChannel = null;
+    let userWalletBalance = 0;
+    let currentUserProfile = null;
+    let isWalletVerified = false;
 
-<div class="messages" id="messages"><div class="empty"><div class="big">💬</div>Loading chat…</div></div>
-
-<div class="composerarea">
-  <div class="replybar" id="replybar"><span id="replyText">Replying to message</span><button id="cancelReply">×</button></div>
-  <div class="composer">
-    <!-- Niche Corner: Sticker Button -->
-    <button class="smallbtn" id="stickerBtn" title="Stickers">🏷️</button>
-    
-    <!-- Input box k andar Emoji Button -->
-    <div class="inputwrap">
-      <button class="smallbtn" id="emojiBtn" title="Emoji">😊</button>
-      <textarea id="messageInput" rows="1" maxlength="1000" placeholder="Message all players…"></textarea>
-    </div>
-    <button class="send" id="sendBtn" title="Send">➤</button>
-  </div>
-  <div class="hint">Enter to send • Shift + Enter for a new line</div>
-</div>
-</main>
-
-<div class="overlay" id="overlay"><section class="sheet" id="sheet"></section></div>
-<div class="toast" id="toast"></div>
-
-<!-- Hidden File Input for Gallery Background -->
-<input type="file" id="bgFileInput" accept="image/*" style="display:none">
-
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const SUPABASE_URL='https://yzirjidgdxhljbhhjfqp.supabase.co';
-const SUPABASE_KEY='sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
-const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
-
-const ADMIN_UID='3239454397';
-const SEND_SOUND_URL='https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/media/sounds/iPhone_Text_Message_Sent_Sound_Effect(256k).mp3';
-
-// GitHub Repository se original stickers (with correct encodeURI)
-const STICKER_NAMES=[
-  '200w.webp', '200w (1).webp', '200w (2).webp', '200w (3).webp',
-  '200w (4).webp', '200w (5).webp', '200w (6).webp', '200w (7).webp',
-  '200w (8).webp', '200w (9).webp', '200w (10).webp', '200w (11).webp',
-  '200w (12).webp', '200w (13).webp', '200w (14).webp', '200w (15).webp',
-  'giphy.gif'
-];
-const GITHUB_STICKERS=STICKER_NAMES.map(file=>
-  `https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/stickers/${encodeURIComponent(file)}`
-);
-
-const $=id=>document.getElementById(id); 
-let me=null, myProfile={}, messages=[], hiddenIds=new Set(), replyTo=null, channel=null, presenceChannel=null, soundOn=true, notificationsOn=true, backgroundChoice='default', customBgData='', messageStyle='normal';
-
-const sendAudio=new Audio(SEND_SOUND_URL);
-sendAudio.preload='auto';
-
-function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
-function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function prefsKey(){return 'multani-chat-prefs-'+(me?.id||'guest')}
-
-function loadPrefs(){
-  try{
-    const p=JSON.parse(localStorage.getItem(prefsKey())||'{}');
-    if(p.theme)document.body.classList.add('theme-'+p.theme);
-    if(p.size)document.documentElement.style.setProperty('--size',p.size+'px');
-    soundOn=p.sound!==false;
-    notificationsOn=p.notifications!==false;
-    backgroundChoice=p.background||'default';
-    customBgData=localStorage.getItem('multani-custom-bg')||'';
-    messageStyle=p.style||'normal';
-    applyBackground();
-  }catch{}
-}
-
-function savePrefs(){
-  const classes=['purple','green','rose','light'];
-  const theme=classes.find(x=>document.body.classList.contains('theme-'+x))||'default';
-  localStorage.setItem(prefsKey(),JSON.stringify({theme,size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--size'))||14,sound:soundOn,notifications:notificationsOn,background:backgroundChoice,style:messageStyle}));
-}
-
-function applyBackground(){
-  const box=$('messages');
-  if(backgroundChoice==='custom'&&customBgData){
-    // Full clear without dark mask
-    box.style.background=`url(${customBgData})`;
-    return;
-  }
-  const bgs={
-    default:'',
-    stars:'radial-gradient(circle at 20% 20%,#20314a 0 1px,transparent 2px),radial-gradient(circle at 80% 50%,#20314a 0 1px,transparent 2px)',
-    ocean:'linear-gradient(145deg,#081c2b,#102e3d)',
-    sunset:'linear-gradient(145deg,#2b1024,#2c1c12)'
-  };
-  box.style.background=bgs[backgroundChoice]||'';
-}
-
-function playSendSound(){
-  if(!soundOn)return;
-  try{
-    sendAudio.currentTime=1.50;
-    sendAudio.play().catch(()=>{});
-  }catch{}
-}
-
-function avatarHtml(p,name){
-  if(p?.avatar_url)return `<img class="avatar" src="${escapeHtml(p.avatar_url)}" alt="" onerror="this.outerHTML='<div class=avatar>👤</div>'">`;
-  return `<div class="avatar">${escapeHtml((name||'P').trim().slice(0,1).toUpperCase())}</div>`;
-}
-
-function profileName(p,id){return p?.username||p?.full_name||p?.free_fire_name||('Player '+String(id||'').slice(0,5))}
-
-async function fetchProfiles(ids){
-  const map={};if(!ids.length)return map;
-  try{
-    const {data,error}=await supabase.from('profiles').select('id,username,full_name,avatar_url,free_fire_uid,free_fire_name').in('id',[...new Set(ids)]);
-    if(error)throw error;
-    (data||[]).forEach(p=>map[p.id]=p);
-  }catch(e){console.warn('Profile lookup:',e.message)}
-  return map;
-}
-
-async function loadHidden(){
-  hiddenIds=new Set();
-  try{
-    const {data,error}=await supabase.from('chat_hidden_messages').select('message_id').eq('user_id',me.id);
-    if(error)throw error;
-    (data||[]).forEach(x=>hiddenIds.add(String(x.message_id)));
-  }catch(e){console.warn('Hidden messages:',e.message)}
-}
-
-async function loadMessages(){
-  const box=$('messages');
-  try{
-    await loadHidden();
-    const {data,error}=await supabase.from('chat_messages').select('id,user_id,message,created_at,message_type,reply_to_id,sticker_key').order('created_at',{ascending:true}).limit(250);
-    if(error)throw error;
-    messages=(data||[]).filter(m=>!hiddenIds.has(String(m.id)));
-    const profiles=await fetchProfiles(messages.map(m=>m.user_id));
-    messages.forEach(m=>m.profile=profiles[m.user_id]||{});
-    renderMessages();
-  }catch(e){
-    box.innerHTML=`<div class="empty"><div class="big">⚠️</div><b>Chat could not load</b><p>${escapeHtml(e.message)}</p><button class="iconbtn" id="retryBtn">↻ Retry</button></div>`;
-    $('retryBtn')?.addEventListener('click',loadMessages);
-  }
-}
-
-function fmtTime(t){return new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
-
-function renderMessages(){
-  const box=$('messages');
-  if(!messages.length){
-    box.innerHTML='<div class="empty"><div class="big">💬</div><b>Welcome to the room!</b><p>Start chatting respectfully with tournament players.</p></div>';
-    return;
-  }
-  const byId=Object.fromEntries(messages.map(m=>[String(m.id),m]));
-  box.innerHTML='<div class="day">PUBLIC CHAT • MESSAGES LAST 12 HOURS</div>'+messages.map(m=>{
-    const mine=m.user_id===me.id;
-    const name=profileName(m.profile,m.user_id);
-    const ffUid=m.profile?.free_fire_uid||'';
-    const isAdmin=String(ffUid).trim()===ADMIN_UID;
-    const uidHtml=ffUid?` • UID ${escapeHtml(ffUid)}`:'';
-    const adminTag=isAdmin?'<span class="admin-badge">👑 VIP ADMIN</span>':'';
-    const replied=m.reply_to_id?byId[String(m.reply_to_id)]:null;
-    const quote=replied?`<div class="replyquote"><b>${escapeHtml(profileName(replied.profile,replied.user_id))}</b><br>${replied.message_type==='sticker'?'[Sticker]':escapeHtml(replied.message||'')}</div>`:'';
-    
-    let body='';
-    if(m.message_type==='sticker'){
-      if(m.message.startsWith('http'))body=`<img src="${escapeHtml(m.message)}" alt="sticker" onerror="this.outerHTML='👾'">`;
-      else body=escapeHtml(m.message);
-    }else{
-      body=escapeHtml(m.message||'');
-    }
-
-    return `<div class="msgrow ${mine?'mine':''} ${isAdmin?'admin':''}" data-id="${m.id}">
-      ${avatarHtml(m.profile,name)}
-      <div class="bubblewrap">
-        <div class="meta">
-          <span class="name">${escapeHtml(name)}${mine?' (You)':''}${adminTag}</span>
-          <span class="uid">${uidHtml}</span>
-        </div>
-        <div class="bubble ${m.message_type==='sticker'?'sticker':''}">${quote}${body}</div>
-        <div class="time">${fmtTime(m.created_at)} ${mine?'✓':''}</div>
-      </div>
-    </div>`;
-  }).join('');
-  box.scrollTop=box.scrollHeight;
-
-  box.querySelectorAll('.msgrow').forEach(row=>{
-    let timer;
-    const start=()=>{timer=setTimeout(()=>openMessageActions(row.dataset.id),550)};
-    const stop=()=>clearTimeout(timer);
-    row.addEventListener('touchstart',start,{passive:true});
-    row.addEventListener('touchend',stop);
-    row.addEventListener('touchmove',stop);
-    row.addEventListener('contextmenu',e=>{e.preventDefault();openMessageActions(row.dataset.id)});
-  });
-}
-
-async function sendMessage(text,type='text'){
-  text=text.trim();
-  if(!text||!me)return;
-  if(text.length>1000){toast('Message is too long');return}
-  $('sendBtn').disabled=true;
-  try{
-    const payload={user_id:me.id,message:text,message_type:type};
-    if(replyTo)payload.reply_to_id=replyTo.id;
-    const {error}=await supabase.from('chat_messages').insert(payload);
-    if(error)throw error;
-    $('messageInput').value='';
-    autoSize();
-    cancelReply();
-    playSendSound();
-    await loadMessages();
-  }catch(e){
-    toast('Send failed: '+e.message);
-  }finally{
-    $('sendBtn').disabled=false;
-  }
-}
-
-function cancelReply(){replyTo=null;$('replybar').classList.remove('show')}
-function setReply(m){
-  replyTo=m;
-  $('replyText').textContent='Replying to '+profileName(m.profile,m.user_id)+': '+(m.message_type==='sticker'?'[Sticker]':(m.message||'')).slice(0,65);
-  $('replybar').classList.add('show');
-  $('messageInput').focus();
-  $('overlay').classList.remove('show');
-}
-
-function openSheet(title,body){
-  $('sheet').innerHTML=`<button class="close" id="sheetClose">×</button><h2>${title}</h2>${body}`;
-  $('overlay').classList.add('show');
-  $('sheetClose').onclick=()=>$('overlay').classList.remove('show');
-}
-
-function openMessageActions(id){
-  const m=messages.find(x=>String(x.id)===String(id));
-  if(!m)return;
-  const mine=m.user_id===me.id;
-  openSheet('Message options',`
-    <button class="opt" id="actReply">↩️ Reply</button>
-    <button class="opt" id="actCopy">📋 Copy message</button>
-    ${mine?'<button class="opt danger" id="actEveryone">🗑️ Delete for Everyone</button>':''}
-    <button class="opt" id="actMe">🙈 Delete for Me</button>
-  `);
-  $('actReply').onclick=()=>setReply(m);
-  $('actCopy').onclick=async()=>{
-    try{await navigator.clipboard.writeText(m.message||'');toast('Message copied')}catch{toast(m.message||'')}
-    $('overlay').classList.remove('show');
-  };
-  $('actEveryone')?.addEventListener('click',async()=>{
-    if(!confirm('Delete this message for everyone?'))return;
-    const {error}=await supabase.from('chat_messages').delete().eq('id',m.id).eq('user_id',me.id);
-    if(error)toast('Delete failed: '+error.message);
-    else{toast('Deleted for everyone');messages=messages.filter(x=>x.id!==m.id);renderMessages()}
-    $('overlay').classList.remove('show');
-  });
-  $('actMe').onclick=async()=>{
-    try{
-      const {error}=await supabase.from('chat_hidden_messages').insert({user_id:me.id,message_id:m.id});
-      if(error&&error.code!=='23505')throw error;
-      hiddenIds.add(String(m.id));
-      messages=messages.filter(x=>String(x.id)!==String(m.id));
-      renderMessages();
-      toast('Hidden from your chat');
-    }catch(e){toast('Could not hide: '+e.message)}
-    $('overlay').classList.remove('show');
-  };
-}
-
-function showStickers(){
-  openSheet('Tournament Stickers',`
-    <div class="stickergrid">
-      ${GITHUB_STICKERS.map(url=>`<button data-img="${url}"><img src="${url}" alt="sticker" loading="lazy" onerror="this.outerHTML='👾'"></button>`).join('')}
-    </div>
-  `);
-  $('sheet').querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{
-    sendMessage(b.dataset.img,'sticker');
-    $('overlay').classList.remove('show');
-  });
-}
-
-function showThemes(){
-  openSheet('Change Chat Theme',`
-    <p class="muted">Theme is saved on this device.</p>
-    <div class="themes">
-      <button data-theme="default" style="background:linear-gradient(135deg,#101521,#ff4b27)">Neon</button>
-      <button data-theme="purple" style="background:linear-gradient(135deg,#281b3e,#72a7ff)">Purple</button>
-      <button data-theme="green" style="background:linear-gradient(135deg,#16372e,#42f5b3)">Green</button>
-      <button data-theme="rose" style="background:linear-gradient(135deg,#3b2130,#ff78a8)">Rose</button>
-      <button data-theme="light" style="background:linear-gradient(135deg,#fff,#aab9d2);color:#172033">Light</button>
-    </div>
-  `);
-  $('sheet').querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{
-    document.body.classList.remove('theme-purple','theme-green','theme-rose','theme-light');
-    if(b.dataset.theme!=='default')document.body.classList.add('theme-'+b.dataset.theme);
-    savePrefs();
-    $('overlay').classList.remove('show');
-  });
-}
-
-function handleMenu(action){
-  $('dropdown').classList.remove('show');
-  if(action==='themes'){showThemes();return}
-  if(action==='background'){
-    openSheet('Change Background',`
-      <button class="opt" id="btnUploadGallery">📁 Upload from Gallery / Photos</button>
-      ${customBgData?'<button class="opt danger" id="btnRemoveCustomBg">🗑️ Remove Gallery Wallpaper</button>':''}
-      <hr style="border:0;border-top:1px solid var(--border);margin:10px 0">
-      <button class="opt" data-bg="default">🌑 Dark Neon (Default)</button>
-      <button class="opt" data-bg="stars">✨ Stars Night</button>
-      <button class="opt" data-bg="ocean">🌊 Deep Ocean</button>
-      <button class="opt" data-bg="sunset">🌇 Sunset Glow</button>
-    `);
-    $('btnUploadGallery').onclick=()=>{$('bgFileInput').click();$('overlay').classList.remove('show')};
-    $('btnRemoveCustomBg')?.addEventListener('click',()=>{
-      customBgData='';
-      localStorage.removeItem('multani-custom-bg');
-      backgroundChoice='default';
-      applyBackground();
-      savePrefs();
-      toast('Wallpaper removed');
-      $('overlay').classList.remove('show');
-    });
-    $('sheet').querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{
-      backgroundChoice=b.dataset.bg;
-      applyBackground();
-      savePrefs();
-      $('overlay').classList.remove('show');
-    });
-    return;
-  }
-  if(action==='style'){
-    openSheet('Message Style',`
-      <button class="opt" data-style="normal">Normal bubbles</button>
-      <button class="opt" data-style="compact">Compact bubbles</button>
-      <button class="opt" data-style="soft">Soft rounded bubbles</button>
-    `);
-    $('sheet').querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{
-      messageStyle=b.dataset.style;
-      document.querySelectorAll('.bubble').forEach(x=>{
-        x.style.padding=messageStyle==='compact'?'4px 8px':messageStyle==='soft'?'10px 14px':'';
-        x.style.borderRadius=messageStyle==='soft'?'20px':'';
-      });
-      savePrefs();
-      $('overlay').classList.remove('show');
-    });
-    return;
-  }
-  if(action==='notify'){
-    notificationsOn=!notificationsOn;
-    savePrefs();
-    toast('Notifications '+(notificationsOn?'enabled':'disabled'));
-    if(notificationsOn&&'Notification'in window&&Notification.permission==='default')Notification.requestPermission();
-    return;
-  }
-  if(action==='sound'){
-    soundOn=!soundOn;
-    savePrefs();
-    toast('Sound '+(soundOn?'on':'off'));
-    if(soundOn)playSendSound();
-    return;
-  }
-  if(action==='size'){
-    openSheet('Chat Text Size',`
-      <button class="opt" data-size="12">Small (12px)</button>
-      <button class="opt" data-size="14">Medium (14px)</button>
-      <button class="opt" data-size="16">Large (16px)</button>
-      <button class="opt" data-size="18">Extra large (18px)</button>
-    `);
-    $('sheet').querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{
-      document.documentElement.style.setProperty('--size',b.dataset.size+'px');
-      savePrefs();
-      $('overlay').classList.remove('show');
-    });
-    return;
-  }
-  if(action==='clear'){
-    if(!confirm('Hide all current messages from your view?'))return;
-    (async()=>{
-      try{
-        const ids=messages.map(m=>m.id);
-        if(ids.length){
-          const rows=ids.map(message_id=>({user_id:me.id,message_id}));
-          const {error}=await supabase.from('chat_hidden_messages').upsert(rows,{onConflict:'user_id,message_id',ignoreDuplicates:true});
-          if(error)throw error;
+    // Remove Red Exit Button from Parent DOM Safely
+    function removeParentExitButton() {
+      try {
+        if (window.parent && window.parent !== window) {
+          const doc = window.parent.document;
+          if (doc) {
+            const elements = doc.querySelectorAll('button, a, div, span');
+            elements.forEach(el => {
+              if (el && el.innerText && el.innerText.trim().toUpperCase() === 'EXIT') {
+                el.style.display = 'none';
+              }
+            });
+          }
         }
-        messages=[];
-        renderMessages();
-        toast('Chat cleared for you');
-      }catch(e){toast('Clear failed: '+e.message)}
-    })();
-    return;
-  }
-  if(action==='info'){
-    openSheet('Chat Information',`
-      <p class="muted">MULTANI FF OFFICIAL TOURNAMENT Chat Room</p>
-      <p class="muted">
-        • Messages delete automatically after 12 hours.<br>
-        • Room ID/Password leaks are strictly prohibited.<br>
-        • UID ${ADMIN_UID} is verified Admin.
-      </p>
-    `);
-  }
-}
-
-// Background file picker from gallery
-$('bgFileInput').addEventListener('change',function(){
-  const file=this.files[0];
-  if(!file)return;
-  if(file.size>3.5*1024*1024){
-    toast('Image too large (Select under 3.5MB)');
-    return;
-  }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    customBgData=e.target.result;
-    try{
-      localStorage.setItem('multani-custom-bg',customBgData);
-      backgroundChoice='custom';
-      applyBackground();
-      savePrefs();
-      toast('Gallery wallpaper applied!');
-    }catch(err){
-      toast('Storage full! Image too high resolution.');
+      } catch(e) {}
     }
-  };
-  reader.readAsDataURL(file);
-});
 
-// Rules Accordion Toggle
-$('rulesToggle').onclick=()=>{
-  const card=$('rulesBox');
-  card.classList.toggle('expanded');
-};
+    // Gmail & Supabase Profile Real Balance Sync
+    async function syncRealWalletBalance() {
+      try {
+        if (!window.supabaseClient) return;
 
-async function startPresence(){
-  try{
-    presenceChannel=supabase.channel('multani-public-chat-online',{config:{presence:{key:me.id}}});
-    presenceChannel.on('presence',{event:'sync'},()=>{$('onlineCount').textContent='🟢 '+Object.keys(presenceChannel.presenceState()).length+' online'});
-    await presenceChannel.subscribe(async status=>{
-      if(status==='SUBSCRIBED')await presenceChannel.track({user_id:me.id,online_at:new Date().toISOString()});
+        // 1. Get Google / Gmail Authenticated Session
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        let user = session?.user;
+
+        // Fallback: Check parent window session if inside iframe
+        if (!user && window.parent && window.parent !== window) {
+          try {
+            for (let i = 0; i < window.parent.localStorage.length; i++) {
+              const k = window.parent.localStorage.key(i);
+              if (k && k.includes('supabase.auth.token')) {
+                const parsed = JSON.parse(window.parent.localStorage.getItem(k));
+                if (parsed && (parsed.user || parsed.current_user)) {
+                  user = parsed.user || parsed.current_user;
+                  break;
+                }
+              }
+            }
+          } catch(err){}
+        }
+
+        if (user && user.id) {
+          currentUserProfile = user;
+          // Check profiles table (connected to chat & arena)
+          const { data: prof } = await window.supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          // Check users table (for wallet balance)
+          const { data: uData } = await window.supabaseClient
+            .from('users')
+            .select('balance, coins, wallet')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (uData) {
+            userWalletBalance = Number(uData.balance !== undefined ? uData.balance : (uData.coins !== undefined ? uData.coins : (uData.wallet || 0)));
+            isWalletVerified = true;
+          } else if (prof) {
+            userWalletBalance = Number(prof.balance !== undefined ? prof.balance : (prof.coins !== undefined ? prof.coins : (prof.wallet || 0)));
+            isWalletVerified = true;
+          }
+
+          if (prof && prof.avatar_url) {
+            const myImg = document.getElementById('host-slot-avatar');
+            const arenaImg = document.getElementById('host-avatar-arena');
+            if (myImg) myImg.src = prof.avatar_url;
+            if (arenaImg) arenaImg.src = prof.avatar_url;
+          }
+        }
+      } catch(e) {
+        console.warn("Wallet sync notice:", e);
+      }
+    }
+
+    // Mobile & Screen Back Button Handler (Closes iframe modal safely)
+    function pushNavigationState(screenName) {
+      try {
+        if (window.history && window.history.pushState) {
+          window.history.pushState({ screen: screenName }, "", "");
+        }
+      } catch(e){}
+    }
+
+    window.addEventListener('popstate', function() {
+      const arenaScreen = document.getElementById('screen-game-arena');
+      const lobbyScreen = document.getElementById('screen-lobby-slots');
+      
+      if (arenaScreen && arenaScreen.style.display === 'flex') {
+        if (confirm("Match se exit karna chahte hain?")) {
+          window.exitMatchSafely();
+        } else {
+          pushNavigationState('arena');
+        }
+        return;
+      }
+
+      if (lobbyScreen && lobbyScreen.style.display === 'flex') {
+        window.backToModeSelect();
+        return;
+      }
+
+      window.closeAndReturnToArena();
     });
-  }catch{
-    $('onlineCount').textContent='🟢 Online';
-  }
-}
 
-async function init(){
-  const {data,error}=await supabase.auth.getSession();
-  if(error)console.warn(error);
-  me=data.session?.user;
-  if(!me){
-    $('app').innerHTML=`<div class="signin"><div style="font-size:46px">🔐</div><h2>PLAYER LOGIN REQUIRED</h2><p class="muted">Please log in to MULTANI FF TOURNAMENT first, then open Chat Room.</p><button id="goHome">Open Tournament Website</button></div>`;
-    $('goHome').onclick=()=>location.href='./';
-    return;
-  }
-  try{
-    const {data:p}=await supabase.from('profiles').select('id,username,full_name,avatar_url,free_fire_uid,free_fire_name').eq('id',me.id).maybeSingle();
-    myProfile=p||{};
-  }catch{}
-  loadPrefs();
-  await loadMessages();
-  await startPresence();
+    window.closeAndReturnToArena = function() {
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: 'CLOSE_LUDO', type: 'CLOSE_MODAL' }, '*');
+          const modalInParent = window.parent.document.querySelector('#ludo-modal, .game-modal, .ludo-frame-container, iframe');
+          if (modalInParent) {
+            if (modalInParent.parentElement && modalInParent.parentElement.classList.contains('modal-wrapper')) {
+              modalInParent.parentElement.style.display = 'none';
+            } else {
+              modalInParent.style.display = 'none';
+            }
+          }
+          if (window.parent.history.length > 1) {
+            window.parent.history.back();
+            return;
+          }
+        }
+      } catch(e){}
 
-  channel=supabase.channel('chat-messages-realtime').on('postgres_changes',{event:'*',schema:'public',table:'chat_messages'},async payload=>{
-    if(payload.eventType==='DELETE'){
-      messages=messages.filter(m=>String(m.id)!==String(payload.old.id));
-      renderMessages();
-      return;
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '../index.html';
+      }
+    };
+
+    window.handleHeaderBack = function() {
+      const arenaScreen = document.getElementById('screen-game-arena');
+      const lobbyScreen = document.getElementById('screen-lobby-slots');
+
+      if (arenaScreen && arenaScreen.style.display === 'flex') {
+        window.exitMatchSafely();
+      } else if (lobbyScreen && lobbyScreen.style.display === 'flex') {
+        window.backToModeSelect();
+      } else {
+        window.closeAndReturnToArena();
+      }
+    };
+
+    window.adjustCoinAmount = function(delta) {
+      selectedCoinIndex = Math.max(0, Math.min(coinSteps.length - 1, selectedCoinIndex + delta));
+      const val = coinSteps[selectedCoinIndex];
+      const el = document.getElementById('selected-coins-val');
+      if (el) {
+        el.innerText = (val === 0) ? "FREE" : val;
+      }
+    };
+
+    window.getSelectedFee = function() {
+      return coinSteps[selectedCoinIndex];
+    };
+
+    window.showRulesPopup = function() {
+      const modal = document.getElementById('rules-modal-overlay');
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeRulesPopup = function() {
+      const modal = document.getElementById('rules-modal-overlay');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.showMatchDetailsPopup = async function() {
+      await syncRealWalletBalance();
+      const modal = document.getElementById('match-details-modal');
+      const fee = window.getSelectedFee();
+      const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
+
+      if (isSingleMode || fee === 0) {
+        document.getElementById('detail-match-fee').innerText = "Free (Practice)";
+        document.getElementById('detail-match-prize').innerText = "Practice Mode (0 Coins)";
+      } else {
+        document.getElementById('detail-match-fee').innerText = fee + " Coins";
+        document.getElementById('detail-match-prize').innerText = prize + " Coins";
+      }
+
+      document.getElementById('detail-user-wallet').innerText = (isWalletVerified ? userWalletBalance : "Loading...") + " Coins";
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeMatchDetailsPopup = function() {
+      const modal = document.getElementById('match-details-modal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.backToModeSelect = function() {
+      document.getElementById('screen-lobby-slots').style.display = 'none';
+      document.getElementById('screen-mode-select').style.display = 'flex';
+    };
+
+    window.startSinglePracticeMode = function() {
+      isSingleMode = true;
+      localPlayerColor = 'red';
+      activeRoomData = { entry_fee: 0, room_code: "OFFLINE_PRACTICE" };
+      document.getElementById('screen-mode-select').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'flex';
+      document.getElementById('opp-name-tag').innerText = "Computer (AI)";
+      pushNavigationState('arena');
+      if (window.initGameplayArena) window.initGameplayArena();
+    };
+
+    window.goToLobbyAndCreateRoom = async function() {
+      await syncRealWalletBalance();
+      const fee = window.getSelectedFee();
+
+      // Only block if wallet balance is properly verified and actually less than fee
+      if (fee > 0 && isWalletVerified && userWalletBalance < fee) {
+        alert("Balance kam hai!\nAapke wallet mein sirf " + userWalletBalance + " Coins hain. Kam coins wali game select karein ya wallet recharge karein.");
+        return;
+      }
+
+      isSingleMode = false;
+      localPlayerColor = 'red';
+      const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
+      currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      document.getElementById('display-rank1-prize').innerText = (fee === 0) ? "FREE (FUN)" : (prize + " COINS");
+      document.getElementById('lobby-team-code').innerText = currentRoomCode;
+      document.getElementById('guest-slot-tag').innerText = "+ Invite";
+      document.getElementById('guest-slot-tag').style.color = "#f1c40f";
+
+      const startBtn = document.getElementById('btn-start-match');
+      startBtn.classList.remove('active-ready');
+      startBtn.innerText = "WAITING FOR FRIEND...";
+
+      document.getElementById('screen-mode-select').style.display = 'none';
+      document.getElementById('screen-lobby-slots').style.display = 'flex';
+      pushNavigationState('lobby');
+
+      if (window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient.from('ludo_rooms').insert({
+            room_code: currentRoomCode,
+            host_id: currentUserProfile?.id || 'host_player',
+            entry_fee: fee,
+            status: 'waiting'
+          }).select().single();
+          if (data) {
+            activeRoomData = data;
+            if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(currentRoomCode);
+          }
+        } catch(e) {
+          console.warn("Room creation DB sync:", e);
+        }
+      }
+    };
+
+    // OPEN CHAT ROOM (../chat.html) WITHOUT 404 AND PREPARE AUTO-CARD
+    window.sendInviteToChatAndWhatsApp = function() {
+      const fee = window.getSelectedFee();
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1","link":"' + joinLink + '"}]';
+
+      try {
+        localStorage.setItem('pending_ludo_invite', chatPayload);
+        if (window.parent && window.parent.localStorage) {
+          window.parent.localStorage.setItem('pending_ludo_invite', chatPayload);
+        }
+      } catch(e){}
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(chatPayload).catch(()=>{});
+      }
+
+      // Root chat.html path from games/ folder
+      const chatUrl = '../chat.html';
+      const win = window.open(chatUrl, '_blank');
+      if (win) {
+        showFloatingToast("Chat Room khul gaya! Match share karein, Lobby ready hai.");
+      } else {
+        showFloatingToast("Invite Copied! Chat Room me paste karein: " + currentRoomCode);
+      }
+    };
+
+    window.shareInviteLinkDirect = function() {
+      const joinLink = window.location.origin + window.location.pathname + "?room=" + currentRoomCode;
+      const fee = window.getSelectedFee();
+      const text = "Join my Ludo match on MULTANI FF TOURNAMENT!\nTeam Code: " + currentRoomCode + "\nFee: " + (fee === 0 ? "FREE" : fee + " Coins") + "\nJoin Match: " + joinLink;
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+    };
+
+    function showFloatingToast(msg) {
+      const toast = document.createElement('div');
+      toast.innerText = msg;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '80px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = '#0284c7';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 20px';
+      toast.style.borderRadius = '25px';
+      toast.style.fontWeight = '800';
+      toast.style.fontSize = '13px';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.5)';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
     }
-    if(payload.new?.user_id===me.id)return;
-    await loadMessages();
-    if(notificationsOn&&document.hidden&&payload.eventType==='INSERT'&&'Notification'in window&&Notification.permission==='granted'){
-      const m=payload.new;
-      new Notification('MULTANI FF Chat',{body:String(m.message||'New message').slice(0,100)});
+
+    // STRICT BALANCE CHECK WHEN GUEST JOINS
+    window.promptJoinByCode = async function(codeToJoin = null) {
+      await syncRealWalletBalance();
+      const code = codeToJoin || prompt("Enter Team Code (e.g. 036154):");
+      if (!code) return;
+
+      if (window.supabaseClient) {
+        try {
+          const { data: room } = await window.supabaseClient.from('ludo_rooms').select('*').eq('room_code', code.trim()).single();
+          if (!room) return alert("Room nahi mila!");
+          if (room.status !== 'waiting') return alert("Room pehle hi full ho chuka hai!");
+
+          if (room.entry_fee > 0 && isWalletVerified && userWalletBalance < room.entry_fee) {
+            return alert("Balance kam hai!\nIs match ki fee " + room.entry_fee + " coins hai jabke aapke pas sirf " + userWalletBalance + " coins hain.");
+          }
+
+          if (currentUserProfile?.id) {
+            await window.supabaseClient.from('ludo_rooms').update({ guest_id: currentUserProfile.id }).eq('id', room.id);
+          }
+
+          activeRoomData = room;
+          localPlayerColor = 'blue';
+          document.getElementById('screen-mode-select').style.display = 'none';
+          document.getElementById('screen-lobby-slots').style.display = 'flex';
+          document.getElementById('lobby-team-code').innerText = code;
+          document.getElementById('guest-slot-tag').innerText = "Connected";
+          document.getElementById('guest-slot-tag').style.color = "#2ecc71";
+
+          const startBtn = document.getElementById('btn-start-match');
+          startBtn.classList.add('active-ready');
+          startBtn.innerText = "READY TO START";
+
+          pushNavigationState('lobby');
+          if (window.subscribeToMatchRealtime) window.subscribeToMatchRealtime(code.trim());
+        } catch(e) {
+          alert("Join error: " + e.message);
+        }
+      }
+    };
+
+    window.handleStartMatchClick = async function() {
+      const startBtn = document.getElementById('btn-start-match');
+      if (!startBtn.classList.contains('active-ready')) {
+        alert("Pehle apne dost ko invite karein!");
+        return;
+      }
+
+      if (window.supabaseClient && activeRoomData) {
+        if (activeRoomData.entry_fee > 0) {
+          const { data: res } = await window.supabaseClient.rpc('start_ludo_coin_match', { p_room_id: activeRoomData.id });
+          if (res && !res.success) {
+            return alert(res.message);
+          }
+        }
+
+        if (realtimeChannel) {
+          realtimeChannel.send({ type: 'broadcast', event: 'game_started', payload: {} });
+        }
+      }
+
+      document.getElementById('screen-lobby-slots').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'flex';
+      pushNavigationState('arena');
+      if (window.initGameplayArena) window.initGameplayArena();
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-sky: #4aa3df;
+      --board-green: #2ecc71;
+      --board-yellow: #f1c40f;
+      --board-red: #e74c3c;
+      --board-blue: #3498db;
+      --gold: #ffbe00;
+      --cyan: #00f2fe;
     }
-    if(soundOn&&payload.eventType==='INSERT')playSendSound();
-  }).subscribe();
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at 50% 30%, #5dade2 0%, #2980b9 55%, #1b4f72 100%);
+      color: #fff;
+    }
 
-function autoSize(){
-  $('messageInput').style.height='auto';
-  $('messageInput').style.height=Math.min($('messageInput').scrollHeight,100)+'px';
-}
+    #app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      max-width: 440px;
+      margin: 0 auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80') center/cover no-repeat;
+    }
+    #app-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, rgba(52, 152, 219, 0.45) 0%, rgba(10, 25, 47, 0.85) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
 
-$('sendBtn').onclick=()=>sendMessage($('messageInput').value);
-$('messageInput').addEventListener('input',autoSize);
-$('messageInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();
-    sendMessage($('messageInput').value);
-  }
-});
-$('cancelReply').onclick=cancelReply;
+    .top-global-header {
+      width: 100%;
+      height: 48px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1.5px solid #1e293b;
+      z-index: 50;
+    }
+    .header-logo-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .btn-detail-pill {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1.5px solid #38bdf8;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      outline: none;
+    }
+    .btn-detail-pill:active { transform: scale(0.95); }
 
-// Button Triggers
-$('stickerBtn').onclick=showStickers;
-$('stickerTop').onclick=showStickers;
+    .screen-view {
+      position: absolute;
+      top: 48px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      overflow-y: auto;
+    }
 
-$('emojiBtn').onclick=()=>{
-  openSheet('Add Emoji',`<div class="stickergrid">${['😀','😂','🥹','😍','😎','🔥','❤️','💯','🙏','👏','⚡','🎮','👑','🏆','🤝','😭','🤣','😈','✨','👍'].map(s=>`<button data-emoji="${s}">${s}</button>`).join('')}</div>`);
-  $('sheet').querySelectorAll('[data-emoji]').forEach(b=>b.onclick=()=>{
-    $('messageInput').value+=$('messageInput').value?' '+b.dataset.emoji:b.dataset.emoji;
-    autoSize();
-    $('overlay').classList.remove('show');
-    $('messageInput').focus();
-  });
-};
+    .top-header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+    .round-btn-top {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #2980b9, #1a5276);
+      border: 2px solid #aed6f1;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
 
-$('menuBtn').onclick=(e)=>{e.stopPropagation();$('dropdown').classList.toggle('show')};
-$('dropdown').querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>handleMenu(b.dataset.action));
-window.addEventListener('click',e=>{if(!e.target.closest('.menuwrap'))$('dropdown').classList.remove('show')});
-$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))$('overlay').classList.remove('show')});
-$('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='./'};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&me)loadMessages()});
+    .mascot-hero-wrap {
+      text-align: center;
+      margin-top: 8px;
+      pointer-events: none;
+    }
+    .mascot-ludo-img {
+      width: 100px;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.6));
+    }
 
-init();
-</script>
+    .panel-card-select {
+      width: 100%;
+      background: rgba(14, 34, 61, 0.94);
+      border: 2px solid #2980b9;
+      border-radius: 20px;
+      padding: 16px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(41, 128, 185, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 25;
+    }
+
+    .mode-single-tab {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, #00b4db, #0083b0);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      border-radius: 12px;
+      text-align: center;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0, 180, 219, 0.4);
+      border: 1.5px solid #e0f7fa;
+    }
+
+    .classic-only-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border: 2px solid #e0f7fa;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
+    }
+
+    .coin-selector-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #091524;
+      border: 1.5px solid #1a3a60;
+      border-radius: 14px;
+      padding: 8px 14px;
+    }
+    .coin-calc-btn {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: linear-gradient(135deg, #34495e, #1c2833);
+      border: 1.5px solid #5d6d7e;
+      color: #fff; font-size: 26px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      outline: none;
+    }
+    .coin-calc-btn:active { transform: scale(0.92); background: #1f2d3d; }
+    .coin-amount-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .action-duo-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .btn-main-yellow {
+      flex: 1;
+      padding: 13px 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      background: linear-gradient(180deg, #ffd32a, #f39c12);
+      color: #5d4037;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+    .btn-main-yellow:active { transform: scale(0.96); }
+
+    .team-code-footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn-join-pill {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      border: 1.5px solid #a3e4d7;
+      padding: 8px 24px;
+      border-radius: 20px;
+      font-weight: 900;
+      font-size: 14px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* SCREEN 2: LOBBY */
+    .lobby-header-box {
+      width: 100%;
+      text-align: center;
+      margin-top: 6px;
+    }
+    .rank-prize-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(14, 34, 61, 0.85);
+      border: 1.5px solid #2980b9;
+      padding: 6px 18px;
+      border-radius: 30px;
+      margin-bottom: 12px;
+    }
+    .team-code-badge-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+    .team-code-num {
+      color: #fff;
+      font-size: 24px;
+      letter-spacing: 2px;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 14px;
+      border-radius: 10px;
+      border: 1px dashed var(--gold);
+    }
+
+    .slots-grid-container {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      margin: 24px 0;
+    }
+    .slot-player-card {
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .avatar-wrapper-ring {
+      width: 74px; height: 74px; border-radius: 50%;
+      border: 3.5px solid #2ecc71;
+      padding: 2px;
+      background: #0e223d;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 16px rgba(46, 204, 113, 0.6);
+      position: relative;
+    }
+    .avatar-wrapper-ring img {
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    }
+    .invite-circle-btn {
+      width: 74px; height: 74px; border-radius: 50%;
+      border: 3.5px solid var(--gold);
+      background: radial-gradient(circle, #2980b9 0%, #1a3a60 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; color: #fff;
+      box-shadow: 0 0 18px rgba(255, 190, 0, 0.5);
+      cursor: pointer;
+      animation: pulseInvite 1.5s infinite alternate;
+    }
+    @keyframes pulseInvite {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); box-shadow: 0 0 25px rgba(255, 190, 0, 0.9); }
+    }
+    .slot-label-ribbon {
+      background: #0b1a2d;
+      border: 1px solid #2980b9;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-start-game {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px;
+      border-radius: 16px;
+      border: none;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: #7f8c8d;
+      color: #d5dbdb;
+      cursor: not-allowed;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+    .btn-start-game.active-ready {
+      background: linear-gradient(180deg, #2ecc71, #27ae60);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+    }
+
+    /* SCREEN 3: GAMEPLAY ARENA & DICE POSITIONING */
+    .arena-top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      z-index: 20;
+    }
+    .arena-gear-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; cursor: pointer;
+    }
+
+    /* BLUE PLAYER (TOP RIGHT) & BLUE DICE NEXT TO IT (BOARD EMPTY) */
+    .opponent-hud-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* RED PLAYER (BOTTOM LEFT) & RED DICE NEXT TO IT (BOARD EMPTY) */
+    .arena-bottom-bar {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 8px 14px;
+      z-index: 20;
+    }
+    .host-hud-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .player-hud-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14, 34, 61, 0.85);
+      border: 2px solid #2980b9;
+      padding: 4px 10px;
+      border-radius: 25px;
+    }
+    .hud-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 2px solid var(--gold); object-fit: cover;
+    }
+
+    .board-island-container {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin: auto;
+      border-radius: 24px;
+      padding: 8px;
+      background: linear-gradient(135deg, #58d68d, #27ae60);
+      border: 4px solid #196f3d;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.7), inset 0 0 15px rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #ludo-main-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .dice-hud-container {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .timer-ring-svg {
+      position: absolute;
+      inset: -4px;
+      width: 54px;
+      height: 54px;
+      transform: rotate(-90deg);
+      pointer-events: none;
+    }
+    .timer-circle-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.2);
+      stroke-width: 3.5;
+    }
+    .timer-circle-progress {
+      fill: none;
+      stroke: #2ecc71;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 188;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.1s linear;
+    }
+
+    .real-dice-cube {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    /* VIBRATE & SHAKE ANIMATION ON TURN */
+    .real-dice-cube.turn-active {
+      animation: diceShakeTurn 0.4s infinite alternate;
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px var(--cyan);
+    }
+    @keyframes diceShakeTurn {
+      0% { transform: scale(1) rotate(-4deg); }
+      100% { transform: scale(1.08) rotate(4deg); }
+    }
+    .real-dice-cube.rolling-anim {
+      animation: dice3DTumble 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+    }
+    @keyframes dice3DTumble {
+      0% { transform: rotate(0deg) scale(0.9); }
+      25% { transform: rotate(180deg) scale(1.2); }
+      50% { transform: rotate(360deg) scale(0.9); }
+      75% { transform: rotate(540deg) scale(1.15); }
+      100% { transform: rotate(720deg) scale(1); }
+    }
+
+    .dice-pips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      width: 32px;
+      height: 32px;
+      padding: 2px;
+      pointer-events: none;
+    }
+    .pip-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    .pip-dot {
+      width: 6.5px;
+      height: 6.5px;
+      background: #111827;
+      border-radius: 50%;
+    }
+    .pip-dot.red-pip { background: #e74c3c; }
+
+    .ingame-popup-menu {
+      position: absolute;
+      top: 55px;
+      left: 12px;
+      background: rgba(14, 34, 61, 0.96);
+      border: 1.5px solid #2980b9;
+      border-radius: 14px;
+      padding: 10px;
+      display: none;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      z-index: 100;
+    }
+    .popup-menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+    .popup-icon-sq {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .rules-card-dialog {
+      background: #0d2238;
+      border: 2px solid #00f2fe;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 360px;
+      padding: 22px 18px;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .rules-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .rules-list-item i {
+      color: var(--gold);
+      margin-top: 3px;
+    }
+
+    .result-sheet {
+      background: #0d2238;
+      border: 2px solid #2980b9;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 360px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-wrapper">
+
+    <!-- TOP GLOBAL HEADER -->
+    <div class="top-global-header">
+      <div class="header-logo-title">
+        <i class="fa-solid fa-gamepad" style="color:var(--gold);"></i>
+        <span>Ludo Championship</span>
+      </div>
+      <button type="button" class="btn-detail-pill" onclick="window.showMatchDetailsPopup()">
+        <i class="fa-solid fa-circle-info"></i> Detail
+      </button>
+    </div>
+
+    <!-- SCREEN 1: 1 ON 1 & COIN SELECTION -->
+    <div id="screen-mode-select" class="screen-view">
+      <div class="top-header-bar">
+        <button type="button" class="round-btn-top" onclick="window.handleHeaderBack()"><i class="fa-solid fa-arrow-left"></i></button>
+        <div style="font-size:15px; font-weight:900; letter-spacing:1px; color:#fff;">SELECT MATCH</div>
+        <button type="button" class="round-btn-top" onclick="window.showRulesPopup()"><i class="fa-solid fa-question"></i></button>
+      </div>
+
+      <div class="mascot-hero-wrap">
+        <img src="https://cdn-icons-png.flaticon.com/512/808/808439.png" class="mascot-ludo-img" alt="Ludo" />
+        <h2 style="font-size:24px; font-weight:900; letter-spacing:1px; margin-top:6px;">MULTANI LUDO</h2>
+      </div>
+
+      <div class="panel-card-select">
+        <div style="font-size: 13px; font-weight: 800; color:#7fb3d5; text-transform: uppercase;">SELECT MODE</div>
+        
+        <div class="mode-single-tab">
+          <i class="fa-solid fa-user-group" style="margin-right:6px;"></i> 1 ON 1 BATTLE
+        </div>
+
+        <div class="classic-only-badge">
+          <i class="fa-solid fa-crown" style="color:var(--gold);"></i> CLASSIC MODE
+        </div>
+
+        <div class="coin-selector-container">
+          <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(-1)">-</button>
+          <div class="coin-amount-display">
+            <i class="fa-solid fa-coins"></i>
+            <span id="selected-coins-val">25</span>
+          </div>
+          <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(1)">+</button>
+        </div>
+
+        <div class="action-duo-buttons">
+          <button type="button" class="btn-main-yellow" onclick="window.startSinglePracticeMode()">Single (Offline)</button>
+          <button type="button" class="btn-main-yellow" onclick="window.goToLobbyAndCreateRoom()">Invite Friends</button>
+        </div>
+      </div>
+
+      <div class="team-code-footer-row">
+        <span style="font-size: 13px; font-weight: 700; color:#cbd5e1;">Have a team code?</span>
+        <button type="button" class="btn-join-pill" onclick="window.promptJoinByCode()">Join</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: 2-SLOTS LOBBY -->
+    <div id="screen-lobby-slots" class="screen-view" style="display: none;">
+      <div class="top-header-bar">
+        <button type="button" class="round-btn-top" onclick="window.backToModeSelect()"><i class="fa-solid fa-arrow-left"></i></button>
+        <div style="font-size:15px; font-weight:900; letter-spacing:1px; color:#fff;">LOBBY ROOM</div>
+        <div style="width: 40px;"></div>
+      </div>
+
+      <div class="lobby-header-box">
+        <div class="rank-prize-pill">
+          <i class="fa-solid fa-trophy" style="color:var(--gold); font-size:18px;"></i>
+          <span style="font-size: 13px; font-weight: 800;">RANK 1: <b id="display-rank1-prize" style="color:var(--gold);">45 COINS</b></span>
+        </div>
+        
+        <div class="team-code-badge-bar">
+          <span>Team Code:</span>
+          <span class="team-code-num" id="lobby-team-code">000000</span>
+          <i class="fa-solid fa-share-nodes" style="cursor:pointer; color:var(--cyan);" onclick="window.shareInviteLinkDirect()"></i>
+        </div>
+      </div>
+
+      <div class="slots-grid-container" id="slots-render-wrap">
+        <div class="slot-player-card">
+          <div class="avatar-wrapper-ring">
+            <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" id="host-slot-avatar" alt="Host" />
+          </div>
+          <div class="slot-label-ribbon" id="host-slot-name">You (Host)</div>
+        </div>
+
+        <div class="slot-player-card" id="slot-guest-card">
+          <button type="button" class="invite-circle-btn" onclick="window.sendInviteToChatAndWhatsApp()">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="slot-label-ribbon" id="guest-slot-tag" style="border-style:dashed; color:#f1c40f;">+ Invite</div>
+        </div>
+      </div>
+
+      <div style="width:100%; text-align:center;">
+        <button type="button" class="btn-start-game" id="btn-start-match" onclick="window.handleStartMatchClick()">WAITING FOR FRIEND...</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: GAMEPLAY ARENA -->
+    <div id="screen-game-arena" class="screen-view" style="display: none; padding:0;">
+      <div class="arena-top-bar">
+        <button type="button" class="arena-gear-btn" onclick="window.toggleIngameMenu()"><i class="fa-solid fa-gear"></i></button>
+        
+        <!-- BLUE DICE ON BLUE PLAYER'S SIDE (RIGHT) -->
+        <div class="opponent-hud-box">
+          <div class="dice-hud-container" id="dice-container-blue">
+            <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="27" cy="27" r="23"></circle><circle class="timer-circle-progress" id="timer-blue" cx="27" cy="27" r="23"></circle></svg>
+            <div class="real-dice-cube" id="cube-blue" onclick="window.handleDiceRollClick('blue')">
+              <div class="dice-pips-grid" id="pips-blue"></div>
+            </div>
+          </div>
+          <div class="player-hud-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="hud-avatar" id="opp-avatar-img" alt="Opponent" />
+            <div style="text-align:left;">
+              <div style="font-size:12px; font-weight:800;" id="opp-name-tag">Opponent</div>
+              <div style="font-size:10px; color:#2ecc71;">🔵 Blue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ingame-popup-menu" id="ingame-menu-dropdown">
+        <div class="popup-menu-item" onclick="window.toggleAudio()"><div class="popup-icon-sq"><i class="fa-solid fa-volume-high" id="menu-sound-icon"></i></div><span id="menu-sound-label">ON</span></div>
+        <div class="popup-menu-item" onclick="window.showRulesPopup()"><div class="popup-icon-sq"><i class="fa-solid fa-book"></i></div><span>Rules</span></div>
+        <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
+      </div>
+
+      <!-- MAIN LUDO BOARD CANVAS -->
+      <div class="board-island-container">
+        <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
+      </div>
+
+      <!-- RED PLAYER & RED DICE ON RED PLAYER'S SIDE (LEFT) -->
+      <div class="arena-bottom-bar">
+        <div class="host-hud-box">
+          <div class="player-hud-card" style="border-color:#e74c3c;">
+            <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
+            <div style="text-align:left;">
+              <div style="font-size:12px; font-weight:800;" id="host-name-tag">You</div>
+              <div style="font-size:10px; color:#e74c3c;">🔴 Red</div>
+            </div>
+          </div>
+
+          <div class="dice-hud-container" id="dice-container-red">
+            <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="27" cy="27" r="23"></circle><circle class="timer-circle-progress" id="timer-red" cx="27" cy="27" r="23"></circle></svg>
+            <div class="real-dice-cube turn-active" id="cube-red" onclick="window.handleDiceRollClick('red')">
+              <div class="dice-pips-grid" id="pips-red"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCH DETAILS POPUP -->
+    <div id="match-details-modal" class="modal-backdrop">
+      <div class="rules-card-dialog">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:8px;">
+          <h3 style="font-size:17px; font-weight:900; color:var(--cyan);"><i class="fa-solid fa-circle-info" style="color:var(--gold); margin-right:6px;"></i> MATCH & WALLET DETAILS</h3>
+          <button type="button" onclick="window.closeMatchDetailsPopup()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="rules-list-item">
+          <i class="fa-solid fa-coins"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Game Entry Fee:</span>
+            <b id="detail-match-fee" style="color:var(--gold);">25 Coins</b>
+          </div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-trophy"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Winning Prize:</span>
+            <b id="detail-match-prize" style="color:#2ecc71;">45 Coins</b>
+          </div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-wallet"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Wallet Balance:</span>
+            <b id="detail-user-wallet" style="color:#00f2fe;">0 Coins</b>
+          </div>
+        </div>
+
+        <button type="button" class="btn-main-yellow" onclick="window.closeMatchDetailsPopup()" style="width:100%; margin-top:8px;">Close</button>
+      </div>
+    </div>
+
+    <!-- RULES MODAL -->
+    <div id="rules-modal-overlay" class="modal-backdrop">
+      <div class="rules-card-dialog">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:8px;">
+          <h3 style="font-size:18px; font-weight:900; color:var(--cyan);"><i class="fa-solid fa-book-bookmark" style="color:var(--gold); margin-right:6px;"></i> GAME RULES</h3>
+          <button type="button" onclick="window.closeRulesPopup()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="rules-list-item">
+          <i class="fa-solid fa-dice-six"></i>
+          <div><b>Pawn Release:</b> Goti sirf 6 aane par base se bahar aati hai aur player ko dubara bari milti hai.</div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-crosshairs"></i>
+          <div><b>Capture Rule:</b> Opponent ki goti cut hone par seedha base me wapas chali jati hai aur extra turn milta hai.</div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-star"></i>
+          <div><b>Safe Zones:</b> Star wale khano par gotiyan safe rehti hain aur wahan koi goti cut nahi ho sakti.</div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-ban"></i>
+          <div><b>Three Sixes:</b> Lagatar 3 martaba 6 aane par turn cancel ho jati hai.</div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-trophy"></i>
+          <div><b>Winner Pool:</b> Chaaron gotiyan pehle home pohanchane wala player 90% prize pool jeet jata hai.</div>
+        </div>
+
+        <button type="button" class="btn-main-yellow" onclick="window.closeRulesPopup()" style="width:100%; margin-top:6px;">Got It</button>
+      </div>
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div id="result-modal" class="modal-backdrop">
+      <div class="result-sheet">
+        <div style="font-size: 28px; font-weight: 900; color:var(--gold);" id="result-winner-title">VICTORY!</div>
+        <p style="font-size: 13px; color: #cbd5e1; margin: 8px 0 16px 0;" id="result-winner-desc">Match complete!</p>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px; margin-bottom: 18px; font-size: 14px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+            <span>Prize Won:</span> <b id="res-prize-amount" style="color:#2ecc71;">0 Coins</b>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Platform Fee (10%):</span> <b id="res-fee-amount">0 Coins</b>
+          </div>
+        </div>
+
+        <button type="button" class="btn-main-yellow" onclick="window.openLobbyFromResults()" style="width:100%;">Play Again</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       SUPABASE REALTIME & CORE GAME ENGINE
+       ========================================================================== */
+    const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
+    const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
+    
+    try {
+      if (typeof window.supabase !== 'undefined') {
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.warn("Supabase init error:", err);
+    }
+
+    function subscribeToMatchRealtime(code) {
+      if (!window.supabaseClient) return;
+      realtimeChannel = window.supabaseClient.channel("ludo_" + code);
+
+      realtimeChannel
+        .on('broadcast', { event: 'guest_joined' }, () => {
+          document.getElementById('guest-slot-tag').innerText = "Friend Joined!";
+          document.getElementById('guest-slot-tag').style.color = "#2ecc71";
+          const startBtn = document.getElementById('btn-start-match');
+          startBtn.classList.add('active-ready');
+          startBtn.innerText = "START MATCH";
+        })
+        .on('broadcast', { event: 'game_started' }, () => {
+          document.getElementById('screen-lobby-slots').style.display = 'none';
+          document.getElementById('screen-game-arena').style.display = 'flex';
+          pushNavigationState('arena');
+          initGameplayArena();
+        })
+        .on('broadcast', { event: 'dice_roll' }, payload => {
+          if (currentTurn !== localPlayerColor) {
+            executeDiceRoll(payload.payload.roll);
+          }
+        })
+        .on('broadcast', { event: 'game_move' }, payload => {
+          if (payload.payload.color !== localPlayerColor) {
+            animateTokenStepByStep(payload.payload.color, payload.payload.tokenIndex, payload.payload.steps, false);
+          }
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED' && localPlayerColor === 'blue') {
+            realtimeChannel.send({ type: 'broadcast', event: 'guest_joined', payload: {} });
+          }
+        });
+    }
+
+    /* ==========================================================================
+       AUDIO SYNTHESIZER
+       ========================================================================== */
+    let audioEnabled = true;
+    let actx = null;
+    function initAudio() {
+      try {
+        if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+        if (actx && actx.state === 'suspended') actx.resume();
+      } catch(e){}
+    }
+
+    window.toggleAudio = function() {
+      audioEnabled = !audioEnabled;
+      const lbl = document.getElementById('menu-sound-label');
+      const icon = document.getElementById('menu-sound-icon');
+      if (lbl) lbl.innerText = audioEnabled ? 'ON' : 'OFF';
+      if (icon) icon.className = audioEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+    };
+
+    const SFX = {
+      roll() {
+        if (!audioEnabled) return; initAudio(); if (!actx) return;
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(340, actx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, actx.currentTime + 0.18);
+          gain.gain.setValueAtTime(0.25, actx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.18);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.18);
+        } catch(e){}
+      },
+      step() {
+        if (!audioEnabled) return; initAudio(); if (!actx) return;
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'sine'; osc.frequency.setValueAtTime(560, actx.currentTime);
+          gain.gain.setValueAtTime(0.2, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.08);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.08);
+        } catch(e){}
+      },
+      capture() {
+        if (!audioEnabled) return; initAudio(); if (!actx) return;
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'sawtooth'; osc.frequency.setValueAtTime(260, actx.currentTime);
+          gain.gain.setValueAtTime(0.3, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.35);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.35);
+        } catch(e){}
+      },
+      win() {
+        if (!audioEnabled) return; initAudio(); if (!actx) return;
+        try {
+          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const osc = actx.createOscillator(), gain = actx.createGain();
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(f, actx.currentTime + i * 0.12);
+            gain.gain.setValueAtTime(0.25, actx.currentTime + i * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + i * 0.12 + 0.3);
+            osc.connect(gain); gain.connect(actx.destination);
+            osc.start(actx.currentTime + i * 0.12); osc.stop(actx.currentTime + i * 0.12 + 0.3);
+          });
+        } catch(e){}
+      }
+    };
+
+    /* ==========================================================================
+       CANVAS & GAMEPLAY ENGINE
+       ========================================================================== */
+    const canvas = document.getElementById('ludo-main-canvas');
+    const ctx = canvas.getContext('2d');
+    const BOARD_PX = 360;
+    const CELL = BOARD_PX / 15;
+
+    const TRACK_COORDS = [
+      [6, 1], [6, 2], [6, 3], [6, 4], [6, 5],
+      [5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6],
+      [0, 7],
+      [0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8],
+      [6, 9], [6, 10], [6, 11], [6, 12], [6, 13], [6, 14],
+      [7, 14],
+      [8, 14], [8, 13], [8, 12], [8, 11], [8, 10], [8, 9],
+      [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8],
+      [14, 7],
+      [14, 6], [13, 6], [12, 6], [11, 6], [10, 6], [9, 6],
+      [8, 5], [8, 4], [8, 3], [8, 2], [8, 1], [8, 0],
+      [7, 0],
+      [6, 0]
+    ];
+    
+    const RED_HOMERUN = [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]];
+    const BLUE_HOMERUN = [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]];
+
+    const RED_BASES = [[2, 2], [2, 3], [3, 2], [3, 3]];
+    const BLUE_BASES = [[11, 11], [11, 12], [12, 11], [12, 12]];
+    const SAFE_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
+
+    let currentTurn = 'red';
+    let localPlayerColor = 'red';
+    let diceValue = 1;
+    let isDiceRolled = false;
+    let isTokenAnimating = false;
+    let consecutiveSixes = 0;
+    let turnTimerInterval = null;
+    let pulseAnimFrame = 0;
+    let glowLoopStarted = false;
+
+    let gameState = {
+      red: [-1, -1, -1, -1],
+      blue: [-1, -1, -1, -1]
+    };
+
+    window.initGameplayArena = function() {
+      gameState = { red: [-1, -1, -1, -1], blue: [-1, -1, -1, -1] };
+      currentTurn = 'red';
+      isDiceRolled = false;
+      isTokenAnimating = false;
+      consecutiveSixes = 0;
+      renderDicePips('red', 1);
+      renderDicePips('blue', 1);
+      updateDiceTurnVisuals();
+      renderBoard();
+      startTurnTimer();
+      if (!glowLoopStarted) {
+        glowLoopStarted = true;
+        startGlowLoop();
+      }
+    };
+
+    // FIXED TOKEN HOME PLACEMENT: Red stays strictly inside Red Triangle (Left)
+    function getTokenVisualCoords(color, index, step) {
+      if (step === -1) {
+        const b = (color === 'red') ? RED_BASES[index] : BLUE_BASES[index];
+        return { r: b[0], c: b[1] };
+      }
+      if (step >= 56) {
+        return (color === 'red') ? { r: 7.5, c: 6.8 } : { r: 7.5, c: 8.2 };
+      }
+      if (color === 'red') {
+        if (step < 51) return { r: TRACK_COORDS[step % 52][0], c: TRACK_COORDS[step % 52][1] };
+        return { r: RED_HOMERUN[step - 51][0], c: RED_HOMERUN[step - 51][1] };
+      } else {
+        if (step < 51) return { r: TRACK_COORDS[(step + 26) % 52][0], c: TRACK_COORDS[(step + 26) % 52][1] };
+        return { r: BLUE_HOMERUN[step - 51][0], c: BLUE_HOMERUN[step - 51][1] };
+      }
+    }
+
+    // DRAW BOARD WITH 5 INDIVIDUAL BOXES ON HOME RUN
+    function renderBoard() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, BOARD_PX, BOARD_PX);
+
+      const drawBase = (r, c, col) => {
+        ctx.fillStyle = col;
+        ctx.fillRect(c * CELL, r * CELL, CELL * 6, CELL * 6);
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.roundRect((c + 1) * CELL, (r + 1) * CELL, CELL * 4, CELL * 4, 12);
+        ctx.fill();
+      };
+      drawBase(0, 0, '#e74c3c');
+      drawBase(0, 9, '#2ecc71');
+      drawBase(9, 9, '#3498db');
+      drawBase(9, 0, '#f1c40f');
+
+      // Grid Lines
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 15; i++) {
+        ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, BOARD_PX); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(BOARD_PX, i * CELL); ctx.stroke();
+      }
+
+      // 5 SEPARATE HOME BOXES WITH VISIBLE BORDERS
+      for (let i = 1; i <= 5; i++) {
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#2980b9'; ctx.lineWidth = 1.5;
+        ctx.strokeRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
+
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
+
+        ctx.fillStyle = '#f1c40f';
+        ctx.fillRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
+        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
+      }
+
+      // Entry Points
+      ctx.fillStyle = '#e74c3c'; ctx.fillRect(1 * CELL, 6 * CELL, CELL, CELL);
+      ctx.fillStyle = '#3498db'; ctx.fillRect(13 * CELL, 8 * CELL, CELL, CELL);
+
+      // Center Triangles
+      const drawTri = (p1, p2, col) => {
+        ctx.beginPath();
+        ctx.moveTo(p1[0] * CELL, p1[1] * CELL);
+        ctx.lineTo(p2[0] * CELL, p2[1] * CELL);
+        ctx.lineTo(7.5 * CELL, 7.5 * CELL);
+        ctx.fillStyle = col; ctx.fill();
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1; ctx.stroke();
+      };
+      drawTri([6, 6], [9, 6], '#2ecc71');
+      drawTri([9, 6], [9, 9], '#3498db');
+      drawTri([9, 9], [6, 9], '#f1c40f');
+      drawTri([6, 9], [6, 6], '#e74c3c');
+
+      SAFE_INDICES.forEach(idx => {
+        const c = TRACK_COORDS[idx];
+        drawStar(c[1] * CELL + CELL / 2, c[0] * CELL + CELL / 2, 5, 8, 4, '#ffbe00');
+      });
+
+      renderRealisticPawns();
+    }
+
+    function drawStar(cx, cy, spikes, outerRadius, innerRadius, color) {
+      let rot = Math.PI / 2 * 3, x = cx, y = cy, step = Math.PI / spikes;
+      ctx.beginPath(); ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius; ctx.lineTo(x, y); rot += step;
+        x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius; ctx.lineTo(x, y); rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+    }
+
+    function startGlowLoop() {
+      pulseAnimFrame = (pulseAnimFrame + 0.1) % (Math.PI * 2);
+      const arenaScreen = document.getElementById('screen-game-arena');
+      if (arenaScreen && arenaScreen.style.display === 'flex' && isDiceRolled) {
+        renderBoard();
+      }
+      requestAnimationFrame(startGlowLoop);
+    }
+
+    function renderRealisticPawns() {
+      const occupiedMap = {};
+
+      ['red', 'blue'].forEach(color => {
+        gameState[color].forEach((step, idx) => {
+          const coords = getTokenVisualCoords(color, idx, step);
+          const key = (step === -1) ? `${color}_base_${idx}` : (step >= 56 ? `${color}_home_${idx}` : `${coords.r.toFixed(1)}_${coords.c.toFixed(1)}`);
+          if (!occupiedMap[key]) occupiedMap[key] = [];
+          occupiedMap[key].push({ color, idx, step, coords });
+        });
+      });
+
+      Object.values(occupiedMap).forEach(group => {
+        const total = group.length;
+        group.forEach((pawn, gIdx) => {
+          let offsetX = 0;
+          let offsetY = 0;
+          if (total > 1 && pawn.step !== -1 && pawn.step < 56) {
+            const angle = (gIdx / total) * Math.PI * 2;
+            offsetX = Math.cos(angle) * (CELL * 0.22);
+            offsetY = Math.sin(angle) * (CELL * 0.22);
+          }
+
+          const px = pawn.coords.c * CELL + CELL / 2 + offsetX;
+          const py = pawn.coords.r * CELL + CELL / 2 + offsetY;
+          const isMovable = isDiceRolled && (pawn.color === currentTurn) && canPawnMove(pawn.step, diceValue);
+
+          // PULSING BLINKING GLOW BORDER ON MOVABLE PAWNS
+          if (isMovable) {
+            const glowSize = CELL * (0.46 + Math.sin(pulseAnimFrame) * 0.08);
+            ctx.beginPath();
+            ctx.arc(px, py, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 235, 59, 0.75)';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffea00';
+            ctx.stroke();
+          }
+
+          ctx.beginPath();
+          ctx.arc(px, py + 2, CELL * 0.38, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.36, 0, Math.PI * 2);
+          ctx.fillStyle = (pawn.color === 'red') ? '#e74c3c' : '#3498db';
+          ctx.fill();
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(px, py - 3, CELL * 0.18, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+        });
+      });
+    }
+
+    async function animateTokenStepByStep(color, tokenIndex, steps, syncToPeer = true) {
+      isTokenAnimating = true;
+      clearInterval(turnTimerInterval);
+
+      if (gameState[color][tokenIndex] === -1) {
+        gameState[color][tokenIndex] = 0;
+        SFX.step();
+        renderBoard();
+        await new Promise(r => setTimeout(r, 220));
+      } else {
+        for (let s = 0; s < steps; s++) {
+          gameState[color][tokenIndex]++;
+          SFX.step();
+          renderBoard();
+          await new Promise(r => setTimeout(r, 160));
+        }
+      }
+
+      const landed = gameState[color][tokenIndex];
+      const opponent = (color === 'red') ? 'blue' : 'red';
+      let captured = false;
+
+      if (landed < 51) {
+        const actualIdx = (color === 'red') ? landed : (landed + 26) % 52;
+        if (!SAFE_INDICES.includes(actualIdx)) {
+          gameState[opponent].forEach((oppStep, oppIdx) => {
+            if (oppStep >= 0 && oppStep < 51) {
+              const oppActual = (opponent === 'red') ? oppStep : (oppStep + 26) % 52;
+              if (oppActual === actualIdx) {
+                gameState[opponent][oppIdx] = -1;
+                SFX.capture();
+                captured = true;
+              }
+            }
+          });
+        }
+      }
+
+      renderBoard();
+      isTokenAnimating = false;
+
+      if (syncToPeer && !isSingleMode && realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'game_move',
+          payload: { color, tokenIndex, steps }
+        });
+      }
+
+      if (gameState[color].every(s => s >= 56)) {
+        handleVictory(color);
+        return;
+      }
+
+      if (diceValue === 6 || captured) {
+        isDiceRolled = false;
+        updateDiceTurnVisuals();
+        startTurnTimer();
+      } else {
+        switchTurn();
+      }
+    }
+
+    function canPawnMove(step, roll) {
+      if (step === -1) return roll === 6;
+      return (step + roll) <= 56;
+    }
+
+    window.handleDiceRollClick = function(clickedColor = null) {
+      if (isDiceRolled || isTokenAnimating) return;
+      if (clickedColor && clickedColor !== currentTurn) return;
+      if (!isSingleMode && currentTurn !== localPlayerColor) return;
+      executeDiceRoll();
+    };
+
+    function executeDiceRoll(forcedVal = null) {
+      isDiceRolled = true;
+      clearInterval(turnTimerInterval);
+
+      const activeCube = document.getElementById(currentTurn === 'red' ? 'cube-red' : 'cube-blue');
+      if (activeCube) {
+        activeCube.classList.remove('turn-active');
+        activeCube.classList.add('rolling-anim');
+      }
+      SFX.roll();
+
+      setTimeout(() => {
+        diceValue = forcedVal || (Math.floor(Math.random() * 6) + 1);
+        if (activeCube) activeCube.classList.remove('rolling-anim');
+        renderDicePips(currentTurn, diceValue);
+
+        if (!forcedVal && !isSingleMode && realtimeChannel) {
+          realtimeChannel.send({ type: 'broadcast', event: 'dice_roll', payload: { roll: diceValue } });
+        }
+
+        if (diceValue === 6) {
+          consecutiveSixes++;
+          if (consecutiveSixes === 3) {
+            consecutiveSixes = 0;
+            setTimeout(switchTurn, 800);
+            return;
+          }
+        } else {
+          consecutiveSixes = 0;
+        }
+
+        evaluateMovesAfterRoll();
+      }, 550);
+    }
+
+    function renderDicePips(playerColor, val) {
+      const container = document.getElementById(playerColor === 'red' ? 'pips-red' : 'pips-blue');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const dotCoords = {
+        1: [4],
+        2: [0, 8],
+        3: [0, 4, 8],
+        4: [0, 2, 6, 8],
+        5: [0, 2, 4, 6, 8],
+        6: [0, 2, 3, 5, 6, 8]
+      };
+
+      const activeDots = dotCoords[val] || [4];
+
+      for (let i = 0; i < 9; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'pip-slot';
+        if (activeDots.includes(i)) {
+          const dot = document.createElement('div');
+          dot.className = 'pip-dot' + (val === 1 ? ' red-pip' : '');
+          slot.appendChild(dot);
+        }
+        container.appendChild(slot);
+      }
+    }
+
+    function evaluateMovesAfterRoll() {
+      const tokens = gameState[currentTurn];
+      const valid = [];
+      tokens.forEach((s, idx) => {
+        if (canPawnMove(s, diceValue)) valid.push(idx);
+      });
+
+      renderBoard();
+
+      if (valid.length === 0) {
+        setTimeout(switchTurn, 750);
+      } else if (valid.length === 1 && (isSingleMode ? currentTurn !== 'blue' : currentTurn === localPlayerColor)) {
+        animateTokenStepByStep(currentTurn, valid[0], diceValue);
+      } else {
+        if (isSingleMode && currentTurn === 'blue') {
+          setTimeout(() => {
+            let chosen = valid[0];
+            for (let idx of valid) {
+              if (gameState.blue[idx] === -1 && diceValue === 6) { chosen = idx; break; }
+              if (gameState.blue[idx] > gameState.blue[chosen]) chosen = idx;
+            }
+            animateTokenStepByStep('blue', chosen, diceValue);
+          }, 450);
+        }
+      }
+    }
+
+    function switchTurn() {
+      currentTurn = (currentTurn === 'red') ? 'blue' : 'red';
+      isDiceRolled = false;
+      updateDiceTurnVisuals();
+      startTurnTimer();
+
+      if (isSingleMode && currentTurn === 'blue') {
+        setTimeout(executeDiceRoll, 600);
+      }
+    }
+
+    function updateDiceTurnVisuals() {
+      const redCube = document.getElementById('cube-red');
+      const blueCube = document.getElementById('cube-blue');
+      if (redCube) redCube.classList.toggle('turn-active', currentTurn === 'red');
+      if (blueCube) blueCube.classList.toggle('turn-active', currentTurn === 'blue');
+    }
+
+    function handleTimerExpiredAutoPlay() {
+      clearInterval(turnTimerInterval);
+      if (isTokenAnimating) return;
+
+      if (!isDiceRolled) {
+        executeDiceRoll();
+        const checkRollInterval = setInterval(() => {
+          if (!isDiceRolled || isTokenAnimating) {
+            clearInterval(checkRollInterval);
+            return;
+          }
+          const tokens = gameState[currentTurn];
+          const valid = [];
+          tokens.forEach((s, idx) => {
+            if (canPawnMove(s, diceValue)) valid.push(idx);
+          });
+
+          if (valid.length > 0) {
+            clearInterval(checkRollInterval);
+            let chosen = valid[0];
+            for (let idx of valid) {
+              if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
+              if (tokens[idx] > tokens[chosen]) chosen = idx;
+            }
+            animateTokenStepByStep(currentTurn, chosen, diceValue);
+          }
+        }, 150);
+      } else {
+        const tokens = gameState[currentTurn];
+        const valid = [];
+        tokens.forEach((s, idx) => {
+          if (canPawnMove(s, diceValue)) valid.push(idx);
+        });
+        if (valid.length > 0) {
+          let chosen = valid[0];
+          for (let idx of valid) {
+            if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
+            if (tokens[idx] > tokens[chosen]) chosen = idx;
+          }
+          animateTokenStepByStep(currentTurn, chosen, diceValue);
+        } else {
+          switchTurn();
+        }
+      }
+    }
+
+    function startTurnTimer() {
+      clearInterval(turnTimerInterval);
+      const ring = document.getElementById(currentTurn === 'red' ? 'timer-red' : 'timer-blue');
+      const otherRing = document.getElementById(currentTurn === 'red' ? 'timer-blue' : 'timer-red');
+      if (otherRing) otherRing.style.strokeDashoffset = '188';
+
+      let timeLeft = 15;
+      const total = 15;
+      turnTimerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        const progress = Math.max(0, (timeLeft / total) * 188);
+        if (ring) ring.style.strokeDashoffset = (188 - progress);
+        if (timeLeft <= 0) {
+          clearInterval(turnTimerInterval);
+          handleTimerExpiredAutoPlay();
+        }
+      }, 100);
+    }
+
+    function handleCanvasTouch(clientX, clientY) {
+      if (!isDiceRolled || isTokenAnimating) return;
+      if (!isSingleMode && currentTurn !== localPlayerColor) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = BOARD_PX / rect.width;
+      const scaleY = BOARD_PX / rect.height;
+      const clickX = (clientX - rect.left) * scaleX;
+      const clickY = (clientY - rect.top) * scaleY;
+
+      const tokens = gameState[currentTurn];
+      for (let i = 0; i < tokens.length; i++) {
+        if (!canPawnMove(tokens[i], diceValue)) continue;
+        const coords = getTokenVisualCoords(currentTurn, i, tokens[i]);
+        const px = coords.c * CELL + CELL / 2;
+        const py = coords.r * CELL + CELL / 2;
+
+        if (Math.hypot(clickX - px, clickY - py) <= CELL * 0.85) {
+          animateTokenStepByStep(currentTurn, i, diceValue);
+          break;
+        }
+      }
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      handleCanvasTouch(e.clientX, e.clientY);
+    });
+
+    async function handleVictory(winner) {
+      SFX.win();
+      clearInterval(turnTimerInterval);
+      document.getElementById('result-modal').style.display = 'flex';
+      document.getElementById('result-winner-title').innerText = winner.toUpperCase() + " WINS!";
+
+      if (!isSingleMode && activeRoomData && activeRoomData.entry_fee > 0 && window.supabaseClient) {
+        const winnerId = (winner === 'red' ? activeRoomData.host_id : activeRoomData.guest_id);
+        const { data: res } = await window.supabaseClient.rpc('settle_ludo_winner', {
+          p_room_id: activeRoomData.id,
+          p_winner_id: winnerId
+        });
+        if (res && res.success) {
+          document.getElementById('res-prize-amount').innerText = res.reward + " Coins";
+          document.getElementById('res-fee-amount').innerText = res.fee + " Coins";
+        }
+      } else {
+        document.getElementById('res-prize-amount').innerText = "Practice Mode";
+        document.getElementById('res-fee-amount').innerText = "0 Coins";
+      }
+      syncRealWalletBalance();
+    }
+
+    window.toggleIngameMenu = function() {
+      const menu = document.getElementById('ingame-menu-dropdown');
+      if (menu) menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+    };
+
+    window.exitMatchSafely = function() {
+      if (confirm("Match se exit karna chahte hain?")) {
+        clearInterval(turnTimerInterval);
+        document.getElementById('screen-game-arena').style.display = 'none';
+        document.getElementById('screen-mode-select').style.display = 'flex';
+      }
+    };
+
+    window.openLobbyFromResults = function() {
+      document.getElementById('result-modal').style.display = 'none';
+      document.getElementById('screen-game-arena').style.display = 'none';
+      document.getElementById('screen-mode-select').style.display = 'flex';
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      pushNavigationState('home');
+      renderDicePips('red', 1);
+      renderDicePips('blue', 1);
+      removeParentExitButton();
+      syncRealWalletBalance();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = urlParams.get('room');
+      if (roomParam) {
+        window.promptJoinByCode(roomParam);
+      }
+    });
+  </script>
 </body>
 </html>
