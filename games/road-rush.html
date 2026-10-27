@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Zombie Road Rush - Action Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 90vh;
+      max-height: 720px;
+      background: #222;
+      border: 2px solid #ff4444;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(255, 68, 68, 0.4);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #1e1e1e;
+    }
+    .hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .hud-box {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #444;
+    }
+    .hud-hp {
+      color: #00ff88;
+    }
+    .hud-score {
+      color: #ffbb00;
+    }
+    .mobile-controls {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 5;
+    }
+    .ctrl-group {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 2px solid #ff4444;
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+    .btn:active {
+      background: #ff4444;
+      transform: scale(0.95);
+    }
+    .btn-fire {
+      width: 70px;
+      height: 70px;
+      border-color: #ffbb00;
+      background: rgba(255, 187, 0, 0.2);
+    }
+    .btn-fire:active {
+      background: #ffbb00;
+      color: #000;
+    }
+    #game-over-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+    }
+    #game-over-screen h2 {
+      font-size: 32px;
+      color: #ff3333;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    #game-over-screen p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #ddd;
+    }
+    .restart-btn {
+      padding: 12px 28px;
+      background: #ff4444;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .restart-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <div class="hud">
+      <div class="hud-box">HP: <span id="hp-val" class="hud-hp">100</span>%</div>
+      <div class="hud-box">SCORE: <span id="score-val" class="hud-score">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="mobile-controls">
+      <div class="ctrl-group">
+        <div class="btn" id="btn-left">&#8592;</div>
+        <div class="btn" id="btn-right">&#8594;</div>
+      </div>
+      <div class="btn btn-fire" id="btn-fire">&#128293;</div>
+    </div>
+
+    <div id="game-over-screen">
+      <h2>MISSION FAILED</h2>
+      <p>Final Score: <span id="final-score">0</span></p>
+      <button class="restart-btn" id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const hpVal = document.getElementById('hp-val');
+    const scoreVal = document.getElementById('score-val');
+    const finalScore = document.getElementById('final-score');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const btnFire = document.getElementById('btn-fire');
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let lanes = 3;
+    let currentLane = 1;
+    let player = {
+      x: 0,
+      y: 0,
+      width: 44,
+      height: 70,
+      hp: 100,
+      speed: 12
+    };
+
+    let score = 0;
+    let isGameOver = false;
+    let bullets = [];
+    let enemies = [];
+    let particles = [];
+    let roadStripeOffset = 0;
+    let spawnTimer = 0;
+    let fireCooldown = 0;
+
+    function getLaneX(laneIndex) {
+      const laneWidth = canvas.width / lanes;
+      return laneWidth * laneIndex + laneWidth / 2;
+    }
+
+    function initGame() {
+      player.hp = 100;
+      score = 0;
+      currentLane = 1;
+      player.x = getLaneX(currentLane);
+      player.y = canvas.height - 150;
+      bullets = [];
+      enemies = [];
+      particles = [];
+      isGameOver = false;
+      hpVal.textContent = player.hp;
+      scoreVal.textContent = score;
+      gameOverScreen.style.display = 'none';
+      requestAnimationFrame(gameLoop);
+    }
+
+    function shootBullet() {
+      if (isGameOver || fireCooldown > 0) return;
+      bullets.push({
+        x: player.x - 12,
+        y: player.y - 10,
+        speed: 14,
+        radius: 4
+      });
+      bullets.push({
+        x: player.x + 12,
+        y: player.y - 10,
+        speed: 14,
+        radius: 4
+      });
+      fireCooldown = 10;
+    }
+
+    function spawnEnemy() {
+      const lane = Math.floor(Math.random() * lanes);
+      const isBarricade = Math.random() > 0.65;
+      enemies.push({
+        x: getLaneX(lane),
+        y: -60,
+        width: isBarricade ? 50 : 36,
+        height: isBarricade ? 35 : 55,
+        type: isBarricade ? 'barricade' : 'zombie',
+        hp: isBarricade ? 4 : 2,
+        speed: isBarricade ? 3 : 4 + Math.random() * 2
+      });
+    }
+
+    function createExplosion(x, y, color, count = 8) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6,
+          radius: Math.random() * 3 + 2,
+          color: color,
+          alpha: 1
+        });
+      }
+    }
+
+    function update() {
+      if (isGameOver) return;
+
+      const targetX = getLaneX(currentLane);
+      player.x += (targetX - player.x) * 0.2;
+
+      roadStripeOffset = (roadStripeOffset + 6) % 40;
+
+      if (fireCooldown > 0) fireCooldown--;
+
+      spawnTimer++;
+      if (spawnTimer > 45) {
+        spawnEnemy();
+        spawnTimer = 0;
+      }
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].y -= bullets[i].speed;
+        if (bullets[i].y < -10) {
+          bullets.splice(i, 1);
+        }
+      }
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i];
+        e.y += e.speed;
+
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          let b = bullets[j];
+          if (
+            b.x > e.x - e.width / 2 &&
+            b.x < e.x + e.width / 2 &&
+            b.y > e.y - e.height / 2 &&
+            b.y < e.y + e.height / 2
+          ) {
+            bullets.splice(j, 1);
+            e.hp--;
+            createExplosion(b.x, b.y, '#ffaa00', 4);
+
+            if (e.hp <= 0) {
+              createExplosion(e.x, e.y, e.type === 'zombie' ? '#44ff44' : '#ff4444', 12);
+              enemies.splice(i, 1);
+              score += e.type === 'zombie' ? 10 : 25;
+              scoreVal.textContent = score;
+              break;
+            }
+          }
+        }
+
+        if (enemies[i]) {
+          const pLeft = player.x - player.width / 2;
+          const pRight = player.x + player.width / 2;
+          const pTop = player.y - player.height / 2;
+          const pBottom = player.y + player.height / 2;
+
+          const eLeft = e.x - e.width / 2;
+          const eRight = e.x + e.width / 2;
+          const eTop = e.y - e.height / 2;
+          const eBottom = e.y + e.height / 2;
+
+          if (pRight > eLeft && pLeft < eRight && pBottom > eTop && pTop < eBottom) {
+            player.hp -= e.type === 'zombie' ? 20 : 35;
+            hpVal.textContent = Math.max(0, player.hp);
+            createExplosion(e.x, e.y, '#ff0000', 15);
+            enemies.splice(i, 1);
+
+            if (player.hp <= 0) {
+              isGameOver = true;
+              finalScore.textContent = score;
+              gameOverScreen.style.display = 'flex';
+            }
+          } else if (e.y > canvas.height + 60) {
+            enemies.splice(i, 1);
+          }
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.04;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1c1c1c';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 4;
+      ctx.setLineDash([20, 20]);
+      ctx.lineDashOffset = -roadStripeOffset;
+
+      const laneW = canvas.width / lanes;
+      for (let i = 1; i < lanes; i++) {
+        ctx.beginPath();
+        ctx.moveTo(laneW * i, 0);
+        ctx.lineTo(laneW * i, canvas.height);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#ffcc00';
+      for (let b of bullets) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let e of enemies) {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+        if (e.type === 'zombie') {
+          ctx.fillStyle = '#2e7d32';
+          ctx.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
+          ctx.fillStyle = '#c62828';
+          ctx.fillRect(-8, -e.height / 2 + 6, 4, 4);
+          ctx.fillRect(4, -e.height / 2 + 6, 4, 4);
+        } else {
+          ctx.fillStyle = '#d84315';
+          ctx.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(-e.width / 2, -4, e.width, 8);
+        }
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.fillStyle = '#1565c0';
+      ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
+      ctx.fillStyle = '#90caf9';
+      ctx.fillRect(-player.width / 2 + 4, -player.height / 2 + 12, player.width - 8, 16);
+      ctx.fillStyle = '#ffeb3b';
+      ctx.fillRect(-player.width / 2 + 2, -player.height / 2, 8, 4);
+      ctx.fillRect(player.width / 2 - 10, -player.height / 2, 8, 4);
+      ctx.restore();
+
+      for (let p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      if (!isGameOver) {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function moveLeft() {
+      if (currentLane > 0) currentLane--;
+    }
+    function moveRight() {
+      if (currentLane < lanes - 1) currentLane++;
+    }
+
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft(); });
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); moveRight(); });
+    btnFire.addEventListener('touchstart', (e) => { e.preventDefault(); shootBullet(); });
+
+    btnLeft.addEventListener('click', moveLeft);
+    btnRight.addEventListener('click', moveRight);
+    btnFire.addEventListener('click', shootBullet);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
+      if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
+      if (e.key === ' ' || e.key === 'ArrowUp') shootBullet();
+    });
+
+    restartBtn.addEventListener('click', initGame);
+
+    initGame();
+  </script>
+</body>
+</html>
