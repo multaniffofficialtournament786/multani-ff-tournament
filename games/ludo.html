@@ -19,65 +19,88 @@
     let userWalletBalance = 0;
     let loggedInUserId = null;
 
-    // Remove Red Exit Button from Parent DOM if in iframe
+    // 100% Safe Parent Exit Button Removal (Zero Crash)
     function removeParentExitButton() {
       try {
-        if (window.parent && window.parent.document) {
-          const parentButtons = window.parent.document.querySelectorAll('button, a, div');
-          parentButtons.forEach(el => {
-            if (el.innerText && el.innerText.trim().toUpperCase().includes('EXIT')) {
-              el.style.display = 'none';
+        if (window.parent && window.parent !== window) {
+          try {
+            const doc = window.parent.document;
+            if (doc) {
+              const elements = doc.querySelectorAll('button, a, div, span');
+              elements.forEach(el => {
+                if (el && el.innerText && el.innerText.trim().toUpperCase() === 'EXIT') {
+                  el.style.display = 'none';
+                }
+              });
             }
-          });
+          } catch(crossErr) {}
         }
       } catch(e) {}
     }
 
-    // Real Wallet Balance Fetcher from Supabase & Storage
+    // 100% Safe Real Wallet Balance Fetcher (Zero Crash)
     async function syncRealWalletBalance() {
       try {
         let savedUser = null;
-        // Check local storage and parent storage
-        const storages = [localStorage];
-        try { if (window.parent && window.parent.localStorage) storages.push(window.parent.localStorage); } catch(e){}
 
-        for (let st of storages) {
-          for (let key of Object.keys(st)) {
-            if (key.includes('supabase.auth.token') || key.includes('user') || key.includes('profile')) {
+        // Safe storage scan
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile'))) {
               try {
-                const parsed = JSON.parse(st.getItem(key));
-                if (parsed && (parsed.user || parsed.id || parsed.current_user)) {
+                const parsed = JSON.parse(localStorage.getItem(key));
+                if (parsed) {
                   savedUser = parsed.user || parsed.current_user || parsed;
-                  break;
+                  if (savedUser && (savedUser.id || savedUser.uid)) break;
                 }
               } catch(err){}
             }
           }
-          if (savedUser) break;
-        }
+        } catch(e) {}
 
-        if (window.supabaseClient) {
-          const { data: { user } } = await window.supabaseClient.auth.getUser();
-          const targetUid = user ? user.id : (savedUser ? (savedUser.id || savedUser.uid) : null);
-          
-          if (targetUid) {
-            loggedInUserId = targetUid;
-            const { data } = await window.supabaseClient
-              .from('users')
-              .select('balance, coins, wallet')
-              .eq('id', targetUid)
-              .single();
-
-            if (data) {
-              userWalletBalance = data.balance !== undefined ? Number(data.balance) : (data.coins !== undefined ? Number(data.coins) : Number(data.wallet || 0));
-              return;
+        // Safe parent storage scan
+        try {
+          if (!savedUser && window.parent && window.parent !== window && window.parent.localStorage) {
+            for (let i = 0; i < window.parent.localStorage.length; i++) {
+              const key = window.parent.localStorage.key(i);
+              if (key && (key.includes('supabase') || key.includes('user') || key.includes('profile'))) {
+                try {
+                  const parsed = JSON.parse(window.parent.localStorage.getItem(key));
+                  if (parsed) {
+                    savedUser = parsed.user || parsed.current_user || parsed;
+                    if (savedUser && (savedUser.id || savedUser.uid)) break;
+                  }
+                } catch(err){}
+              }
             }
           }
+        } catch(e) {}
+
+        if (savedUser) {
+          loggedInUserId = savedUser.id || savedUser.uid || null;
+          if (savedUser.balance !== undefined) userWalletBalance = Number(savedUser.balance);
+          else if (savedUser.coins !== undefined) userWalletBalance = Number(savedUser.coins);
         }
 
-        // Fallback from raw parent elements or storages
-        if (savedUser && (savedUser.balance !== undefined || savedUser.coins !== undefined)) {
-          userWalletBalance = Number(savedUser.balance || savedUser.coins || 0);
+        // Supabase DB fetch
+        if (window.supabaseClient) {
+          try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            const targetUid = user ? user.id : loggedInUserId;
+            if (targetUid) {
+              loggedInUserId = targetUid;
+              const { data } = await window.supabaseClient
+                .from('users')
+                .select('balance, coins, wallet')
+                .eq('id', targetUid)
+                .single();
+
+              if (data) {
+                userWalletBalance = data.balance !== undefined ? Number(data.balance) : (data.coins !== undefined ? Number(data.coins) : Number(data.wallet || 0));
+              }
+            }
+          } catch(sbErr) {}
         }
       } catch(e) {
         console.warn("Wallet sync note:", e);
@@ -86,9 +109,11 @@
 
     // Mobile Back Button Navigation Management
     function pushNavigationState(screenName) {
-      if (window.history && window.history.pushState) {
-        window.history.pushState({ screen: screenName }, "", "");
-      }
+      try {
+        if (window.history && window.history.pushState) {
+          window.history.pushState({ screen: screenName }, "", "");
+        }
+      } catch(e){}
     }
 
     window.addEventListener('popstate', function() {
@@ -121,8 +146,12 @@
       } else {
         if (window.history.length > 1) {
           window.history.back();
-        } else if (window.parent && window.parent.Router) {
-          window.parent.location.href = 'index.html';
+        } else {
+          try {
+            if (window.parent && window.parent !== window && window.parent.location) {
+              window.parent.location.href = 'index.html';
+            }
+          } catch(e){}
         }
       }
     };
@@ -193,7 +222,6 @@
       await syncRealWalletBalance();
       const fee = window.getSelectedFee();
 
-      // STRICT WALLET BALANCE CHECK
       if (fee > 0 && userWalletBalance < fee) {
         alert("Balance kam hai!\nAapke wallet mein sirf " + userWalletBalance + " Coins hain. Kam coins wali game select karein ya wallet recharge karein.");
         return;
@@ -235,7 +263,6 @@
       }
     };
 
-    // FIXED INVITE WITHOUT 404 REDIRECT
     window.sendInviteToChatAndWhatsApp = function() {
       const fee = window.getSelectedFee();
       const chatPayload = '[LUDO_INVITE:{"code":"' + currentRoomCode + '","fee":' + fee + ',"mode":"Classic 1v1"}]';
@@ -388,7 +415,6 @@
       pointer-events: none;
     }
 
-    /* TOP HEADER: CLEAN TITLE & DETAIL BUTTON */
     .top-global-header {
       width: 100%;
       height: 48px;
@@ -707,7 +733,6 @@
       color: #fff; font-size: 18px; cursor: pointer;
     }
 
-    /* BLUE PLAYER (TOP RIGHT) & BLUE DICE NEXT TO BLUE AVATAR */
     .opponent-hud-box {
       position: absolute;
       top: 10px;
@@ -718,7 +743,6 @@
       z-index: 20;
     }
 
-    /* RED PLAYER (BOTTOM LEFT) & RED DICE NEXT TO RED AVATAR */
     .host-hud-box {
       position: absolute;
       bottom: 12px;
@@ -810,7 +834,6 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       transition: transform 0.1s, box-shadow 0.2s;
     }
-    /* VIBRATE / SHAKE ANIMATION ON ACTIVE TURN */
     .real-dice-cube.turn-active {
       animation: diceShakeTurn 0.4s infinite alternate;
       border-color: var(--cyan);
@@ -831,7 +854,6 @@
       100% { transform: rotate(720deg) scale(1); }
     }
 
-    /* REALISTIC 3X3 DICE GRID */
     .dice-pips-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -940,7 +962,7 @@
 
   <div id="app-wrapper">
 
-    <!-- TOP HEADER: DETAIL BUTTON -->
+    <!-- TOP HEADER -->
     <div class="top-global-header">
       <div class="header-logo-title">
         <i class="fa-solid fa-gamepad" style="color:var(--gold);"></i>
@@ -975,7 +997,7 @@
           <i class="fa-solid fa-crown" style="color:var(--gold);"></i> CLASSIC MODE
         </div>
 
-        <!-- Coin Selector (- / +) Steps: FREE(0), 25, 50, 100, 250, 500, 1000 -->
+        <!-- Coin Selector -->
         <div class="coin-selector-container">
           <button type="button" class="coin-calc-btn" onclick="window.adjustCoinAmount(-1)">-</button>
           <div class="coin-amount-display">
@@ -1054,7 +1076,7 @@
         <div class="popup-menu-item" onclick="window.exitMatchSafely()"><div class="popup-icon-sq" style="background:#c0392b;"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><span>Exit</span></div>
       </div>
 
-      <!-- BLUE PLAYER & BLUE DICE (TOP RIGHT CORNER) -->
+      <!-- BLUE PLAYER & BLUE DICE (TOP RIGHT) -->
       <div class="opponent-hud-box">
         <div class="dice-hud-container" id="dice-container-blue">
           <svg class="timer-ring-svg"><circle class="timer-circle-bg" cx="31" cy="31" r="27"></circle><circle class="timer-circle-progress" id="timer-blue" cx="31" cy="31" r="27"></circle></svg>
@@ -1076,7 +1098,7 @@
         <canvas id="ludo-main-canvas" width="360" height="360"></canvas>
       </div>
 
-      <!-- RED PLAYER & RED DICE (BOTTOM LEFT CORNER) -->
+      <!-- RED PLAYER & RED DICE (BOTTOM LEFT) -->
       <div class="host-hud-box">
         <div class="player-hud-card" style="border-color:#e74c3c;">
           <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="hud-avatar" id="host-avatar-arena" alt="Me" />
@@ -1241,7 +1263,7 @@
     function initAudio() {
       try {
         if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-        if (actx.state === 'suspended') actx.resume();
+        if (actx && actx.state === 'suspended') actx.resume();
       } catch(e){}
     }
 
@@ -1256,47 +1278,55 @@
     const SFX = {
       roll() {
         if (!audioEnabled) return; initAudio(); if (!actx) return;
-        const osc = actx.createOscillator(), gain = actx.createGain();
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(340, actx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(160, actx.currentTime + 0.18);
-        gain.gain.setValueAtTime(0.25, actx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.18);
-        osc.connect(gain); gain.connect(actx.destination);
-        osc.start(); osc.stop(actx.currentTime + 0.18);
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(340, actx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, actx.currentTime + 0.18);
+          gain.gain.setValueAtTime(0.25, actx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.18);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.18);
+        } catch(e){}
       },
       step() {
         if (!audioEnabled) return; initAudio(); if (!actx) return;
-        const osc = actx.createOscillator(), gain = actx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(560, actx.currentTime);
-        gain.gain.setValueAtTime(0.2, actx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.08);
-        osc.connect(gain); gain.connect(actx.destination);
-        osc.start(); osc.stop(actx.currentTime + 0.08);
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'sine'; osc.frequency.setValueAtTime(560, actx.currentTime);
+          gain.gain.setValueAtTime(0.2, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.08);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.08);
+        } catch(e){}
       },
       capture() {
         if (!audioEnabled) return; initAudio(); if (!actx) return;
-        const osc = actx.createOscillator(), gain = actx.createGain();
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(260, actx.currentTime);
-        gain.gain.setValueAtTime(0.3, actx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.35);
-        osc.connect(gain); gain.connect(actx.destination);
-        osc.start(); osc.stop(actx.currentTime + 0.35);
+        try {
+          const osc = actx.createOscillator(), gain = actx.createGain();
+          osc.type = 'sawtooth'; osc.frequency.setValueAtTime(260, actx.currentTime);
+          gain.gain.setValueAtTime(0.3, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.35);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 0.35);
+        } catch(e){}
       },
       win() {
         if (!audioEnabled) return; initAudio(); if (!actx) return;
-        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-          const osc = actx.createOscillator(), gain = actx.createGain();
-          osc.type = 'triangle'; osc.frequency.setValueAtTime(f, actx.currentTime + i * 0.12);
-          gain.gain.setValueAtTime(0.25, actx.currentTime + i * 0.12);
-          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + i * 0.12 + 0.3);
-          osc.connect(gain); gain.connect(actx.destination);
-          osc.start(actx.currentTime + i * 0.12); osc.stop(actx.currentTime + i * 0.12 + 0.3);
-        });
+        try {
+          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const osc = actx.createOscillator(), gain = actx.createGain();
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(f, actx.currentTime + i * 0.12);
+            gain.gain.setValueAtTime(0.25, actx.currentTime + i * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + i * 0.12 + 0.3);
+            osc.connect(gain); gain.connect(actx.destination);
+            osc.start(actx.currentTime + i * 0.12); osc.stop(actx.currentTime + i * 0.12 + 0.3);
+          });
+        } catch(e){}
       }
     };
 
     /* ==========================================================================
-       BOARD COORDINATES & 5 HOME BOXES
+       BOARD ENGINE & 5 HOME BOXES
        ========================================================================== */
     const canvas = document.getElementById('ludo-main-canvas');
     const ctx = canvas.getContext('2d');
@@ -1319,11 +1349,9 @@
       [6, 0]
     ];
     
-    // 5 Individual Home Run Boxes (Row, Col)
     const RED_HOMERUN = [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]];
     const BLUE_HOMERUN = [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]];
 
-    // Base positions
     const RED_BASES = [[2, 2], [2, 3], [3, 2], [3, 3]];
     const BLUE_BASES = [[11, 11], [11, 12], [12, 11], [12, 12]];
     const SAFE_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
@@ -1336,6 +1364,7 @@
     let consecutiveSixes = 0;
     let turnTimerInterval = null;
     let pulseAnimFrame = 0;
+    let glowLoopStarted = false;
 
     let gameState = {
       red: [-1, -1, -1, -1],
@@ -1353,23 +1382,19 @@
       updateDiceTurnVisuals();
       renderBoard();
       startTurnTimer();
-      startGlowLoop();
+      if (!glowLoopStarted) {
+        glowLoopStarted = true;
+        startGlowLoop();
+      }
     };
 
-    // FIXED TOKEN HOME PLACEMENT: Red stays strictly in Red triangle (Left), Blue in Blue (Right)
     function getTokenVisualCoords(color, index, step) {
       if (step === -1) {
         const b = (color === 'red') ? RED_BASES[index] : BLUE_BASES[index];
         return { r: b[0], c: b[1] };
       }
       if (step >= 56) {
-        // Red home inside left red triangle
-        if (color === 'red') {
-          return { r: 7.5, c: 6.8 };
-        } else {
-          // Blue home inside right blue triangle
-          return { r: 7.5, c: 8.2 };
-        }
+        return (color === 'red') ? { r: 7.5, c: 6.8 } : { r: 7.5, c: 8.2 };
       }
       if (color === 'red') {
         if (step < 51) return { r: TRACK_COORDS[step % 52][0], c: TRACK_COORDS[step % 52][1] };
@@ -1380,8 +1405,8 @@
       }
     }
 
-    // DRAW BOARD WITH 5 INDIVIDUAL BOXES ON HOME RUN
     function renderBoard() {
+      if (!ctx) return;
       ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, BOARD_PX, BOARD_PX);
@@ -1399,7 +1424,6 @@
       drawBase(9, 9, '#3498db');
       drawBase(9, 0, '#f1c40f');
 
-      // Grid Lines
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 1;
       for (let i = 0; i <= 15; i++) {
@@ -1407,38 +1431,31 @@
         ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(BOARD_PX, i * CELL); ctx.stroke();
       }
 
-      // 5 SEPARATE HOME BOXES WITH VISIBLE BORDERS
       for (let i = 1; i <= 5; i++) {
-        // RED 5 Boxes
         ctx.fillStyle = '#e74c3c';
         ctx.fillRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
         ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5;
         ctx.strokeRect(i * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
 
-        // BLUE 5 Boxes
         ctx.fillStyle = '#3498db';
         ctx.fillRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
         ctx.strokeStyle = '#2980b9'; ctx.lineWidth = 1.5;
         ctx.strokeRect((14 - i) * CELL + 1, 7 * CELL + 1, CELL - 2, CELL - 2);
 
-        // GREEN 5 Boxes
         ctx.fillStyle = '#2ecc71';
         ctx.fillRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
         ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1.5;
         ctx.strokeRect(7 * CELL + 1, i * CELL + 1, CELL - 2, CELL - 2);
 
-        // YELLOW 5 Boxes
         ctx.fillStyle = '#f1c40f';
         ctx.fillRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 1.5;
         ctx.strokeRect(7 * CELL + 1, (14 - i) * CELL + 1, CELL - 2, CELL - 2);
       }
 
-      // Starting Entry Arrow Boxes
       ctx.fillStyle = '#e74c3c'; ctx.fillRect(1 * CELL, 6 * CELL, CELL, CELL);
       ctx.fillStyle = '#3498db'; ctx.fillRect(13 * CELL, 8 * CELL, CELL, CELL);
 
-      // Center Triangles
       const drawTri = (p1, p2, col) => {
         ctx.beginPath();
         ctx.moveTo(p1[0] * CELL, p1[1] * CELL);
@@ -1471,10 +1488,10 @@
       ctx.fillStyle = color; ctx.fill();
     }
 
-    // CONTINUOUS GLOW ANIMATION FOR MOVABLE PAWNS
     function startGlowLoop() {
       pulseAnimFrame = (pulseAnimFrame + 0.1) % (Math.PI * 2);
-      if (isDiceRolled) {
+      const arenaScreen = document.getElementById('screen-game-arena');
+      if (arenaScreen && arenaScreen.style.display === 'flex' && isDiceRolled) {
         renderBoard();
       }
       requestAnimationFrame(startGlowLoop);
@@ -1507,7 +1524,6 @@
           const py = pawn.coords.r * CELL + CELL / 2 + offsetY;
           const isMovable = isDiceRolled && (pawn.color === currentTurn) && canPawnMove(pawn.step, diceValue);
 
-          // PULSING BLINKING GLOW BORDER ON MOVABLE PAWNS
           if (isMovable) {
             const glowSize = CELL * (0.46 + Math.sin(pulseAnimFrame) * 0.08);
             ctx.beginPath();
@@ -1620,13 +1636,15 @@
       clearInterval(turnTimerInterval);
 
       const activeCube = document.getElementById(currentTurn === 'red' ? 'cube-red' : 'cube-blue');
-      activeCube.classList.remove('turn-active');
-      activeCube.classList.add('rolling-anim');
+      if (activeCube) {
+        activeCube.classList.remove('turn-active');
+        activeCube.classList.add('rolling-anim');
+      }
       SFX.roll();
 
       setTimeout(() => {
         diceValue = forcedVal || (Math.floor(Math.random() * 6) + 1);
-        activeCube.classList.remove('rolling-anim');
+        if (activeCube) activeCube.classList.remove('rolling-anim');
         renderDicePips(currentTurn, diceValue);
 
         if (!forcedVal && !isSingleMode && realtimeChannel) {
@@ -1648,9 +1666,9 @@
       }, 550);
     }
 
-    /* REALISTIC 3X3 DICE DOTS */
     function renderDicePips(playerColor, val) {
       const container = document.getElementById(playerColor === 'red' ? 'pips-red' : 'pips-blue');
+      if (!container) return;
       container.innerHTML = '';
 
       const dotCoords = {
@@ -1714,15 +1732,13 @@
       }
     }
 
-    // UPDATE DICE TURN VISUALS & ACTIVATE SHAKE ANIMATION
     function updateDiceTurnVisuals() {
       const redCube = document.getElementById('cube-red');
       const blueCube = document.getElementById('cube-blue');
-      redCube.classList.toggle('turn-active', currentTurn === 'red');
-      blueCube.classList.toggle('turn-active', currentTurn === 'blue');
+      if (redCube) redCube.classList.toggle('turn-active', currentTurn === 'red');
+      if (blueCube) blueCube.classList.toggle('turn-active', currentTurn === 'blue');
     }
 
-    // AUTO-ROLL & AUTO-MOVE ON TIMER EXPIRATION
     function handleTimerExpiredAutoPlay() {
       clearInterval(turnTimerInterval);
       if (isTokenAnimating) return;
@@ -1773,14 +1789,14 @@
       clearInterval(turnTimerInterval);
       const ring = document.getElementById(currentTurn === 'red' ? 'timer-red' : 'timer-blue');
       const otherRing = document.getElementById(currentTurn === 'red' ? 'timer-blue' : 'timer-red');
-      otherRing.style.strokeDashoffset = '188';
+      if (otherRing) otherRing.style.strokeDashoffset = '188';
 
       let timeLeft = 15;
       const total = 15;
       turnTimerInterval = setInterval(() => {
         timeLeft -= 0.1;
         const progress = Math.max(0, (timeLeft / total) * 188);
-        ring.style.strokeDashoffset = (188 - progress);
+        if (ring) ring.style.strokeDashoffset = (188 - progress);
         if (timeLeft <= 0) {
           clearInterval(turnTimerInterval);
           handleTimerExpiredAutoPlay();
@@ -1841,7 +1857,7 @@
 
     window.toggleIngameMenu = function() {
       const menu = document.getElementById('ingame-menu-dropdown');
-      menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+      if (menu) menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
     };
 
     window.exitMatchSafely = function() {
