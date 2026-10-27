@@ -10,13 +10,13 @@
 
   <!-- ZERO-LAG FAST FUNCTIONS IN HEAD -->
   <script>
-    // 0 = FREE Game, followed by coin tiers
     const coinSteps = [0, 25, 50, 100, 250, 500, 1000];
     let selectedCoinIndex = 1; // Default 25
     let currentRoomCode = "000000";
     let activeRoomData = null;
     let isSingleMode = false;
     let realtimeChannel = null;
+    let userWalletBalance = 0;
 
     // Mobile Back Button / Navigation History State Management
     function pushNavigationState(screenName) {
@@ -81,6 +81,23 @@
 
     window.closeRulesPopup = function() {
       const modal = document.getElementById('rules-modal-overlay');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.showMatchDetailsPopup = function() {
+      const modal = document.getElementById('match-details-modal');
+      const fee = window.getSelectedFee();
+      const prize = (fee === 0) ? 0 : Math.floor((fee * 2) * 0.9);
+
+      document.getElementById('detail-match-fee').innerText = (fee === 0) ? "FREE (0 Coins)" : (fee + " Coins");
+      document.getElementById('detail-match-prize').innerText = (fee === 0) ? "Fun Match" : (prize + " Coins");
+      document.getElementById('detail-user-wallet').innerText = userWalletBalance + " Coins";
+
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeMatchDetailsPopup = function() {
+      const modal = document.getElementById('match-details-modal');
       if (modal) modal.style.display = 'none';
     };
 
@@ -269,15 +286,58 @@
       pointer-events: none;
     }
 
+    /* TOP GLOBAL HEADER */
+    .top-global-header {
+      width: 100%;
+      height: 48px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1.5px solid #1e293b;
+      z-index: 50;
+    }
+    .header-logo-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .btn-detail-pill {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1.5px solid #38bdf8;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      outline: none;
+    }
+    .btn-detail-pill:active {
+      transform: scale(0.95);
+    }
+
     .screen-view {
       position: absolute;
-      inset: 0;
+      top: 48px;
+      bottom: 0;
+      left: 0;
+      right: 0;
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 16px;
+      padding: 14px;
       overflow-y: auto;
     }
 
@@ -299,11 +359,11 @@
 
     .mascot-hero-wrap {
       text-align: center;
-      margin-top: 10px;
+      margin-top: 8px;
       pointer-events: none;
     }
     .mascot-ludo-img {
-      width: 110px;
+      width: 100px;
       filter: drop-shadow(0 8px 18px rgba(0,0,0,0.6));
     }
 
@@ -312,17 +372,17 @@
       background: rgba(14, 34, 61, 0.94);
       border: 2px solid #2980b9;
       border-radius: 20px;
-      padding: 18px 16px;
+      padding: 16px 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(41, 128, 185, 0.4);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       z-index: 25;
     }
 
     .mode-single-tab {
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       background: linear-gradient(135deg, #00b4db, #0083b0);
       color: #fff;
       font-size: 15px;
@@ -341,10 +401,10 @@
       gap: 8px;
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       border: 2px solid #e0f7fa;
-      padding: 11px;
+      padding: 10px;
       border-radius: 12px;
       font-weight: 900;
-      font-size: 16px;
+      font-size: 15px;
       letter-spacing: 1px;
       box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
     }
@@ -359,7 +419,7 @@
       padding: 8px 14px;
     }
     .coin-calc-btn {
-      width: 50px; height: 50px; border-radius: 10px;
+      width: 48px; height: 48px; border-radius: 10px;
       background: linear-gradient(135deg, #34495e, #1c2833);
       border: 1.5px solid #5d6d7e;
       color: #fff; font-size: 26px; font-weight: 900;
@@ -372,22 +432,22 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--gold);
     }
 
     .action-duo-buttons {
       display: flex;
-      gap: 12px;
-      margin-top: 4px;
+      gap: 10px;
+      margin-top: 2px;
     }
     .btn-main-yellow {
       flex: 1;
-      padding: 14px 10px;
+      padding: 13px 8px;
       border: none;
       border-radius: 12px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 900;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -407,7 +467,7 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .btn-join-pill {
       background: linear-gradient(135deg, #1abc9c, #16a085);
@@ -424,7 +484,7 @@
     .lobby-header-box {
       width: 100%;
       text-align: center;
-      margin-top: 10px;
+      margin-top: 6px;
     }
     .rank-prize-pill {
       display: inline-flex;
@@ -441,13 +501,13 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 900;
       color: var(--gold);
     }
     .team-code-num {
       color: #fff;
-      font-size: 26px;
+      font-size: 24px;
       letter-spacing: 2px;
       background: rgba(0,0,0,0.3);
       padding: 2px 14px;
@@ -460,7 +520,7 @@
       justify-content: center;
       gap: 24px;
       width: 100%;
-      margin: 30px 0;
+      margin: 24px 0;
     }
     .slot-player-card {
       width: 100px;
@@ -470,7 +530,7 @@
       gap: 8px;
     }
     .avatar-wrapper-ring {
-      width: 76px; height: 76px; border-radius: 50%;
+      width: 74px; height: 74px; border-radius: 50%;
       border: 3.5px solid #2ecc71;
       padding: 2px;
       background: #0e223d;
@@ -482,11 +542,11 @@
       width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
     }
     .invite-circle-btn {
-      width: 76px; height: 76px; border-radius: 50%;
+      width: 74px; height: 74px; border-radius: 50%;
       border: 3.5px solid var(--gold);
       background: radial-gradient(circle, #2980b9 0%, #1a3a60 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 34px; color: #fff;
+      font-size: 32px; color: #fff;
       box-shadow: 0 0 18px rgba(255, 190, 0, 0.5);
       cursor: pointer;
       animation: pulseInvite 1.5s infinite alternate;
@@ -513,10 +573,10 @@
     .btn-start-game {
       width: 100%;
       max-width: 320px;
-      padding: 15px;
+      padding: 14px;
       border-radius: 16px;
       border: none;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 900;
       letter-spacing: 1px;
       background: #7f8c8d;
@@ -537,7 +597,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 6px 12px;
       z-index: 20;
     }
     .arena-gear-btn {
@@ -550,8 +610,8 @@
 
     .opponent-hud-box {
       position: absolute;
-      top: 14px;
-      right: 14px;
+      top: 12px;
+      right: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -567,7 +627,7 @@
       border-radius: 25px;
     }
     .hud-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
+      width: 42px; height: 42px; border-radius: 50%;
       border: 2px solid var(--gold); object-fit: cover;
     }
 
@@ -596,8 +656,8 @@
 
     .host-hud-box {
       position: absolute;
-      bottom: 20px;
-      left: 16px;
+      bottom: 16px;
+      left: 12px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -697,8 +757,8 @@
 
     .ingame-popup-menu {
       position: absolute;
-      top: 60px;
-      left: 16px;
+      top: 55px;
+      left: 12px;
       background: rgba(14, 34, 61, 0.96);
       border: 1.5px solid #2980b9;
       border-radius: 14px;
@@ -779,17 +839,28 @@
 
   <div id="app-wrapper">
 
+    <!-- TOP PERMANENT HEADER: EXIT BUTTON REMOVED, DETAIL BUTTON ADDED -->
+    <div class="top-global-header">
+      <div class="header-logo-title">
+        <i class="fa-solid fa-gamepad" style="color:var(--gold);"></i>
+        <span>Ludo Championship</span>
+      </div>
+      <button type="button" class="btn-detail-pill" onclick="window.showMatchDetailsPopup()">
+        <i class="fa-solid fa-circle-info"></i> Detail
+      </button>
+    </div>
+
     <!-- SCREEN 1: 1 ON 1 & COIN SELECTION -->
     <div id="screen-mode-select" class="screen-view">
       <div class="top-header-bar">
         <button type="button" class="round-btn-top" onclick="window.handleHeaderBack()"><i class="fa-solid fa-arrow-left"></i></button>
-        <div style="font-size:16px; font-weight:900; letter-spacing:1px; color:#fff;">LUDO CHAMPIONSHIP</div>
+        <div style="font-size:15px; font-weight:900; letter-spacing:1px; color:#fff;">SELECT MATCH</div>
         <button type="button" class="round-btn-top" onclick="window.showRulesPopup()"><i class="fa-solid fa-question"></i></button>
       </div>
 
       <div class="mascot-hero-wrap">
         <img src="https://cdn-icons-png.flaticon.com/512/808/808439.png" class="mascot-ludo-img" alt="Ludo" />
-        <h2 style="font-size:24px; font-weight:900; letter-spacing:1px; margin-top:8px;">MULTANI LUDO</h2>
+        <h2 style="font-size:24px; font-weight:900; letter-spacing:1px; margin-top:6px;">MULTANI LUDO</h2>
       </div>
 
       <div class="panel-card-select">
@@ -830,7 +901,7 @@
     <div id="screen-lobby-slots" class="screen-view" style="display: none;">
       <div class="top-header-bar">
         <button type="button" class="round-btn-top" onclick="window.backToModeSelect()"><i class="fa-solid fa-arrow-left"></i></button>
-        <div style="font-size:16px; font-weight:900; letter-spacing:1px; color:#fff;">LOBBY</div>
+        <div style="font-size:15px; font-weight:900; letter-spacing:1px; color:#fff;">LOBBY ROOM</div>
         <div style="width: 40px;"></div>
       </div>
 
@@ -868,7 +939,7 @@
       </div>
     </div>
 
-    <!-- SCREEN 3: GAMEPLAY ARENA (EXIT BUTTON COMPLETELY REMOVED) -->
+    <!-- SCREEN 3: GAMEPLAY ARENA -->
     <div id="screen-game-arena" class="screen-view" style="display: none; padding:0;">
       <div class="arena-top-bar">
         <button type="button" class="arena-gear-btn" onclick="window.toggleIngameMenu()"><i class="fa-solid fa-gear"></i></button>
@@ -920,6 +991,40 @@
             <div class="dice-pips-grid" id="pips-red"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- MATCH DETAILS POPUP -->
+    <div id="match-details-modal" class="modal-backdrop">
+      <div class="rules-card-dialog">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:8px;">
+          <h3 style="font-size:17px; font-weight:900; color:var(--cyan);"><i class="fa-solid fa-circle-info" style="color:var(--gold); margin-right:6px;"></i> MATCH & WALLET DETAILS</h3>
+          <button type="button" onclick="window.closeMatchDetailsPopup()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="rules-list-item">
+          <i class="fa-solid fa-coins"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Game Entry Fee:</span>
+            <b id="detail-match-fee" style="color:var(--gold);">25 Coins</b>
+          </div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-trophy"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Winning Prize:</span>
+            <b id="detail-match-prize" style="color:#2ecc71;">45 Coins</b>
+          </div>
+        </div>
+        <div class="rules-list-item">
+          <i class="fa-solid fa-wallet"></i>
+          <div style="width:100%; display:flex; justify-content:space-between;">
+            <span>Wallet Balance:</span>
+            <b id="detail-user-wallet" style="color:#00f2fe;">0 Coins</b>
+          </div>
+        </div>
+
+        <button type="button" class="btn-main-yellow" onclick="window.closeMatchDetailsPopup()" style="width:100%; margin-top:8px;">Close</button>
       </div>
     </div>
 
@@ -979,7 +1084,7 @@
 
   <script>
     /* ==========================================================================
-       SUPABASE CLIENT INITIALIZATION
+       SUPABASE CLIENT INITIALIZATION & WALLET FETCH
        ========================================================================== */
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "Sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -990,6 +1095,21 @@
       }
     } catch(err) {
       console.warn("Supabase init error:", err);
+    }
+
+    async function fetchUserWallet() {
+      if (!window.supabaseClient) return;
+      try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (user) {
+          const { data } = await window.supabaseClient.from('users').select('coins, balance').eq('id', user.id).single();
+          if (data) {
+            userWalletBalance = data.coins !== undefined ? data.coins : (data.balance || 0);
+          }
+        }
+      } catch(e) {
+        console.warn("Wallet fetch error:", e);
+      }
     }
 
     function subscribeToMatchRealtime(code) {
@@ -1375,7 +1495,7 @@
           consecutiveSixes++;
           if (consecutiveSixes === 3) {
             consecutiveSixes = 0;
-            setTimeout(switchTurn, 900);
+            setTimeout(switchTurn, 800);
             return;
           }
         } else {
@@ -1383,7 +1503,7 @@
         }
 
         evaluateMovesAfterRoll();
-      }, 650);
+      }, 550);
     }
 
     /* REALISTIC 3X3 DICE PIPS RENDERER */
@@ -1391,10 +1511,6 @@
       const container = document.getElementById(playerColor === 'red' ? 'pips-red' : 'pips-blue');
       container.innerHTML = '';
 
-      // Standard positions in a 3x3 grid (indices 0 to 8)
-      // 0 1 2
-      // 3 4 5
-      // 6 7 8
       const dotCoords = {
         1: [4],
         2: [0, 8],
@@ -1428,11 +1544,12 @@
       renderBoard();
 
       if (valid.length === 0) {
-        setTimeout(switchTurn, 900);
+        setTimeout(switchTurn, 750);
       } else if (valid.length === 1 && (isSingleMode ? currentTurn !== 'blue' : currentTurn === localPlayerColor)) {
         animateTokenStepByStep(currentTurn, valid[0], diceValue);
       } else {
         if (isSingleMode && currentTurn === 'blue') {
+          // FAST AI AUTO-MOVE UNDER 1.5 SECONDS TOTAL
           setTimeout(() => {
             let chosen = valid[0];
             for (let idx of valid) {
@@ -1440,7 +1557,7 @@
               if (gameState.blue[idx] > gameState.blue[chosen]) chosen = idx;
             }
             animateTokenStepByStep('blue', chosen, diceValue);
-          }, 600);
+          }, 450);
         }
       }
     }
@@ -1451,8 +1568,9 @@
       updateDiceTurnVisuals();
       startTurnTimer();
 
+      // COMPUTER (AI) ROLLS IN UNDER 1 SECOND (MAX 2 SECONDS TOTAL TURN)
       if (isSingleMode && currentTurn === 'blue') {
-        setTimeout(executeDiceRoll, 800);
+        setTimeout(executeDiceRoll, 600);
       }
     }
 
@@ -1461,6 +1579,56 @@
       const blueCube = document.getElementById('cube-blue');
       redCube.classList.toggle('turn-active', currentTurn === 'red' && (isSingleMode || localPlayerColor === 'red'));
       blueCube.classList.toggle('turn-active', currentTurn === 'blue' && (!isSingleMode && localPlayerColor === 'blue'));
+    }
+
+    // AUTO ROLL & AUTO MOVE WHEN TIMER EXPIRES (NO TURN SKIP)
+    function handleTimerExpiredAutoPlay() {
+      clearInterval(turnTimerInterval);
+      if (isTokenAnimating) return;
+
+      if (!isDiceRolled) {
+        // Auto-roll dice on timer completion
+        executeDiceRoll();
+        const checkRollInterval = setInterval(() => {
+          if (!isDiceRolled || isTokenAnimating) {
+            clearInterval(checkRollInterval);
+            return;
+          }
+          // After roll, auto-pick best pawn
+          const tokens = gameState[currentTurn];
+          const valid = [];
+          tokens.forEach((s, idx) => {
+            if (canPawnMove(s, diceValue)) valid.push(idx);
+          });
+
+          if (valid.length > 0) {
+            clearInterval(checkRollInterval);
+            let chosen = valid[0];
+            for (let idx of valid) {
+              if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
+              if (tokens[idx] > tokens[chosen]) chosen = idx;
+            }
+            animateTokenStepByStep(currentTurn, chosen, diceValue);
+          }
+        }, 150);
+      } else {
+        // If dice was already rolled but token wasn't clicked, auto-pick token
+        const tokens = gameState[currentTurn];
+        const valid = [];
+        tokens.forEach((s, idx) => {
+          if (canPawnMove(s, diceValue)) valid.push(idx);
+        });
+        if (valid.length > 0) {
+          let chosen = valid[0];
+          for (let idx of valid) {
+            if (tokens[idx] === -1 && diceValue === 6) { chosen = idx; break; }
+            if (tokens[idx] > tokens[chosen]) chosen = idx;
+          }
+          animateTokenStepByStep(currentTurn, chosen, diceValue);
+        } else {
+          switchTurn();
+        }
+      }
     }
 
     function startTurnTimer() {
@@ -1477,7 +1645,7 @@
         ring.style.strokeDashoffset = (188 - progress);
         if (timeLeft <= 0) {
           clearInterval(turnTimerInterval);
-          switchTurn();
+          handleTimerExpiredAutoPlay();
         }
       }, 100);
     }
@@ -1530,6 +1698,7 @@
         document.getElementById('res-prize-amount').innerText = "Fun / Practice";
         document.getElementById('res-fee-amount').innerText = "0 Coins";
       }
+      fetchUserWallet();
     }
 
     window.toggleIngameMenu = function() {
@@ -1555,6 +1724,7 @@
       pushNavigationState('home');
       renderDicePips('red', 1);
       renderDicePips('blue', 1);
+      fetchUserWallet();
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('room');
       if (roomParam) {
