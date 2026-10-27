@@ -10,7 +10,7 @@
 html,body{
  margin:0;width:100%;height:100%;overflow:hidden;
  background:#050912;color:white;
- font-family:Arial,sans-serif;touch-action:none;
+ font-family:'Segoe UI', Roboto, Arial, sans-serif;touch-action:none;
 }
 #game{
  position:relative;width:100%;height:100%;
@@ -19,103 +19,105 @@ html,body{
 }
 canvas{width:100%;height:100%;display:block;touch-action:none}
 .hud{
- position:absolute;top:env(safe-area-inset-top,8px);
- left:10px;right:10px;display:flex;
+ position:absolute;top:env(safe-area-inset-top,10px);
+ left:12px;right:12px;display:flex;
  justify-content:space-between;pointer-events:none;
  gap:10px;z-index:3;
 }
 .panel{
- min-width:115px;padding:9px 13px;
- background:linear-gradient(145deg,#111a2c,#030710);
- border:2px solid #687b9d;border-radius:12px;
- box-shadow:0 0 12px #00baff55,inset 0 0 8px #ffffff15;
+ min-width:115px;padding:8px 14px;
+ background:rgba(8, 14, 25, 0.88);
+ border:1.8px solid #283955;border-radius:12px;
+ box-shadow:0 0 15px rgba(0, 186, 255, 0.25), inset 0 0 10px rgba(255, 255, 255, 0.08);
+ backdrop-filter:blur(4px);
 }
 .panel small{
- display:block;color:#aabbd7;font-size:10px;
- letter-spacing:2px;font-weight:bold;margin-bottom:4px
+ display:block;color:#9cb5d9;font-size:10px;
+ letter-spacing:2px;font-weight:bold;margin-bottom:3px
 }
-.panel strong{font-size:clamp(19px,5vw,27px);letter-spacing:1px}
+.panel strong{font-size:clamp(18px,4.5vw,26px);letter-spacing:1px}
 #hpText{color:#32ffc0;text-shadow:0 0 10px #00ffab}
 #scoreText{color:#ffc64c;text-shadow:0 0 10px #ff9a00}
 #hpBar{
- height:4px;background:#29334a;margin-top:6px;
+ height:5px;background:#182335;margin-top:5px;
  border-radius:5px;overflow:hidden
 }
-#hpFill{height:100%;width:100%;background:#32ffc0}
+#hpFill{height:100%;width:100%;background:#32ffc0;transition:width 0.2s}
 .brand{
- position:absolute;top:80px;left:0;right:0;
+ position:absolute;top:76px;left:0;right:0;
  text-align:center;pointer-events:none;
- color:#ffffff55;font-size:11px;letter-spacing:4px;
+ color:rgba(255, 255, 255, 0.35);font-size:11px;letter-spacing:4px;
  font-weight:900
 }
+
+/* Controls layout: Left | FIRE (Center) | Right */
 .controls{
  position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));
- left:0;right:0;display:flex;align-items:flex-end;
- justify-content:space-between;padding:0 16px;z-index:4;
+ left:0;right:0;display:flex;align-items:center;
+ justify-content:space-between;padding:0 18px;z-index:4;
  pointer-events:none
 }
-.side{display:flex;gap:12px;pointer-events:auto}
-.control{
- width:clamp(65px,18vw,94px);
- height:clamp(65px,18vw,94px);
+.control-btn{
+ pointer-events:auto;
+ width:clamp(64px,18vw,86px);
+ height:clamp(64px,18vw,86px);
  border-radius:50%;display:flex;align-items:center;
  justify-content:center;user-select:none;
  -webkit-user-select:none;touch-action:none;
  background:radial-gradient(circle at 35% 25%,#9aafc9,#28384f 55%,#101827 75%);
- border:5px solid #ff6577;
- box-shadow:0 0 8px #ff415c,0 0 22px #ff304455,
- inset 0 0 0 3px #ffffff55;
- color:white;font-size:36px;font-weight:900;
- text-shadow:0 2px 5px #000;
+ border:4px solid #ff4d66;
+ box-shadow:0 0 12px #ff415c,0 0 22px rgba(255, 48, 68, 0.4),
+ inset 0 0 0 3px rgba(255,255,255,0.4);
+ color:white;font-size:32px;font-weight:900;
+ text-shadow:0 2px 6px #000;
+ cursor:pointer;
+ transition:transform 0.08s;
 }
-.control:active{transform:scale(.91);filter:brightness(1.4)}
+.control-btn:active{transform:scale(0.91);filter:brightness(1.3)}
+
 #fire{
- width:clamp(88px,23vw,116px);
- height:clamp(88px,23vw,116px);
- flex-direction:column;gap:3px;
- font-size:15px;font-weight:900;color:#ffdc72;
- border:5px solid #ffbc38;
- background:radial-gradient(circle at 35% 25%,#765b39,#251a16 65%,#0b0d12);
- box-shadow:0 0 12px #ffb52b,0 0 26px #ff8d2455,
- inset 0 0 0 3px #ffffff55;
+ pointer-events:auto;
+ width:clamp(86px,24vw,112px);
+ height:clamp(86px,24vw,112px);
+ flex-direction:column;gap:2px;
+ font-size:14px;font-weight:900;color:#ffdc72;
+ border:5px solid #ffaa22;
+ background:radial-gradient(circle at 35% 25%,#7a582c,#2a1d17 65%,#0d0f14);
+ box-shadow:0 0 16px #ff9a1a,0 0 30px rgba(255, 141, 36, 0.55),
+ inset 0 0 0 3px rgba(255,255,255,0.45);
+ cursor:pointer;
 }
-#fire span{font-size:36px}
+#fire span{font-size:34px;line-height:1}
+#fire:active{transform:scale(0.92);filter:brightness(1.35)}
+
 #message{
  position:absolute;inset:0;z-index:10;
  display:flex;align-items:center;justify-content:center;
- background:#020713b8;backdrop-filter:blur(5px);
+ background:rgba(2, 7, 19, 0.88);backdrop-filter:blur(6px);
  padding:20px;
 }
 .card{
- width:min(360px,100%);padding:26px 20px;
- border-radius:20px;text-align:center;
- background:linear-gradient(155deg,#17243a,#060b16);
- border:1px solid #ffb93e;
- box-shadow:0 0 35px #ff9c2440;
+ width:min(350px,100%);padding:25px 20px;
+ border-radius:18px;text-align:center;
+ background:linear-gradient(155deg,#131e33,#060b16);
+ border:1.5px solid #ffaa22;
+ box-shadow:0 0 35px rgba(255, 156, 36, 0.35);
 }
-.card h1{font-size:26px;color:#ffc14d;margin:0 0 8px}
-.card p{color:#c2d0e6;line-height:1.6;font-size:13px}
+.card h1{font-size:24px;color:#ffc14d;margin:0 0 10px;letter-spacing:1px}
+.card p{color:#c2d0e6;line-height:1.6;font-size:13.5px}
 .action{
- width:100%;padding:15px;margin-top:10px;
- border:0;border-radius:12px;font-weight:900;
- font-size:16px;color:#101018;
+ width:100%;padding:14px;margin-top:14px;
+ border:0;border-radius:10px;font-weight:900;
+ font-size:16px;color:#101018;cursor:pointer;
  background:linear-gradient(90deg,#ffd875,#ff922b);
- box-shadow:0 0 18px #ffae3344;
+ box-shadow:0 0 18px rgba(255, 174, 51, 0.4);
 }
 .hidden{display:none!important}
 #pause{
- position:absolute;right:12px;top:100px;z-index:5;
+ position:absolute;right:14px;top:84px;z-index:5;
  width:38px;height:38px;border-radius:50%;
- background:#0b1424dd;border:1px solid #8ca9d5;
- color:white;font-size:17px;
-}
-@media(max-height:520px){
- .control{width:58px;height:58px}
- #fire{width:70px;height:70px}
- #fire span{font-size:25px}
- .controls{bottom:8px}
- .brand{top:58px}
- .panel{padding:5px 9px}
+ background:rgba(11, 20, 36, 0.85);border:1.5px solid #8ca9d5;
+ color:white;font-size:16px;cursor:pointer;
 }
 </style>
 </head>
@@ -139,21 +141,20 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
  <div class="brand">MULTANI FF • AIR FORCE</div>
  <button id="pause">Ⅱ</button>
 
+ <!-- Left | FIRE (Center) | Right Layout -->
  <div class="controls">
-  <div class="side">
-   <button class="control" id="left" aria-label="Move left">◀</button>
-   <button class="control" id="right" aria-label="Move right">▶</button>
-  </div>
-  <button class="control" id="fire"><span>🔥</span>FIRE</button>
+  <button class="control-btn" id="left" aria-label="Move left">◀</button>
+  <button class="control-btn" id="fire"><span>🔥</span>FIRE</button>
+  <button class="control-btn" id="right" aria-label="Move right">▶</button>
  </div>
 
  <div id="message">
   <div class="card">
    <h1>✈ AIR FORCE BATTLE</h1>
    <p>MULTANI FF OFFICIAL<br>
-   <b>ELITE FIGHTER MISSION</b><br><br>
-   Dushman jets ko destroy karein.<br>
-   Left / Right se jet move karein aur FIRE dabayein.</p>
+   <b>ELITE FIGHTER JET MISSION</b><br><br>
+   Dushman jets ko khatam karein.<br>
+   Bayein/Dayein buttons se steer karein aur Center se FIRE karein.</p>
    <button class="action" id="start">START MISSION ▶</button>
   </div>
  </div>
@@ -170,160 +171,238 @@ const $=id=>document.getElementById(id);
 let W=0,H=0,DPR=1;
 let running=false,paused=false,gameOver=false;
 let score=0,hp=100,last=0,elapsed=0,spawn=0,shot=0;
-let enemies=[],bullets=[],sparks=[],clouds=[];
+let enemies=[],bullets=[],sparks=[],clouds=[],islands=[];
 const keys={left:false,right:false,fire:false};
 
-const player={x:0,y:0,w:65,h:100,speed:330,inv:0};
+// Precise Jet Dimension definition
+const player={x:0,y:0,w:56,h:84,speed:360,inv:0};
+
+// Built-in Web Audio API for VIP Laser and Blast SFX
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function playLaserSFX(){
+ try{
+  if(!actx) actx = new AudioContextClass();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(750, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(140, actx.currentTime + 0.09);
+  gain.gain.setValueAtTime(0.18, actx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.09);
+  osc.connect(gain);
+  gain.connect(actx.destination);
+  osc.start();
+  osc.stop(actx.currentTime + 0.09);
+ }catch(e){}
+}
+
+function playBlastSFX(){
+ try{
+  if(!actx) actx = new AudioContextClass();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(140, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(25, actx.currentTime + 0.25);
+  gain.gain.setValueAtTime(0.3, actx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.25);
+  osc.connect(gain);
+  gain.connect(actx.destination);
+  osc.start();
+  osc.stop(actx.currentTime + 0.25);
+ }catch(e){}
+}
 
 function resize(){
- DPR=Math.min(window.devicePixelRatio||1,1.6);
+ DPR=Math.min(window.devicePixelRatio||1,1.5);
  W=canvas.clientWidth;H=canvas.clientHeight;
  canvas.width=Math.round(W*DPR);
  canvas.height=Math.round(H*DPR);
  ctx.setTransform(DPR,0,0,DPR,0,0);
- player.x=Math.max(35,Math.min(W-35,player.x||W/2));
- player.y=H*.72;
+ player.x=Math.max(30,Math.min(W-30,player.x||W/2));
+ player.y=H*0.74;
+
  if(!clouds.length){
-  for(let i=0;i<15;i++)clouds.push({
-   x:Math.random()*W,y:Math.random()*H,
-   s:30+Math.random()*90,v:15+Math.random()*40
-  });
+  for(let i=0;i<12;i++){
+   clouds.push({
+    x:Math.random()*W,y:Math.random()*H,
+    s:35+Math.random()*70,v:18+Math.random()*35
+   });
+  }
+  for(let i=0;i<4;i++){
+   islands.push({
+    x:W*(0.2+i*0.25)+(Math.random()-0.5)*40,
+    y:i*(H/3.5),
+    rx:45+Math.random()*30,
+    ry:35+Math.random()*20,
+    v:22
+   });
+  }
  }
 }
 window.addEventListener("resize",resize);
 resize();
 
-function polygon(points,fill,stroke="#d4e6ff",line=1){
+// High Quality Jet Visuals
+function drawFighterJet(x,y,w,h,isEnemy=false){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.scale(w/60,h/84);
+ if(isEnemy) ctx.rotate(Math.PI);
+
+ // Double Jet Engine Afterburners
+ const flameHeight = 16 + Math.random()*16;
+ const flameGrad = ctx.createLinearGradient(0,34,0,34+flameHeight);
+ flameGrad.addColorStop(0,"#ffffff");
+ flameGrad.addColorStop(0.3,"#ffaa00");
+ flameGrad.addColorStop(1,"rgba(255,50,0,0)");
+ ctx.fillStyle = flameGrad;
+
  ctx.beginPath();
- ctx.moveTo(points[0][0],points[0][1]);
- for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
- ctx.closePath();ctx.fillStyle=fill;ctx.fill();
- if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}
-}
+ ctx.moveTo(-11,34);ctx.lineTo(-8,34+flameHeight);ctx.lineTo(-5,34);
+ ctx.moveTo(5,34);ctx.lineTo(8,34+flameHeight);ctx.lineTo(11,34);
+ ctx.fill();
 
-function jet(x,y,w,h,color,enemy=false){
- ctx.save();ctx.translate(x,y);ctx.scale(w/70,h/100);
- if(enemy)ctx.rotate(Math.PI);
+ // Main Wings (Delta Jet Style)
+ ctx.fillStyle = isEnemy ? "#4b5768" : "#2563eb";
+ ctx.beginPath();
+ ctx.moveTo(0,-38);
+ ctx.lineTo(9,-6);
+ ctx.lineTo(29,14);
+ ctx.lineTo(26,24);
+ ctx.lineTo(13,20);
+ ctx.lineTo(12,34);
+ ctx.lineTo(-12,34);
+ ctx.lineTo(-13,20);
+ ctx.lineTo(-26,24);
+ ctx.lineTo(-29,14);
+ ctx.lineTo(-9,-6);
+ ctx.closePath();
+ ctx.fill();
+ ctx.strokeStyle = isEnemy ? "#7c8ba1" : "#93c5fd";
+ ctx.lineWidth = 1.6;
+ ctx.stroke();
 
- // engine glow
- const flame=ctx.createRadialGradient(35,90,2,35,90,22);
- flame.addColorStop(0,"#fff6a1");
- flame.addColorStop(.35,"#ff9c24");
- flame.addColorStop(1,"#ff3c0900");
- ctx.fillStyle=flame;ctx.fillRect(8,72,54,38);
+ // Wing Tips Highlights
+ ctx.fillStyle = isEnemy ? "#dc2626" : "#60a5fa";
+ ctx.fillRect(-27,14,3,9);
+ ctx.fillRect(24,14,3,9);
 
- // Wings
- const metal=ctx.createLinearGradient(0,10,70,70);
- metal.addColorStop(0,"#b5c9df");
- metal.addColorStop(.35,color);
- metal.addColorStop(.7,"#324e7b");
- metal.addColorStop(1,"#101b30");
- polygon([[31,24],[3,43],[10,57],[27,49],[32,73],
-          [38,73],[43,49],[60,57],[67,43],[39,24]],metal);
+ // Center Fuselage Body
+ ctx.fillStyle = isEnemy ? "#718096" : "#e2e8f0";
+ ctx.beginPath();
+ ctx.moveTo(0,-42);
+ ctx.lineTo(6,-12);
+ ctx.lineTo(6,30);
+ ctx.lineTo(-6,30);
+ ctx.lineTo(-6,-12);
+ ctx.closePath();
+ ctx.fill();
 
- // Tail wings
- polygon([[29,61],[15,72],[25,75],[32,69]],"#536985");
- polygon([[41,61],[55,72],[45,75],[38,69]],"#536985");
-
- // Main fuselage
- polygon([[35,0],[39,20],[44,52],[40,77],[35,92],
-          [30,77],[26,52],[31,20]],"#c5d4e7","#eef5ff",1.3);
-
- // Cockpit
- const glass=ctx.createLinearGradient(27,25,40,56);
- glass.addColorStop(0,"#b6f6ff");
- glass.addColorStop(.4,"#3978b8");
- glass.addColorStop(1,"#071528");
- polygon([[35,20],[39,37],[36,49],[32,39]],glass,"#d5edff",.8);
-
- // Panel details
- ctx.strokeStyle="#263b59";ctx.lineWidth=1;
- ctx.beginPath();ctx.moveTo(35,50);ctx.lineTo(35,81);
- ctx.moveTo(28,53);ctx.lineTo(32,62);
- ctx.moveTo(42,53);ctx.lineTo(38,62);ctx.stroke();
-
- // Engines
- for(const ex of [28,42]){
-  ctx.fillStyle="#111a2b";ctx.fillRect(ex-3,72,6,13);
-  ctx.fillStyle="#ffc747";ctx.fillRect(ex-2,84,4,9);
+ // Canopy (Cockpit Glass Reflection)
+ const glass = ctx.createLinearGradient(0,-24,0,-2);
+ if(isEnemy){
+  glass.addColorStop(0,"#ff8b8b");
+  glass.addColorStop(1,"#450a0a");
+ }else{
+  glass.addColorStop(0,"#fde047");
+  glass.addColorStop(0.5,"#ca8a04");
+  glass.addColorStop(1,"#451a03");
  }
- // insignia
- ctx.fillStyle=enemy?"#ff514d":"#8bf7ff";
- ctx.beginPath();ctx.arc(19,49,2.5,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle = glass;
+ ctx.beginPath();
+ ctx.ellipse(0,-14,4,11,0,0,Math.PI*2);
+ ctx.fill();
+ ctx.strokeStyle = "rgba(255,255,255,0.7)";
+ ctx.lineWidth = 1;
+ ctx.stroke();
+
  ctx.restore();
 }
 
 function background(dt){
+ // VIP Ocean Deep Water
  const sky=ctx.createLinearGradient(0,0,0,H);
- sky.addColorStop(0,"#7c9eaf");
- sky.addColorStop(.35,"#23618a");
- sky.addColorStop(1,"#061b36");
- ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ sky.addColorStop(0,"#0d3859");
+ sky.addColorStop(0.5,"#0b2a47");
+ sky.addColorStop(1,"#06172a");
+ ctx.fillStyle=sky;
+ ctx.fillRect(0,0,W,H);
 
- // Ocean and islands
- ctx.fillStyle="#174963";
- ctx.beginPath();ctx.moveTo(0,H*.18);
- for(let y=0;y<=H+80;y+=80){
-  ctx.lineTo(W*.43+Math.sin(y*.009+elapsed*.08)*W*.2,y);
- }
- ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
-
- for(let i=0;i<5;i++){
-  const yy=((i*H/4+elapsed*20)%(H+160))-80;
-  ctx.fillStyle="#517c66";
+ // Floating Green Islands
+ islands.forEach(isl=>{
+  isl.y+=isl.v*dt;
+  if(isl.y>H+80){isl.y=-80;isl.x=W*0.1+Math.random()*W*0.8}
+  ctx.fillStyle="#1e5c4d";
   ctx.beginPath();
-  ctx.ellipse(W*(.15+(i%3)*.36)+Math.sin(i*5)*20,
-   yy, W*.12,25+i%3*12,i*.8,0,Math.PI*2);
+  ctx.ellipse(isl.x,isl.y,isl.rx,isl.ry,0,0,Math.PI*2);
   ctx.fill();
-  ctx.strokeStyle="#8da28a44";ctx.stroke();
- }
-
- // Clouds
- clouds.forEach(c=>{
-  c.y+=c.v*dt;
-  if(c.y>H+100){c.y=-100;c.x=Math.random()*W}
-  ctx.fillStyle="#e5f2ff12";
-  ctx.beginPath();
-  ctx.ellipse(c.x,c.y,c.s,c.s*.42,0,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle="#ffffff0b";
-  ctx.beginPath();
-  ctx.ellipse(c.x-c.s*.25,c.y-5,c.s*.45,c.s*.28,0,0,Math.PI*2);
-  ctx.fill();
+  ctx.strokeStyle="rgba(80,180,140,0.25)";
+  ctx.lineWidth=2;
+  ctx.stroke();
  });
 
- // Neon flight-lane lines
- ctx.strokeStyle="#ff704055";ctx.lineWidth=3;
- ctx.beginPath();ctx.moveTo(W*.31,0);ctx.lineTo(W*.31,H);
- ctx.moveTo(W*.69,0);ctx.lineTo(W*.69,H);ctx.stroke();
+ // Neon Flight-Lane Glowing Lines
+ ctx.strokeStyle="rgba(255, 95, 45, 0.45)";
+ ctx.lineWidth=3;
+ ctx.shadowColor="#ff5511";
+ ctx.shadowBlur=12;
+ ctx.beginPath();
+ ctx.moveTo(W*0.33,0);ctx.lineTo(W*0.33,H);
+ ctx.moveTo(W*0.67,0);ctx.lineTo(W*0.67,H);
+ ctx.stroke();
+ ctx.shadowBlur=0;
+
+ // Scrolling Soft Clouds
+ clouds.forEach(c=>{
+  c.y+=c.v*dt;
+  if(c.y>H+70){c.y=-70;c.x=Math.random()*W}
+  ctx.fillStyle="rgba(255, 255, 255, 0.08)";
+  ctx.beginPath();
+  ctx.ellipse(c.x,c.y,c.s,c.s*0.48,0,0,Math.PI*2);
+  ctx.fill();
+ });
 }
 
 function shoot(){
- bullets.push({x:player.x,y:player.y-43,v:610,r:3});
- bullets.push({x:player.x-10,y:player.y-30,v:560,r:2});
- bullets.push({x:player.x+10,y:player.y-30,v:560,r:2});
-}
-
-function enemy(){
- const size=44+Math.random()*15;
- enemies.push({
-  x:30+Math.random()*(W-60),y:-65,
-  w:size,h:size*1.35,
-  v:100+Math.random()*70+Math.min(score*.08,150),
-  hp:1,phase:Math.random()*6.28
+ playLaserSFX();
+ // 5-Way Fan Spreading Lasers
+ const angles=[-0.14, -0.07, 0, 0.07, 0.14];
+ angles.forEach(ang=>{
+  bullets.push({
+   x:player.x,
+   y:player.y-34,
+   vx:Math.sin(ang)*580,
+   vy:-Math.cos(ang)*580
+  });
  });
 }
 
-function explosion(x,y,big=false){
- const count=big?34:14;
+function enemy(){
+ const size=44+Math.random()*10;
+ enemies.push({
+  x:25+Math.random()*(W-50),
+  y:-60,
+  w:size,
+  h:size*1.3,
+  v:115+Math.random()*60+Math.min(score*0.06,120),
+  phase:Math.random()*6.28
+ });
+}
+
+function explosion(x,y,isPlayer=false){
+ playBlastSFX();
+ const count=isPlayer?36:18;
  for(let i=0;i<count;i++){
   const a=Math.random()*Math.PI*2;
-  const speed=40+Math.random()*(big?240:130);
+  const speed=30+Math.random()*(isPlayer?220:130);
   sparks.push({
    x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
-   life:.3+Math.random()*.65,max:.95,
-   size:2+Math.random()*5,
-   color:["#fff6a1","#ffb52f","#ff6a21","#ffffff"][i%4]
+   life:0.35+Math.random()*0.5,
+   size:2.5+Math.random()*5,
+   color:["#ffffff","#ffee55","#ff7711","#ff2200"][i%4]
   });
  }
 }
@@ -335,45 +414,56 @@ function update(dt){
  if(running&&!paused&&!gameOver){
   if(keys.left)player.x-=player.speed*dt;
   if(keys.right)player.x+=player.speed*dt;
-  player.x=Math.max(30,Math.min(W-30,player.x));
+  player.x=Math.max(26,Math.min(W-26,player.x));
 
   shot-=dt;
-  if(keys.fire&&shot<=0){shoot();shot=.13}
+  if(keys.fire&&shot<=0){shoot();shot=0.14}
 
   spawn-=dt;
   if(spawn<=0){
    enemy();
-   spawn=Math.max(.32,1.05-score/4500);
+   spawn=Math.max(0.4,1.1-score/5000);
   }
 
-  bullets.forEach(b=>b.y-=b.v*dt);
-  bullets=bullets.filter(b=>b.y>-20);
+  // Bullets update
+  bullets.forEach(b=>{
+   b.x+=b.vx*dt;
+   b.y+=b.vy*dt;
+  });
+  bullets=bullets.filter(b=>b.y>-20&&b.x>-10&&b.x<W+10);
 
+  // Accurate Jet Hitbox Detection (Tight bounds: wing/fuselage overlap only)
   enemies.forEach(e=>{
    e.y+=e.v*dt;
-   e.x+=Math.sin(elapsed*1.7+e.phase)*22*dt;
-   if(e.y>player.y-45&&e.y<player.y+45&&
-      Math.abs(e.x-player.x)<(e.w+player.w)*.31){
+   e.x+=Math.sin(elapsed*1.8+e.phase)*20*dt;
+
+   // Tight Hitbox bounds (No fake touches, real proximity only)
+   const xDist = Math.abs(e.x - player.x);
+   const yDist = Math.abs(e.y - player.y);
+
+   if(xDist < (player.w * 0.36 + e.w * 0.36) && yDist < (player.h * 0.38 + e.h * 0.38)){
     e.hit=true;
     if(player.inv<=0){
-     hp=Math.max(0,hp-12);
-     player.inv=.65;
+     hp=Math.max(0,hp-20);
+     player.inv=0.7;
      explosion(player.x,player.y,true);
     }
    }
   });
   player.inv=Math.max(0,player.inv-dt);
 
+  // Bullets Hit detection
   enemies=enemies.filter(e=>{
    if(e.hit){explosion(e.x,e.y);return false}
    for(const b of bullets){
-    if(!b.used&&Math.abs(b.x-e.x)<e.w*.45&&
-       Math.abs(b.y-e.y)<e.h*.45){
-     b.used=true;score+=100;
-     explosion(e.x,e.y);return false;
+    if(!b.used && Math.abs(b.x - e.x) < e.w * 0.44 && Math.abs(b.y - e.y) < e.h * 0.44){
+     b.used=true;
+     score+=100;
+     explosion(e.x,e.y);
+     return false;
     }
    }
-   if(e.y>H+100)return false;
+   if(e.y>H+80)return false;
    return true;
   });
   bullets=bullets.filter(b=>!b.used);
@@ -381,36 +471,42 @@ function update(dt){
   if(hp<=0)endGame();
  }
 
+ // Explosion sparks animation
  sparks.forEach(s=>{
   s.x+=s.vx*dt;s.y+=s.vy*dt;
-  s.vx*=.98;s.vy*=.98;s.life-=dt;
+  s.vx*=0.97;s.vy*=0.97;s.life-=dt;
  });
  sparks=sparks.filter(s=>s.life>0);
 
- // Bullets
+ // Draw Glowing Lasers
  bullets.forEach(b=>{
-  ctx.shadowBlur=12;ctx.shadowColor="#ffe85c";
-  ctx.fillStyle="#fff8a0";
-  ctx.fillRect(b.x-2,b.y-12,4,17);
-  ctx.shadowBlur=0;
+  ctx.shadowBlur=12;ctx.shadowColor="#ffe144";
+  ctx.fillStyle="#ffff88";
+  ctx.beginPath();
+  ctx.arc(b.x,b.y,3.5,0,Math.PI*2);
+  ctx.fill();
  });
+ ctx.shadowBlur=0;
 
- // Enemies and damage flashes
+ // Draw Enemies
  enemies.forEach(e=>{
-  jet(e.x,e.y,e.w,e.h,"#8b9fb9",true);
+  drawFighterJet(e.x,e.y,e.w,e.h,true);
  });
 
- // Explosion particles
+ // Draw Explosions
  sparks.forEach(s=>{
-  ctx.globalAlpha=Math.min(1,s.life*2);
-  ctx.fillStyle=s.color;ctx.shadowBlur=9;ctx.shadowColor=s.color;
-  ctx.beginPath();ctx.arc(s.x,s.y,s.size*Math.min(1,s.life*2),0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=Math.min(1,s.life*2.2);
+  ctx.fillStyle=s.color;
+  ctx.shadowBlur=8;ctx.shadowColor=s.color;
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+  ctx.fill();
  });
  ctx.globalAlpha=1;ctx.shadowBlur=0;
 
- // Player jet
- if(player.inv<=0||Math.floor(elapsed*18)%2===0){
-  jet(player.x,player.y,player.w,player.h,"#397bc8",false);
+ // Draw Player Jet (Flashes when invulnerable)
+ if(player.inv<=0 || Math.floor(elapsed*20)%2===0){
+  drawFighterJet(player.x,player.y,player.w,player.h,false);
  }
 
  $("hpText").textContent=hp+"%";
@@ -424,14 +520,14 @@ function endGame(){
  $("message").classList.remove("hidden");
  $("message").querySelector("h1").textContent="MISSION FAILED";
  $("message").querySelector("p").innerHTML=
-  "Aapka fighter jet destroy ho gaya.<br><b>FINAL SCORE: "+score+"</b><br>Dobara mission shuru karein!";
+  "Aapka jet dushman se takra kar destroy ho gaya!<br><b>FINAL SCORE: "+score+"</b><br>Dobara koshish karein!";
  $("start").textContent="↻ RESTART MISSION";
 }
 
 function reset(){
- score=0;hp=100;elapsed=0;spawn=.5;shot=0;
+ score=0;hp=100;elapsed=0;spawn=0.4;shot=0;
  enemies=[];bullets=[];sparks=[];
- player.x=W/2;player.y=H*.72;player.inv=0;
+ player.x=W/2;player.y=H*0.74;player.inv=0;
  gameOver=false;paused=false;running=true;
  Object.keys(keys).forEach(k=>keys[k]=false);
  $("pause").textContent="Ⅱ";
@@ -450,7 +546,7 @@ $("pause").addEventListener("click",()=>{
  if(paused){
   $("message").classList.remove("hidden");
   $("message").querySelector("h1").textContent="MISSION PAUSED";
-  $("message").querySelector("p").textContent="Aapka mission ruka hua hai.";
+  $("message").querySelector("p").textContent="Aapka mission pause hai.";
   $("start").textContent="RESUME MISSION ▶";
   $("start").onclick=()=>{
    $("start").onclick=null;
@@ -489,7 +585,7 @@ window.addEventListener("keyup",e=>{
 });
 
 function loop(now){
- const dt=Math.min((now-last)/1000||0,.035);
+ const dt=Math.min((now-last)/1000||0, 0.035);
  last=now;
  if(!paused)update(dt);
  else background(dt);
