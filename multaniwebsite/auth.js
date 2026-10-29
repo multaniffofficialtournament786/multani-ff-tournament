@@ -335,7 +335,16 @@ export function renderProfile() {
           </div>
 
           <div class="form-group"><label class="form-label">WhatsApp Mobile #</label><input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" required /></div>
-          <div class="form-group"><label class="form-label">Email</label><input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || state.currentUser.email)}" required /></div>
+          
+          <!-- EMAIL (PERMANENT & LOCKED) -->
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || state.currentUser.email)}" readonly style="background:rgba(255,255,255,0.05); color:#888; cursor:not-allowed; border:1px solid rgba(255,255,255,0.1);" />
+            <small style="color:#8e9bb0; font-size:11px; margin-top:5px; display:block;">
+              🔒 Email address permanent locked hai.
+            </small>
+          </div>
+
           <div class="form-group">
             <label class="form-label">Referral Code (UID)</label>
             <input type="text" id="prof-ref" class="form-input" value="${escapeHTML(p.referred_by || '')}" ${hasReferrer ? 'style="opacity:0.6; cursor:not-allowed;" readonly' : 'placeholder="Enter friend UID"'} />
@@ -379,7 +388,6 @@ export async function saveUserProfile(e) {
 
   const fullName = document.getElementById('prof-fullname').value.trim();
   const ign = document.getElementById('prof-ign').value.trim();
-  const newEmail = document.getElementById('prof-email').value.trim();
   const phone = document.getElementById('prof-phone').value.trim();
   const refInputEl = document.getElementById('prof-ref');
   const newRef = refInputEl ? refInputEl.value.trim() : '';
@@ -392,10 +400,9 @@ export async function saveUserProfile(e) {
       if (refCheck) verifiedReferredBy = refCheck.free_fire_uid;
     }
 
-    // free_fire_uid yahan update nahi hoga (Permanent rahega)
+    // UID aur Email dono update query se nikal diye hain (Permanent rahein ge)
     const { error } = await sbClient.from('profiles').upsert([{
       id: state.currentUser.id,
-      email: newEmail,
       full_name: fullName,
       free_fire_name: ign,
       phone: phone,
