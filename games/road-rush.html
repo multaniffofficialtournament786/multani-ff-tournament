@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>MULTANI FF AIR FORCE</title>
+<title>MULTANI FF AIR FORCE - 500 LEVELS</title>
 
 <style>
 *{box-sizing:border-box}
@@ -19,105 +19,118 @@ html,body{
 }
 canvas{width:100%;height:100%;display:block;touch-action:none}
 .hud{
- position:absolute;top:env(safe-area-inset-top,10px);
- left:12px;right:12px;display:flex;
+ position:absolute;top:env(safe-area-inset-top,8px);
+ left:10px;right:10px;display:flex;
  justify-content:space-between;pointer-events:none;
- gap:10px;z-index:3;
+ gap:8px;z-index:3;
 }
 .panel{
- min-width:115px;padding:8px 14px;
+ min-width:95px;padding:6px 12px;
  background:rgba(8, 14, 25, 0.88);
  border:1.8px solid #283955;border-radius:12px;
- box-shadow:0 0 15px rgba(0, 186, 255, 0.25), inset 0 0 10px rgba(255, 255, 255, 0.08);
+ box-shadow:0 0 12px rgba(0, 186, 255, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.08);
  backdrop-filter:blur(4px);
 }
 .panel small{
- display:block;color:#9cb5d9;font-size:10px;
- letter-spacing:2px;font-weight:bold;margin-bottom:3px
+ display:block;color:#9cb5d9;font-size:9px;
+ letter-spacing:1.5px;font-weight:bold;margin-bottom:2px
 }
-.panel strong{font-size:clamp(18px,4.5vw,26px);letter-spacing:1px}
+.panel strong{font-size:clamp(16px,4vw,22px);letter-spacing:1px}
 #hpText{color:#32ffc0;text-shadow:0 0 10px #00ffab}
+#levelText{color:#ff55a3;text-shadow:0 0 10px #ff2a70}
 #scoreText{color:#ffc64c;text-shadow:0 0 10px #ff9a00}
-#hpBar{
- height:5px;background:#182335;margin-top:5px;
- border-radius:5px;overflow:hidden
+#hpBar,#lvlBar{
+ height:4px;background:#182335;margin-top:4px;
+ border-radius:4px;overflow:hidden
 }
 #hpFill{height:100%;width:100%;background:#32ffc0;transition:width 0.2s}
+#lvlFill{height:100%;width:0%;background:#ff55a3;transition:width 0.2s}
+
+/* Boss Health Bar */
+#bossHud{
+ position:absolute;top:70px;left:20px;right:20px;
+ z-index:4;pointer-events:none;display:none;
+ text-align:center;
+}
+#bossName{font-size:12px;font-weight:900;letter-spacing:2px;color:#ff3355;text-shadow:0 0 8px #ff0033;margin-bottom:4px}
+#bossBarOutline{
+ width:100%;height:9px;background:rgba(15,15,25,0.85);
+ border:1.5px solid #ff3355;border-radius:10px;overflow:hidden;
+ box-shadow:0 0 12px rgba(255,50,80,0.5);
+}
+#bossBarFill{width:100%;height:100%;background:linear-gradient(90deg,#ff8800,#ff0055);transition:width 0.1s}
+
 .brand{
  position:absolute;top:76px;left:0;right:0;
  text-align:center;pointer-events:none;
- color:rgba(255, 255, 255, 0.35);font-size:11px;letter-spacing:4px;
+ color:rgba(255, 255, 255, 0.4);font-size:10px;letter-spacing:3px;
  font-weight:900
 }
 
-/* Controls layout: Left | FIRE (Center) | Right */
+/* Controls */
 .controls{
- position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+ position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));
  left:0;right:0;display:flex;align-items:center;
- justify-content:space-between;padding:0 18px;z-index:4;
+ justify-content:space-between;padding:0 16px;z-index:4;
  pointer-events:none
 }
 .control-btn{
  pointer-events:auto;
- width:clamp(64px,18vw,86px);
- height:clamp(64px,18vw,86px);
+ width:clamp(62px,17vw,80px);
+ height:clamp(62px,17vw,80px);
  border-radius:50%;display:flex;align-items:center;
  justify-content:center;user-select:none;
  -webkit-user-select:none;touch-action:none;
  background:radial-gradient(circle at 35% 25%,#9aafc9,#28384f 55%,#101827 75%);
  border:4px solid #ff4d66;
- box-shadow:0 0 12px #ff415c,0 0 22px rgba(255, 48, 68, 0.4),
- inset 0 0 0 3px rgba(255,255,255,0.4);
- color:white;font-size:32px;font-weight:900;
- text-shadow:0 2px 6px #000;
- cursor:pointer;
- transition:transform 0.08s;
+ box-shadow:0 0 12px #ff415c,0 0 20px rgba(255, 48, 68, 0.4);
+ color:white;font-size:30px;font-weight:900;
+ cursor:pointer;transition:transform 0.08s;
 }
-.control-btn:active{transform:scale(0.91);filter:brightness(1.3)}
+.control-btn:active{transform:scale(0.92);filter:brightness(1.3)}
 
 #fire{
  pointer-events:auto;
- width:clamp(86px,24vw,112px);
- height:clamp(86px,24vw,112px);
+ width:clamp(82px,23vw,104px);
+ height:clamp(82px,23vw,104px);
  flex-direction:column;gap:2px;
- font-size:14px;font-weight:900;color:#ffdc72;
+ font-size:13px;font-weight:900;color:#ffdc72;
  border:5px solid #ffaa22;
  background:radial-gradient(circle at 35% 25%,#7a582c,#2a1d17 65%,#0d0f14);
- box-shadow:0 0 16px #ff9a1a,0 0 30px rgba(255, 141, 36, 0.55),
- inset 0 0 0 3px rgba(255,255,255,0.45);
+ box-shadow:0 0 16px #ff9a1a,0 0 28px rgba(255, 141, 36, 0.55);
  cursor:pointer;
 }
-#fire span{font-size:34px;line-height:1}
+#fire span{font-size:30px;line-height:1}
 #fire:active{transform:scale(0.92);filter:brightness(1.35)}
 
 #message{
  position:absolute;inset:0;z-index:10;
  display:flex;align-items:center;justify-content:center;
- background:rgba(2, 7, 19, 0.88);backdrop-filter:blur(6px);
+ background:rgba(2, 7, 19, 0.9);backdrop-filter:blur(6px);
  padding:20px;
 }
 .card{
- width:min(350px,100%);padding:25px 20px;
+ width:min(350px,100%);padding:24px 18px;
  border-radius:18px;text-align:center;
  background:linear-gradient(155deg,#131e33,#060b16);
  border:1.5px solid #ffaa22;
  box-shadow:0 0 35px rgba(255, 156, 36, 0.35);
 }
-.card h1{font-size:24px;color:#ffc14d;margin:0 0 10px;letter-spacing:1px}
-.card p{color:#c2d0e6;line-height:1.6;font-size:13.5px}
+.card h1{font-size:22px;color:#ffc14d;margin:0 0 8px;letter-spacing:1px}
+.card p{color:#c2d0e6;line-height:1.5;font-size:13px}
 .action{
- width:100%;padding:14px;margin-top:14px;
+ width:100%;padding:13px;margin-top:14px;
  border:0;border-radius:10px;font-weight:900;
- font-size:16px;color:#101018;cursor:pointer;
+ font-size:15px;color:#101018;cursor:pointer;
  background:linear-gradient(90deg,#ffd875,#ff922b);
- box-shadow:0 0 18px rgba(255, 174, 51, 0.4);
+ box-shadow:0 0 16px rgba(255, 174, 51, 0.4);
 }
 .hidden{display:none!important}
 #pause{
- position:absolute;right:14px;top:84px;z-index:5;
- width:38px;height:38px;border-radius:50%;
+ position:absolute;right:12px;top:80px;z-index:5;
+ width:36px;height:36px;border-radius:50%;
  background:rgba(11, 20, 36, 0.85);border:1.5px solid #8ca9d5;
- color:white;font-size:16px;cursor:pointer;
+ color:white;font-size:15px;cursor:pointer;
 }
 </style>
 </head>
@@ -132,16 +145,26 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
    <strong id="hpText">100%</strong>
    <div id="hpBar"><div id="hpFill"></div></div>
   </div>
+  <div class="panel" style="text-align:center">
+   <small>LEVEL <span id="currentLevel">1</span>/500</small>
+   <strong id="levelText">STAGE 1</strong>
+   <div id="lvlBar"><div id="lvlFill"></div></div>
+  </div>
   <div class="panel" style="text-align:right">
    <small>MISSION SCORE</small>
    <strong id="scoreText">0000</strong>
   </div>
  </div>
 
- <div class="brand">MULTANI FF • AIR FORCE</div>
+ <!-- Dynamic Boss Health Bar -->
+ <div id="bossHud">
+  <div id="bossName">⚠️ MEGA TITAN BOSS ⚠️</div>
+  <div id="bossBarOutline"><div id="bossBarFill"></div></div>
+ </div>
+
+ <div class="brand" id="phaseIndicator">PHASE 1: JET SQUADRON</div>
  <button id="pause">Ⅱ</button>
 
- <!-- Left | FIRE (Center) | Right Layout -->
  <div class="controls">
   <button class="control-btn" id="left" aria-label="Move left">◀</button>
   <button class="control-btn" id="fire"><span>🔥</span>FIRE</button>
@@ -150,12 +173,13 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 
  <div id="message">
   <div class="card">
-   <h1>✈ AIR FORCE BATTLE</h1>
-   <p>MULTANI FF OFFICIAL<br>
-   <b>ELITE FIGHTER JET MISSION</b><br><br>
-   Dushman jets ko khatam karein.<br>
-   Bayein/Dayein buttons se steer karein aur Center se FIRE karein.</p>
-   <button class="action" id="start">START MISSION ▶</button>
+   <h1 id="modalTitle">✈ AIR FORCE 500</h1>
+   <p id="modalDesc">MULTANI FF OFFICIAL<br>
+   <b>500 HARDCORE CAMPAIGN LEVELS</b><br><br>
+   • Har level naya background environment!<br>
+   • 100 Mukhtalif Dushman (Jets, Tanks, Dinosaurs, Aliens, Spiders, Machines)<br>
+   • Har 10 Level baad MEGA BOSS Fight!</p>
+   <button class="action" id="start">START MISSION 1 ▶</button>
   </div>
  </div>
 </div>
@@ -171,13 +195,16 @@ const $=id=>document.getElementById(id);
 let W=0,H=0,DPR=1;
 let running=false,paused=false,gameOver=false;
 let score=0,hp=100,last=0,elapsed=0,spawn=0,shot=0;
-let enemies=[],bullets=[],sparks=[],clouds=[],islands=[];
+let level=1, levelKills=0, killsNeeded=10;
+let activeBoss=null;
+let bannerTimer=0, bannerText="";
+
+let enemies=[],bullets=[],enemyBullets=[],sparks=[],clouds=[],bgObjects=[];
 const keys={left:false,right:false,fire:false};
 
-// Precise Jet Dimension definition
-const player={x:0,y:0,w:56,h:84,speed:360,inv:0};
+const player={x:0,y:0,w:54,h:80,speed:360,inv:0};
 
-// Built-in Web Audio API for VIP Laser and Blast SFX
+// Web Audio API Sound Effects
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 let actx = null;
 
@@ -187,14 +214,31 @@ function playLaserSFX(){
   const osc = actx.createOscillator();
   const gain = actx.createGain();
   osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(750, actx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(140, actx.currentTime + 0.09);
+  osc.frequency.setValueAtTime(760, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(140, actx.currentTime + 0.08);
   gain.gain.setValueAtTime(0.18, actx.currentTime);
-  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.09);
+  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.08);
   osc.connect(gain);
   gain.connect(actx.destination);
   osc.start();
-  osc.stop(actx.currentTime + 0.09);
+  osc.stop(actx.currentTime + 0.08);
+ }catch(e){}
+}
+
+function playEnemyLaserSFX(){
+ try{
+  if(!actx) actx = new AudioContextClass();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(320, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, actx.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.14, actx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.12);
+  osc.connect(gain);
+  gain.connect(actx.destination);
+  osc.start();
+  osc.stop(actx.currentTime + 0.12);
  }catch(e){}
 }
 
@@ -205,14 +249,54 @@ function playBlastSFX(){
   const gain = actx.createGain();
   osc.type = 'triangle';
   osc.frequency.setValueAtTime(140, actx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(25, actx.currentTime + 0.25);
-  gain.gain.setValueAtTime(0.3, actx.currentTime);
-  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.25);
+  osc.frequency.exponentialRampToValueAtTime(25, actx.currentTime + 0.28);
+  gain.gain.setValueAtTime(0.35, actx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, actx.currentTime + 0.28);
   osc.connect(gain);
   gain.connect(actx.destination);
   osc.start();
-  osc.stop(actx.currentTime + 0.25);
+  osc.stop(actx.currentTime + 0.28);
  }catch(e){}
+}
+
+// 100 Dynamic Enemy Phases Titles & Visual Classes (Every 5 Levels)
+const ENEMY_PHASES = [
+ "FIGHTER JET DELTA", "FLYING TANK BATTALION", "APACHE ATTACK CHOPPERS", "HYPERSONIC ROCKETS", "DRONE SWARM ALPHA",
+ "T-REX TITAN DINOS", "VENOM CYBER SPIDERS", "FIRE DRAGON BEASTS", "CYBER MECH SOLDIERS", "ALIEN UFO INVADERS",
+ "ORBITAL BOMBERS", "PREHISTORIC PTERODACTYLS", "HEAVY ARTILLERY HOVERS", "TOXIC SCORPION DRONES", "STEALTH PHANTOM JETS",
+ "MUTANT BAT COLONY", "PLASMA LASER TANKS", "KRAKEN SKY WORMS", "NANOTECH BOT HORDE", "INTERCEPTOR CRUSERS",
+ "VOLCANIC FIRE DINOS", "MECHA BEAST HORDE", "HELLFIRE HELICOPTERS", "CYBER WASP SWARM", "VOID GALAXY FIGHTERS",
+ "DESERT DUNE JETS", "ARMORED TRICERATOPS", "SHOCKWAVE ROCKET BARRAGE", "ALIEN ASSAULT BIOPODS", "CYBER CENTIPEDE FLIERS",
+ "QUANTUM MECHA DROID", "GLACIER ICE JETS", "FLYING PREDATOR JAGUARS", "WARSHIP SKIFFS", "HEAVY PLASMA CANNONS",
+ "CYBER DEMON DRONES", "TITANIC RHINO FLYERS", "LIGHTNING STRUSH CRAFTS", "BLOOD WING DRAGONS", "GALAXY CORVETTES",
+ "SUB-ZERO BOMBERS", "CYBER MANTIS HORDE", "INFERNO WAR ROBOTS", "TOXIC FLYING VIPERS", "EXTINCTION DINOS",
+ "HYPER ASSAULT TANKS", "VORTEX JET PACK SOLDIERS", "CHOPPER GUNSHIPS", "STEALTH MECHA HORNETS", "COSMIC REAPER FLEET",
+ "SOLAR FLARE BOMBERS", "JUNGLE STALKER MONSTERS", "MISSILE CRUISERS", "TITAN CHIMERA FLYERS", "PLASMA BEAM HOVERS",
+ "NIGHT HUNTER BATS", "CYBER BULL MECHS", "ORBITAL DEATH PODS", "SKY GORGON BEASTS", "NEO-STEALTH BOMBERS",
+ "ACID DRAGON SQUAD", "HEAVY DUAL-CANNON TANKS", "ALIEN HARVESTER FLYERS", "MUTANT RAPTOR HORDE", "QUANTUM CRUSHERS",
+ "SONIC PULSE JET", "DESERT DEATH SCORPIONS", "APACHE DEMON CHOPPERS", "BIO-MECHANIC HYDRAS", "STEALTH PHANTOM FLEET",
+ "CYBER ANACONDA DRONES", "INFERNO T-REX HERD", "WARZONE BATTLE TANKS", "ALIEN QUEEN BROOD", "STORM CARRIERS",
+ "MECHA WYVERN RAIDERS", "CORROSIVE SLIME FLIERS", "GIGANTIC HORNET HORDE", "HEAVY SIEGE CANNONS", "BLACK HOLE FIGHTERS",
+ "THUNDER TITAN FLYERS", "CYBER PANTHER DRONES", "MISSILE DREADNOUGHTS", "TOXIC SKY SPIDERS", "LAVA DRAGON SQUADRON",
+ "ALIEN CYCLOPS FLYERS", "WAR TURRET HOVERS", "GHOST RECON FIGHTERS", "CYBER GORILLA MECHS", "DARK MATTER SATELLITES",
+ "EXTREME CYBER TANKS", "DOOMSDAY CARRIER JETS", "MUTANT DRAGON LORDS", "BIO-VIRUS SPORE FLIERS", "PLASMA GUNSHIP CORPS",
+ "TITAN BEHEMOTH FLIERS", "CYBER MECHA LEGION", "ANNIHILATOR DRONES", "VOID EMPEROR ARMADA", "APOCALYPSE SKY FLEET"
+];
+
+// Dynamic Background Palettes (Cycles per Level)
+const BG_PALETTES = [
+ {top:"#0d3859", mid:"#0b2a47", bot:"#06172a", obj:"#1e5c4d", line:"#ff5511"}, // 1 Ocean
+ {top:"#4a1508", mid:"#2d0e06", bot:"#120402", obj:"#782410", line:"#ffaa00"}, // 2 Lava
+ {top:"#052516", mid:"#03180e", bot:"#010905", obj:"#145233", line:"#00ff88"}, // 3 Toxic Jungle
+ {top:"#2e0840", mid:"#190424", bot:"#0a010f", obj:"#5e187d", line:"#e024ff"}, // 4 Cyber Neon
+ {top:"#362208", mid:"#211504", bot:"#0d0701", obj:"#6e4a1b", line:"#ffcc00"}, // 5 Desert Wasteland
+ {top:"#041e3d", mid:"#031124", bot:"#010712", obj:"#154070", line:"#00ccff"}, // 6 Deep Space
+ {top:"#3d071a", mid:"#24030e", bot:"#0f0105", obj:"#78183a", line:"#ff0055"}, // 7 Blood Red Sky
+ {top:"#132b36", mid:"#0b1c24", bot:"#050d12", obj:"#2a5163", line:"#3df0c2"}  // 8 Storm Tempest
+];
+
+function getBgPalette(lvl){
+ return BG_PALETTES[(lvl - 1) % BG_PALETTES.length];
 }
 
 function resize(){
@@ -225,19 +309,16 @@ function resize(){
  player.y=H*0.74;
 
  if(!clouds.length){
-  for(let i=0;i<12;i++){
-   clouds.push({
-    x:Math.random()*W,y:Math.random()*H,
-    s:35+Math.random()*70,v:18+Math.random()*35
-   });
+  for(let i=0;i<14;i++){
+   clouds.push({x:Math.random()*W,y:Math.random()*H,s:35+Math.random()*70,v:18+Math.random()*35});
   }
-  for(let i=0;i<4;i++){
-   islands.push({
-    x:W*(0.2+i*0.25)+(Math.random()-0.5)*40,
-    y:i*(H/3.5),
+  for(let i=0;i<5;i++){
+   bgObjects.push({
+    x:W*(0.15+i*0.22)+(Math.random()-0.5)*30,
+    y:i*(H/4),
     rx:45+Math.random()*30,
     ry:35+Math.random()*20,
-    v:22
+    v:20+Math.random()*10
    });
   }
  }
@@ -245,72 +326,206 @@ function resize(){
 window.addEventListener("resize",resize);
 resize();
 
-// High Quality Jet Visuals
-function drawFighterJet(x,y,w,h,isEnemy=false){
+// Procedural Enemy & Boss Visual Art
+function drawEntity(type, subKind, x, y, w, h, isBoss=false){
+ ctx.save();
+ ctx.translate(x,y);
+
+ if(isBoss){
+  // MEGA BOSS (Airship / Titan Fortress / Giant Beast)
+  const sc = w / 110;
+  ctx.scale(sc, sc);
+
+  // Boss Glow
+  ctx.shadowColor = "#ff2244";
+  ctx.shadowBlur = 20;
+
+  // Giant Main Armor Hull
+  ctx.fillStyle = "#1e2230";
+  ctx.strokeStyle = "#ff3355";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(0, 48);
+  ctx.lineTo(54, 18);
+  ctx.lineTo(46, -30);
+  ctx.lineTo(16, -48);
+  ctx.lineTo(-16, -48);
+  ctx.lineTo(-46, -30);
+  ctx.lineTo(-54, 18);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Heavy Cannons Left & Right
+  ctx.fillStyle = "#4a5568";
+  ctx.fillRect(-48, 12, 10, 26);
+  ctx.fillRect(38, 12, 10, 26);
+  ctx.fillStyle = "#ffaa00";
+  ctx.fillRect(-46, 36, 6, 6);
+  ctx.fillRect(40, 36, 6, 6);
+
+  // Glowing Core Reactor
+  ctx.fillStyle = Math.floor(elapsed*15)%2===0 ? "#ff2255" : "#ffbb00";
+  ctx.beginPath();
+  ctx.arc(0, 0, 18, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Mega Wings
+  ctx.fillStyle = "#334155";
+  ctx.beginPath();
+  ctx.moveTo(-54, 0); ctx.lineTo(-88, 22); ctx.lineTo(-50, 26);
+  ctx.moveTo(54, 0); ctx.lineTo(88, 22); ctx.lineTo(50, 26);
+  ctx.fill();
+
+  ctx.restore();
+  return;
+ }
+
+ // Standard 100-Phase Sub-Categories
+ const phaseIdx = Math.floor((level - 1) / 5) % 10;
+
+ if(phaseIdx === 0 || phaseIdx === 4){
+  // JET / FIGHTER CRAFT
+  ctx.scale(w/60, h/84);
+  ctx.rotate(Math.PI);
+  // Engines
+  ctx.fillStyle="#ff8800";
+  ctx.fillRect(-8, 30, 4, 12);
+  ctx.fillRect(4, 30, 4, 12);
+  // Wings
+  ctx.fillStyle="#475569";
+  ctx.beginPath();
+  ctx.moveTo(0,-35); ctx.lineTo(26,16); ctx.lineTo(12,28);
+  ctx.lineTo(-12,28); ctx.lineTo(-26,16); ctx.closePath();
+  ctx.fill();
+  // Cockpit
+  ctx.fillStyle="#ff3344";
+  ctx.fillRect(-4,-15,8,18);
+
+ }else if(phaseIdx === 1 || phaseIdx === 5){
+  // FLYING ARMORED TANK / MECHA
+  ctx.scale(w/60, h/70);
+  ctx.fillStyle="#2b394a";
+  ctx.fillRect(-22,-20,44,40);
+  // Tank Treads
+  ctx.fillStyle="#0f172a";
+  ctx.fillRect(-28,-26,10,52);
+  ctx.fillRect(18,-26,10,52);
+  // Heavy Turret Cannon
+  ctx.fillStyle="#94a3b8";
+  ctx.fillRect(-5,0,10,32);
+  ctx.fillStyle="#ff2244";
+  ctx.beginPath();ctx.arc(0,-4,12,0,Math.PI*2);ctx.fill();
+
+ }else if(phaseIdx === 2 || phaseIdx === 7){
+  // CHOPPER / HELICOPTER
+  ctx.scale(w/60, h/70);
+  // Spinning Blades
+  ctx.save();
+  ctx.rotate(elapsed*28);
+  ctx.fillStyle="rgba(255,255,255,0.7)";
+  ctx.fillRect(-35,-3,70,6);
+  ctx.restore();
+  // Chopper Body
+  ctx.fillStyle="#334155";
+  ctx.beginPath();ctx.ellipse(0,0,16,24,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#38bdf8";
+  ctx.beginPath();ctx.ellipse(0,10,10,12,0,0,Math.PI*2);ctx.fill();
+  // Tail
+  ctx.fillStyle="#1e293b";
+  ctx.fillRect(-4,-36,8,24);
+
+ }else if(phaseIdx === 3 || phaseIdx === 8){
+  // DINOSAURS & FIRE DRAGONS
+  ctx.scale(w/65, h/75);
+  // Dragon Flapping Wings
+  const wingY = Math.sin(elapsed*16)*14;
+  ctx.fillStyle="#7f1d1d";
+  ctx.beginPath();
+  ctx.moveTo(0,0); ctx.lineTo(-38, wingY); ctx.lineTo(-15,22);
+  ctx.moveTo(0,0); ctx.lineTo(38, wingY); ctx.lineTo(15,22);
+  ctx.fill();
+  // Dino Body & Head
+  ctx.fillStyle="#991b1b";
+  ctx.beginPath();ctx.ellipse(0,-5,12,24,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ef4444";
+  ctx.beginPath();ctx.arc(0,22,10,0,Math.PI*2);ctx.fill();
+  // Glowing Eyes
+  ctx.fillStyle="#fef08a";
+  ctx.fillRect(-5,20,3,3); ctx.fillRect(2,20,3,3);
+
+ }else{
+  // CYBER SPIDERS / ALIEN UFOS / SCI-FI MACHINES
+  ctx.scale(w/60, h/65);
+  // Alien Saucer Rim
+  ctx.fillStyle="#065f46";
+  ctx.beginPath();ctx.ellipse(0,0,28,15,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#34d399";
+  ctx.lineWidth=2;ctx.stroke();
+  // Glowing Dome
+  ctx.fillStyle=Math.floor(elapsed*10)%2===0?"#a7f3d0":"#10b981";
+  ctx.beginPath();ctx.arc(0,-4,12,0,Math.PI*2);ctx.fill();
+  // Tentacle legs / laser antennas
+  ctx.strokeStyle="#6ee7b7";
+  ctx.beginPath();
+  ctx.moveTo(-20,5); ctx.lineTo(-26,20);
+  ctx.moveTo(20,5); ctx.lineTo(26,20);
+  ctx.moveTo(0,10); ctx.lineTo(0,24);
+  ctx.stroke();
+ }
+
+ ctx.restore();
+}
+
+// Player Fighter Jet
+function drawPlayerJet(x,y,w,h){
  ctx.save();
  ctx.translate(x,y);
  ctx.scale(w/60,h/84);
- if(isEnemy) ctx.rotate(Math.PI);
 
- // Double Jet Engine Afterburners
- const flameHeight = 16 + Math.random()*16;
- const flameGrad = ctx.createLinearGradient(0,34,0,34+flameHeight);
+ const flameH = 16 + Math.random()*16;
+ const flameGrad = ctx.createLinearGradient(0,34,0,34+flameH);
  flameGrad.addColorStop(0,"#ffffff");
  flameGrad.addColorStop(0.3,"#ffaa00");
  flameGrad.addColorStop(1,"rgba(255,50,0,0)");
  ctx.fillStyle = flameGrad;
-
  ctx.beginPath();
- ctx.moveTo(-11,34);ctx.lineTo(-8,34+flameHeight);ctx.lineTo(-5,34);
- ctx.moveTo(5,34);ctx.lineTo(8,34+flameHeight);ctx.lineTo(11,34);
+ ctx.moveTo(-11,34);ctx.lineTo(-8,34+flameH);ctx.lineTo(-5,34);
+ ctx.moveTo(5,34);ctx.lineTo(8,34+flameH);ctx.lineTo(11,34);
  ctx.fill();
 
- // Main Wings (Delta Jet Style)
- ctx.fillStyle = isEnemy ? "#4b5768" : "#2563eb";
+ // Main Wings
+ ctx.fillStyle = "#2563eb";
  ctx.beginPath();
- ctx.moveTo(0,-38);
- ctx.lineTo(9,-6);
- ctx.lineTo(29,14);
- ctx.lineTo(26,24);
- ctx.lineTo(13,20);
- ctx.lineTo(12,34);
- ctx.lineTo(-12,34);
- ctx.lineTo(-13,20);
- ctx.lineTo(-26,24);
- ctx.lineTo(-29,14);
- ctx.lineTo(-9,-6);
- ctx.closePath();
+ ctx.moveTo(0,-38); ctx.lineTo(9,-6); ctx.lineTo(29,14);
+ ctx.lineTo(26,24); ctx.lineTo(13,20); ctx.lineTo(12,34);
+ ctx.lineTo(-12,34); ctx.lineTo(-13,20); ctx.lineTo(-26,24);
+ ctx.lineTo(-29,14); ctx.lineTo(-9,-6); ctx.closePath();
  ctx.fill();
- ctx.strokeStyle = isEnemy ? "#7c8ba1" : "#93c5fd";
+ ctx.strokeStyle = "#93c5fd";
  ctx.lineWidth = 1.6;
  ctx.stroke();
 
  // Wing Tips Highlights
- ctx.fillStyle = isEnemy ? "#dc2626" : "#60a5fa";
+ ctx.fillStyle = "#60a5fa";
  ctx.fillRect(-27,14,3,9);
  ctx.fillRect(24,14,3,9);
 
- // Center Fuselage Body
- ctx.fillStyle = isEnemy ? "#718096" : "#e2e8f0";
+ // Center Fuselage
+ ctx.fillStyle = "#e2e8f0";
  ctx.beginPath();
- ctx.moveTo(0,-42);
- ctx.lineTo(6,-12);
- ctx.lineTo(6,30);
- ctx.lineTo(-6,30);
- ctx.lineTo(-6,-12);
- ctx.closePath();
+ ctx.moveTo(0,-42); ctx.lineTo(6,-12); ctx.lineTo(6,30);
+ ctx.lineTo(-6,30); ctx.lineTo(-6,-12); ctx.closePath();
  ctx.fill();
 
- // Canopy (Cockpit Glass Reflection)
+ // Cockpit
  const glass = ctx.createLinearGradient(0,-24,0,-2);
- if(isEnemy){
-  glass.addColorStop(0,"#ff8b8b");
-  glass.addColorStop(1,"#450a0a");
- }else{
-  glass.addColorStop(0,"#fde047");
-  glass.addColorStop(0.5,"#ca8a04");
-  glass.addColorStop(1,"#451a03");
- }
+ glass.addColorStop(0,"#fde047");
+ glass.addColorStop(0.5,"#ca8a04");
+ glass.addColorStop(1,"#451a03");
  ctx.fillStyle = glass;
  ctx.beginPath();
  ctx.ellipse(0,-14,4,11,0,0,Math.PI*2);
@@ -323,31 +538,32 @@ function drawFighterJet(x,y,w,h,isEnemy=false){
 }
 
 function background(dt){
- // VIP Ocean Deep Water
- const sky=ctx.createLinearGradient(0,0,0,H);
- sky.addColorStop(0,"#0d3859");
- sky.addColorStop(0.5,"#0b2a47");
- sky.addColorStop(1,"#06172a");
- ctx.fillStyle=sky;
+ const pal = getBgPalette(level);
+
+ const grad=ctx.createLinearGradient(0,0,0,H);
+ grad.addColorStop(0,pal.top);
+ grad.addColorStop(0.5,pal.mid);
+ grad.addColorStop(1,pal.bot);
+ ctx.fillStyle=grad;
  ctx.fillRect(0,0,W,H);
 
- // Floating Green Islands
- islands.forEach(isl=>{
+ // Floating Islands/Terrains with level dynamic colors
+ bgObjects.forEach(isl=>{
   isl.y+=isl.v*dt;
-  if(isl.y>H+80){isl.y=-80;isl.x=W*0.1+Math.random()*W*0.8}
-  ctx.fillStyle="#1e5c4d";
+  if(isl.y>H+90){isl.y=-90;isl.x=W*0.1+Math.random()*W*0.8}
+  ctx.fillStyle=pal.obj;
   ctx.beginPath();
   ctx.ellipse(isl.x,isl.y,isl.rx,isl.ry,0,0,Math.PI*2);
   ctx.fill();
-  ctx.strokeStyle="rgba(80,180,140,0.25)";
+  ctx.strokeStyle="rgba(255,255,255,0.15)";
   ctx.lineWidth=2;
   ctx.stroke();
  });
 
- // Neon Flight-Lane Glowing Lines
- ctx.strokeStyle="rgba(255, 95, 45, 0.45)";
- ctx.lineWidth=3;
- ctx.shadowColor="#ff5511";
+ // Glowing Speed Lanes
+ ctx.strokeStyle=pal.line;
+ ctx.lineWidth=2.5;
+ ctx.shadowColor=pal.line;
  ctx.shadowBlur=12;
  ctx.beginPath();
  ctx.moveTo(W*0.33,0);ctx.lineTo(W*0.33,H);
@@ -355,11 +571,11 @@ function background(dt){
  ctx.stroke();
  ctx.shadowBlur=0;
 
- // Scrolling Soft Clouds
+ // Floating Atmosphere Clouds
  clouds.forEach(c=>{
   c.y+=c.v*dt;
   if(c.y>H+70){c.y=-70;c.x=Math.random()*W}
-  ctx.fillStyle="rgba(255, 255, 255, 0.08)";
+  ctx.fillStyle="rgba(255, 255, 255, 0.07)";
   ctx.beginPath();
   ctx.ellipse(c.x,c.y,c.s,c.s*0.48,0,0,Math.PI*2);
   ctx.fill();
@@ -368,43 +584,119 @@ function background(dt){
 
 function shoot(){
  playLaserSFX();
- // 5-Way Fan Spreading Lasers
  const angles=[-0.14, -0.07, 0, 0.07, 0.14];
  angles.forEach(ang=>{
   bullets.push({
    x:player.x,
    y:player.y-34,
-   vx:Math.sin(ang)*580,
-   vy:-Math.cos(ang)*580
+   vx:Math.sin(ang)*620,
+   vy:-Math.cos(ang)*620
   });
  });
 }
 
-function enemy(){
- const size=44+Math.random()*10;
+function spawnEnemyBullet(x, y, targetX, targetY, speed=260){
+ playEnemyLaserSFX();
+ const angle = Math.atan2(targetY - y, targetX - x);
+ enemyBullets.push({
+  x, y,
+  vx: Math.cos(angle)*speed,
+  vy: Math.sin(angle)*speed
+ });
+}
+
+function spawnEnemy(){
+ if(activeBoss) return;
+ const size=44+Math.random()*12;
+ const phaseIndex = Math.min(99, Math.floor((level - 1) / 5));
+
  enemies.push({
   x:25+Math.random()*(W-50),
   y:-60,
   w:size,
-  h:size*1.3,
-  v:115+Math.random()*60+Math.min(score*0.06,120),
-  phase:Math.random()*6.28
+  h:size*1.25,
+  v:115 + Math.random()*50 + Math.min(level*1.5, 240),
+  phase:Math.random()*6.28,
+  subKind:phaseIndex,
+  fireCooldown:1.2 + Math.random()*1.8
  });
 }
 
-function explosion(x,y,isPlayer=false){
+function spawnMegaBoss(){
+ const bossHP = 400 + (level * 80);
+ activeBoss = {
+  x: W/2,
+  y: -120,
+  targetY: H * 0.18,
+  w: Math.min(W * 0.65, 170),
+  h: Math.min(W * 0.65, 170) * 0.85,
+  hp: bossHP,
+  maxHp: bossHP,
+  speed: 120 + Math.min(level*0.8, 120),
+  fireCooldown: 0.6,
+  movePhase: 0
+ };
+
+ $("bossHud").style.display="block";
+ $("bossName").textContent = `⚠️ LEVEL ${level} MEGA BOSS BATTLE ⚠️`;
+ updateBossBar();
+ showBanner(`⚠️ LEVEL ${level} BOSS INCOMING! ⚠️`);
+}
+
+function updateBossBar(){
+ if(!activeBoss) return;
+ const pct = Math.max(0, (activeBoss.hp / activeBoss.maxHp) * 100);
+ $("bossBarFill").style.width = pct + "%";
+}
+
+function showBanner(txt){
+ bannerText = txt;
+ bannerTimer = 2.8;
+}
+
+function explosion(x,y,isPlayer=false,big=false){
  playBlastSFX();
- const count=isPlayer?36:18;
+ const count = big ? 60 : (isPlayer ? 40 : 20);
  for(let i=0;i<count;i++){
   const a=Math.random()*Math.PI*2;
-  const speed=30+Math.random()*(isPlayer?220:130);
+  const speed=30+Math.random()*(big?320:(isPlayer?220:130));
   sparks.push({
    x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
-   life:0.35+Math.random()*0.5,
-   size:2.5+Math.random()*5,
-   color:["#ffffff","#ffee55","#ff7711","#ff2200"][i%4]
+   life:0.4+Math.random()*0.6,
+   size:2.5+Math.random()*(big?7:4),
+   color:["#ffffff","#ffee55","#ff7711","#ff2200","#ff0055"][i%5]
   });
  }
+}
+
+function checkLevelAdvance(){
+ if(levelKills >= killsNeeded && !activeBoss){
+  // Check if next is Boss Wave (Every 10th Level)
+  if(level % 10 === 0){
+   spawnMegaBoss();
+  } else {
+   advanceNextLevel();
+  }
+ }
+}
+
+function advanceNextLevel(){
+ if(level >= 500){
+  victoryGame();
+  return;
+ }
+ level++;
+ levelKills = 0;
+ killsNeeded = 10 + Math.floor(level * 0.8);
+
+ const phaseNumber = Math.min(100, Math.floor((level - 1) / 5) + 1);
+ $("phaseIndicator").textContent = `PHASE ${phaseNumber}: ${ENEMY_PHASES[phaseNumber-1] || "WAR SQUAD"}`;
+ showBanner(`STAGE ${level} CLEARED!`);
+
+ // Update HUD
+ $("currentLevel").textContent = level;
+ $("levelText").textContent = `STAGE ${level}`;
+ $("lvlFill").style.width = "0%";
 }
 
 function update(dt){
@@ -412,6 +704,7 @@ function update(dt){
  background(dt);
 
  if(running&&!paused&&!gameOver){
+  // Controls
   if(keys.left)player.x-=player.speed*dt;
   if(keys.right)player.x+=player.speed*dt;
   player.x=Math.max(26,Math.min(W-26,player.x));
@@ -419,29 +712,51 @@ function update(dt){
   shot-=dt;
   if(keys.fire&&shot<=0){shoot();shot=0.14}
 
-  spawn-=dt;
-  if(spawn<=0){
-   enemy();
-   spawn=Math.max(0.4,1.1-score/5000);
+  // Regular Enemies Spawning
+  if(!activeBoss){
+   spawn-=dt;
+   if(spawn<=0){
+    spawnEnemy();
+    spawn=Math.max(0.35, 1.1 - Math.min(level*0.003, 0.7));
+   }
   }
 
-  // Bullets update
-  bullets.forEach(b=>{
-   b.x+=b.vx*dt;
-   b.y+=b.vy*dt;
-  });
-  bullets=bullets.filter(b=>b.y>-20&&b.x>-10&&b.x<W+10);
+  // Player Bullets update
+  bullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;});
+  bullets=bullets.filter(b=>b.y>-30&&b.x>-10&&b.x<W+10);
 
-  // Accurate Jet Hitbox Detection (Tight bounds: wing/fuselage overlap only)
+  // Enemy Bullets update
+  enemyBullets.forEach(eb=>{eb.x+=eb.vx*dt;eb.y+=eb.vy*dt;});
+  enemyBullets=enemyBullets.filter(eb=>{
+   if(eb.y>H+30||eb.y<-30||eb.x<-30||eb.x>W+30) return false;
+   // Hit Player
+   if(player.inv<=0 && Math.abs(eb.x - player.x) < 22 && Math.abs(eb.y - player.y) < 26){
+    hp = Math.max(0, hp - 15);
+    player.inv = 0.6;
+    explosion(player.x, player.y, true);
+    return false;
+   }
+   return true;
+  });
+
+  // Standard Enemies update
   enemies.forEach(e=>{
    e.y+=e.v*dt;
-   e.x+=Math.sin(elapsed*1.8+e.phase)*20*dt;
+   e.x+=Math.sin(elapsed*2 + e.phase)*25*dt;
 
-   // Tight Hitbox bounds (No fake touches, real proximity only)
+   // Enemies shooting
+   if(level >= 5){
+    e.fireCooldown -= dt;
+    if(e.fireCooldown <= 0 && e.y < player.y - 60){
+     spawnEnemyBullet(e.x, e.y + 15, player.x, player.y, 240);
+     e.fireCooldown = 1.8 + Math.random()*2;
+    }
+   }
+
+   // Collision with Player
    const xDist = Math.abs(e.x - player.x);
    const yDist = Math.abs(e.y - player.y);
-
-   if(xDist < (player.w * 0.36 + e.w * 0.36) && yDist < (player.h * 0.38 + e.h * 0.38)){
+   if(xDist < (player.w*0.36 + e.w*0.36) && yDist < (player.h*0.38 + e.h*0.38)){
     e.hit=true;
     if(player.inv<=0){
      hp=Math.max(0,hp-20);
@@ -450,15 +765,56 @@ function update(dt){
     }
    }
   });
+
+  // Boss Logic
+  if(activeBoss){
+   if(activeBoss.y < activeBoss.targetY){
+    activeBoss.y += 90 * dt;
+   }else{
+    activeBoss.movePhase += dt * 1.5;
+    activeBoss.x = (W/2) + Math.sin(activeBoss.movePhase) * (W * 0.35);
+
+    // Boss Aggressive Shooting
+    activeBoss.fireCooldown -= dt;
+    if(activeBoss.fireCooldown <= 0){
+     // Triple/Fan Attack
+     spawnEnemyBullet(activeBoss.x - 35, activeBoss.y + 25, player.x, player.y, 280);
+     spawnEnemyBullet(activeBoss.x, activeBoss.y + 35, player.x, player.y, 290);
+     spawnEnemyBullet(activeBoss.x + 35, activeBoss.y + 25, player.x, player.y, 280);
+     activeBoss.fireCooldown = Math.max(0.4, 1.2 - Math.min(level*0.002, 0.6));
+    }
+   }
+
+   // Bullets vs Boss
+   bullets.forEach(b=>{
+    if(!b.used && Math.abs(b.x - activeBoss.x) < activeBoss.w*0.5 && Math.abs(b.y - activeBoss.y) < activeBoss.h*0.5){
+     b.used = true;
+     activeBoss.hp -= 20;
+     score += 25;
+     updateBossBar();
+     if(activeBoss.hp <= 0){
+      explosion(activeBoss.x, activeBoss.y, false, true);
+      score += 1500;
+      activeBoss = null;
+      $("bossHud").style.display="none";
+      showBanner("MEGA BOSS DESTROYED! LEVEL UP!");
+      advanceNextLevel();
+     }
+    }
+   });
+  }
+
   player.inv=Math.max(0,player.inv-dt);
 
-  // Bullets Hit detection
+  // Bullets Hit detection vs Regular Enemies
   enemies=enemies.filter(e=>{
    if(e.hit){explosion(e.x,e.y);return false}
    for(const b of bullets){
     if(!b.used && Math.abs(b.x - e.x) < e.w * 0.44 && Math.abs(b.y - e.y) < e.h * 0.44){
      b.used=true;
      score+=100;
+     levelKills++;
+     checkLevelAdvance();
      explosion(e.x,e.y);
      return false;
     }
@@ -471,14 +827,14 @@ function update(dt){
   if(hp<=0)endGame();
  }
 
- // Explosion sparks animation
+ // Sparks animation
  sparks.forEach(s=>{
   s.x+=s.vx*dt;s.y+=s.vy*dt;
   s.vx*=0.97;s.vy*=0.97;s.life-=dt;
  });
  sparks=sparks.filter(s=>s.life>0);
 
- // Draw Glowing Lasers
+ // Draw Player Bullets
  bullets.forEach(b=>{
   ctx.shadowBlur=12;ctx.shadowColor="#ffe144";
   ctx.fillStyle="#ffff88";
@@ -486,12 +842,26 @@ function update(dt){
   ctx.arc(b.x,b.y,3.5,0,Math.PI*2);
   ctx.fill();
  });
+
+ // Draw Enemy Bullets (Red Laser / Plasma Orbs)
+ enemyBullets.forEach(eb=>{
+  ctx.shadowBlur=14;ctx.shadowColor="#ff2244";
+  ctx.fillStyle="#ff3366";
+  ctx.beginPath();
+  ctx.arc(eb.x,eb.y,4.5,0,Math.PI*2);
+  ctx.fill();
+ });
  ctx.shadowBlur=0;
 
  // Draw Enemies
  enemies.forEach(e=>{
-  drawFighterJet(e.x,e.y,e.w,e.h,true);
+  drawEntity(level, e.subKind, e.x, e.y, e.w, e.h, false);
  });
+
+ // Draw Mega Boss
+ if(activeBoss){
+  drawEntity(level, 0, activeBoss.x, activeBoss.y, activeBoss.w, activeBoss.h, true);
+ }
 
  // Draw Explosions
  sparks.forEach(s=>{
@@ -504,37 +874,74 @@ function update(dt){
  });
  ctx.globalAlpha=1;ctx.shadowBlur=0;
 
- // Draw Player Jet (Flashes when invulnerable)
+ // Draw Player Jet
  if(player.inv<=0 || Math.floor(elapsed*20)%2===0){
-  drawFighterJet(player.x,player.y,player.w,player.h,false);
+  drawPlayerJet(player.x,player.y,player.w,player.h);
  }
 
+ // Level Up / Boss Banner Overlay
+ if(bannerTimer > 0){
+  bannerTimer -= dt;
+  ctx.save();
+  ctx.fillStyle="rgba(0, 0, 0, 0.65)";
+  ctx.fillRect(0, H*0.42 - 22, W, 44);
+  ctx.font="bold 16px 'Segoe UI', sans-serif";
+  ctx.textAlign="center";
+  ctx.fillStyle="#ffd855";
+  ctx.shadowColor="#ff8800";
+  ctx.shadowBlur=12;
+  ctx.fillText(bannerText, W/2, H*0.42 + 6);
+  ctx.restore();
+ }
+
+ // Update HUDs
  $("hpText").textContent=hp+"%";
  $("hpFill").style.width=hp+"%";
  $("hpFill").style.background=hp<30?"#ff4e59":"#32ffc0";
  $("scoreText").textContent=String(score).padStart(4,"0");
+
+ const progressPct = Math.min(100, (levelKills / killsNeeded) * 100);
+ $("lvlFill").style.width = progressPct + "%";
 }
 
 function endGame(){
  running=false;gameOver=true;
+ $("bossHud").style.display="none";
  $("message").classList.remove("hidden");
- $("message").querySelector("h1").textContent="MISSION FAILED";
- $("message").querySelector("p").innerHTML=
-  "Aapka jet dushman se takra kar destroy ho gaya!<br><b>FINAL SCORE: "+score+"</b><br>Dobara koshish karein!";
- $("start").textContent="↻ RESTART MISSION";
+ $("modalTitle").textContent="MISSION FAILED";
+ $("modalDesc").innerHTML=
+  `Aapka Jet Level <b>${level}</b> par destroy ho gaya!<br><b>FINAL SCORE: ${score}</b><br>Dobara koshish karein aur Level 500 fatah karein!`;
+ $("start").textContent="↻ RESTART LEVEL 1";
+}
+
+function victoryGame(){
+ running=false;gameOver=true;
+ $("bossHud").style.display="none";
+ $("message").classList.remove("hidden");
+ $("modalTitle").textContent="🏆 VICTORY: 500 LEVELS COMPLETED!";
+ $("modalDesc").innerHTML=
+  `CONGRATULATIONS MULTANI FF WARRIOR!<br>Aapne tamam 500 Levels aur Mega Bosses ko khatam kar diya hai!<br><b>LEGENDARY SCORE: ${score}</b>`;
+ $("start").textContent="PLAY AGAIN ▶";
 }
 
 function reset(){
  score=0;hp=100;elapsed=0;spawn=0.4;shot=0;
- enemies=[];bullets=[];sparks=[];
+ level=1;levelKills=0;killsNeeded=10;
+ activeBoss=null;
+ enemies=[];bullets=[];enemyBullets=[];sparks=[];
  player.x=W/2;player.y=H*0.74;player.inv=0;
  gameOver=false;paused=false;running=true;
  Object.keys(keys).forEach(k=>keys[k]=false);
  $("pause").textContent="Ⅱ";
+ $("bossHud").style.display="none";
  $("message").classList.add("hidden");
  $("hpText").textContent="100%";
  $("hpFill").style.width="100%";
  $("scoreText").textContent="0000";
+ $("currentLevel").textContent="1";
+ $("levelText").textContent="STAGE 1";
+ $("lvlFill").style.width="0%";
+ $("phaseIndicator").textContent="PHASE 1: " + ENEMY_PHASES[0];
  last=performance.now();
 }
 
@@ -545,8 +952,8 @@ $("pause").addEventListener("click",()=>{
  $("pause").textContent=paused?"▶":"Ⅱ";
  if(paused){
   $("message").classList.remove("hidden");
-  $("message").querySelector("h1").textContent="MISSION PAUSED";
-  $("message").querySelector("p").textContent="Aapka mission pause hai.";
+  $("modalTitle").textContent="MISSION PAUSED";
+  $("modalDesc").textContent=`Level ${level} is paused.`;
   $("start").textContent="RESUME MISSION ▶";
   $("start").onclick=()=>{
    $("start").onclick=null;
