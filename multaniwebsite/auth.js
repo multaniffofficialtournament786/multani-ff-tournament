@@ -143,18 +143,33 @@ export function renderAuth(mode = 'login') {
       const phone = document.getElementById('reg-phone').value.trim();
       const refInput = document.getElementById('reg-ref').value.trim();
 
+      if (!uid) {
+        Loader.hide();
+        Toast.show("Free Fire UID enter karein!", "error");
+        return;
+      }
+
       try {
-        const { data: existingProfiles } = await sbClient
+        const { data: existingProfiles, error: checkError } = await sbClient
           .from('profiles')
           .select('free_fire_uid, email, phone')
           .or(`free_fire_uid.eq.${uid},email.eq.${email},phone.eq.${phone}`);
 
+        if (checkError) throw checkError;
+
         if (existingProfiles && existingProfiles.length > 0) {
           Loader.hide();
-          const match = existingProfiles[0];
-          if (match.free_fire_uid === uid) Toast.show("Error: UID already registered!", "error");
-          else if (match.email === email) Toast.show("Error: Email already registered!", "error");
-          else Toast.show("Error: Phone already registered!", "error");
+          const match = existingProfiles.find(p => p.free_fire_uid === uid);
+          if (match) {
+            Toast.show("Ye Free Fire UID pehle se registered hai! Har account ke liye alag UID honi chahiye.", "error");
+            return;
+          }
+          const emailMatch = existingProfiles.find(p => p.email.toLowerCase() === email.toLowerCase());
+          if (emailMatch) {
+            Toast.show("Ye Email pehle se registered hai!", "error");
+            return;
+          }
+          Toast.show("Ye Mobile Number pehle se registered hai!", "error");
           return;
         }
 
@@ -309,7 +324,16 @@ export function renderProfile() {
         <form id="edit-profile-form">
           <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="prof-fullname" class="form-input" value="${escapeHTML(p.full_name || '')}" required /></div>
           <div class="form-group"><label class="form-label">Free Fire IGN</label><input type="text" id="prof-ign" class="form-input" value="${escapeHTML(p.free_fire_name || '')}" required /></div>
-          <div class="form-group"><label class="form-label">Free Fire UID</label><input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" required /></div>
+          
+          <!-- FREE FIRE UID (PERMANENT & LOCKED) -->
+          <div class="form-group">
+            <label class="form-label">Free Fire UID</label>
+            <input type="text" id="prof-uid" class="form-input" value="${escapeHTML(p.free_fire_uid || '')}" readonly style="background:rgba(255,255,255,0.05); color:#888; cursor:not-allowed; border:1px solid rgba(255,255,255,0.1);" />
+            <small style="color:#ff9800; font-size:11px; margin-top:5px; display:block; font-weight:600;">
+              ⚠️ UID change krne k liye Admin se Rabta kren
+            </small>
+          </div>
+
           <div class="form-group"><label class="form-label">WhatsApp Mobile #</label><input type="text" id="prof-phone" class="form-input" value="${escapeHTML(p.phone || '')}" required /></div>
           <div class="form-group"><label class="form-label">Email</label><input type="email" id="prof-email" class="form-input" value="${escapeHTML(p.email || state.currentUser.email)}" required /></div>
           <div class="form-group">
@@ -355,7 +379,6 @@ export async function saveUserProfile(e) {
 
   const fullName = document.getElementById('prof-fullname').value.trim();
   const ign = document.getElementById('prof-ign').value.trim();
-  const newUid = document.getElementById('prof-uid').value.trim();
   const newEmail = document.getElementById('prof-email').value.trim();
   const phone = document.getElementById('prof-phone').value.trim();
   const refInputEl = document.getElementById('prof-ref');
@@ -369,12 +392,12 @@ export async function saveUserProfile(e) {
       if (refCheck) verifiedReferredBy = refCheck.free_fire_uid;
     }
 
+    // free_fire_uid yahan update nahi hoga (Permanent rahega)
     const { error } = await sbClient.from('profiles').upsert([{
       id: state.currentUser.id,
       email: newEmail,
       full_name: fullName,
       free_fire_name: ign,
-      free_fire_uid: newUid,
       phone: phone,
       referred_by: verifiedReferredBy,
       updated_at: new Date().toISOString()
