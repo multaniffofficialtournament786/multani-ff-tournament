@@ -2,91 +2,224 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Copy to Clipboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Jump Jump Game</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #f4f6f8;
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
     }
-
-    .container {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    body {
+      background: #d4e6f1;
+      overflow: hidden;
       display: flex;
-      gap: 10px;
-      max-width: 450px;
-      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
     }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      outline: none;
+    #score-board {
+      position: absolute;
+      top: 30px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #2c3e50;
     }
-
-    input[type="text"]:focus {
-      border-color: #007bff;
+    #game-canvas {
+      background: #eaf2f8;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      touch-action: none;
     }
-
-    button {
-      padding: 12px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    button.copied {
-      background-color: #28a745;
+    #instruction {
+      position: absolute;
+      bottom: 25px;
+      font-size: 15px;
+      color: #7f8c8d;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <input type="text" id="textInput" value="Yeh text copy hoga!">
-    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
-  </div>
+  <div id="score-board">Score: <span id="score">0</span></div>
+  <canvas id="game-canvas" width="400" height="600"></canvas>
+  <div id="instruction">Tap & Hold to Charge, Release to Jump!</div>
 
   <script>
-    function copyToClipboard() {
-      const input = document.getElementById("textInput");
-      const btn = document.getElementById("copyBtn");
+    const canvas = document.getElementById("game-canvas");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
 
-      // Text clipboard par copy karein
-      navigator.clipboard.writeText(input.value).then(() => {
-        // Button ka text aur color tabdeel karein
-        btn.innerText = "Copied!";
-        btn.classList.add("copied");
+    let score = 0;
+    let isCharging = false;
+    let power = 0;
+    let maxPower = 35;
+    let isJumping = false;
 
-        // 2 second baad wapis pehle jaisa ho jaye
-        setTimeout(() => {
-          btn.innerText = "Copy";
-          btn.classList.remove("copied");
-        }, 2000);
-      }).catch(err => {
-        console.error("Copy fail ho gaya: ", err);
+    // Platform system
+    let platforms = [
+      { x: 80, y: 460, width: 80, height: 35, color: "#34495e" },
+      { x: 230, y: 460, width: 80, height: 35, color: "#e67e22" }
+    ];
+
+    // Player object
+    let player = {
+      x: 120,
+      y: 460,
+      width: 24,
+      height: 40,
+      scaleY: 1,
+      vx: 0,
+      vy: 0,
+      groundY: 460
+    };
+
+    function resetGame() {
+      score = 0;
+      scoreEl.innerText = score;
+      platforms = [
+        { x: 80, y: 460, width: 80, height: 35, color: "#34495e" },
+        { x: 230, y: 460, width: 80, height: 35, color: "#e67e22" }
+      ];
+      player.x = 120;
+      player.y = 460;
+      player.scaleY = 1;
+      player.vx = 0;
+      player.vy = 0;
+      isJumping = false;
+      isCharging = false;
+      power = 0;
+    }
+
+    function addNextPlatform() {
+      const minDistance = 120;
+      const maxDistance = 210;
+      const nextDist = minDistance + Math.random() * (maxDistance - minDistance);
+      const newWidth = 65 + Math.random() * 25;
+      const colors = ["#e74c3c", "#9b59b6", "#1abc9c", "#f39c12", "#2ecc71"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+      platforms.push({
+        x: platforms[1].x + nextDist,
+        y: 460,
+        width: newWidth,
+        height: 35,
+        color: randomColor
       });
     }
-  </script>
 
+    function startCharge(e) {
+      if (e) e.preventDefault();
+      if (!isJumping) {
+        isCharging = true;
+      }
+    }
+
+    function releaseCharge(e) {
+      if (e) e.preventDefault();
+      if (isCharging && !isJumping) {
+        isCharging = false;
+        isJumping = true;
+        player.vx = power * 0.45;
+        player.vy = -power * 0.55;
+        player.scaleY = 1;
+      }
+    }
+
+    window.addEventListener("mousedown", startCharge);
+    window.addEventListener("mouseup", releaseCharge);
+    window.addEventListener("touchstart", startCharge, { passive: false });
+    window.addEventListener("touchend", releaseCharge, { passive: false });
+
+    function update() {
+      // Power charge animation
+      if (isCharging) {
+        if (power < maxPower) {
+          power += 0.8;
+        }
+        player.scaleY = Math.max(0.55, 1 - (power / maxPower) * 0.45);
+      }
+
+      // Physics while jumping
+      if (isJumping) {
+        player.x += player.vx;
+        player.y += player.vy;
+        player.vy += 0.85; // Gravity
+
+        // Landing check
+        if (player.y >= player.groundY) {
+          player.y = player.groundY;
+          isJumping = false;
+
+          const target = platforms[1];
+          const halfW = player.width / 2;
+
+          // Check if landed safely on target platform
+          if (player.x + halfW >= target.x && player.x - halfW <= target.x + target.width) {
+            score++;
+            scoreEl.innerText = score;
+            shiftCamera();
+          } else {
+            alert("Game Over! Score: " + score);
+            resetGame();
+          }
+          power = 0;
+        }
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    function shiftCamera() {
+      const shiftDistance = platforms[1].x - 80;
+      platforms.forEach(p => p.x -= shiftDistance);
+      player.x -= shiftDistance;
+      platforms.shift();
+      addNextPlatform();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Platforms
+      platforms.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.roundRect(p.x, p.y, p.width, p.height, 6);
+        ctx.fill();
+
+        // 3D effect bevel
+        ctx.fillStyle = "rgba(0,0,0,0.15)";
+        ctx.fillRect(p.x, p.y + p.height - 8, p.width, 8);
+      });
+
+      // Draw Player (Bottle/Pin style)
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.scale(1, player.scaleY);
+
+      // Body
+      ctx.fillStyle = "#2c3e50";
+      ctx.beginPath();
+      ctx.roundRect(-player.width / 2, -player.height, player.width, player.height, [8, 8, 4, 4]);
+      ctx.fill();
+
+      // Head / Cap
+      ctx.fillStyle = "#e74c3c";
+      ctx.beginPath();
+      ctx.arc(0, -player.height - 6, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    update();
+  </script>
 </body>
 </html>
