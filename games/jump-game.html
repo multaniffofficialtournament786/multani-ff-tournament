@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copy to Clipboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f4f6f8;
+      margin: 0;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 10px;
+      max-width: 450px;
+      width: 100%;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #007bff;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button.copied {
+      background-color: #28a745;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <input type="text" id="textInput" value="Yeh text copy hoga!">
+    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+  </div>
+
+  <script>
+    function copyToClipboard() {
+      const input = document.getElementById("textInput");
+      const btn = document.getElementById("copyBtn");
+
+      // Text clipboard par copy karein
+      navigator.clipboard.writeText(input.value).then(() => {
+        // Button ka text aur color tabdeel karein
+        btn.innerText = "Copied!";
+        btn.classList.add("copied");
+
+        // 2 second baad wapis pehle jaisa ho jaye
+        setTimeout(() => {
+          btn.innerText = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      }).catch(err => {
+        console.error("Copy fail ho gaya: ", err);
+      });
+    }
+  </script>
+
+</body>
+</html>
