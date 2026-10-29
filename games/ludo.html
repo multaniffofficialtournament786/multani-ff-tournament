@@ -1,177 +1,252 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Ludo Championship • VIP Coming Soon</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      background: radial-gradient(circle at 50% 25%, #1e293b 0%, #090d16 100%);
-      color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      overflow: hidden;
-    }
-
-    /* VIP Card Container */
-    .vip-card {
-      background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(9, 14, 26, 0.98));
-      border: 2px solid #ffd700;
-      border-radius: 24px;
-      padding: 34px 22px;
-      text-align: center;
-      max-width: 350px;
-      width: 100%;
-      box-shadow: 0 0 35px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.1);
-      position: relative;
-      animation: vipZoom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes vipZoom {
-      0% { transform: scale(0.85); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Floating Golden Badge */
-    .vip-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(135deg, #ffd700, #ff8800);
-      color: #0b0f19;
-      font-size: 11px;
-      font-weight: 900;
-      padding: 5px 16px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-      letter-spacing: 1px;
-      box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
-      text-transform: uppercase;
-    }
-
-    /* Dice Icon Glow */
-    .icon-box {
-      width: 74px;
-      height: 74px;
-      margin: 0 auto 16px;
-      background: radial-gradient(circle, #2d2410 0%, #111726 100%);
-      border: 2px solid #ffd700;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 34px;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-      animation: pulseGlow 1.8s infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      from { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
-      to { transform: scale(1.06); box-shadow: 0 0 26px rgba(255, 215, 0, 0.7); }
-    }
-
-    h1 {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      margin-bottom: 8px;
-      color: #ffffff;
-      text-transform: uppercase;
-    }
-
-    .sub-heading {
-      color: #20e7f4;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      margin-bottom: 24px;
-      text-shadow: 0 0 10px rgba(32, 231, 244, 0.4);
-      text-transform: uppercase;
-    }
-
-    .btn-back {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #ffd700, #ff8800);
-      border: none;
-      border-radius: 14px;
-      color: #090d16;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 18px rgba(255, 136, 0, 0.4);
-      transition: transform 0.1s ease;
-      outline: none;
-    }
-
-    .btn-back:active {
-      transform: scale(0.96);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>MULTANI FF LUDO CHAMPIONSHIP</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#080a10;--panel:#111722;--gold:#f8c85b;--red:#ff4655}
+body{margin:0;background:radial-gradient(circle at top,#202333,#080a10 60%);color:#fff;font-family:Arial,sans-serif}
+header{padding:22px 14px;text-align:center;background:#0d111b;border-bottom:1px solid #65512c}
+.logo{font-size:12px;color:var(--gold);letter-spacing:3px}
+h1{font-size:22px;margin:8px 0;color:#fff}
+.sub{font-size:11px;color:#aeb6c8}
+.wallet{margin:14px auto 0;padding:12px;border:1px solid #5b4828;border-radius:14px;background:#171921;max-width:380px;display:flex;justify-content:space-around}
+.wallet strong{color:var(--gold)}
+main{max-width:520px;margin:auto;padding:14px}
+.section-title{font-size:13px;color:var(--gold);margin:12px 0}
+.modes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mode{padding:15px 8px;background:linear-gradient(145deg,#1c2432,#11151d);border:1px solid #30394a;border-radius:14px;color:white;font-weight:bold}
+.mode span{display:block;font-size:11px;color:#aeb6c8;margin-top:6px;font-weight:normal}
+button{cursor:pointer}
+.mode.active{border-color:var(--gold);box-shadow:0 0 12px #f8c85b20}
+#game{display:none;margin-top:18px}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.player{border-radius:10px;padding:10px;background:#171c27;font-size:12px;border:1px solid #30394a}
+.player.active{border-color:var(--gold);color:var(--gold)}
+.board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));aspect-ratio:1;background:#e8e8e8;border:4px solid #c5a45c;border-radius:8px;overflow:hidden;gap:1px}
+.cell{position:relative;display:flex;align-items:center;justify-content:center;background:#f7f5ee;min-width:0;min-height:0}
+.cell.red{background:#ff7881}.cell.green{background:#79e5b0}
+.cell.yellow{background:#ffe38b}.cell.blue{background:#8bd0ff}
+.cell.home{background:#e9d39b}
+.cell.safe:after{content:"★";font-size:clamp(6px,2vw,12px);color:#777}
+.token{position:absolute;width:80%;height:80%;border:1px solid #fff;border-radius:50%;box-shadow:0 2px 4px #0008;z-index:2;padding:0}
+.token.red{background:#e51e36}.token.green{background:#079653}
+.token.yellow{background:#e7b800}.token.blue{background:#1678e8}
+.token.selected{outline:2px solid #fff;transform:scale(1.1)}
+.center{background:#fff0;display:flex;align-items:center;justify-content:center}
+.centerbox{background:#161b27;color:#f8c85b;border:2px solid #c5a45c;border-radius:8px;padding:4px;font-size:clamp(8px,2vw,13px);text-align:center}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.action{border:0;border-radius:12px;padding:14px;background:linear-gradient(120deg,#f8d77d,#d69a32);color:#15100a;font-weight:bold}
+.action.secondary{background:#202838;color:white;border:1px solid #394458}
+.action:disabled{opacity:.4}
+.status{text-align:center;margin:12px 0;padding:12px;background:#111722;border-radius:10px;font-size:13px;line-height:1.6}
+.reward{padding:15px;background:linear-gradient(120deg,#22202a,#141a24);border:1px solid #51452d;border-radius:14px;margin-top:16px}
+.reward button{float:right;background:#f5c65b;border:0;padding:9px;border-radius:8px;font-weight:bold}
+.reward small{color:#b8bfd0}
+footer{text-align:center;color:#777f91;font-size:10px;padding:22px}
+</style>
 </head>
 <body>
-
-  <div class="vip-card">
-    <div class="vip-badge">
-      <i class="fa-solid fa-crown"></i> VIP EXCLUSIVE
-    </div>
-
-    <div class="icon-box">
-      🎲
-    </div>
-
-    <h1>LUDDU</h1>
-    <div class="sub-heading">Online Games Friend Coming Soon</div>
-
-    <button type="button" class="btn-back" onclick="goBackToArena()">
-      <i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i> WAPAS JAYEIN
-    </button>
+<header>
+ <div class="logo">MULTANI FF OFFICIAL</div>
+ <h1>LUDO CHAMPIONSHIP</h1>
+ <div class="sub">PREMIUM GAME LOUNGE</div>
+ <div class="wallet"><div>🪙 Coins<br><strong id="coins">100</strong></div><div>🎮 Mode<br><strong id="modeName">Classic</strong></div></div>
+</header>
+<main>
+ <div class="section-title">SELECT GAME MODE</div>
+ <div class="modes">
+  <button class="mode active" data-mode="2">👥 2 PLAYERS<span>Head-to-head practice</span></button>
+  <button class="mode" data-mode="4">🎲 4 PLAYERS<span>Classic Ludo practice</span></button>
+  <button class="mode" data-mode="team">🤝 TEAM MODE<span>2 vs 2 practice</span></button>
+  <button class="mode" data-mode="cpu">🤖 VS COMPUTER<span>Local practice</span></button>
+ </div>
+ <div class="controls">
+  <button class="action" id="start">▶ START GAME</button>
+  <button class="action secondary" id="reset">↻ NEW GAME</button>
+ </div>
+ <section id="game">
+  <div class="section-title">LIVE MATCH</div>
+  <div class="players" id="players"></div>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Dice roll karne ke liye button dabayein.</div>
+  <div class="controls">
+   <button class="action" id="roll">🎲 ROLL DICE</button>
+   <button class="action secondary" id="pass" disabled>END TURN</button>
   </div>
-
-  <script>
-    function goBackToArena() {
-      try {
-        if (window.parent && window.parent !== window) {
-          // Parent iframe ko hide karna
-          const pDoc = window.parent.document;
-          if (pDoc) {
-            const iframes = pDoc.querySelectorAll('iframe, #ludoModal, #gameModal, .game-modal');
-            iframes.forEach(el => {
-              if (el.parentElement && el.parentElement !== pDoc.body) {
-                el.parentElement.style.display = 'none';
-              } else {
-                el.style.display = 'none';
-              }
-            });
-          }
-          if (window.parent.history.length > 1) {
-            window.parent.history.back();
-            return;
-          }
-        }
-      } catch(e) {}
-
-      // Fallback redirection
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = '../index.html';
-      }
-    }
-  </script>
+  <div class="sub" style="margin-top:10px;line-height:1.6">
+   Practice prototype: dice par 6 aane par goti bahar niklegi. Goti select karke move karein.
+  </div>
+ </section>
+ <div class="reward">
+  <strong>🎁 DAILY LOGIN REWARD</strong>
+  <button id="claim">CLAIM +10</button>
+  <p><small>Roz ek martaba local demo reward.</small></p>
+  <small id="rewardStatus">Aaj ka reward claim karein.</small>
+ </div>
+</main>
+<footer> MULTANI FF LUDO CHAMPIONSHIP · PRACTICE BUILD </footer>
+<script>
+const $=id=>document.getElementById(id);
+let coins=Number(localStorage.getItem("mfl_coins")||100);
+$("coins").textContent=coins;
+const colors=["red","green","yellow","blue"];
+const names=["Red Player","Green Player","Yellow Player","Blue Player"];
+// Board ke gird 52 cells ka demo route.
+const route=[];
+for(let c=1;c<=6;c++)route.push([6,c]);
+for(let r=5;r>=0;r--)route.push([r,6]);
+route.push([0,7],[0,8]);
+for(let r=1;r<=6;r++)route.push([r,8]);
+for(let c=9;c<=14;c++)route.push([6,c]);
+route.push([7,14],[8,14]);
+for(let c=13;c>=9;c--)route.push([8,c]);
+for(let r=9;r<=14;r++)route.push([r,8]);
+route.push([14,7],[14,6]);
+for(let r=13;r>=9;r--)route.push([r,6]);
+for(let c=5;c>=0;c--)route.push([8,c]);
+route.push([7,0],[6,0]);
+// Route ko 52 spaces tak normalize karein.
+while(route.length<52)route.push([7,7]);
+route.length=52;
+const yards=[
+ [[2,2],[2,4],[4,2],[4,4]],
+ [[2,10],[2,12],[4,10],[4,12]],
+ [[10,10],[10,12],[12,10],[12,12]],
+ [[10,2],[10,4],[12,2],[12,4]]
+];
+let mode="2",turn=0,dice=0,playing=false,finished=false;
+let pieces=[],cellEls=[];
+function setupBoard(){
+ const b=$("board");b.innerHTML="";cellEls=[];
+ for(let r=0;r<15;r++)for(let c=0;c<15;c++){
+  const el=document.createElement("div");el.className="cell";
+  let idx=route.findIndex(p=>p[0]===r&&p[1]===c);
+  if(idx>=0){el.classList.add("safe");}
+  if(r<6&&c<6)el.classList.add("red");
+  else if(r<6&&c>8)el.classList.add("green");
+  else if(r>8&&c>8)el.classList.add("yellow");
+  else if(r>8&&c<6)el.classList.add("blue");
+  if(r>=6&&r<=8&&c>=6&&c<=8){
+   el.className="cell home";
+   if(r===7&&c===7)el.innerHTML='<div class="centerbox">MULTANI<br>🏆 LUDO</div>';
+  }
+  el.dataset.r=r;el.dataset.c=c;b.appendChild(el);cellEls.push(el);
+ }
+}
+function activeCount(){return mode==="2"||mode==="cpu"?2:4}
+function setupPieces(){
+ pieces=[];
+ for(let p=0;p<activeCount();p++)
+  for(let n=0;n<4;n++)pieces.push({p,n,pos:-1,done:false});
+}
+function playersUI(){
+ $("players").innerHTML="";
+ for(let p=0;p<activeCount();p++){
+  const e=document.createElement("div");e.className="player"+(p===turn?" active":"");
+  e.textContent=["🔴","🟢","🟡","🔵"][p]+" "+names[p]+(p===turn?" ◀ TURN":"");
+  $("players").appendChild(e);
+ }
+}
+function positionOf(piece){
+ if(piece.pos<0)return yards[piece.p][piece.n];
+ if(piece.pos>=route.length)return [7,7];
+ return route[piece.pos];
+}
+function render(){
+ cellEls.forEach(el=>el.querySelectorAll(".token").forEach(t=>t.remove()));
+ for(const piece of pieces){
+  const [r,c]=positionOf(piece);
+  const cell=cellEls.find(e=>+e.dataset.r===r&&+e.dataset.c===c);
+  if(!cell)continue;
+  const t=document.createElement("button");
+  t.className="token "+colors[piece.p];
+  t.title=names[piece.p]+" token "+(piece.n+1);
+  t.setAttribute("aria-label",t.title);
+  if(piece.pos>=0&&dice>0&&piece.p===turn&&!piece.done)t.classList.add("selected");
+  t.onclick=()=>movePiece(piece);
+  cell.appendChild(t);
+ }
+ playersUI();
+}
+function say(s){$("status").textContent=s}
+function newGame(){
+ turn=0;dice=0;finished=false;playing=true;
+ setupPieces();setupBoard();render();
+ $("roll").disabled=false;$("pass").disabled=true;
+ say("Game shuru! Red Player, dice roll karein.");
+ $("game").style.display="block";
+}
+$("start").onclick=newGame;
+$("reset").onclick=newGame;
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{
+ mode=b.dataset.mode;
+ document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("active",x===b));
+ $("modeName").textContent=b.textContent.trim().split("\n")[0];
+});
+$("roll").onclick=()=>{
+ if(!playing||finished||dice!==0)return;
+ $("roll").disabled=true;say("🎲 Dice roll ho raha hai...");
+ let count=0;
+ const anim=setInterval(()=>{
+  $("status").textContent="🎲 "+(1+Math.floor(Math.random()*6));
+  count++;
+  if(count>=9){
+   clearInterval(anim);dice=1+Math.floor(Math.random()*6);
+   say(names[turn]+": Dice "+dice+". Apni goti select karein.");
+   $("roll").disabled=false;$("pass").disabled=false;
+   render();
+  }
+ },80);
+};
+function movePiece(piece){
+ if(!playing||finished||dice===0||piece.p!==turn||piece.done)return;
+ if(piece.pos<0&&dice!==6){
+  say("Goti bahar nikalne ke liye 6 chahiye. Dice dobara roll karein ya turn end karein.");
+  return;
+ }
+ if(piece.pos<0)piece.pos=0;
+ else piece.pos+=dice;
+ if(piece.pos>=route.length){piece.pos=route.length;piece.done=true;}
+ const won=pieces.filter(x=>x.p===turn&&x.done).length;
+ dice=0;
+ if(won===4){
+  finished=true;playing=false;
+  say("🏆 "+names[turn]+" jeet gaye! Demo match mukammal.");
+  $("roll").disabled=true;$("pass").disabled=true;
+ }else{
+  say(names[turn]+" ne goti move ki. "+(won)+"/4 gotiyan finish.");
+  $("roll").disabled=false;$("pass").disabled=true;
+  if(mode==="cpu"&&turn===1){
+   $("roll").disabled=true;
+   setTimeout(()=>{turn=0;render();say("Aapki bari! Dice roll karein.");$("roll").disabled=false;},700);
+  }else if(dice===0&&piece.pos<route.length&&piece.pos===0){
+   // six ke baad extra turn; demo rule
+   if(piece.pos===0){turn=(turn+1)%activeCount();}
+  }
+ }
+ render();
+}
+$("pass").onclick=()=>{
+ if(!playing||dice===0)return;
+ dice=0;turn=(turn+1)%activeCount();render();
+ say(names[turn]+" ki bari. Dice roll karein.");
+ $("roll").disabled=false;$("pass").disabled=true;
+};
+$("claim").onclick=()=>{
+ const today=new Date().toLocaleDateString("en-CA");
+ if(localStorage.getItem("mfl_reward_day")===today){
+  $("rewardStatus").textContent="Aaj ka reward pehle hi claim ho chuka hai.";return;
+ }
+ coins+=10;localStorage.setItem("mfl_coins",coins);
+ localStorage.setItem("mfl_reward_day",today);
+ $("coins").textContent=coins;
+ $("rewardStatus").textContent="+10 demo coins mil gaye!";
+};
+setupBoard();setupPieces();render();
+</script>
 </body>
 </html>
