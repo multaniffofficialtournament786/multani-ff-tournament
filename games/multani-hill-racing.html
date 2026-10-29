@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101b2c">
+<title>MULTANI FF Hill Racing</title>
+<style>
+:root{--bg:#101b2c;--panel:#17283d;--orange:#ff9b25;--cyan:#59e3e8;--white:#f6fbff}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,Arial;color:var(--white);touch-action:none}
+#game{display:block;width:100vw;height:100dvh;background:#91d9ed}
+.hud{position:fixed;inset:10px 10px auto;display:flex;justify-content:space-between;gap:6px;pointer-events:none;z-index:2}
+.pill{background:#101b2cdd;border:1px solid #ffffff24;border-radius:13px;padding:7px 10px;font-size:12px;font-weight:800;box-shadow:0 5px 18px #0002}
+.topbuttons{position:fixed;top:57px;left:10px;display:flex;gap:6px;z-index:3}
+button{font:inherit;color:white;border:1px solid #ffffff35;background:#182a40;border-radius:12px;padding:10px 12px;font-weight:800;box-shadow:0 4px 12px #0002}
+button:active{transform:scale(.96)}.topbuttons button{font-size:12px;padding:8px 10px}
+.controls{position:fixed;bottom:max(15px,env(safe-area-inset-bottom));left:0;right:0;display:flex;justify-content:space-between;align-items:end;padding:0 16px;z-index:3;pointer-events:none}
+.cluster{display:flex;gap:10px;pointer-events:auto}.pedal{width:74px;height:66px;border-radius:20px;background:#12233ddd;border:2px solid #ffffff48;font-size:25px;display:grid;place-items:center;touch-action:none}
+.pedal small{font-size:10px;display:block;line-height:10px}.pedal.gas{border-color:#55e4bd}.pedal.brake{border-color:#ff9a6c}
+.overlay{position:fixed;inset:0;background:#091321c9;display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.card{width:min(430px,100%);max-height:90dvh;overflow:auto;background:linear-gradient(160deg,#203650,#111e30);border:1px solid #ffffff24;border-radius:24px;padding:22px;box-shadow:0 20px 60px #0008}
+h1{font-size:26px;line-height:1.1;margin:0 0 8px;color:#ffb347}h2{margin:0 0 12px;font-size:21px}p{color:#c7d7e7;font-size:13px;line-height:1.5}.choice{display:flex;gap:9px;margin:15px 0}.choice button{flex:1;padding:13px}.choice button.active{background:#a95712;border-color:#ffc16d}.primary{width:100%;background:linear-gradient(90deg,#ff7a18,#ffb22d);color:#1c2330;border:0;padding:13px;font-size:15px}.upgrade{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #ffffff19;gap:10px}.upgrade button{white-space:nowrap}.hidden{display:none!important}.muted{font-size:11px;color:#9eb2c8}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="hud">
+ <div class="pill">🪙 <span id="coins">0</span></div>
+ <div class="pill">⛽ <span id="fuel">100</span>%</div>
+ <div class="pill">📏 <span id="distance">0</span> m</div>
+ <div class="pill">🏆 <span id="best">0</span> m</div>
+</div>
+<div class="topbuttons">
+ <button id="garageBtn">🔧 GARAGE</button>
+ <button id="pauseBtn">Ⅱ PAUSE</button>
+ <button id="soundBtn">🔊</button>
+</div>
+<div class="controls">
+ <div class="cluster"><button class="pedal brake" id="brake">◀<small>BRAKE</small></button></div>
+ <div class="cluster"><button class="pedal" id="tiltBack">↶<small>TILT</small></button><button class="pedal gas" id="gas">▶<small>GAS</small></button><button class="pedal" id="tiltFront">↷<small>TILT</small></button></div>
+</div>
+<div class="overlay" id="menu">
+ <div class="card">
+  <h1>MULTANI FF<br>HILL RACING</h1>
+  <p>Hill climb adventure • Collect coins • Upgrade your ride</p>
+  <div class="choice"><button id="jeepChoice" class="active">🚙 JEEP</button><button id="bikeChoice">🏍️ BIKE</button></div>
+  <button class="primary" id="startBtn">START RACING</button>
+  <p class="muted">Offline single-player prototype. Progress is saved on this device.</p>
+ </div>
+</div>
+<div class="overlay hidden" id="garage">
+ <div class="card">
+  <h2>🔧 Garage</h2><p>Spend collected coins to improve your vehicle.</p>
+  <div class="upgrade"><div><b>Engine</b><div class="muted">Better acceleration · Level <span id="engineLv">1</span></div></div><button id="engineBuy">Upgrade 🪙 <span id="engineCost">50</span></button></div>
+  <div class="upgrade"><div><b>Tyres</b><div class="muted">More grip · Level <span id="tyreLv">1</span></div></div><button id="tyreBuy">Upgrade 🪙 <span id="tyreCost">50</span></button></div>
+  <div class="upgrade"><div><b>Fuel tank</b><div class="muted">Longer rides · Level <span id="fuelLv">1</span></div></div><button id="fuelBuy">Upgrade 🪙 <span id="fuelCost">50</span></button></div>
+  <p id="garageMsg" class="muted"></p><button class="primary" id="closeGarage">BACK TO GAME</button>
+ </div>
+</div>
+<div class="overlay hidden" id="end">
+ <div class="card"><h2 id="endTitle">Ride over!</h2><p id="endText"></p><button class="primary" id="retryBtn">RACE AGAIN</button><p></p><button id="endGarage">OPEN GARAGE</button></div>
+</div>
+<script>
+(()=> {
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=innerWidth,H=innerHeight,dpr=Math.min(devicePixelRatio||1,2);
+function resize(){W=innerWidth;H=innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+const storeKey='multaniHillRacingSaveV1';
+let saved={coins:0,best:0,engine:1,tyre:1,tank:1};
+try{saved={...saved,...JSON.parse(localStorage.getItem(storeKey)||'{}')}}catch(e){}
+let coins=saved.coins,best=saved.best,engine=saved.engine,tyre=saved.tyre,tank=saved.tank;
+let vehicle='jeep',running=false,paused=false,ended=false,muted=false;
+let x=0,y=0,vy=0,speed=0,angle=0,angVel=0,fuel=100,dist=0,runCoins=0;
+let cameraX=0,wheels=[],particles=[],collected=new Set(),last=0,keys={gas:false,brake:false,back:false,front:false};
+let audioCtx=null;
+function beep(freq=500,duration=.06){if(muted)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;g.gain.value=.035;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.stop(audioCtx.currentTime+duration)}catch(e){}}
+function save(){saved={coins,best,engine,tyre,tank};try{localStorage.setItem(storeKey,JSON.stringify(saved))}catch(e){}updateHud()}
+function updateHud(){$('coins').textContent=coins;$('fuel').textContent=Math.max(0,Math.ceil(fuel));$('distance').textContent=Math.floor(dist);$('best').textContent=best;$('engineLv').textContent=engine;$('tyreLv').textContent=tyre;$('fuelLv').textContent=tank;$('engineCost').textContent=engine*50;$('tyreCost').textContent=tyre*50;$('fuelCost').textContent=tank*50}
+function ground(wx){return H*.69+Math.sin(wx*.009)*H*.055+Math.sin(wx*.022+1.2)*H*.025+Math.sin(wx*.003)*H*.045}
+function slope(wx){return (ground(wx+2)-ground(wx-2))/4}
+function reset(){x=80;y=ground(x)-55;vy=0;speed=0;angle=0;angVel=0;fuel=Math.min(100+(tank-1)*15,100+(tank-1)*15);dist=0;runCoins=0;cameraX=0;collected=new Set();particles=[];ended=false;running=true;paused=false;$('menu').classList.add('hidden');$('end').classList.add('hidden');$('garage').classList.add('hidden');last=performance.now();updateHud()}
+function worldY(wx){return ground(wx)}
+function coinPositions(){let arr=[];for(let i=0;i<160;i++){let cx=280+i*155+Math.sin(i*2)*35;arr.push({x:cx,y:ground(cx)-70-(i%3)*15,id:i})}return arr}
+const coinList=coinPositions();
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#75cde9');sky.addColorStop(1,'#d7f3f4');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ // distant hills
+ for(let layer=0;layer<2;layer++){ctx.beginPath();ctx.moveTo(0,H);for(let sx=0;sx<=W+8;sx+=8){let wx=sx+cameraX*(layer?.22:.12);let yy=H*(.56+layer*.07)+Math.sin(wx*.003+layer)*H*.04+Math.sin(wx*.008)*H*.018;ctx.lineTo(sx,yy)}ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle=layer?'#8fc99a':'#b1dba7';ctx.fill()}
+ // ground
+ ctx.beginPath();ctx.moveTo(0,H);for(let sx=0;sx<=W+5;sx+=5)ctx.lineTo(sx,ground(sx+cameraX));ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle='#6d9d42';ctx.fill();
+ ctx.beginPath();for(let sx=0;sx<=W+5;sx+=5){let yy=ground(sx+cameraX);if(sx===0)ctx.moveTo(sx,yy);else ctx.lineTo(sx,yy)}ctx.strokeStyle='#386c35';ctx.lineWidth=5;ctx.stroke();
+ // coin trail
+ for(const c of coinList){let sx=c.x-cameraX;if(sx < -30||sx>W+30||collected.has(c.id))continue;ctx.beginPath();ctx.ellipse(sx,c.y,10,13,0,0,Math.PI*2);ctx.fillStyle='#ffbe27';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#e78313';ctx.stroke();ctx.fillStyle='#fff1a4';ctx.fillRect(sx-2,c.y-7,3,14)}
+ // vehicle position follows screen x
+ let sx=x-cameraX, sy=y;
+ ctx.save();ctx.translate(sx,sy);ctx.rotate(angle);
+ if(vehicle==='jeep'){
+  // suspension links
+  ctx.strokeStyle='#333d49';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-31,5);ctx.lineTo(-24,17);ctx.moveTo(28,5);ctx.lineTo(22,17);ctx.stroke();
+  // body
+  ctx.fillStyle='#e97a20';ctx.strokeStyle='#542f1a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-43,-8);ctx.lineTo(-35,-25);ctx.lineTo(-9,-28);ctx.lineTo(5,-17);ctx.lineTo(29,-16);ctx.lineTo(43,-5);ctx.lineTo(40,9);ctx.lineTo(-39,9);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#a8e9f4';ctx.beginPath();ctx.moveTo(-29,-22);ctx.lineTo(-11,-24);ctx.lineTo(-2,-16);ctx.lineTo(-26,-16);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#263444';ctx.fillRect(7,-15,17,3);ctx.fillRect(-42,-4,8,5);ctx.fillStyle='#ffeaa2';ctx.fillRect(34,-5,6,5);
+ }else{
+  ctx.strokeStyle='#e6e9ef';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-27,5);ctx.lineTo(25,5);ctx.stroke();
+  ctx.fillStyle='#ff762b';ctx.beginPath();ctx.moveTo(-24,-5);ctx.lineTo(-10,-14);ctx.lineTo(13,-10);ctx.lineTo(24,0);ctx.lineTo(6,5);ctx.lineTo(-21,4);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#263747';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-7,-8);ctx.lineTo(2,-24);ctx.lineTo(12,-13);ctx.stroke();
+  ctx.fillStyle='#253044';ctx.beginPath();ctx.arc(1,-30,6,0,Math.PI*2);ctx.fill();
+ }
+ const wheelX=vehicle==='jeep'?[-27,27]:[-24,22];
+ for(const wx of wheelX){ctx.beginPath();ctx.arc(wx,14,vehicle==='jeep'?12:9,0,Math.PI*2);ctx.fillStyle='#18212b';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#aeb9c5';ctx.stroke();ctx.beginPath();ctx.arc(wx,14,4,0,Math.PI*2);ctx.fillStyle='#f6b342';ctx.fill()}
+ ctx.restore();
+ // fuel indicator prompt
+ if(fuel<22){ctx.fillStyle='#17283d';ctx.font='bold 14px system-ui';ctx.fillText('LOW FUEL!',W/2-38,110)}
+ // speed bar
+ ctx.fillStyle='#0f2034aa';ctx.fillRect(W/2-65,H-105,130,8);ctx.fillStyle='#55e4bd';ctx.fillRect(W/2-65,H-105,Math.min(130,Math.abs(speed)*1.8),8);
+}
+function update(dt){
+ if(!running||paused||ended)return;
+ dt=Math.min(dt,.035);
+ const oldx=x;
+ if(keys.gas&&fuel>0){speed+= (vehicle==='jeep'?.34:.29)*(1+engine*.13)*dt*60;fuel-=.95*dt*(1+(engine*.05))}
+ if(keys.brake)speed-=.48*dt*60;
+ speed*=Math.pow(.992,dt*60);speed=Math.max(-2,Math.min(vehicle==='jeep'?8.5:7.5,speed));
+ x+=speed*dt*30;
+ if(x<0){x=0;speed=0}
+ // simple hill gravity and suspension
+ let gy=ground(x)-(vehicle==='jeep'?34:26);
+ let grounded=y>=gy-1;
+ if(grounded){y=gy;let target=Math.atan(slope(x));angle+=((target-angle)*.16);vy=Math.min(vy,0);if(keys.back)angVel-=.045*dt*60;if(keys.front)angVel+=.045*dt*60}
+ else {vy+=.32*dt*60; y+=vy*dt*60; if(keys.back)angVel-=.065*dt*60;if(keys.front)angVel+=.065*dt*60;angle+=angVel*dt*60;angVel*=.99}
+ if(y>gy&&vy>0){y=gy;vy=0;angVel*=.45;angle+=((Math.atan(slope(x))-angle)*.4);beep(180,.035)}
+ cameraX=Math.max(0,x-W*.3);
+ dist=Math.max(0,(x-80)/10);
+ if(Math.floor(dist)>best)best=Math.floor(dist);
+ if(fuel<=0){fuel=0;if(Math.abs(speed)<.45){finish('Fuel finished!','Aap '+Math.floor(dist)+' meter chale. Garage mein fuel tank upgrade kar sakte hain.');}}
+ // collect coins
+ for(const c of coinList){if(!collected.has(c.id)&&Math.abs(c.x-x)<28&&Math.abs(c.y-y)<45){collected.add(c.id);coins+=1;runCoins++;beep(850,.07);}}
+ // crash on upside-down landing
+ if(y>=gy-1&&Math.cos(angle)<-.35&&Math.abs(speed)>1.2){finish('Crash!','Distance: '+Math.floor(dist)+' m · Coins collected: '+runCoins); }
+ if(x>25000){finish('Amazing ride!','Aap ne bohat lamba safar tay kiya!')}
+ updateHud();
+}
+function finish(title,msg){ended=true;running=false;best=Math.max(best,Math.floor(dist));save();$('endTitle').textContent=title;$('endText').textContent=msg;$('end').classList.remove('hidden')}
+function loop(t){let dt=(t-last)/1000||0;last=t;update(dt);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+function bindHold(id,key){let el=$(id);const down=e=>{e.preventDefault();keys[key]=true};const up=e=>{e.preventDefault();keys[key]=false};el.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,up))}
+bindHold('gas','gas');bindHold('brake','brake');bindHold('tiltBack','back');bindHold('tiltFront','front');
+$('jeepChoice').onclick=()=>{vehicle='jeep';$('jeepChoice').classList.add('active');$('bikeChoice').classList.remove('active')};
+$('bikeChoice').onclick=()=>{vehicle='bike';$('bikeChoice').classList.add('active');$('jeepChoice').classList.remove('active')};
+$('startBtn').onclick=()=>{beep();reset()};
+$('retryBtn').onclick=()=>{beep();reset()};
+$('pauseBtn').onclick=()=>{if(!running)return;paused=!paused;$('pauseBtn').textContent=paused?'▶ RESUME':'Ⅱ PAUSE';if(paused){$('endTitle').textContent='Game paused';$('endText').textContent='Resume par tap karein.';$('retryBtn').textContent='RESUME';$('end').classList.remove('hidden')}else $('end').classList.add('hidden')};
+$('retryBtn').addEventListener('click',()=>{$('retryBtn').textContent='RACE AGAIN';});
+$('garageBtn').onclick=()=>{paused=true;$('garage').classList.remove('hidden');updateHud()};
+$('endGarage').onclick=()=>{$('end').classList.add('hidden');$('garage').classList.remove('hidden');running=false;paused=true};
+$('closeGarage').onclick=()=>{$('garage').classList.add('hidden');if(!ended){paused=false;running=true;last=performance.now()}else{$('menu').classList.remove('hidden')}};
+$('soundBtn').onclick=()=>{muted=!muted;$('soundBtn').textContent=muted?'🔇':'🔊';};
+function buy(which){let level=which==='engine'?engine:which==='tyre'?tyre:tank,cost=level*50;if(coins<cost){$('garageMsg').textContent='Coins kam hain! Pehle race khel kar coins jama karein.';beep(180);return}coins-=cost;if(which==='engine')engine++;if(which==='tyre')tyre++;if(which==='tank')tank++;$('garageMsg').textContent='Upgrade successful!';save();updateHud();beep(700)}
+$('engineBuy').onclick=()=>buy('engine');$('tyreBuy').onclick=()=>buy('tyre');$('fuelBuy').onclick=()=>buy('fuel');
+addEventListener('keydown',e=>{if(['ArrowRight','ArrowUp','d','w'].includes(e.key))keys.gas=true;if(['ArrowLeft','s'].includes(e.key))keys.brake=true;if(e.key==='ArrowDown'||e.key==='a')keys.back=true;if(e.key==='ArrowUp'&&e.shiftKey)keys.front=true;if(e.key==='Escape')paused=!paused});
+addEventListener('keyup',e=>{if(['ArrowRight','ArrowUp','d','w'].includes(e.key))keys.gas=false;if(['ArrowLeft','s'].includes(e.key))keys.brake=false;if(e.key==='ArrowDown'||e.key==='a')keys.back=false});
+updateHud();
+})();
+</script>
+</body>
+</html>
