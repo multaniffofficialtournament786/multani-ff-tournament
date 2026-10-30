@@ -15,6 +15,13 @@ import { renderWithdrawal, calculateWithdrawalNet } from './withdrawal.js';
 import { renderDiamondsShop, renderDiamondHistoryPage, requestDiamondPurchase } from './diamonds.js';
 import { renderWinners, renderLeaderboard, renderNotifications, renderInvite, renderRules, renderAbout } from './extras.js';
 
+// APP OPEN HOTE HI SABSE PEHLE VIP LOADER CHALAYEIN (No White Screen)
+try {
+  Loader.show("INITIALIZING ARENA...");
+} catch (e) {
+  console.warn("Loader init warning:", e);
+}
+
 // گلوبل ونڈو ابجیکٹ پر بنیادی کنٹرولز اٹیچ کرنا
 window.Router = Router;
 window.Drawer = Drawer;
@@ -385,14 +392,21 @@ function bindHeaderAndUIEvents() {
 document.addEventListener('DOMContentLoaded', async () => {
   setupRouterEvents();
   bindHeaderAndUIEvents();
-  await syncAuthAndProfile();
 
-  // براؤزر URL ہیش کی بنیاد پر پیج اوپن کرنا
-  const initialHash = window.location.hash.replace('#', '') || 'home';
-  if (!state.currentUser && initialHash !== 'login' && initialHash !== 'register') {
-    Router.navigate('login', null, false);
-  } else {
-    Router.navigate(initialHash, null, false);
+  try {
+    await syncAuthAndProfile();
+
+    const initialHash = window.location.hash.replace('#', '') || 'home';
+    if (!state.currentUser && initialHash !== 'login' && initialHash !== 'register') {
+      await Router.navigate('login', null, false);
+    } else {
+      await Router.navigate(initialHash, null, false);
+    }
+  } catch (err) {
+    console.error("App startup error:", err);
+  } finally {
+    // Data ready hote hi loader smoothly band hoga
+    Loader.hide();
   }
 });
 
