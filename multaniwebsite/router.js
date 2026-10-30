@@ -1,15 +1,19 @@
-import { state, Loader, Sound } from './config.js';
+import { state, Sound } from './config.js';
 import { syncAuthAndProfile, renderAuth, renderProfile } from './auth.js';
 
 export const Drawer = {
   open() {
-    Sound.playBrandName();
-    document.getElementById('side-drawer').classList.add('open');
-    document.getElementById('drawer-overlay').classList.remove('hidden');
+    if (Sound && Sound.playBrandName) Sound.playBrandName();
+    const sideDrawer = document.getElementById('side-drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    if (sideDrawer) sideDrawer.classList.add('open');
+    if (drawerOverlay) drawerOverlay.classList.remove('hidden');
   },
   close() {
-    document.getElementById('side-drawer').classList.remove('open');
-    document.getElementById('drawer-overlay').classList.add('hidden');
+    const sideDrawer = document.getElementById('side-drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    if (sideDrawer) sideDrawer.classList.remove('open');
+    if (drawerOverlay) drawerOverlay.classList.add('hidden');
   }
 };
 
@@ -17,9 +21,11 @@ export const Router = {
   history: [],
   async navigate(page, id = null, pushHistory = true) {
     Drawer.close();
-    Loader.show("Loading...");
-    await syncAuthAndProfile();
 
+    // Background sync: User profile background mein sync hogi bina screen rokay
+    syncAuthAndProfile().catch(err => console.warn("Background auth sync error:", err));
+
+    // Agar user logged in na ho aur auth pages na hon
     if (!state.currentUser && page !== 'login' && page !== 'register') {
       page = 'login';
     }
@@ -34,6 +40,7 @@ export const Router = {
     const subHeader = document.getElementById('sub-header-bar');
     const bottomNav = document.getElementById('bottom-nav');
 
+    // Headers & Nav bar updates
     if (isAuthView) {
       if (masterHeader) masterHeader.classList.add('hidden');
       if (subHeader) subHeader.classList.add('hidden');
@@ -52,10 +59,12 @@ export const Router = {
       if (bottomNav) bottomNav.classList.remove('hidden');
     }
 
+    // Active bottom-bar button toggle
     document.querySelectorAll('.nav-item').forEach(el => {
       el.classList.toggle('active', el.getAttribute('data-page') === page);
     });
 
+    // Instant Page Render (No full-screen blocking loader)
     try {
       if (page === 'home' && window.renderHome) await window.renderHome();
       else if (page === 'games' && window.renderGamesList) await window.renderGamesList();
@@ -79,9 +88,8 @@ export const Router = {
     } catch (navErr) {
       console.error("Navigation error:", navErr);
     }
-
-    Loader.hide();
   },
+
   async back() {
     if (this.history.length > 1) {
       this.history.pop();
