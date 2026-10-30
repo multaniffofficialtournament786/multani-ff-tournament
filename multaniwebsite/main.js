@@ -1,28 +1,101 @@
+
 // ==========================================
 // MULTANI FF OFFICIAL - MASTER MODULE LOADER
+// SAFE UPDATED VERSION
 // ==========================================
 
-import { sbClient, state, Sound, Toast, Loader } from './config.js';
-import { syncAuthAndProfile, renderAuth, renderForgotPassword, renderProfile, uploadAvatarPhoto, saveUserProfile } from './auth.js';
-import { Router, Drawer, setupRouterEvents } from './router.js';
-import { renderHome } from './home.js';
-import { renderGamesList, launchGame, closeGamePlayer } from './games.js';
-import { openDailyMissionsModal, closeDailyMissionsModal, toggleMissionsRulesDropdown, claimMissionReward } from './missions.js';
-import { renderTournaments, renderTournamentDetail, filterTournaments, toggleRulesDropdown } from './tournaments.js';
-import { renderDailySpin, triggerDailySpin } from './spin.js';
-import { renderWallet, renderDeposit, filterWalletHistory, toggleTransactionHistory, updatePaymentDetailsDisplay } from './wallet.js';
-import { renderWithdrawal, calculateWithdrawalNet } from './withdrawal.js';
-import { renderDiamondsShop, renderDiamondHistoryPage, requestDiamondPurchase } from './diamonds.js';
-import { renderWinners, renderLeaderboard, renderNotifications, renderInvite, renderRules, renderAbout } from './extras.js';
+import {
+  sbClient,
+  state,
+  Sound,
+  Toast,
+  Loader
+} from './config.js';
 
-// گلوبل ونڈو ابجیکٹ پر بنیادی کنٹرولز اٹیچ کرنا
+import {
+  syncAuthAndProfile,
+  renderAuth,
+  renderForgotPassword,
+  renderProfile,
+  uploadAvatarPhoto,
+  saveUserProfile
+} from './auth.js';
+
+import {
+  Router,
+  Drawer,
+  setupRouterEvents
+} from './router.js';
+
+import { renderHome } from './home.js';
+
+import {
+  renderGamesList,
+  launchGame,
+  closeGamePlayer
+} from './games.js';
+
+import {
+  openDailyMissionsModal,
+  closeDailyMissionsModal,
+  toggleMissionsRulesDropdown,
+  claimMissionReward
+} from './missions.js';
+
+import {
+  renderTournaments,
+  renderTournamentDetail,
+  filterTournaments,
+  toggleRulesDropdown
+} from './tournaments.js';
+
+import {
+  renderDailySpin,
+  triggerDailySpin
+} from './spin.js';
+
+import {
+  renderWallet,
+  renderDeposit,
+  filterWalletHistory,
+  toggleTransactionHistory,
+  updatePaymentDetailsDisplay
+} from './wallet.js';
+
+import {
+  renderWithdrawal,
+  calculateWithdrawalNet
+} from './withdrawal.js';
+
+import {
+  renderDiamondsShop,
+  renderDiamondHistoryPage,
+  requestDiamondPurchase
+} from './diamonds.js';
+
+import {
+  renderWinners,
+  renderLeaderboard,
+  renderNotifications,
+  renderInvite,
+  renderRules,
+  renderAbout
+} from './extras.js';
+
+// ==========================================
+// 1. GLOBAL CONTROLS
+// ==========================================
+
 window.Router = Router;
 window.Drawer = Drawer;
 window.Sound = Sound;
 window.Toast = Toast;
 window.Loader = Loader;
 
-// Pages Render Functions
+// ==========================================
+// 2. PAGE RENDER FUNCTIONS
+// ==========================================
+
 window.renderHome = renderHome;
 window.renderGamesList = renderGamesList;
 window.renderTournaments = renderTournaments;
@@ -40,96 +113,183 @@ window.renderInvite = renderInvite;
 window.renderRules = renderRules;
 window.renderAbout = renderAbout;
 
-// Profile & Auth Functions
+// ==========================================
+// 3. AUTH & PROFILE FUNCTIONS
+// ==========================================
+
+window.renderAuth = renderAuth;
+window.renderProfile = renderProfile;
 window.renderForgotPassword = renderForgotPassword;
 window.uploadAvatarPhoto = uploadAvatarPhoto;
 window.saveUserProfile = saveUserProfile;
 
-// Interactivity & Actions
+// ==========================================
+// 4. GAME & APP ACTIONS
+// ==========================================
+
 window.launchGame = launchGame;
 window.closeGamePlayer = closeGamePlayer;
+
 window.openDailyMissionsModal = openDailyMissionsModal;
 window.closeDailyMissionsModal = closeDailyMissionsModal;
 window.toggleMissionsRulesDropdown = toggleMissionsRulesDropdown;
 window.claimMissionReward = claimMissionReward;
+
 window.filterTournaments = filterTournaments;
 window.toggleRulesDropdown = toggleRulesDropdown;
+
 window.triggerDailySpin = triggerDailySpin;
+
 window.filterWalletHistory = filterWalletHistory;
 window.toggleTransactionHistory = toggleTransactionHistory;
 window.updatePaymentDetailsDisplay = updatePaymentDetailsDisplay;
+
 window.calculateWithdrawalNet = calculateWithdrawalNet;
 window.requestDiamondPurchase = requestDiamondPurchase;
 
-// App Refresh Handler
-window.hardRefreshApp = async () => {
-  Loader.show("Refreshing...");
-  await syncAuthAndProfile();
-  await Router.navigate('home', null, false);
-  Loader.hide();
-  Toast.show("App Refreshed!", "success");
-};
+// ==========================================
+// 5. APK DOWNLOAD LINK
+// ==========================================
+
+const APK_DOWNLOAD_URL =
+  "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
 
 // ==========================================
-// 1. HAMBURGER (3 LINES) & SIDE DRAWER
+// 6. SAFE TEXT HELPER
 // ==========================================
-window.Drawer = {
-  open: () => {
-    document.getElementById('side-drawer')?.classList.add('open');
-    document.getElementById('drawer-overlay')?.classList.remove('hidden');
-  },
-  close: () => {
-    document.getElementById('side-drawer')?.classList.remove('open');
-    document.getElementById('drawer-overlay')?.classList.add('hidden');
-  }
-};
+
+function safeText(value) {
+  const element = document.createElement('div');
+  element.textContent = String(value ?? '');
+  return element.innerHTML;
+}
 
 // ==========================================
-// 2. SHARE BUTTON & SHARE MODAL CONTROLS
+// 7. APP SHARE MODAL
 // ==========================================
-const APK_DOWNLOAD_URL = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
+
+function getShareMessage() {
+  const userUid =
+    state.currentProfile?.free_fire_uid ||
+    state.currentUser?.id?.slice(0, 8) ||
+    '3239454397';
+
+  return `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_URL}
+
+Use my Referral UID: *${userUid}* when registering!`;
+}
 
 window.openShareModal = () => {
   const modal = document.getElementById('share-modal-overlay');
-  if (modal) {
-    const userUid = state.currentProfile?.free_fire_uid || state.currentUser?.id?.slice(0, 8) || '3239454397';
-    const shareMessage = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_URL}\n\nUse my Referral UID: *${userUid}* when registering!`;
 
-    const wa = document.getElementById('share-whatsapp');
-    const fb = document.getElementById('share-facebook');
-    const tg = document.getElementById('share-telegram');
+  if (!modal) return;
 
-    if (wa) wa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
-    if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_URL)}`;
-    if (tg) tg.href = `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_URL)}&text=${encodeURIComponent(shareMessage)}`;
+  const shareMessage = getShareMessage();
 
-    modal.classList.remove('hidden');
+  const wa = document.getElementById('share-whatsapp');
+  const fb = document.getElementById('share-facebook');
+  const tg = document.getElementById('share-telegram');
+
+  if (wa) {
+    wa.href =
+      `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
   }
+
+  if (fb) {
+    fb.href =
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APK_DOWNLOAD_URL)}`;
+  }
+
+  if (tg) {
+    tg.href =
+      `https://t.me/share/url?url=${encodeURIComponent(APK_DOWNLOAD_URL)}&text=${encodeURIComponent(shareMessage)}`;
+  }
+
+  modal.classList.remove('hidden');
 };
 
 window.closeShareModal = () => {
-  document.getElementById('share-modal-overlay')?.classList.add('hidden');
+  document
+    .getElementById('share-modal-overlay')
+    ?.classList.add('hidden');
 };
 
-window.copyShareText = () => {
-  const userUid = state.currentProfile?.free_fire_uid || state.currentUser?.id?.slice(0, 8) || '3239454397';
-  const shareMessage = `🔥 Join Multani FF Tournaments & Win Real Cash! Download App: ${APK_DOWNLOAD_URL}\n\nUse my Referral UID: *${userUid}* when registering!`;
-  navigator.clipboard.writeText(shareMessage);
-  Toast.show("App link & referral code copied!", "success");
-  window.closeShareModal();
+window.copyShareText = async () => {
+  const shareMessage = getShareMessage();
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareMessage);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = shareMessage;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      const copied = document.execCommand('copy');
+      textarea.remove();
+
+      if (!copied) throw new Error('Copy failed');
+    }
+
+    Toast.show('App link & referral code copied!', 'success');
+    window.closeShareModal();
+
+  } catch (error) {
+    console.error('Copy error:', error);
+    Toast.show('Copy nahi hua. Dobara try karein!', 'error');
+  }
 };
 
 window.closeCommunityPopup = () => {
-  document.getElementById('community-popup-overlay')?.classList.add('hidden');
+  document
+    .getElementById('community-popup-overlay')
+    ?.classList.add('hidden');
 };
 
 // ==========================================
-// 3. DRAGGABLE FLOATING ROBOT SPEED-DIAL
+// 8. SIDE DRAWER
 // ==========================================
+
+window.Drawer = {
+  open: () => {
+    document
+      .getElementById('side-drawer')
+      ?.classList.add('open');
+
+    document
+      .getElementById('drawer-overlay')
+      ?.classList.remove('hidden');
+  },
+
+  close: () => {
+    document
+      .getElementById('side-drawer')
+      ?.classList.remove('open');
+
+    document
+      .getElementById('drawer-overlay')
+      ?.classList.add('hidden');
+  }
+};
+
+// ==========================================
+// 9. FLOATING SUPPORT ROBOT
+// ==========================================
+
 window.toggleSupportMenu = (forceState) => {
   const menu = document.getElementById('support-popup-menu');
+
   if (!menu) return;
-  const shouldShow = typeof forceState === 'boolean' ? forceState : !menu.classList.contains('show');
+
+  const shouldShow =
+    typeof forceState === 'boolean'
+      ? forceState
+      : !menu.classList.contains('show');
+
   menu.classList.toggle('show', shouldShow);
 };
 
@@ -137,28 +297,41 @@ function setupFloatingBotWidget() {
   const widget = document.getElementById('admin-float-widget');
   const mainBtn = document.getElementById('float-main-btn');
 
-  if (!widget || !mainBtn || widget.dataset.dragReady === 'true') return;
+  if (!widget || !mainBtn) return;
+
+  if (widget.dataset.dragReady === 'true') return;
+
   widget.dataset.dragReady = 'true';
 
   let isDragging = false;
-  let startX = 0, startY = 0;
-  let origX = 0, origY = 0;
+  let startX = 0;
+  let startY = 0;
+  let origX = 0;
+  let origY = 0;
   let hasMoved = false;
 
   function onStart(e) {
+    const touch = e.touches?.[0] || e;
+
+    if (typeof touch.clientX !== 'number') return;
+
     isDragging = true;
     hasMoved = false;
-    const touch = e.touches ? e.touches[0] : e;
+
     startX = touch.clientX;
     startY = touch.clientY;
+
     const rect = widget.getBoundingClientRect();
+
     origX = rect.left;
     origY = rect.top;
   }
 
   function onMove(e) {
     if (!isDragging) return;
-    const touch = e.touches ? e.touches[0] : e;
+
+    const touch = e.touches?.[0] || e;
+
     const dx = touch.clientX - startX;
     const dy = touch.clientY - startY;
 
@@ -169,8 +342,15 @@ function setupFloatingBotWidget() {
     let newX = origX + dx;
     let newY = origY + dy;
 
-    const maxX = window.innerWidth - widget.offsetWidth - 10;
-    const maxY = window.innerHeight - widget.offsetHeight - 75;
+    const maxX = Math.max(
+      10,
+      window.innerWidth - widget.offsetWidth - 10
+    );
+
+    const maxY = Math.max(
+      50,
+      window.innerHeight - widget.offsetHeight - 75
+    );
 
     newX = Math.max(10, Math.min(newX, maxX));
     newY = Math.max(50, Math.min(newY, maxY));
@@ -185,8 +365,14 @@ function setupFloatingBotWidget() {
     isDragging = false;
   }
 
-  widget.addEventListener('touchstart', onStart, { passive: true });
-  window.addEventListener('touchmove', onMove, { passive: true });
+  widget.addEventListener('touchstart', onStart, {
+    passive: true
+  });
+
+  window.addEventListener('touchmove', onMove, {
+    passive: true
+  });
+
   window.addEventListener('touchend', onEnd);
 
   widget.addEventListener('mousedown', onStart);
@@ -195,6 +381,7 @@ function setupFloatingBotWidget() {
 
   mainBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+
     if (!hasMoved) {
       window.toggleSupportMenu();
     }
@@ -202,57 +389,83 @@ function setupFloatingBotWidget() {
 }
 
 // ==========================================
-// 4. ADMIN SUPPORT CHAT MODAL
+// 10. SUPPORT CHAT
 // ==========================================
+
 let supportChatSub = null;
 
 window.ChatModal = {
   open: async () => {
-    const overlay = document.getElementById('chat-modal-overlay');
+    const overlay =
+      document.getElementById('chat-modal-overlay');
+
     if (!overlay) return;
+
     overlay.classList.remove('hidden');
 
     if (!state.currentUser) {
-      Toast.show("Please login to contact support", "info");
+      Toast.show(
+        'Please login to contact support',
+        'info'
+      );
       return;
     }
 
     await window.ChatModal.loadMessages();
 
-    if (!supportChatSub && sbClient) {
-      try {
-        supportChatSub = sbClient
-          .channel('support-chat-room')
-          .on(
-            'postgres_changes',
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'support_messages',
-              filter: `user_id=eq.${state.currentUser.id}`
-            },
-            (payload) => {
-              const newMsg = payload.new;
-              if (newMsg && newMsg.sender_role === 'admin') {
-                window.ChatModal.appendMessage(newMsg.message, 'theirs', newMsg.created_at, 'Admin Support');
-                Sound?.play?.('notification');
-              }
+    if (supportChatSub || !sbClient) return;
+
+    try {
+      const userId = state.currentUser.id;
+
+      supportChatSub = sbClient
+        .channel(`support-chat-${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            const newMsg = payload.new;
+
+            if (
+              newMsg &&
+              newMsg.sender_role === 'admin'
+            ) {
+              window.ChatModal.appendMessage(
+                newMsg.message,
+                'theirs',
+                newMsg.created_at,
+                'Admin Support'
+              );
+
+              Sound?.play?.('notification');
             }
-          )
-          .subscribe();
-      } catch (err) {
-        console.warn("Realtime support error:", err);
-      }
+          }
+        )
+        .subscribe();
+
+    } catch (error) {
+      console.warn('Realtime support error:', error);
+      supportChatSub = null;
     }
   },
 
   close: () => {
-    document.getElementById('chat-modal-overlay')?.classList.add('hidden');
+    document
+      .getElementById('chat-modal-overlay')
+      ?.classList.add('hidden');
   },
 
   loadMessages: async () => {
     if (!sbClient || !state.currentUser) return;
-    const container = document.getElementById('chat-modal-messages');
+
+    const container =
+      document.getElementById('chat-modal-messages');
+
     if (!container) return;
 
     try {
@@ -260,140 +473,367 @@ window.ChatModal = {
         .from('support_messages')
         .select('*')
         .eq('user_id', state.currentUser.id)
-        .order('created_at', { ascending: true });
+        .order('created_at', {
+          ascending: true
+        });
 
       if (error) throw error;
 
       container.innerHTML = `
         <div class="chat-row theirs">
           <div class="chat-bubble theirs">
-            Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
+            Assalam-o-Alaikum! Welcome to Multani FF Official.
+            Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
           </div>
-          <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+          <div class="chat-time-tag"
+               style="text-align:left;padding-left:4px;color:#6b7280;">
+            Support Desk
+          </div>
         </div>
       `;
 
-      if (data && data.length > 0) {
-        data.forEach(msg => {
-          const type = msg.sender_role === 'admin' ? 'theirs' : 'mine';
-          const label = msg.sender_role === 'admin' ? 'Support Desk' : (state.currentProfile?.free_fire_name || state.currentProfile?.full_name || 'You');
-          window.ChatModal.appendMessage(msg.message, type, msg.created_at, label);
+      if (Array.isArray(data)) {
+        data.forEach((msg) => {
+          const type =
+            msg.sender_role === 'admin'
+              ? 'theirs'
+              : 'mine';
+
+          const label =
+            msg.sender_role === 'admin'
+              ? 'Support Desk'
+              : (
+                  state.currentProfile?.free_fire_name ||
+                  state.currentProfile?.full_name ||
+                  'You'
+                );
+
+          window.ChatModal.appendMessage(
+            msg.message,
+            type,
+            msg.created_at,
+            label
+          );
         });
       }
+
       container.scrollTop = container.scrollHeight;
-    } catch (err) {
-      console.error("Support chat load error:", err);
+
+    } catch (error) {
+      console.error('Support chat load error:', error);
+
+      Toast.show(
+        'Chat load nahi hui. Internet check karein!',
+        'error'
+      );
     }
   },
 
-  appendMessage: (text, type, timeStr, senderLabel) => {
-    const container = document.getElementById('chat-modal-messages');
+  appendMessage: (message, type, timeStr, senderLabel) => {
+    const container =
+      document.getElementById('chat-modal-messages');
+
     if (!container) return;
 
     const row = document.createElement('div');
     row.className = `chat-row ${type}`;
 
-    const formattedTime = timeStr ? new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now';
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${type}`;
+    bubble.textContent = String(message ?? '');
 
-    row.innerHTML = `
-      <div class="chat-bubble ${type}">
-        ${text}
-      </div>
-      <div class="chat-time-tag" style="text-align:${type === 'mine' ? 'right' : 'left'}; padding-${type === 'mine' ? 'right' : 'left'}:4px; color:#6b7280;">
-        ${senderLabel} • ${formattedTime}
-      </div>
-    `;
+    const timeTag = document.createElement('div');
+    timeTag.className = 'chat-time-tag';
+
+    timeTag.style.textAlign =
+      type === 'mine' ? 'right' : 'left';
+
+    timeTag.style.paddingLeft =
+      type === 'mine' ? '0' : '4px';
+
+    timeTag.style.paddingRight =
+      type === 'mine' ? '4px' : '0';
+
+    timeTag.style.color = '#6b7280';
+
+    let formattedTime = 'Now';
+
+    if (timeStr) {
+      const date = new Date(timeStr);
+
+      if (!Number.isNaN(date.getTime())) {
+        formattedTime = date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    }
+
+    timeTag.textContent =
+      `${String(senderLabel ?? 'Player')} • ${formattedTime}`;
+
+    row.appendChild(bubble);
+    row.appendChild(timeTag);
 
     container.appendChild(row);
     container.scrollTop = container.scrollHeight;
   },
 
   sendMessage: async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('chat-modal-input');
+    e?.preventDefault?.();
+
+    const input =
+      document.getElementById('chat-modal-input');
+
     if (!input) return;
+
     const msgText = input.value.trim();
+
     if (!msgText) return;
 
     if (!state.currentUser) {
-      Toast.show("Please login first!", "error");
+      Toast.show('Please login first!', 'error');
       return;
     }
 
+    if (!sbClient) {
+      Toast.show('Internet connection check karein!', 'error');
+      return;
+    }
+
+    const senderName =
+      state.currentProfile?.free_fire_name ||
+      state.currentProfile?.full_name ||
+      'Player';
+
+    const previousValue = input.value;
+
     input.value = '';
-    const senderName = state.currentProfile?.free_fire_name || state.currentProfile?.full_name || 'Player';
-    window.ChatModal.appendMessage(msgText, 'mine', new Date().toISOString(), senderName);
+
+    window.ChatModal.appendMessage(
+      msgText,
+      'mine',
+      new Date().toISOString(),
+      senderName
+    );
 
     try {
-      if (!sbClient) throw new Error("Supabase client not initialized");
-
       const payload = {
         user_id: state.currentUser.id,
         user_name: senderName,
-        user_uid: state.currentProfile?.free_fire_uid || 'N/A',
+        user_uid:
+          state.currentProfile?.free_fire_uid || 'N/A',
         message: msgText,
         sender_role: 'user',
         is_read_by_admin: false,
         created_at: new Date().toISOString()
       };
 
-      const { error } = await sbClient.from('support_messages').insert([payload]);
+      const { error } = await sbClient
+        .from('support_messages')
+        .insert([payload]);
+
       if (error) throw error;
+
       Sound?.play?.('click');
-    } catch (err) {
-      console.error("Failed to send support message:", err);
-      Toast.show("Message send failed. Check internet!", "error");
+
+    } catch (error) {
+      console.error('Failed to send support message:', error);
+
+      input.value = previousValue;
+
+      Toast.show(
+        'Message send failed. Check internet!',
+        'error'
+      );
     }
   }
 };
 
 // ==========================================
-// INITIALIZATION & EVENT BINDINGS
+// 11. HEADER & UI EVENT BINDINGS
 // ==========================================
+
 function bindHeaderAndUIEvents() {
-  const btnHam = document.getElementById('btn-hamburger');
-  if (btnHam) {
+  const btnHam =
+    document.getElementById('btn-hamburger');
+
+  if (btnHam && btnHam.dataset.bound !== 'true') {
+    btnHam.dataset.bound = 'true';
+
     btnHam.onclick = (e) => {
       e.stopPropagation();
       window.Drawer.open();
     };
   }
 
-  const btnShare = document.getElementById('btn-header-share');
-  if (btnShare) {
+  const btnShare =
+    document.getElementById('btn-header-share');
+
+  if (btnShare && btnShare.dataset.bound !== 'true') {
+    btnShare.dataset.bound = 'true';
+
     btnShare.onclick = (e) => {
       e.stopPropagation();
       window.openShareModal();
     };
   }
 
-  const chatForm = document.getElementById('chat-modal-form');
-  if (chatForm) {
+  const chatForm =
+    document.getElementById('chat-modal-form');
+
+  if (chatForm && chatForm.dataset.bound !== 'true') {
+    chatForm.dataset.bound = 'true';
     chatForm.onsubmit = window.ChatModal.sendMessage;
   }
 
   setupFloatingBotWidget();
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  setupRouterEvents();
-  bindHeaderAndUIEvents();
+// ==========================================
+// 12. SAFE APP INITIALIZATION
+// ==========================================
 
-  // Pehle URL Hash ke mutabiq screen navigate karein (Taki Bottom Nav aur Home foran load ho)
-  const initialHash = window.location.hash.replace('#', '') || 'home';
-  Router.navigate(initialHash, null, false);
+let appInitialized = false;
 
-  // Background mein profile sync karein bina screen rokay
-  syncAuthAndProfile().then(() => {
-    if (!state.currentUser && initialHash !== 'login' && initialHash !== 'register') {
-      Router.navigate('login', null, false);
-    } else if (initialHash === 'home' && window.renderHome) {
-      window.renderHome();
+async function initializeMultaniApp() {
+  if (appInitialized) return;
+
+  appInitialized = true;
+
+  try {
+    setupRouterEvents();
+    bindHeaderAndUIEvents();
+
+    const initialHash =
+      window.location.hash
+        .replace('#', '')
+        .trim() || 'home';
+
+    // Authentication sync
+    try {
+      await syncAuthAndProfile();
+    } catch (authError) {
+      console.warn(
+        'Auth sync notice:',
+        authError
+      );
     }
-  }).catch(err => console.warn("Auth sync notice:", err));
+
+    const authPages = [
+      'login',
+      'register'
+    ];
+
+    if (
+      !state.currentUser &&
+      !authPages.includes(initialHash)
+    ) {
+      await Router.navigate(
+        'login',
+        null,
+        false
+      );
+
+      return;
+    }
+
+    await Router.navigate(
+      initialHash,
+      null,
+      false
+    );
+
+  } catch (error) {
+    console.error(
+      'App initialization error:',
+      error
+    );
+
+    Toast.show(
+      'App load nahi ho saki. Internet check karein aur dobara try karein.',
+      'error'
+    );
+
+  } finally {
+    setTimeout(() => {
+      Loader.hide();
+    }, 300);
+  }
+}
+
+// ==========================================
+// 13. DOM READY
+// ==========================================
+
+if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    initializeMultaniApp,
+    { once: true }
+  );
+} else {
+  initializeMultaniApp();
+}
+
+// ==========================================
+// 14. SAFE APP REFRESH
+// ==========================================
+
+window.hardRefreshApp = async () => {
+  try {
+    Loader.show('Refreshing...');
+
+    await syncAuthAndProfile();
+
+    const targetPage =
+      state.currentUser ? 'home' : 'login';
+
+    await Router.navigate(
+      targetPage,
+      null,
+      false
+    );
+
+    Toast.show(
+      'App Refreshed!',
+      'success'
+    );
+
+  } catch (error) {
+    console.error(
+      'Refresh error:',
+      error
+    );
+
+    Toast.show(
+      'Refresh failed. Internet check karein!',
+      'error'
+    );
+
+  } finally {
+    Loader.hide();
+  }
+};
+
+// ==========================================
+// 15. GLOBAL ERROR LOGGING
+// ==========================================
+
+window.addEventListener('error', (event) => {
+  console.error(
+    'Global app error:',
+    event.error || event.message
+  );
 });
 
-// Fallback init
-setTimeout(() => {
-  bindHeaderAndUIEvents();
-}, 500);
+window.addEventListener(
+  'unhandledrejection',
+  (event) => {
+    console.error(
+      'Unhandled promise rejection:',
+      event.reason
+    );
+  }
+);
+                         
