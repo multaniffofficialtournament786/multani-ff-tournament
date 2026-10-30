@@ -2,74 +2,27 @@ import { sbClient, state, APK_DOWNLOAD_LINK, escapeHTML } from './config.js';
 
 let autoScrollInterval = null;
 
-// Cache Helper Functions
-function getCachedHomeData() {
-  try {
-    const raw = localStorage.getItem('mff_home_cache');
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function setCachedHomeData(tutorials, ticker) {
-  try {
-    localStorage.setItem('mff_home_cache', JSON.stringify({
-      tutorials: tutorials || [],
-      ticker: ticker || "",
-      cachedAt: Date.now()
-    }));
-  } catch (e) {}
-}
-
 export async function renderHome() {
-  // 1. Local Cache check karein
-  const cached = getCachedHomeData();
-  let siteTutorialsList = cached ? cached.tutorials : [];
-  
-  if (cached && cached.ticker && !state.siteSettings.announcement_ticker) {
-    state.siteSettings.announcement_ticker = cached.ticker;
-  }
-
-  // 2. FORAN RENDER KAREIN (Screen bilkul black/blank nahi rahegi)
-  drawHomeUI(siteTutorialsList);
-
-  // 3. BACKGROUND FETCH (Slow internet par screen rokay baghair naya data laye ga)
-  fetchFreshHomeData();
-}
-
-async function fetchFreshHomeData() {
+  let siteTutorialsList = [];
   try {
-    const [settingsRes, tourRes, tutRes] = await Promise.all([
+    const [settingsRes, tourRes] = await Promise.all([
       sbClient.from('site_settings').select('*'),
-      sbClient.from('tournaments').select('*').order('created_at', { ascending: false }),
-      sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false })
+      sbClient.from('tournaments').select('*').order('created_at', { ascending: false })
     ]);
-
-    let updatedTicker = state.siteSettings.announcement_ticker;
+    
     if (settingsRes.data && settingsRes.data.length > 0) {
       const sRow = settingsRes.data[0];
-      updatedTicker = sRow.ticker_text || "";
-      state.siteSettings.announcement_ticker = updatedTicker;
+      state.siteSettings.announcement_ticker = sRow.ticker_text || "";
     }
 
     state.activeTournaments = tourRes.data || [];
-    const freshTutorials = tutRes.data || [];
 
-    // Cache save karein future ke liye
-    setCachedHomeData(freshTutorials, updatedTicker);
-
-    // Agar user abhi bhi Home page par hai to smoothly UI sync kar dein
-    const view = document.getElementById('app-view');
-    if (view && window.location.hash === '#home' || !window.location.hash || window.location.hash === '#') {
-      drawHomeUI(freshTutorials);
-    }
+    const { data: tutData } = await sbClient.from('site_tutorials').select('*').order('created_at', { ascending: false });
+    if (tutData) siteTutorialsList = tutData;
   } catch (e) {
-    console.error("Home background fetch error:", e);
+    console.error("Home load error:", e);
   }
-}
 
-function drawHomeUI(siteTutorialsList = []) {
   const p = state.currentProfile || { free_fire_name: "Guest Player", free_fire_uid: "Tap to Login", wallet_balance: 0, total_won: 0, total_matches: 0, phone: "" };
   const displayName = p.free_fire_name || p.full_name || (state.currentUser ? 'Soldier' : 'Guest Player');
   const displayUid = p.free_fire_uid || (state.currentUser ? 'Not Set' : 'Tap to Login');
