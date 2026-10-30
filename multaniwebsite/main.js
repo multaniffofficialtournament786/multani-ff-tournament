@@ -375,40 +375,25 @@ function bindHeaderAndUIEvents() {
   setupFloatingBotWidget();
 }
 
-async function startApp() {
+document.addEventListener('DOMContentLoaded', async () => {
   setupRouterEvents();
   bindHeaderAndUIEvents();
 
-  try {
-    // Shuru mein safe loader chalayein
-    if (Loader && typeof Loader.show === 'function') {
-      Loader.show("INITIALIZING ARENA...");
-    }
+  // Pehle URL Hash ke mutabiq screen navigate karein (Taki Bottom Nav aur Home foran load ho)
+  const initialHash = window.location.hash.replace('#', '') || 'home';
+  Router.navigate(initialHash, null, false);
 
-    await syncAuthAndProfile();
-
-    const initialHash = window.location.hash.replace('#', '') || 'home';
+  // Background mein profile sync karein bina screen rokay
+  syncAuthAndProfile().then(() => {
     if (!state.currentUser && initialHash !== 'login' && initialHash !== 'register') {
-      await Router.navigate('login', null, false);
-    } else {
-      await Router.navigate(initialHash, null, false);
+      Router.navigate('login', null, false);
+    } else if (initialHash === 'home' && window.renderHome) {
+      window.renderHome();
     }
-  } catch (err) {
-    console.error("App startup error:", err);
-  } finally {
-    if (Loader && typeof Loader.hide === 'function') {
-      Loader.hide();
-    }
-  }
-}
+  }).catch(err => console.warn("Auth sync notice:", err));
+});
 
-// Page load hone par safely start karein
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startApp);
-} else {
-  startApp();
-}
-
+// Fallback init
 setTimeout(() => {
   bindHeaderAndUIEvents();
-}, 600);
+}, 500);
