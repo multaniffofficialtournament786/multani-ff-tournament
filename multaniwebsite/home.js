@@ -1,4 +1,4 @@
-import { sbClient, state, APK_DOWNLOAD_LINK, escapeHTML } from './config.js';
+Import { sbClient, state, APK_DOWNLOAD_LINK, escapeHTML } from './config.js';
 
 let autoScrollInterval = null;
 
@@ -89,7 +89,6 @@ export async function renderHome() {
   }
 
   const view = document.getElementById('app-view');
-  if (!view) return;
 
   view.innerHTML = `
     <div class="view-container">
