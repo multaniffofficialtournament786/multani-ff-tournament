@@ -15,13 +15,6 @@ import { renderWithdrawal, calculateWithdrawalNet } from './withdrawal.js';
 import { renderDiamondsShop, renderDiamondHistoryPage, requestDiamondPurchase } from './diamonds.js';
 import { renderWinners, renderLeaderboard, renderNotifications, renderInvite, renderRules, renderAbout } from './extras.js';
 
-// APP OPEN HOTE HI SABSE PEHLE VIP LOADER CHALAYEIN (No White Screen)
-try {
-  Loader.show("INITIALIZING ARENA...");
-} catch (e) {
-  console.warn("Loader init warning:", e);
-}
-
 // گلوبل ونڈو ابجیکٹ پر بنیادی کنٹرولز اٹیچ کرنا
 window.Router = Router;
 window.Drawer = Drawer;
@@ -176,7 +169,6 @@ function setupFloatingBotWidget() {
     let newX = origX + dx;
     let newY = origY + dy;
 
-    // Mobile screen bounds protection
     const maxX = window.innerWidth - widget.offsetWidth - 10;
     const maxY = window.innerHeight - widget.offsetHeight - 75;
 
@@ -210,7 +202,7 @@ function setupFloatingBotWidget() {
 }
 
 // ==========================================
-// 4. ADMIN SUPPORT CHAT MODAL & SUPABASE LOGIC
+// 4. ADMIN SUPPORT CHAT MODAL
 // ==========================================
 let supportChatSub = null;
 
@@ -225,10 +217,8 @@ window.ChatModal = {
       return;
     }
 
-    // Load Chat History
     await window.ChatModal.loadMessages();
 
-    // Listen to real-time incoming messages from Admin
     if (!supportChatSub && sbClient) {
       try {
         supportChatSub = sbClient
@@ -274,7 +264,6 @@ window.ChatModal = {
 
       if (error) throw error;
 
-      // Reset to default greeting first
       container.innerHTML = `
         <div class="chat-row theirs">
           <div class="chat-bubble theirs">
@@ -332,10 +321,7 @@ window.ChatModal = {
     }
 
     input.value = '';
-
     const senderName = state.currentProfile?.free_fire_name || state.currentProfile?.full_name || 'Player';
-
-    // Show message immediately on UI
     window.ChatModal.appendMessage(msgText, 'mine', new Date().toISOString(), senderName);
 
     try {
@@ -389,11 +375,16 @@ function bindHeaderAndUIEvents() {
   setupFloatingBotWidget();
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function startApp() {
   setupRouterEvents();
   bindHeaderAndUIEvents();
 
   try {
+    // Shuru mein safe loader chalayein
+    if (Loader && typeof Loader.show === 'function') {
+      Loader.show("INITIALIZING ARENA...");
+    }
+
     await syncAuthAndProfile();
 
     const initialHash = window.location.hash.replace('#', '') || 'home';
@@ -405,12 +396,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error("App startup error:", err);
   } finally {
-    // Data ready hote hi loader smoothly band hoga
-    Loader.hide();
+    if (Loader && typeof Loader.hide === 'function') {
+      Loader.hide();
+    }
   }
-});
+}
 
-// Fallback init
+// Page load hone par safely start karein
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  startApp();
+}
+
 setTimeout(() => {
   bindHeaderAndUIEvents();
-}, 500);
+}, 600);
