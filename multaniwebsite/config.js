@@ -1,6 +1,6 @@
 // Multani FF Official Background Image & Logo
-export const MULTANI_BG_IMG = "https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg";
-export const MULTANI_FF_LOGO = "https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png";
+export const MULTANI_BG_IMG = "./multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg";
+export const MULTANI_FF_LOGO = "./multaniwebsite/1793357792725.png";
 
 function injectVIPLoaderStyles() {
   if (document.getElementById('mff-loader-styles')) return;
@@ -10,97 +10,91 @@ function injectVIPLoaderStyles() {
     .mff-splash-overlay {
       position: fixed;
       inset: 0;
-      background: linear-gradient(rgba(5, 5, 10, 0.82), rgba(5, 5, 10, 0.88)), url('${MULTANI_BG_IMG}') center/cover no-repeat;
+      background: #0d0907;
+      background: linear-gradient(rgba(5, 5, 10, 0.85), rgba(5, 5, 10, 0.9)), url('${MULTANI_BG_IMG}') center/cover no-repeat;
       z-index: 999999;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: 'Rajdhani', sans-serif, system-ui;
+      font-family: sans-serif;
       color: #ffffff;
-      overflow: hidden;
+      pointer-events: none; /* Screen kabhi freeze nahi hogi */
     }
-    
-    /* Neon Cyan Gaming Corners */
     .mff-corner {
       position: absolute;
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-color: #00f0ff;
       filter: drop-shadow(0 0 6px #00f0ff);
       border-style: solid;
       pointer-events: none;
     }
-    .mff-corner.top-left { top: 22px; left: 22px; border-width: 3px 0 0 3px; }
-    .mff-corner.top-right { top: 22px; right: 22px; border-width: 3px 3px 0 0; }
-    .mff-corner.bottom-left { bottom: 22px; left: 22px; border-width: 0 0 3px 3px; }
-    .mff-corner.bottom-right { bottom: 22px; right: 22px; border-width: 0 3px 3px 0; }
+    .mff-corner.top-left { top: 20px; left: 20px; border-width: 3px 0 0 3px; }
+    .mff-corner.top-right { top: 20px; right: 20px; border-width: 3px 3px 0 0; }
+    .mff-corner.bottom-left { bottom: 20px; left: 20px; border-width: 0 0 3px 3px; }
+    .mff-corner.bottom-right { bottom: 20px; right: 20px; border-width: 0 3px 3px 0; }
 
-    /* Full Large Glowing Circular Frame */
     .mff-dp-wrapper {
       position: relative;
-      width: 170px;
-      height: 170px;
+      width: 150px;
+      height: 150px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .mff-rotate-ring {
       position: absolute;
-      inset: -6px;
+      inset: -5px;
       border-radius: 50%;
-      border: 3.5px solid transparent;
+      border: 3px solid transparent;
       border-top: 4px solid #00f0ff;
       border-right: 4px solid #ff0055;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
       animation: mffSpinDP 1.8s linear infinite;
     }
     @keyframes mffSpinDP {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    /* DP Pura Gol Dayre me Fit */
     .mff-user-dp {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #00f0ff;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.95), inset 0 0 10px rgba(0, 240, 255, 0.3);
+      background: #111;
       z-index: 2;
     }
     .mff-loader-title {
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: 3px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 2px;
       color: #ffffff;
       margin: 0;
       text-transform: uppercase;
-      text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
     }
     .mff-loader-subtitle {
       font-size: 11px;
       letter-spacing: 2px;
       color: #00f0ff;
-      font-weight: 700;
+      font-weight: 600;
       margin-top: 6px;
-      margin-bottom: 50px;
+      margin-bottom: 40px;
       text-transform: uppercase;
-      text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
     }
     .mff-loader-bottom {
       position: absolute;
-      bottom: 55px;
-      width: 82%;
-      max-width: 270px;
+      bottom: 50px;
+      width: 80%;
+      max-width: 260px;
       text-align: center;
     }
     .mff-loader-status {
       font-size: 12px;
       color: #d1d5db;
-      letter-spacing: 1.5px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .mff-progress-track {
       width: 100%;
@@ -114,9 +108,9 @@ function injectVIPLoaderStyles() {
       width: 50%;
       height: 100%;
       background: linear-gradient(90deg, #00f0ff, #ff0055);
-      box-shadow: 0 0 12px #00f0ff;
+      box-shadow: 0 0 10px #00f0ff;
       border-radius: 6px;
-      animation: mffProgressAnim 1.5s ease-in-out infinite alternate;
+      animation: mffProgressAnim 1.4s ease-in-out infinite alternate;
     }
     @keyframes mffProgressAnim {
       0% { transform: translateX(-100%); }
@@ -143,7 +137,7 @@ export const Loader = {
 
         <div class="mff-dp-wrapper">
           <div class="mff-rotate-ring"></div>
-          <img src="${MULTANI_FF_LOGO}" class="mff-user-dp" id="mff-splash-dp" alt="Logo" />
+          <img src="${MULTANI_FF_LOGO}" class="mff-user-dp" id="mff-splash-dp" alt="Logo" onerror="this.src='https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=120'" />
         </div>
 
         <h1 class="mff-loader-title">MULTANI FF ARENA</h1>
@@ -160,13 +154,16 @@ export const Loader = {
     } else {
       const statusEl = document.getElementById('mff-splash-status');
       if (statusEl) statusEl.innerText = text;
-      overlay.style.display = 'flex';
     }
 
+    overlay.style.display = 'flex';
+    overlay.style.pointerEvents = 'auto'; // Load hote waqt clicks rokay
+
+    // Agar slow internet ya crash ho to 3 second baad khud ba khud hata dega
     if (window._vipLoaderTimeout) clearTimeout(window._vipLoaderTimeout);
     window._vipLoaderTimeout = setTimeout(() => {
       this.hide();
-    }, 4500);
+    }, 3000);
   },
 
   hide() {
@@ -174,6 +171,9 @@ export const Loader = {
     const overlay = document.getElementById('mff-vip-splash');
     if (overlay) {
       overlay.style.display = 'none';
+      overlay.style.pointerEvents = 'none';
     }
+    const oldLoader = document.getElementById('global-loader');
+    if (oldLoader) oldLoader.classList.add('hidden');
   }
 };
