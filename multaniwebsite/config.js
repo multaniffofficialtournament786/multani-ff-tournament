@@ -241,26 +241,29 @@ function injectVipLoaderStyles() {
       width: 136px;
       height: 136px;
       border-radius: 50%;
-      border: 2px dashed rgba(0, 240, 255, 0.35);
+      border: 2px dashed rgba(0, 240, 255, 0.45);
       animation: mffRingSpin 9s linear infinite;
     }
 
     .mff-glow-disc {
       position: absolute;
-      width: 114px;
-      height: 114px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, rgba(3, 10, 19, 0.8) 75%);
-      box-shadow: 0 0 35px rgba(0, 240, 255, 0.25), inset 0 0 16px rgba(0, 240, 255, 0.35);
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.25) 0%, rgba(3, 10, 19, 0.8) 75%);
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.35), inset 0 0 16px rgba(0, 240, 255, 0.45);
     }
 
     .mff-rotating-coin {
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
       border-radius: 50%;
+      position: relative;
+      z-index: 2;
       animation: mffCoinTurn 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-      filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.85));
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      border: 2px solid rgba(0, 240, 255, 0.5);
     }
 
     /* Typography */
@@ -336,13 +339,13 @@ function injectVipLoaderStyles() {
     /* Keyframes */
     @keyframes mffCoinTurn {
       0% {
-        transform: rotateY(0deg) scale(1);
+        transform: rotateY(0deg);
       }
       50% {
-        transform: rotateY(180deg) scale(1.08);
+        transform: rotateY(180deg);
       }
       100% {
-        transform: rotateY(360deg) scale(1);
+        transform: rotateY(360deg);
       }
     }
 
@@ -380,7 +383,7 @@ export const Loader = {
             <div class="mff-logo-stage">
               <div class="mff-outer-ring"></div>
               <div class="mff-glow-disc"></div>
-              <img src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png" alt="Logo" class="mff-rotating-coin" />
+              <img src="1793357792725.png" alt="Logo" class="mff-rotating-coin" onerror="this.src='./1793357792725.png'" />
             </div>
             <h1 class="mff-brand-title">MULTANI FF</h1>
             <span class="mff-sub-badge">OFFICIAL TOURNAMENT ARENA</span>
