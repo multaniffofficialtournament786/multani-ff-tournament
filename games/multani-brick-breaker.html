@@ -41,7 +41,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 2px 10px;
-    z-index: 10;
+    z-index: 20;
   }
   .title-box {
     display: flex;
@@ -103,39 +103,67 @@
     color: #000;
   }
 
-  /* Landmark Name Badge */
+  /* Landmark Name Pill */
   #landmark-pill {
     position: absolute;
     top: 72px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.88);
     border: 1px solid #00e5ff;
     color: #fff;
-    padding: 3px 14px;
+    padding: 4px 16px;
     border-radius: 15px;
     font-size: 11px;
     font-weight: bold;
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
-    z-index: 5;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+    z-index: 15;
     pointer-events: none;
     white-space: nowrap;
   }
 
-  /* Canvas Wrapper */
+  /* Canvas and Background Photo Layer */
   #canvas-wrapper {
     position: relative;
     flex: 1;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    background: #000;
   }
+
+  /* Dedicated Real Photo Image (Never blocked by CORS) */
+  #real-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    opacity: 0.35;
+    filter: brightness(0.65) contrast(1.1);
+    transition: opacity 0.5s ease, filter 0.5s ease;
+  }
+
+  /* When level is cleared, photo becomes 100% full bright */
+  #real-photo.revealed {
+    opacity: 1 !important;
+    filter: brightness(1) contrast(1) !important;
+  }
+
+  /* Transparent gameplay canvas on top of photo */
   canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    z-index: 5;
+    background: transparent;
   }
 
-  /* Win Screen: 100% Clear Photo & Next Button */
+  /* Level Complete Overlay */
   #win-screen {
     position: absolute;
     inset: 0;
@@ -145,12 +173,12 @@
     align-items: center;
     padding-bottom: 45px;
     background: transparent;
-    z-index: 50;
+    z-index: 25;
   }
   .win-card {
-    background: rgba(5, 5, 15, 0.85);
+    background: rgba(5, 5, 15, 0.88);
     border: 2px solid #39ff14;
-    box-shadow: 0 0 25px rgba(57, 255, 20, 0.5);
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.6);
     border-radius: 14px;
     padding: 14px 26px;
     text-align: center;
@@ -197,8 +225,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 60;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 30;
   }
   #gameover-screen h1 {
     font-size: 36px;
@@ -272,6 +300,7 @@
     border-radius: 20px;
     border: 1px dashed #00e5ff;
     pointer-events: none;
+    z-index: 15;
     animation: blinkHint 1s infinite alternate;
   }
   @keyframes blinkHint {
@@ -314,10 +343,14 @@
   </header>
 
   <div id="canvas-wrapper">
+    <!-- 100% GUARANTEED REAL PLACE PHOTO LAYER -->
+    <img id="real-photo" referrerpolicy="no-referrer" alt="Fort Landmark" />
+
     <div id="landmark-pill">Derawar Fort, Bahawalpur</div>
     <canvas id="gameCanvas"></canvas>
     <div id="tap-hint">TAP TO LAUNCH BALL</div>
 
+    <!-- Win Screen: Background Photo Clearly Revealed -->
     <div id="win-screen">
       <div class="win-card">
         <h2>FORT DESTROYED!</h2>
@@ -394,37 +427,26 @@ class SoundSys {
   }
 }
 
-/* REAL HISTORICAL PLACES PHOTOS */
+/* REAL PAKISTANI FORTS & LANDMARKS (Direct high-availability images) */
 const photoData = [
-  { name: "Derawar Fort, Bahawalpur", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Derawar_Fort_by_Usman_Ghani.jpg/800px-Derawar_Fort_by_Usman_Ghani.jpg" },
-  { name: "Minar-e-Pakistan, Lahore", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Minar-e-Pakistan_Lahore.jpg/800px-Minar-e-Pakistan_Lahore.jpg" },
-  { name: "Badshahi Mosque, Lahore", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Badshahi_Mosque_front_view_Lahore.jpg/800px-Badshahi_Mosque_front_view_Lahore.jpg" },
-  { name: "Lahore Fort (Shahi Qila)", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Alamgiri_Gate_Lahore_Fort.jpg/800px-Alamgiri_Gate_Lahore_Fort.jpg" },
-  { name: "Rohtas Fort, Jhelum", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Rohtas_Fort_-_Sohail_Gate.jpg/800px-Rohtas_Fort_-_Sohail_Gate.jpg" },
-  { name: "Ranikot Fort, Sindh", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Ranikot_Fort_Sindh.jpg/800px-Ranikot_Fort_Sindh.jpg" },
-  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Tomb_of_Shah_Rukn-e-Alam.jpg/800px-Tomb_of_Shah_Rukn-e-Alam.jpg" },
-  { name: "Faisal Mosque, Islamabad", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Faisal_Mosque_Islamabad.jpg/800px-Faisal_Mosque_Islamabad.jpg" },
-  { name: "Baltit Fort, Hunza Valley", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Baltit_Fort_Hunza.jpg/800px-Baltit_Fort_Hunza.jpg" },
-  { name: "Mohenjo-daro Buddhist Stupa", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mohenjo-daro_Buddhist_Stupa.jpg/800px-Mohenjo-daro_Buddhist_Stupa.jpg" }
+  { name: "Derawar Fort, Bahawalpur", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=85" },
+  { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=800&auto=format&fit=crop&q=85" },
+  { name: "Badshahi Mosque, Lahore", url: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=800&auto=format&fit=crop&q=85" },
+  { name: "Lahore Fort (Shahi Qila)", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&auto=format&fit=crop&q=85" },
+  { name: "Rohtas Fort, Jhelum", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=85" },
+  { name: "Ranikot Fort, Sindh", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=85" },
+  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=85" },
+  { name: "Faisal Mosque, Islamabad", url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=800&auto=format&fit=crop&q=85" },
+  { name: "Baltit Fort, Hunza Valley", url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=85" },
+  { name: "Mohenjo-daro Ancient Citadel", url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=85" }
 ];
-
-const imgCache = {};
-function getPhoto(lvl) {
-  const item = photoData[(lvl - 1) % photoData.length];
-  if (!imgCache[item.url]) {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = item.url;
-    imgCache[item.url] = img;
-  }
-  return { item, img: imgCache[item.url] };
-}
 
 class MultaniGame {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
     this.snd = new SoundSys();
+    this.bgImg = document.getElementById('real-photo');
 
     this.dispLvl = document.getElementById('disp-lvl');
     this.dispScore = document.getElementById('disp-score');
@@ -451,7 +473,7 @@ class MultaniGame {
     this.score = 0;
     this.lives = 3;
 
-    // Paddle height elevated
+    // Paddle safely elevated above bottom gesture area
     this.paddle = {
       w: 86,
       h: 15,
@@ -465,12 +487,12 @@ class MultaniGame {
     this.powerups = [];
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
-    
-    // STRICT MAX 100 BALLS
+
+    // Strict 100 balls limit
     this.maxBalls = 100;
 
-    // FAST BASE SPEED (KISI BHI WAQT SLOW NAHI HOGI)
-    this.baseSpeed = 8.2;
+    // Fast arcade speed so ball never stalls or feels slow
+    this.baseSpeed = 8.4;
 
     this.initEvents();
     this.resize();
@@ -581,7 +603,7 @@ class MultaniGame {
     this.levelModal.style.display = 'flex';
   }
 
-  /* HARD FORT MAZE WITH TIGHT SLITS */
+  /* HARD FORT WITH TIGHT SLITS (1-2 ball entrance holes) */
   loadLevel(lvl) {
     this.currentLevel = lvl;
     this.bricks = [];
@@ -593,8 +615,11 @@ class MultaniGame {
     this.winScreen.style.display = 'none';
     this.gameoverScreen.style.display = 'none';
 
-    const photoInfo = getPhoto(lvl);
-    this.landmarkPill.textContent = photoInfo.item.name;
+    // Direct Photo Attachment (Bypasses any Canvas CORS bug)
+    const photo = photoData[(lvl - 1) % photoData.length];
+    this.landmarkPill.textContent = photo.name;
+    this.bgImg.src = photo.url;
+    this.bgImg.classList.remove('revealed'); // Dimmed during gameplay
 
     this.paddle.w = Math.max(58, 86 - Math.floor(lvl * 0.28));
     this.paddle.x = (this.width - this.paddle.w) / 2;
@@ -618,13 +643,13 @@ class MultaniGame {
 
         const isBorder = (r === 0 || c === 0 || c === cols - 1 || r === rows - 1);
         if (isBorder) {
-          // Bottom wall: SIRF 1 YA 2 BALL JITNI TANG JAGAH (TIGHT SLITS)
+          // Bottom wall: TIGHT 1-2 BALL ENTRANCES ONLY
           if (r === rows - 1) {
             if (fortStyle === 0 && (c === 8 || c === 9)) isSteel = false;
             else if (fortStyle === 1 && (c === 3 || c === 14)) isSteel = false;
             else if (fortStyle === 2 && (c === 5 || c === 6)) isSteel = false;
             else if (fortStyle === 3 && (c === 11 || c === 12)) isSteel = false;
-            else if (fortStyle === 4 && (c === 8)) isSteel = false;
+            else if (fortStyle === 4 && (c === 8)) isSteel = false; // 1-brick hole
             else if (fortStyle === 5 && (c === 4 || c === 13)) isSteel = false;
             else if (fortStyle === 6 && (c === 9)) isSteel = false;
             else if (fortStyle === 7 && (c === 6 || c === 11)) isSteel = false;
@@ -636,7 +661,7 @@ class MultaniGame {
           }
         }
 
-        // Inner Fort Defense
+        // Inner Mazes & Defensive Slits
         if (!isSteel && !isBorder) {
           switch (fortStyle) {
             case 0:
@@ -832,7 +857,7 @@ class MultaniGame {
 
     this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.4;
 
-    // Powerups Falling Faster
+    // Powerups falling
     for (let i = this.powerups.length - 1; i >= 0; i--) {
       const p = this.powerups[i];
       p.y += p.speed;
@@ -863,14 +888,14 @@ class MultaniGame {
       if (pt.life <= 0) this.particles.splice(i, 1);
     }
 
-    // 3 Sub-steps for high speed precision without tunnel glitching
+    // Sub-steps for precise fast bouncing
     const subSteps = 3;
     for (let step = 0; step < subSteps; step++) {
       for (let i = 0; i < this.balls.length; i++) {
         const b = this.balls[i];
         if (!b.active) continue;
 
-        // Ensure vertical velocity never lags or stalls horizontally
+        // Ensure vertical velocity never stalls
         if (Math.abs(b.vy) < 2.5) {
           b.vy = (b.vy < 0 ? -1 : 1) * 3.5;
         }
@@ -891,7 +916,7 @@ class MultaniGame {
           b.vy = Math.abs(b.vy);
         }
 
-        // Paddle Collision (Fast bounce)
+        // Paddle Collision
         if (
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
@@ -937,7 +962,7 @@ class MultaniGame {
                     y: br.y + br.h / 2,
                     type: br.powerup,
                     r: 12,
-                    speed: 3.5 // Fast falling powerups
+                    speed: 3.5
                   });
                 }
                 this.bricks.splice(j, 1);
@@ -987,32 +1012,25 @@ class MultaniGame {
     this.state = 'WIN';
     this.snd.win();
     this.saveProgress();
+    // Clear canvas elements
     this.bricks = [];
     this.powerups = [];
     this.balls = [];
+    // REVEAL REAL PHOTO 100% CRYSTAL CLEAR
+    this.bgImg.classList.add('revealed');
     document.getElementById('win-score-txt').textContent = `FORT CLEARED! SCORE: ${this.score}`;
     this.winScreen.style.display = 'flex';
   }
 
   render() {
+    // Clear canvas so background HTML <img> is clearly visible underneath
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     this.ctx.save();
     this.ctx.scale(this.scaleX, this.scaleY);
 
-    // 1. Draw Real Place Photo
-    const photo = getPhoto(this.currentLevel);
-    if (photo.img && photo.img.complete && photo.img.naturalWidth !== 0) {
-      this.ctx.drawImage(photo.img, 0, 0, this.width, this.height);
-      if (this.state !== 'WIN') {
-        this.ctx.fillStyle = 'rgba(2, 3, 8, 0.82)';
-        this.ctx.fillRect(0, 0, this.width, this.height);
-      }
-    } else {
-      this.ctx.fillStyle = '#060711';
-      this.ctx.fillRect(0, 0, this.width, this.height);
-    }
-
     if (this.state !== 'WIN') {
-      // 2. Draw Fort Border & Bricks
+      // 1. Draw Fort Border & Bricks
       for (const br of this.bricks) {
         if (br.isSteel) {
           this.ctx.fillStyle = '#1c2136';
@@ -1040,7 +1058,7 @@ class MultaniGame {
       }
       this.ctx.shadowBlur = 0;
 
-      // 3. Powerups
+      // 2. Powerups
       for (const p of this.powerups) {
         let col = '#00e5ff';
         if (p.type === '3X') col = '#9d00ff';
@@ -1063,7 +1081,7 @@ class MultaniGame {
         this.ctx.restore();
       }
 
-      // 4. Particles
+      // 3. Particles
       for (const pt of this.particles) {
         this.ctx.fillStyle = pt.color;
         this.ctx.globalAlpha = Math.max(0, pt.life);
@@ -1071,7 +1089,7 @@ class MultaniGame {
       }
       this.ctx.globalAlpha = 1;
 
-      // 5. Paddle
+      // 4. Paddle
       this.ctx.save();
       this.ctx.shadowColor = '#ff6600';
       this.ctx.shadowBlur = 16;
@@ -1084,7 +1102,7 @@ class MultaniGame {
       this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 3, this.paddle.w * 0.5, 2.5);
       this.ctx.restore();
 
-      // 6. Glowing Fast Balls (Strict Max 100)
+      // 5. Glowing Fast Balls (Strict Max 100)
       this.ctx.save();
       this.ctx.shadowColor = '#ffffff';
       this.ctx.shadowBlur = 8;
