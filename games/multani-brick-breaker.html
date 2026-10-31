@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MULTANI BRICK BREAKER 100</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  body {
+    background-color: #050608;
+    color: #fff;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  #game-wrapper {
+    position: relative;
+    width: 100vw;
+    max-width: 480px;
+    height: 100vh;
+    max-height: 960px;
+    background: #090b10;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 35px rgba(255, 42, 109, 0.25);
+    border: 1px solid #1a2234;
+  }
+  #header {
+    height: 52px;
+    background: linear-gradient(180deg, #121824 0%, #0a0e17 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-bottom: 2px solid #ff2a6d;
+    z-index: 10;
+  }
+  .title-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .title-main {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #ff2a6d;
+    text-shadow: 0 0 8px rgba(255, 42, 109, 0.7);
+  }
+  .title-sub {
+    font-size: 10px;
+    font-weight: 700;
+    color: #05d9e8;
+    letter-spacing: 0.5px;
+  }
+  .stats-group {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .stat-label {
+    font-size: 8px;
+    color: #8892b0;
+    text-transform: uppercase;
+  }
+  .stat-val {
+    color: #fff;
+  }
+  .stat-val.balls { color: #05d9e8; }
+  .stat-val.score { color: #ffb703; }
+  .stat-val.lives { color: #ff2a6d; }
+  .btn-group {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-ctrl {
+    background: #141c2b;
+    border: 1px solid #05d9e8;
+    color: #05d9e8;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(5, 217, 232, 0.3);
+  }
+  .btn-ctrl:active {
+    background: #05d9e8;
+    color: #000;
+  }
+  #canvas-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #place-banner {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid #05d9e8;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: 0 0 10px rgba(5, 217, 232, 0.4);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 6, 8, 0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 20px;
+    text-align: center;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  .modal-title {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .modal-title.win {
+    color: #05d9e8;
+    text-shadow: 0 0 15px rgba(5, 217, 232, 0.8);
+  }
+  .modal-title.loss {
+    color: #ff2a6d;
+    text-shadow: 0 0 15px rgba(255, 42, 109, 0.8);
+  }
+  .modal-desc {
+    font-size: 13px;
+    color: #a0aec0;
+    margin-bottom: 20px;
+  }
+  .modal-btn {
+    background: #ff2a6d;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 42, 109, 0.6);
+    margin: 5px;
+  }
+  .modal-btn.sec {
+    background: transparent;
+    border: 1px solid #05d9e8;
+    color: #05d9e8;
+    box-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
+  }
+  #level-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 100%;
+    padding: 10px;
+  }
+  .lvl-tile {
+    background: #141c2b;
+    border: 1px solid #2a374f;
+    border-radius: 6px;
+    padding: 10px 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+  }
+  .lvl-tile.unlocked {
+    border-color: #05d9e8;
+    color: #05d9e8;
+  }
+  .lvl-tile.current {
+    background: #ff2a6d;
+    border-color: #ff2a6d;
+    color: #fff;
+  }
+  .lvl-tile.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div id="game-wrapper">
+  <div id="header">
+    <div class="title-group">
+      <div class="title-main">MULTANI BRICK BREAKER</div>
+      <div class="title-sub">100 FORTS</div>
+    </div>
+    <div class="stats-group">
+      <div class="stat-item"><span class="stat-label">Lvl</span><span class="stat-val" id="disp-lvl">1</span></div>
+      <div class="stat-item"><span class="stat-label">Score</span><span class="stat-val score" id="disp-score">0</span></div>
+      <div class="stat-item"><span class="stat-label">Balls</span><span class="stat-val balls" id="disp-balls">1</span></div>
+      <div class="stat-item"><span class="stat-label">Lives</span><span class="stat-val lives" id="disp-lives">❤❤❤</span></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn-ctrl" id="btn-sound">SFX: ON</button>
+      <button class="btn-ctrl" id="btn-levels">LVLS</button>
+      <button class="btn-ctrl" id="btn-pause">II</button>
+    </div>
+  </div>
+
+  <div id="canvas-container">
+    <div id="place-banner">Multan Landmark</div>
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <div class="modal-overlay" id="end-modal">
+    <div class="modal-title" id="end-title">LEVEL COMPLETE!</div>
+    <div class="modal-desc" id="end-desc">Multan Fort Cleared</div>
+    <div>
+      <button class="modal-btn" id="modal-act-btn">NEXT LEVEL</button>
+      <button class="modal-btn sec" id="modal-select-btn">SELECT LEVEL</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="level-picker-modal">
+    <div class="modal-title win">SELECT LEVEL</div>
+    <div class="modal-desc">100 Fortified Chambers of Multan</div>
+    <div id="level-modal-grid"></div>
+    <button class="modal-btn sec" style="margin-top:15px;" id="lvl-picker-close">CLOSE</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const LANDMARKS = [
+    { title: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Tomb_of_Shah_Rukn-e-Alam_Multan_Pakistan.jpg/800px-Tomb_of_Shah_Rukn-e-Alam_Multan_Pakistan.jpg" },
+    { title: "Multani Runner Custom Heritage", url: "https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg" },
+    { title: "Shrine of Hazrat Bahauddin Zakariya, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Tomb_of_Baha-ud-din_Zakariya_Multan_Punjab_Pakistan.jpg/800px-Tomb_of_Baha-ud-din_Zakariya_Multan_Punjab_Pakistan.jpg" },
+    { title: "Ghanta Ghar Clock Tower, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Ghanta_Ghar_Multan.jpg/800px-Ghanta_Ghar_Multan.jpg" },
+    { title: "Minar-e-Pakistan, Lahore", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Minar-e-Pakistan_Lahore.jpg/800px-Minar-e-Pakistan_Lahore.jpg" },
+    { title: "Faisal Mosque, Islamabad", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Faisal_Mosque_Islamabad_Pakistan.jpg/800px-Faisal_Mosque_Islamabad_Pakistan.jpg" },
+    { title: "Tomb of Shah Shams Sabzwari, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Tomb_of_Shah_Shams_Sabzwari.jpg/800px-Tomb_of_Shah_Shams_Sabzwari.jpg" },
+    { title: "Fort Kohna Qasim Bagh, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Qasim_Fort_Multan.jpg/800px-Qasim_Fort_Multan.jpg" }
+  ];
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let sfxEnabled = true;
+
+  function playTone(freq, type, duration, vol = 0.1) {
+    if (!sfxEnabled || !audioCtx) return;
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e){}
+  }
+
+  const sfxHitBrick = () => playTone(540, 'triangle', 0.05, 0.08);
+  const sfxHitWall = () => playTone(220, 'square', 0.03, 0.04);
+  const sfxHitPaddle = () => playTone(440, 'sine', 0.08, 0.1);
+  const sfxPowerup = () => {
+    playTone(600, 'sine', 0.08, 0.12);
+    setTimeout(() => playTone(900, 'sine', 0.12, 0.15), 60);
+  };
+  const sfxWin = () => {
+    [400, 500, 600, 800].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'triangle', 0.15, 0.15), i * 90);
+    });
+  };
+
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const container = document.getElementById('canvas-container');
+  const banner = document.getElementById('place-banner');
+
+  const dispLvl = document.getElementById('disp-lvl');
+  const dispScore = document.getElementById('disp-score');
+  const dispBalls = document.getElementById('disp-balls');
+  const dispLives = document.getElementById('disp-lives');
+  const endModal = document.getElementById('end-modal');
+  const endTitle = document.getElementById('end-title');
+  const endDesc = document.getElementById('end-desc');
+  const modalActBtn = document.getElementById('modal-act-btn');
+  const modalSelectBtn = document.getElementById('modal-select-btn');
+  const lvlPickerModal = document.getElementById('level-picker-modal');
+  const lvlGrid = document.getElementById('level-modal-grid');
+  const lvlPickerClose = document.getElementById('lvl-picker-close');
+  const btnPause = document.getElementById('btn-pause');
+  const btnSound = document.getElementById('btn-sound');
+  const btnLevels = document.getElementById('btn-levels');
+
+  let W = 400, H = 700;
+  let currentLevel = parseInt(localStorage.getItem('mbb_lvl') || '1');
+  let maxUnlocked = parseInt(localStorage.getItem('mbb_max_lvl') || '1');
+  let score = parseInt(localStorage.getItem('mbb_score') || '0');
+  let lives = 3;
+  let isPaused = false;
+  let gameState = 'AIMING';
+
+  let currentImage = new Image();
+  currentImage.crossOrigin = 'anonymous';
+
+  function loadLevelImage(lvl) {
+    const info = LANDMARKS[(lvl - 1) % LANDMARKS.length];
+    currentImage.src = info.url;
+    banner.innerText = info.title;
+    banner.style.opacity = '1';
+    setTimeout(() => { banner.style.opacity = '0'; }, 3500);
+  }
+
+  const PADDLE = {
+    x: 0,
+    y: 0,
+    w: 90,
+    h: 14,
+    speed: 0,
+    targetX: 0
+  };
+
+  const BALL_RADIUS = 4.2;
+  const BASE_SPEED = 6.2;
+  const MAX_BALLS = 180;
+  let balls = [];
+
+  class Ball {
+    constructor(x, y, vx, vy) {
+      this.x = x;
+      this.y = y;
+      const mag = Math.hypot(vx, vy) || 1;
+      this.vx = (vx / mag) * BASE_SPEED;
+      this.vy = (vy / mag) * BASE_SPEED;
+      this.stuckTimer = 0;
+      this.lastY = y;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (Math.abs(this.y - this.lastY) < 1.0) {
+        this.stuckTimer++;
+        if (this.stuckTimer > 75) {
+          this.vy += (Math.random() > 0.5 ? 1.5 : -1.5);
+          const mag = Math.hypot(this.vx, this.vy);
+          this.vx = (this.vx / mag) * BASE_SPEED;
+          this.vy = (this.vy / mag) * BASE_SPEED;
+          this.stuckTimer = 0;
+        }
+      } else {
+        this.stuckTimer = 0;
+      }
+      this.lastY = this.y;
+    }
+  }
+
+  const GRID_COLS = 32;
+  const GRID_ROWS = 40;
+  let cellW = 0;
+  let cellH = 0;
+  let gridOffsetX = 0;
+  let gridOffsetY = 0;
+  let grid = [];
+
+  const CELL_EMPTY = 0;
+  const CELL_BORDER = 1;
+  const CELL_BRICK = 2;
+
+  let bubbles = [];
+  let particles = [];
+
+  function resize() {
+    W = container.clientWidth;
+    H = container.clientHeight;
+    canvas.width = W;
+    canvas.height = H;
+
+    cellW = Math.floor((W - 20) / GRID_COLS);
+    cellH = Math.floor((H * 0.58) / GRID_ROWS);
+    gridOffsetX = Math.floor((W - (cellW * GRID_COLS)) / 2);
+    gridOffsetY = 15;
+
+    PADDLE.y = H - 45;
+    if (gameState === 'AIMING' && balls.length === 0) {
+      PADDLE.x = W / 2 - PADDLE.w / 2;
+    }
+  }
+
+  function generateFortress(lvl) {
+    grid = [];
+    for (let r = 0; r < GRID_ROWS; r++) {
+      grid[r] = new Uint8Array(GRID_COLS);
+    }
+
+    const maxR = GRID_ROWS - 1;
+    const maxC = GRID_COLS - 1;
+
+    for (let c = 0; c <= maxC; c++) {
+      grid[0][c] = CELL_BORDER;
+      grid[maxR][c] = CELL_BORDER;
+    }
+    for (let r = 0; r <= maxR; r++) {
+      grid[r][0] = CELL_BORDER;
+      grid[maxR][c = maxC] = CELL_BORDER;
+      grid[r][maxC] = CELL_BORDER;
+    }
+
+    const gateWidth = 4;
+    const gateStart = Math.floor((GRID_COLS / 2) - (gateWidth / 2));
+    for (let g = gateStart; g < gateStart + gateWidth; g++) {
+      grid[maxR][g] = CELL_EMPTY;
+    }
+
+    const corridorX1 = gateStart - 1;
+    const corridorX2 = gateStart + gateWidth;
+    const corridorLen = 14;
+    for (let r = maxR - 1; r >= maxR - corridorLen; r--) {
+      grid[r][corridorX1] = CELL_BORDER;
+      grid[r][corridorX2] = CELL_BORDER;
+      for (let g = gateStart; g < gateStart + gateWidth; g++) {
+        grid[r][g] = CELL_EMPTY;
+      }
+    }
+
+    const chamberTop = maxR - corridorLen - 1;
+    const chamberHalfW = 10;
+    for (let c = Math.max(2, gateStart - chamberHalfW); c <= Math.min(maxC - 2, gateStart + gateWidth + chamberHalfW); c++) {
+      if (c < gateStart || c >= gateStart + gateWidth) {
+        grid[chamberTop + 1][c] = CELL_BORDER;
+      }
+    }
+
+    const patternType = lvl % 5;
+    for (let r = 2; r < chamberTop - 2; r += 5) {
+      const openLeft = (r / 5) % 2 === 0;
+      for (let c = 2; c < maxC - 2; c++) {
+        if (openLeft && c > 8) grid[r][c] = CELL_BORDER;
+        else if (!openLeft && c < maxC - 8) grid[r][c] = CELL_BORDER;
+      }
+    }
+
+    let brickCount = 0;
+    for (let r = 1; r < maxR; r++) {
+      for (let c = 1; c < maxC; c++) {
+        if (grid[r][c] === CELL_EMPTY) {
+          if (r > maxR - corridorLen - 2 && c >= corridorX1 && c <= corridorX2) {
+            continue;
+          }
+          grid[r][c] = CELL_BRICK;
+          brickCount++;
+        }
+      }
+    }
+    return brickCount;
+  }
+
+  let totalBricks = 0;
+  let remainingBricks = 0;
+
+  function initLevel(lvl) {
+    currentLevel = lvl;
+    localStorage.setItem('mbb_lvl', currentLevel);
+    dispLvl.innerText = currentLevel;
+    balls = [];
+    bubbles = [];
+    particles = [];
+    totalBricks = generateFortress(lvl);
+    remainingBricks = totalBricks;
+    loadLevelImage(lvl);
+
+    gameState = 'AIMING';
+    PADDLE.x = (W - PADDLE.w) / 2;
+    PADDLE.targetX = PADDLE.x;
+    dispBalls.innerText = '1';
+    updateHUD();
+  }
+
+  function launchBall(targetX, targetY) {
+    if (gameState !== 'AIMING') return;
+    const startX = PADDLE.x + PADDLE.w / 2;
+    const startY = PADDLE.y - BALL_RADIUS - 2;
+    const dx = targetX - startX;
+    const dy = targetY - startY;
+    if (dy >= -20) return;
+
+    balls.push(new Ball(startX, startY, dx, dy));
+    gameState = 'PLAYING';
+    sfxHitPaddle();
+  }
+
+  function triggerBubbleDrop(gx, gy) {
+    if (bubbles.length >= 6) return;
+    if (Math.random() < 0.075) {
+      const roll = Math.random();
+      let multi = 2;
+      let col = '#05d9e8';
+
+      if (roll < 0.40) { multi = 2; col = '#05d9e8'; }
+      else if (roll < 0.70) { multi = 3; col = '#7209b7'; }
+      else if (roll < 0.90) { multi = 4; col = '#f72585'; }
+      else if (roll < 0.98) { multi = 5; col = '#ffb703'; }
+      else { multi = 10; col = '#38b000'; }
+
+      const bx = gridOffsetX + gx * cellW + cellW / 2;
+      const by = gridOffsetY + gy * cellH + cellH / 2;
+      bubbles.push({
+        x: bx,
+        y: by,
+        vy: 1.8 + Math.random() * 0.7,
+        multi: multi,
+        col: col,
+        radius: 12
+      });
+    }
+  }
+
+  function multiplyBalls(factor) {
+    if (balls.length === 0) return;
+    sfxPowerup();
+    const countToAdd = Math.min(MAX_BALLS - balls.length, balls.length * (factor - 1));
+    const newOnes = [];
+    for (let i = 0; i < countToAdd; i++) {
+      const src = balls[i % balls.length];
+      const ang = Math.random() * Math.PI * 2;
+      newOnes.push(new Ball(src.x, src.y, Math.cos(ang) * BASE_SPEED, Math.sin(ang) * BASE_SPEED));
+    }
+    balls.push(...newOnes);
+    dispBalls.innerText = balls.length;
+  }
+
+  function spawnParticles(x, y, col, num = 4) {
+    for (let i = 0; i < num; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.random() * 3 + 1;
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s,
+        life: 1.0,
+        decay: 0.05 + Math.random() * 0.05,
+        col: col
+      });
+    }
+  }
+
+  function update() {
+    if (isPaused) return;
+
+    PADDLE.x += (PADDLE.targetX - PADDLE.x) * 0.35;
+    if (PADDLE.x < 5) PADDLE.x = 5;
+    if (PADDLE.x + PADDLE.w > W - 5) PADDLE.x = W - 5 - PADDLE.w;
+
+    for (let i = bubbles.length - 1; i >= 0; i--) {
+      const b = bubbles[i];
+      b.y += b.vy;
+
+      if (b.y + b.radius >= PADDLE.y && b.y - b.radius <= PADDLE.y + PADDLE.h) {
+        if (b.x >= PADDLE.x && b.x <= PADDLE.x + PADDLE.w) {
+          multiplyBalls(b.multi);
+          spawnParticles(b.x, b.y, b.col, 8);
+          bubbles.splice(i, 1);
+          continue;
+        }
+      }
+      if (b.y > H + 20) bubbles.splice(i, 1);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    if (gameState === 'PLAYING') {
+      const gridW = GRID_COLS * cellW;
+      const gridH = GRID_ROWS * cellH;
+
+      for (let bi = balls.length - 1; bi >= 0; bi--) {
+        const ball = balls[bi];
+        ball.update();
+
+        if (ball.x - BALL_RADIUS < 0) {
+          ball.x = BALL_RADIUS;
+          ball.vx = Math.abs(ball.vx);
+          sfxHitWall();
+        } else if (ball.x + BALL_RADIUS > W) {
+          ball.x = W - BALL_RADIUS;
+          ball.vx = -Math.abs(ball.vx);
+          sfxHitWall();
+        }
+        if (ball.y - BALL_RADIUS < 0) {
+          ball.y = BALL_RADIUS;
+          ball.vy = Math.abs(ball.vy);
+          sfxHitWall();
+        }
+
+        if (ball.y + BALL_RADIUS >= PADDLE.y &&
+            ball.y - BALL_RADIUS <= PADDLE.y + PADDLE.h &&
+            ball.x >= PADDLE.x - 2 &&
+            ball.x <= PADDLE.x + PADDLE.w + 2 &&
+            ball.vy > 0) {
+
+          const hitOffset = (ball.x - (PADDLE.x + PADDLE.w / 2)) / (PADDLE.w / 2);
+          const angle = hitOffset * (Math.PI / 3);
+          ball.vx = BASE_SPEED * Math.sin(angle);
+          ball.vy = -BASE_SPEED * Math.cos(angle);
+          ball.y = PADDLE.y - BALL_RADIUS - 1;
+          sfxHitPaddle();
+        }
+
+        if (ball.x >= gridOffsetX && ball.x < gridOffsetX + gridW &&
+            ball.y >= gridOffsetY && ball.y < gridOffsetY + gridH) {
+
+          const gx = Math.floor((ball.x - gridOffsetX) / cellW);
+          const gy = Math.floor((ball.y - gridOffsetY) / cellH);
+
+          if (gx >= 0 && gx < GRID_COLS && gy >= 0 && gy < GRID_ROWS) {
+            const cell = grid[gy][gx];
+            if (cell !== CELL_EMPTY) {
+              const cellLeft = gridOffsetX + gx * cellW;
+              const cellTop = gridOffsetY + gy * cellH;
+              const overlapL = Math.abs(ball.x - cellLeft);
+              const overlapR = Math.abs(cellLeft + cellW - ball.x);
+              const overlapT = Math.abs(ball.y - cellTop);
+              const overlapB = Math.abs(cellTop + cellH - ball.y);
+              const minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
+
+              if (minOverlap === overlapL || minOverlap === overlapR) {
+                ball.vx *= -1;
+              } else {
+                ball.vy *= -1;
+              }
+
+              if (cell === CELL_BRICK) {
+                grid[gy][gx] = CELL_EMPTY;
+                remainingBricks--;
+                score += 100;
+                dispScore.innerText = score;
+                sfxHitBrick();
+                triggerBubbleDrop(gx, gy);
+                spawnParticles(ball.x, ball.y, '#ff2a6d', 4);
+
+                if (remainingBricks <= 0) {
+                  onLevelWin();
+                  return;
+                }
+              } else if (cell === CELL_BORDER) {
+                sfxHitWall();
+              }
+            }
+          }
+        }
+
+        if (ball.y > H + 10) {
+          balls.splice(bi, 1);
+        }
+      }
+
+      dispBalls.innerText = balls.length;
+
+      if (balls.length === 0) {
+        lives--;
+        updateHUD();
+        if (lives <= 0) {
+          onGameOver();
+        } else {
+          gameState = 'AIMING';
+        }
+      }
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#090b10';
+    ctx.fillRect(0, 0, W, H);
+
+    const gw = GRID_COLS * cellW;
+    const gh = GRID_ROWS * cellH;
+
+    if (currentImage.complete && currentImage.naturalWidth !== 0) {
+      ctx.save();
+      ctx.drawImage(currentImage, gridOffsetX, gridOffsetY, gw, gh);
+      ctx.restore();
+    }
+
+    for (let r = 0; r < GRID_ROWS; r++) {
+      for (let c = 0; c < GRID_COLS; c++) {
+        const type = grid[r][c];
+        const x = gridOffsetX + c * cellW;
+        const y = gridOffsetY + r * cellH;
+
+        if (type === CELL_BORDER) {
+          ctx.fillStyle = '#1e2638';
+          ctx.fillRect(x, y, cellW, cellH);
+          ctx.strokeStyle = '#0d131f';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, cellW, cellH);
+        } else if (type === CELL_BRICK) {
+          const rowMod = (r + c) % 3;
+          ctx.fillStyle = rowMod === 0 ? '#ff2a6d' : (rowMod === 1 ? '#ffb703' : '#05d9e8');
+          ctx.fillRect(x, y, cellW, cellH);
+          ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, cellW, cellH);
+        }
+      }
+    }
+
+    for (const b of bubbles) {
+      ctx.save();
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = b.col;
+      ctx.fillStyle = b.col;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(b.multi + 'X', b.x, b.y);
+      ctx.restore();
+    }
+
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.col;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#05d9e8';
+    ctx.fillStyle = '#fff';
+    for (const ball of balls) {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#ffb703';
+    ctx.fillStyle = '#ff7b00';
+    ctx.beginPath();
+    ctx.roundRect(PADDLE.x, PADDLE.y, PADDLE.w, PADDLE.h, 6);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    if (gameState === 'AIMING') {
+      const startX = PADDLE.x + PADDLE.w / 2;
+      const startY = PADDLE.y - BALL_RADIUS - 2;
+
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(startX, startY, BALL_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(5, 217, 232, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(startX, startY - 100);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function updateHUD() {
+    dispScore.innerText = score;
+    dispBalls.innerText = balls.length || 1;
+    dispLives.innerText = '❤'.repeat(Math.max(0, lives));
+  }
+
+  function onLevelWin() {
+    sfxWin();
+    gameState = 'PAUSED';
+    if (currentLevel >= maxUnlocked && maxUnlocked < 100) {
+      maxUnlocked = currentLevel + 1;
+      localStorage.setItem('mbb_max_lvl', maxUnlocked);
+    }
+    localStorage.setItem('mbb_score', score);
+
+    endTitle.className = 'modal-title win';
+    endTitle.innerText = 'LEVEL COMPLETE!';
+    endDesc.innerText = `Chamber ${currentLevel} of Multan Fort successfully cleared!`;
+    modalActBtn.innerText = 'NEXT LEVEL';
+    modalActBtn.onclick = () => {
+      endModal.classList.remove('active');
+      initLevel(currentLevel + 1);
+    };
+    endModal.classList.add('active');
+  }
+
+  function onGameOver() {
+    gameState = 'PAUSED';
+    endTitle.className = 'modal-title loss';
+    endTitle.innerText = 'DEFENSE FAILED';
+    endDesc.innerText = `You breached ${currentLevel - 1} chambers of Multan!`;
+    modalActBtn.innerText = 'TRY AGAIN';
+    modalActBtn.onclick = () => {
+      endModal.classList.remove('active');
+      lives = 3;
+      initLevel(currentLevel);
+    };
+    endModal.classList.add('active');
+  }
+
+  function openLevelPicker() {
+    lvlGrid.innerHTML = '';
+    for (let i = 1; i <= 100; i++) {
+      const tile = document.createElement('div');
+      tile.className = 'lvl-tile';
+      tile.innerText = i;
+      if (i === currentLevel) tile.classList.add('current');
+      else if (i <= maxUnlocked) tile.classList.add('unlocked');
+      else tile.classList.add('locked');
+
+      tile.onclick = () => {
+        if (i <= maxUnlocked) {
+          lvlPickerModal.classList.remove('active');
+          initLevel(i);
+        }
+      };
+      lvlGrid.appendChild(tile);
+    }
+    lvlPickerModal.classList.add('active');
+  }
+
+  let isTouchDragging = false;
+  function handlePointer(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    PADDLE.targetX = x - PADDLE.w / 2;
+
+    if (gameState === 'AIMING' && !isTouchDragging) {
+      launchBall(x, y);
+    }
+  }
+
+  window.addEventListener('touchstart', (e) => {
+    isTouchDragging = true;
+    handlePointer(e);
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    handlePointer(e);
+  }, { passive: false });
+
+  window.addEventListener('touchend', () => {
+    isTouchDragging = false;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    handlePointer(e);
+  });
+
+  window.addEventListener('click', (e) => {
+    if (gameState === 'AIMING') {
+      const rect = canvas.getBoundingClientRect();
+      launchBall(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  });
+
+  btnSound.onclick = () => {
+    sfxEnabled = !sfxEnabled;
+    btnSound.innerText = sfxEnabled ? 'SFX: ON' : 'SFX: OFF';
+  };
+
+  btnPause.onclick = () => {
+    isPaused = !isPaused;
+    btnPause.innerText = isPaused ? '▶' : 'II';
+  };
+
+  btnLevels.onclick = openLevelPicker;
+  modalSelectBtn.onclick = () => {
+    endModal.classList.remove('active');
+    openLevelPicker();
+  };
+  lvlPickerClose.onclick = () => lvlPickerModal.classList.remove('active');
+
+  window.addEventListener('resize', resize);
+  resize();
+  initLevel(currentLevel);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
