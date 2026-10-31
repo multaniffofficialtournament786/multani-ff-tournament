@@ -255,15 +255,17 @@ function injectVipLoaderStyles() {
     }
 
     .mff-rotating-coin {
-      width: 120px;
-      height: 120px;
+      width: 118px;
+      height: 118px;
       object-fit: cover;
       border-radius: 50%;
       position: relative;
       z-index: 2;
+      display: block;
       animation: mffCoinTurn 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
       box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
-      border: 2px solid rgba(0, 240, 255, 0.5);
+      border: 2px solid rgba(0, 240, 255, 0.7);
+      background-color: #030a13;
     }
 
     /* Typography */
@@ -383,7 +385,10 @@ export const Loader = {
             <div class="mff-logo-stage">
               <div class="mff-outer-ring"></div>
               <div class="mff-glow-disc"></div>
-              <img src="1793357792725.png" alt="Logo" class="mff-rotating-coin" onerror="this.src='./1793357792725.png'" />
+              <img id="mff-logo-img" 
+                   src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png" 
+                   alt="Multani FF Logo" 
+                   class="mff-rotating-coin" />
             </div>
             <h1 class="mff-brand-title">MULTANI FF</h1>
             <span class="mff-sub-badge">OFFICIAL TOURNAMENT ARENA</span>
@@ -398,6 +403,24 @@ export const Loader = {
           </div>
         `;
         document.body.appendChild(splash);
+
+        // Fallback paths agar raw link slow ho
+        const imgEl = document.getElementById('mff-logo-img');
+        if (imgEl) {
+          const sources = [
+            'https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png',
+            '1793357792725.png',
+            './1793357792725.png',
+            'multaniwebsite/1793357792725.png'
+          ];
+          let curIdx = 0;
+          imgEl.onerror = () => {
+            curIdx++;
+            if (curIdx < sources.length) {
+              imgEl.src = sources[curIdx];
+            }
+          };
+        }
       } else {
         const txtEl = document.getElementById('mff-loader-text');
         if (txtEl) txtEl.innerText = text;
