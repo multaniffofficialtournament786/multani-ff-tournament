@@ -18,29 +18,29 @@
     height: 100%;
     overflow: hidden;
     background-color: #050508;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #fff;
   }
   #game-container {
     position: relative;
     width: 100%;
     height: 100%;
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
     background: #000;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
-  /* Top Dashboard */
+  /* Top HUD Dashboard */
   #header {
-    height: 72px;
-    background: #080811;
+    height: 66px;
+    background: #070712;
     border-bottom: 2px solid #ff007f;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 10px;
+    padding: 2px 10px;
     z-index: 10;
   }
   .title-box {
@@ -51,9 +51,9 @@
     font-size: 13px;
     font-weight: 900;
     color: #ff007f;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     line-height: 1.1;
-    text-shadow: 0 0 8px rgba(255,0,127,0.7);
+    text-shadow: 0 0 8px rgba(255,0,127,0.8);
   }
   .title-sub {
     font-size: 9px;
@@ -72,28 +72,28 @@
   }
   .stat-label {
     font-size: 8px;
-    color: #8888aa;
-    font-weight: bold;
+    color: #8fa0be;
+    font-weight: 800;
   }
   .stat-val {
     font-size: 13px;
     font-weight: 900;
   }
-  .val-lvl { color: #fff; }
+  .val-lvl { color: #ffffff; }
   .val-score { color: #ffcc00; }
   .val-balls { color: #00e5ff; }
-  .val-lives { color: #ff0055; letter-spacing: 1px; font-size: 11px; }
+  .val-lives { color: #ff0055; font-size: 11px; letter-spacing: 1px; }
 
   .header-actions {
     display: flex;
     gap: 4px;
   }
   .btn-hdr {
-    background: #0d1b2a;
+    background: #0d162b;
     border: 1px solid #00e5ff;
     color: #00e5ff;
-    border-radius: 4px;
-    padding: 5px 7px;
+    border-radius: 5px;
+    padding: 6px 8px;
     font-size: 10px;
     font-weight: bold;
     cursor: pointer;
@@ -103,13 +103,31 @@
     color: #000;
   }
 
+  /* Landmark Name Pill */
+  #landmark-pill {
+    position: absolute;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid #00e5ff;
+    color: #fff;
+    padding: 3px 14px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    z-index: 5;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
   /* Canvas Area */
   #canvas-wrapper {
     position: relative;
     flex: 1;
     width: 100%;
     height: 100%;
-    overflow: hidden;
   }
   canvas {
     display: block;
@@ -117,47 +135,39 @@
     height: 100%;
   }
 
-  /* Overlays */
-  .overlay {
+  /* Level Clear Overlay (Background Image Fully Revealed) */
+  #win-screen {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     display: none;
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    padding-bottom: 70px;
-    z-index: 50;
-    pointer-events: auto;
-  }
-  #win-screen {
+    padding-bottom: 50px;
     background: transparent;
+    z-index: 50;
   }
   .win-card {
-    background: rgba(8, 8, 20, 0.85);
-    border: 2px solid #00e5ff;
-    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
-    border-radius: 12px;
-    padding: 18px 24px;
+    background: rgba(5, 5, 15, 0.85);
+    border: 2px solid #39ff14;
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.5);
+    border-radius: 14px;
+    padding: 14px 26px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     backdrop-filter: blur(4px);
   }
   .win-card h2 {
     color: #39ff14;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 900;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-    text-shadow: 0 0 10px #39ff14;
+    letter-spacing: 1.5px;
   }
   .win-card p {
     font-size: 14px;
     color: #ffcc00;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-top: 4px;
   }
 
   .btn-huge {
@@ -170,48 +180,52 @@
     background: linear-gradient(90deg, #ff007f, #ffaa00);
     border: none;
     border-radius: 35px;
-    box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+    box-shadow: 0 0 25px rgba(255, 0, 127, 0.9);
     cursor: pointer;
     text-transform: uppercase;
-    animation: pulseBtn 1.2s infinite alternate;
+    animation: btnPulse 1.2s infinite alternate;
   }
-  @keyframes pulseBtn {
+  @keyframes btnPulse {
     0% { transform: scale(0.97); }
     100% { transform: scale(1.03); }
   }
 
   #gameover-screen {
-    background: rgba(0, 0, 0, 0.88);
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
     justify-content: center;
-    padding-bottom: 0;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 60;
   }
   #gameover-screen h1 {
-    font-size: 34px;
+    font-size: 36px;
     color: #ff0044;
     font-weight: 900;
-    text-shadow: 0 0 15px #ff0044;
-    margin-bottom: 15px;
+    text-shadow: 0 0 20px #ff0044;
+    margin-bottom: 10px;
   }
 
-  /* Level Selection Modal */
   #level-modal {
     position: absolute;
     inset: 0;
-    background: rgba(5,5,10,0.96);
+    background: rgba(5, 7, 16, 0.98);
     z-index: 100;
     display: none;
     flex-direction: column;
-    padding: 15px;
+    padding: 16px;
   }
   #level-modal header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
   #level-modal h3 {
     color: #00e5ff;
-    font-size: 18px;
+    font-size: 17px;
   }
   .grid-levels {
     flex: 1;
@@ -219,12 +233,12 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
   }
   .lvl-btn {
     aspect-ratio: 1;
-    background: #111422;
-    border: 1px solid #333a56;
+    background: #0d1222;
+    border: 1px solid #28334e;
     color: #fff;
     font-size: 14px;
     font-weight: bold;
@@ -240,22 +254,21 @@
     color: #fff;
   }
   .lvl-btn.locked {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: not-allowed;
   }
 
-  /* Start instructions hint */
   #tap-hint {
     position: absolute;
     bottom: 240px;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 1px;
     font-weight: bold;
-    background: rgba(0,0,0,0.6);
-    padding: 5px 14px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 6px 16px;
     border-radius: 20px;
     border: 1px dashed #00e5ff;
     pointer-events: none;
@@ -269,7 +282,6 @@
 </head>
 <body>
 <div id="game-container">
-  <!-- Top Arcade Dashboard -->
   <header id="header">
     <div class="title-box">
       <div class="title-main">MULTANI</div>
@@ -301,33 +313,30 @@
     </div>
   </header>
 
-  <!-- Gameplay Canvas -->
   <div id="canvas-wrapper">
+    <div id="landmark-pill">Derawar Fort, Bahawalpur</div>
     <canvas id="gameCanvas"></canvas>
     <div id="tap-hint">TAP TO LAUNCH BALL</div>
 
-    <!-- Win Screen: Background photo clearly visible + Next Level button below -->
-    <div class="overlay" id="win-screen">
+    <div id="win-screen">
       <div class="win-card">
-        <h2>LEVEL CLEAR!</h2>
-        <p id="win-score-txt">SCORE: 2500</p>
-        <span style="font-size:12px; color:#aaa;">Photo Unlocked</span>
+        <h2>FORT DESTROYED!</h2>
+        <p id="win-score-txt">SCORE: 0</p>
+        <span style="font-size:11px; color:#aaa;">Photo Fully Revealed</span>
       </div>
       <button class="btn-huge" id="btn-next">NEXT LEVEL</button>
     </div>
 
-    <!-- Game Over Screen -->
-    <div class="overlay" id="gameover-screen">
+    <div id="gameover-screen">
       <h1>GAME OVER</h1>
-      <p style="color:#aaa; margin-bottom:20px; font-size:15px;">Target missed. Try again!</p>
+      <p style="color:#aaa; margin-bottom:20px;">Fort defended by enemies!</p>
       <button class="btn-huge" id="btn-retry" style="background:#ff0055; color:#fff;">RESTART LEVEL</button>
     </div>
 
-    <!-- Level Selection Grid -->
     <div id="level-modal">
       <header>
-        <h3>SELECT LEVEL (1 - 100)</h3>
-        <button class="btn-hdr" id="btn-close-lvl" style="padding:6px 14px;">✕</button>
+        <h3>SELECT FORT LEVEL (1 - 100)</h3>
+        <button class="btn-hdr" id="btn-close-lvl" style="padding:6px 12px;">✕</button>
       </header>
       <div class="grid-levels" id="grid-levels"></div>
     </div>
@@ -335,9 +344,6 @@
 </div>
 
 <script>
-/* ==========================================================================
-   AUDIO SYNTHESIZER (No outside MP3 needed)
-   ========================================================================== */
 class SoundSys {
   constructor() {
     this.ctx = null;
@@ -364,7 +370,7 @@ class SoundSys {
       if (endFreq) {
         osc.frequency.exponentialRampToValueAtTime(Math.max(10, endFreq), this.ctx.currentTime + duration);
       }
-      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -373,58 +379,52 @@ class SoundSys {
     } catch (e) {}
   }
   hitPaddle() { this.playTone(320, 'square', 0.08, 480); }
-  hitBrick() { this.playTone(550, 'sine', 0.06, 200); }
-  powerup() {
-    this.playTone(300, 'triangle', 0.25, 900);
-  }
+  hitBrick() { this.playTone(550, 'sine', 0.06, 220); }
+  hitSteel() { this.playTone(180, 'square', 0.05, 110); }
+  powerup() { this.playTone(320, 'triangle', 0.22, 950); }
   win() {
-    [400, 520, 660, 880].forEach((f, i) => {
-      setTimeout(() => this.playTone(f, 'sine', 0.2, f * 1.2), i * 110);
+    [440, 554, 659, 880].forEach((f, i) => {
+      setTimeout(() => this.playTone(f, 'sine', 0.2, f * 1.2), i * 120);
     });
   }
   over() {
-    [320, 260, 200, 140].forEach((f, i) => {
-      setTimeout(() => this.playTone(f, 'sawtooth', 0.18, f * 0.7), i * 100);
+    [300, 240, 180, 120].forEach((f, i) => {
+      setTimeout(() => this.playTone(f, 'sawtooth', 0.16, f * 0.7), i * 90);
     });
   }
 }
 
-/* ==========================================================================
-   BACKGROUND PHOTO MANAGER (Photos load behind bricks)
-   ========================================================================== */
-const photoUrls = [
-  // Curated high quality neon sci-fi / arcade portrait backgrounds
-  "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80"
+const photoData = [
+  { name: "Derawar Fort, Cholistan Desert", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80" },
+  { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=600&auto=format&fit=crop&q=80" },
+  { name: "Badshahi Mosque, Lahore", url: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=600&auto=format&fit=crop&q=80" },
+  { name: "Lahore Fort (Shahi Qila)", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&auto=format&fit=crop&q=80" },
+  { name: "Rohtas Fort, Jhelum", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80" },
+  { name: "Ranikot Fort (Great Wall of Sindh)", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80" },
+  { name: "Faisal Mosque, Islamabad", url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=600&auto=format&fit=crop&q=80" },
+  { name: "Baltit Fort, Hunza Valley", url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" },
+  { name: "Mohenjo-daro Ancient Citadel", url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80" }
 ];
 
-const bgImages = {};
-function preloadPhoto(level) {
-  const url = photoUrls[(level - 1) % photoUrls.length];
-  if (!bgImages[url]) {
+const imgCache = {};
+function getPhoto(lvl) {
+  const item = photoData[(lvl - 1) % photoData.length];
+  if (!imgCache[item.url]) {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = url;
-    bgImages[url] = img;
+    img.src = item.url;
+    imgCache[item.url] = img;
   }
-  return bgImages[url];
+  return { item, img: imgCache[item.url] };
 }
 
-/* ==========================================================================
-   MAIN GAME CLASS
-   ========================================================================== */
 class MultaniGame {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
     this.snd = new SoundSys();
 
-    // DOM Elements
     this.dispLvl = document.getElementById('disp-lvl');
     this.dispScore = document.getElementById('disp-score');
     this.dispBalls = document.getElementById('disp-balls');
@@ -440,35 +440,31 @@ class MultaniGame {
     this.btnRetry = document.getElementById('btn-retry');
     this.btnCloseLvl = document.getElementById('btn-close-lvl');
     this.tapHint = document.getElementById('tap-hint');
+    this.landmarkPill = document.getElementById('landmark-pill');
 
-    // Virtual Game Coordinates
     this.width = 400;
     this.height = 700;
 
-    // Progress
     this.level = parseInt(localStorage.getItem('multani_unlocked_level') || '1');
     this.currentLevel = this.level;
     this.score = 0;
     this.lives = 3;
 
-    // Game Objects
+    // Paddle elevated so it never gets covered by Android bottom navigation
     this.paddle = {
-      w: 88,
+      w: 86,
       h: 15,
-      x: 156,
-      // PADDLE KO BAHUT UPAR POSITION KIYA GAYA HAI TA-KI BOTTOM BAR MEIN NA CHUPE
+      x: 157,
       y: this.height - 135,
-      targetX: 156,
-      speed: 16
+      targetX: 157
     };
 
     this.balls = [];
     this.bricks = [];
     this.powerups = [];
     this.particles = [];
-
-    this.state = 'WAIT_LAUNCH'; // 'WAIT_LAUNCH', 'PLAYING', 'WIN', 'GAMEOVER', 'PAUSED'
-    this.maxBalls = 250; // Performance safety ceiling
+    this.state = 'WAIT_LAUNCH';
+    this.maxBalls = 250;
 
     this.initEvents();
     this.resize();
@@ -488,11 +484,10 @@ class MultaniGame {
   }
 
   initEvents() {
-    // Touch & Mouse input
     const handleMove = (clientX) => {
       const rect = this.canvas.getBoundingClientRect();
       const canvasX = (clientX - rect.left) * (this.width / rect.width);
-      this.paddle.targetX = Math.max(10, Math.min(this.width - this.paddle.w - 10, canvasX - this.paddle.w / 2));
+      this.paddle.targetX = Math.max(8, Math.min(this.width - this.paddle.w - 8, canvasX - this.paddle.w / 2));
     };
 
     const handlePointerStart = (clientX) => {
@@ -517,7 +512,6 @@ class MultaniGame {
     window.addEventListener('mousemove', (e) => handleMove(e.clientX));
     this.canvas.addEventListener('mousedown', (e) => handlePointerStart(e.clientX));
 
-    // Dashboard Buttons
     this.btnSfx.addEventListener('click', () => {
       this.snd.enabled = !this.snd.enabled;
       this.btnSfx.textContent = this.snd.enabled ? 'SFX: ON' : 'SFX: OFF';
@@ -582,7 +576,7 @@ class MultaniGame {
   }
 
   /* ---------------------------------------------------------
-     LEVEL GENERATOR (100 Unique Patterns)
+     HARD FORT & BORDER MAZE GENERATOR (100 Unique Forts)
      --------------------------------------------------------- */
   loadLevel(lvl) {
     this.currentLevel = lvl;
@@ -595,85 +589,167 @@ class MultaniGame {
     this.winScreen.style.display = 'none';
     this.gameoverScreen.style.display = 'none';
 
-    // Preload background photo for this level
-    preloadPhoto(lvl);
+    const photoInfo = getPhoto(lvl);
+    this.landmarkPill.textContent = photoInfo.item.name;
 
-    // Paddle size adjustment for difficulty
-    this.paddle.w = Math.max(55, 90 - Math.floor(lvl * 0.35));
+    this.paddle.w = Math.max(58, 88 - Math.floor(lvl * 0.3));
     this.paddle.x = (this.width - this.paddle.w) / 2;
     this.paddle.targetX = this.paddle.x;
 
     this.resetBallToPaddle();
 
-    const cols = 10;
-    const rows = 14;
-    const brickW = 34;
+    const cols = 18;
+    const rows = 23;
+    const brickW = 18;
     const brickH = 14;
-    const offsetX = 30;
-    const offsetY = 50;
+    const offsetX = 22;
+    const offsetY = 70;
+
+    const fortType = (lvl - 1) % 10;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        let active = false;
-        let hp = 1;
         let isSteel = false;
+        let isBreakable = false;
 
-        // Custom mathematical and geometric patterns per level
-        const pat = (lvl - 1) % 15;
-        if (pat === 0) active = r >= 2 && r <= 7 && c >= 1 && c <= 8; // Square
-        else if (pat === 1) active = Math.abs(c - 4.5) + Math.abs(r - 5) <= 4.5; // Diamond
-        else if (pat === 2) active = r >= 2 && Math.abs(c - 4.5) <= (r - 1.5); // Triangle
-        else if (pat === 3) active = (r + c) % 2 === 0 && r >= 2 && r <= 9; // Checker / Zigzag
-        else if (pat === 4) { // Heart
-          active = (r === 2 && (c === 2 || c === 3 || c === 6 || c === 7)) ||
-                   (r === 3 && (c >= 1 && c <= 8)) ||
-                   (r >= 4 && r <= 7 && Math.abs(c - 4.5) <= (7.5 - r));
-        }
-        else if (pat === 5) active = (r === 2 || r === 9 || c === 1 || c === 8 || (r === 5 && c >= 3 && c <= 6)); // Spiral / Maze
-        else if (pat === 6) active = (c === 1 || c === 2 || c === 7 || c === 8) && r >= 2 && r <= 10; // Twin Pillars
-        else if (pat === 7) active = (r === 2 || r === 4 || r === 6 || r === 8) && c >= 1 && c <= 8; // Horizontal Bars
-        else if (pat === 8) active = (c === 2 || c === 4 || c === 6 || c === 8) && r >= 2 && r <= 9; // Vertical Strips
-        else if (pat === 9) active = (r >= 2 && r <= 8) && (c >= 1 && c <= 8) && (r + c) % 3 !== 0; // Crosshatch
-        else if (pat === 10) active = Math.hypot(c - 4.5, r - 5.5) <= 3.8 && Math.hypot(c - 4.5, r - 5.5) >= 1.5; // Ring
-        else if (pat === 11) active = (r <= 6 && (c <= 3 || c >= 6)) || (r > 6 && c >= 3 && c <= 6); // Hourglass
-        else if (pat === 12) active = ((c + r * 2) % 4 === 0) && r >= 2 && r <= 9; // Staggered
-        else if (pat === 13) active = (r >= 3 && r <= 8 && c >= 2 && c <= 7) && !(r >= 5 && r <= 6 && c >= 4 && c <= 5); // Window
-        else active = ((c * r + lvl) % 3 !== 0) && r >= 2 && r <= 8; // Alien fortress
-
-        // Boss Levels & Unbreakables
-        if (lvl % 10 === 0 && r === 2 && (c === 4 || c === 5)) {
-          isSteel = true;
-          active = true;
+        // 1. OUTSIDE HARD FORTRESS BORDER (Always steel with tactical gates)
+        const isBorder = (r === 0 || c === 0 || c === cols - 1 || r === rows - 1);
+        if (isBorder) {
+          // Bottom wall gates: different gate opening position per fort
+          if (r === rows - 1) {
+            if (fortType === 0 && (c >= 7 && c <= 10)) isSteel = false; // Middle gate
+            else if (fortType === 1 && ((c >= 2 && c <= 4) || (c >= 13 && c <= 15))) isSteel = false; // Dual side gates
+            else if (fortType === 2 && (c >= 8 && c <= 9)) isSteel = false; // Narrow tunnel
+            else if (fortType === 3 && (c <= 4 || c >= 13)) isSteel = false; // Wide flanks
+            else if (fortType === 4 && (c >= 5 && c <= 12)) isSteel = false; // Grand entrance
+            else if (fortType >= 5 && (c >= 6 && c <= 11)) isSteel = false;
+            else isSteel = true;
+          } else {
+            isSteel = true;
+          }
         }
 
-        if (active) {
-          // Brick durability scales with level
+        // 2. INNER FORT WALLS & MAZES (10 completely different tough architectural layouts)
+        if (!isSteel && !isBorder) {
+          switch (fortType) {
+            case 0: // Original Screenshot Fortress: 3 horizontal slit bars + 2 lower pillars
+              if ((r === 4 || r === 7 || r === 10) && (c >= 2 && c <= 15 && c !== 8 && c !== 9)) {
+                isSteel = true;
+              } else if (r >= 14 && r <= 20 && (c === 5 || c === 12)) {
+                isSteel = true; // Two vertical towers
+              } else if (r >= 1 && r <= 13 && c >= 1 && c <= 16) {
+                isBreakable = true;
+              }
+              break;
+
+            case 1: // The Great Citadel: Center dividing column with dual reinforced vaults
+              if (c === 8 && r >= 2 && r <= 15 && r !== 7) {
+                isSteel = true; // Central divide
+              } else if (r === 6 && ((c >= 1 && c <= 5) || (c >= 12 && c <= 16))) {
+                isSteel = true;
+              } else if (r === 12 && c >= 3 && c <= 14) {
+                isSteel = true;
+              } else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) {
+                isBreakable = true;
+              }
+              break;
+
+            case 2: // Diamond Vault Bastion: Enclosed diamond steel core
+              if ((Math.abs(c - 8.5) + Math.abs(r - 7)) === 4) {
+                isSteel = true;
+              } else if (r >= 2 && r <= 13 && c >= 2 && c <= 15) {
+                isBreakable = true;
+              }
+              break;
+
+            case 3: // Zigzag Trench Fort: Alternating steel defense corridors
+              if (r === 4 && c <= 13) isSteel = true;
+              else if (r === 8 && c >= 4) isSteel = true;
+              else if (r === 12 && c <= 13) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 4: // Twin Fortress Keeps: Two heavily fortified steel towers
+              if ((c === 4 || c === 13) && r >= 3 && r <= 16 && r !== 9) {
+                isSteel = true;
+              } else if (r === 8 && (c <= 4 || c >= 13)) {
+                isSteel = true;
+              } else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) {
+                isBreakable = true;
+              }
+              break;
+
+            case 5: // Four Quadrant Prison: 4 separate cells
+              if (c === 8 && r >= 2 && r <= 14 && r !== 5 && r !== 11) isSteel = true;
+              else if (r === 8 && c >= 2 && c <= 15 && c !== 4 && c !== 13) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 6: // Funnel Canyon: Converging steel barriers leading to dense core
+              if (r === 4 && (c <= 4 || c >= 13)) isSteel = true;
+              else if (r === 7 && (c <= 6 || c >= 11)) isSteel = true;
+              else if (r === 10 && (c <= 7 || c >= 10)) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 7: // Honeycomb Fortress: Strategic steel barricades
+              if ((r === 4 || r === 8 || r === 12) && (c % 3 === 0)) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 8: // Concentric Ring Walls: Outer and inner ring
+              if ((r === 3 || r === 12) && c >= 3 && c <= 14 && (c < 7 || c > 10)) isSteel = true;
+              else if ((c === 3 || c === 14) && r >= 3 && r <= 12 && r !== 7) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 9: // Milestone Boss Fortress: Armored Core
+              if (r === 3 && c >= 5 && c <= 12) isSteel = true;
+              else if (r === 6 && (c <= 5 || c >= 12)) isSteel = true;
+              else if (r === 10 && c >= 4 && c <= 13 && c !== 8 && c !== 9) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+          }
+        }
+
+        // Push Bricks to Level
+        if (isSteel) {
+          this.bricks.push({
+            x: offsetX + c * (brickW + 1),
+            y: offsetY + r * (brickH + 1),
+            w: brickW,
+            h: brickH,
+            isSteel: true,
+            color: '#1a1f33' // Dark charcoal fort wall color
+          });
+        } else if (isBreakable) {
+          let hp = 1;
           if (lvl > 15 && Math.random() < 0.25) hp = 2;
-          if (lvl > 45 && Math.random() < 0.2) hp = 3;
+          if (lvl > 40 && Math.random() < 0.2) hp = 3;
 
-          // Powerup probability (2X, 3X, 4X, 5X)
-          let pType = null;
-          const pRoll = Math.random();
-          if (pRoll < 0.12) pType = '2X';
-          else if (pRoll < 0.19) pType = '3X';
-          else if (pRoll < 0.23) pType = '4X';
-          else if (pRoll < 0.25) pType = '5X';
+          let pPower = null;
+          const roll = Math.random();
+          if (roll < 0.14) pPower = '2X';
+          else if (roll < 0.20) pPower = '3X';
+          else if (roll < 0.23) pPower = '4X';
+          else if (roll < 0.25) pPower = '5X';
 
-          // Color palette based on screenshot (pink, cyan, orange)
-          let color = '#ff007f';
-          if ((r + c) % 3 === 0) color = '#00e5ff';
-          if ((r + c) % 4 === 0) color = '#ff9900';
+          // Dense Pink, Cyan, Orange stripes (from screenshot)
+          let col = '#ff007f'; // Pink
+          const stripe = (r + c + lvl) % 3;
+          if (stripe === 1) col = '#00e5ff'; // Cyan
+          else if (stripe === 2) col = '#ff9900'; // Orange
 
           this.bricks.push({
-            x: offsetX + c * (brickW + 2),
-            y: offsetY + r * (brickH + 2),
+            x: offsetX + c * (brickW + 1),
+            y: offsetY + r * (brickH + 1),
             w: brickW,
             h: brickH,
             hp: hp,
             maxHp: hp,
-            color: isSteel ? '#444d66' : color,
-            isSteel: isSteel,
-            powerup: pType
+            isSteel: false,
+            color: col,
+            powerup: pPower
           });
         }
       }
@@ -688,7 +764,7 @@ class MultaniGame {
       y: this.paddle.y - 8,
       vx: 0,
       vy: 0,
-      radius: 6,
+      radius: 5.5,
       speed: 4.8 + Math.min(3, this.currentLevel * 0.05),
       active: true
     }];
@@ -698,7 +774,7 @@ class MultaniGame {
     if (this.state !== 'WAIT_LAUNCH') return;
     this.state = 'PLAYING';
     this.tapHint.style.display = 'none';
-    const angle = -Math.PI / 2 + (Math.random() * 0.6 - 0.3);
+    const angle = -Math.PI / 2 + (Math.random() * 0.4 - 0.2);
     const spd = this.balls[0].speed;
     this.balls[0].vx = Math.cos(angle) * spd;
     this.balls[0].vy = Math.sin(angle) * spd;
@@ -735,7 +811,7 @@ class MultaniGame {
   }
 
   createExplosion(x, y, color) {
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       const ang = Math.random() * Math.PI * 2;
       const spd = Math.random() * 3 + 1;
       this.particles.push({
@@ -759,15 +835,13 @@ class MultaniGame {
   update() {
     if (this.state !== 'PLAYING') return;
 
-    // Smooth paddle tracking
     this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.35;
 
-    // Update Powerups
+    // Powerups falling
     for (let i = this.powerups.length - 1; i >= 0; i--) {
       const p = this.powerups[i];
       p.y += p.speed;
 
-      // Check catch by paddle
       if (
         p.y + p.r >= this.paddle.y &&
         p.y - p.r <= this.paddle.y + this.paddle.h &&
@@ -785,7 +859,7 @@ class MultaniGame {
       }
     }
 
-    // Update Particles
+    // Particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const pt = this.particles[i];
       pt.x += pt.vx;
@@ -794,10 +868,8 @@ class MultaniGame {
       if (pt.life <= 0) this.particles.splice(i, 1);
     }
 
-    // Update Balls & Collisions
-    let aliveBalls = 0;
-    const subSteps = 2; // Continuous collision precision
-
+    // Sub-steps continuous physics
+    const subSteps = 2;
     for (let step = 0; step < subSteps; step++) {
       for (let i = 0; i < this.balls.length; i++) {
         const b = this.balls[i];
@@ -806,7 +878,7 @@ class MultaniGame {
         b.x += b.vx / subSteps;
         b.y += b.vy / subSteps;
 
-        // Walls
+        // Screen Boundary
         if (b.x - b.radius <= 4) {
           b.x = 4 + b.radius;
           b.vx = Math.abs(b.vx);
@@ -819,7 +891,7 @@ class MultaniGame {
           b.vy = Math.abs(b.vy);
         }
 
-        // Paddle Collision (Paddle upar hone ki wajah se yahan bounce hoga)
+        // Paddle Collision (At elevated position)
         if (
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
@@ -829,15 +901,14 @@ class MultaniGame {
         ) {
           b.y = this.paddle.y - b.radius;
           const hitPos = (b.x - (this.paddle.x + this.paddle.w / 2)) / (this.paddle.w / 2);
-          const maxBounceAngle = Math.PI * 0.42;
-          const bounceAngle = hitPos * maxBounceAngle - Math.PI / 2;
+          const bounceAngle = hitPos * (Math.PI * 0.42) - Math.PI / 2;
           const spd = Math.hypot(b.vx, b.vy);
           b.vx = Math.cos(bounceAngle) * spd;
           b.vy = Math.sin(bounceAngle) * spd;
           this.snd.hitPaddle();
         }
 
-        // Brick Collision
+        // Brick & Fort Wall Collision
         for (let j = 0; j < this.bricks.length; j++) {
           const br = this.bricks[j];
           if (
@@ -846,10 +917,7 @@ class MultaniGame {
             b.y + b.radius > br.y &&
             b.y - b.radius < br.y + br.h
           ) {
-            // Find collision side
             const prevX = b.x - b.vx / subSteps;
-            const prevY = b.y - b.vy / subSteps;
-
             if (prevX <= br.x || prevX >= br.x + br.w) {
               b.vx = -b.vx;
             } else {
@@ -858,12 +926,11 @@ class MultaniGame {
 
             if (!br.isSteel) {
               br.hp--;
-              this.score += 10;
+              this.score += 15;
               this.createExplosion(b.x, b.y, br.color);
               this.snd.hitBrick();
 
               if (br.hp <= 0) {
-                // Drop powerup
                 if (br.powerup) {
                   this.powerups.push({
                     x: br.x + br.w / 2,
@@ -877,33 +944,30 @@ class MultaniGame {
                 j--;
               }
             } else {
-              this.snd.hitPaddle();
+              this.snd.hitSteel();
             }
             break;
           }
         }
 
-        // Bottom Boundary check (Ball Lost)
+        // Lost Ball
         if (b.y > this.height + 20) {
           b.active = false;
-        } else {
-          aliveBalls++;
         }
       }
     }
 
-    // Clean up inactive balls
     this.balls = this.balls.filter(b => b.active);
     this.dispBalls.textContent = this.balls.length;
 
-    // Check Level Complete (All breakable bricks cleared)
+    // Check Win (All breakables cleared)
     const remainingBreakable = this.bricks.filter(b => !b.isSteel).length;
     if (remainingBreakable === 0) {
       this.handleLevelWin();
       return;
     }
 
-    // Check All Balls Lost
+    // Check Lives Loss
     if (this.balls.length === 0) {
       this.lives--;
       this.updateHUD();
@@ -923,11 +987,11 @@ class MultaniGame {
     this.state = 'WIN';
     this.snd.win();
     this.saveProgress();
-    // Bricks saaf taaki background photo clear dikhe
+    // Sab fort walls aur bricks clear taaki photo 100% crystal-clear dikhe
     this.bricks = [];
     this.powerups = [];
     this.balls = [];
-    document.getElementById('win-score-txt').textContent = `FINAL SCORE: ${this.score}`;
+    document.getElementById('win-score-txt').textContent = `FORT CLEARED! SCORE: ${this.score}`;
     this.winScreen.style.display = 'flex';
   }
 
@@ -935,76 +999,72 @@ class MultaniGame {
     this.ctx.save();
     this.ctx.scale(this.scaleX, this.scaleY);
 
-    // 1. Draw Background Photo (Clearly visible & dimmed during play, 100% visible on clear)
-    const currentImg = preloadPhoto(this.currentLevel);
-    if (currentImg && currentImg.complete && currentImg.naturalWidth !== 0) {
-      this.ctx.drawImage(currentImg, 0, 0, this.width, this.height);
-      // Agar khel rahe hain to thoda dark tint takay bricks dikhein, level win par full clean clear
+    // 1. Background Image
+    const photo = getPhoto(this.currentLevel);
+    if (photo.img && photo.img.complete && photo.img.naturalWidth !== 0) {
+      this.ctx.drawImage(photo.img, 0, 0, this.width, this.height);
       if (this.state !== 'WIN') {
-        this.ctx.fillStyle = 'rgba(5, 5, 12, 0.72)';
+        this.ctx.fillStyle = 'rgba(2, 3, 8, 0.82)';
         this.ctx.fillRect(0, 0, this.width, this.height);
       }
     } else {
-      // Fallback sci-fi gradient
-      const grad = this.ctx.createLinearGradient(0, 0, 0, this.height);
-      grad.addColorStop(0, '#090a14');
-      grad.addColorStop(1, '#020205');
-      this.ctx.fillStyle = grad;
+      this.ctx.fillStyle = '#060711';
       this.ctx.fillRect(0, 0, this.width, this.height);
     }
 
-    // 2. Neon Arena Borders
-    this.ctx.strokeStyle = '#222744';
-    this.ctx.lineWidth = 4;
-    this.ctx.strokeRect(2, 2, this.width - 4, this.height - 4);
-
-    // 3. Draw Bricks (agar win nahi hua)
     if (this.state !== 'WIN') {
+      // 2. Draw Fort Border & Bricks
       for (const br of this.bricks) {
-        this.ctx.fillStyle = br.color;
-        this.ctx.shadowColor = br.color;
-        this.ctx.shadowBlur = br.isSteel ? 0 : 8;
-        this.ctx.fillRect(br.x, br.y, br.w, br.h);
+        if (br.isSteel) {
+          this.ctx.fillStyle = '#1c2136';
+          this.ctx.fillRect(br.x, br.y, br.w, br.h);
+          this.ctx.strokeStyle = '#2d3756';
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(br.x, br.y, br.w, br.h);
+        } else {
+          this.ctx.fillStyle = br.color;
+          this.ctx.shadowColor = br.color;
+          this.ctx.shadowBlur = 6;
+          this.ctx.fillRect(br.x, br.y, br.w, br.h);
 
-        // Brick inner border / bevel
-        this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(br.x, br.y, br.w, br.h);
+          this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(br.x, br.y, br.w, br.h);
 
-        // Power-up indicator dot
-        if (br.powerup) {
-          this.ctx.fillStyle = '#fff';
-          this.ctx.beginPath();
-          this.ctx.arc(br.x + br.w / 2, br.y + br.h / 2, 2.5, 0, Math.PI * 2);
-          this.ctx.fill();
+          if (br.powerup) {
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.beginPath();
+            this.ctx.arc(br.x + br.w / 2, br.y + br.h / 2, 2.5, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
         }
       }
       this.ctx.shadowBlur = 0;
 
-      // 4. Draw Falling Powerup Spheres
+      // 3. Powerups
       for (const p of this.powerups) {
         let col = '#00e5ff';
-        if (p.type === '3X') col = '#b026ff';
+        if (p.type === '3X') col = '#9d00ff';
         if (p.type === '4X') col = '#ff00aa';
         if (p.type === '5X') col = '#ffea00';
 
         this.ctx.save();
         this.ctx.shadowColor = col;
-        this.ctx.shadowBlur = 12;
+        this.ctx.shadowBlur = 14;
         this.ctx.fillStyle = col;
         this.ctx.beginPath();
         this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         this.ctx.fill();
 
-        this.ctx.fillStyle = '#000';
-        this.ctx.font = 'bold 9px Arial';
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 9px sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(p.type, p.x, p.y);
         this.ctx.restore();
       }
 
-      // 5. Particles
+      // 4. Particles
       for (const pt of this.particles) {
         this.ctx.fillStyle = pt.color;
         this.ctx.globalAlpha = Math.max(0, pt.life);
@@ -1012,24 +1072,23 @@ class MultaniGame {
       }
       this.ctx.globalAlpha = 1;
 
-      // 6. Draw Paddle (Glowing Neon Orange, elevated)
+      // 5. Glowing Orange Paddle
       this.ctx.save();
       this.ctx.shadowColor = '#ff6600';
-      this.ctx.shadowBlur = 15;
+      this.ctx.shadowBlur = 16;
       this.ctx.fillStyle = '#ff6600';
       this.ctx.beginPath();
       this.ctx.roundRect(this.paddle.x, this.paddle.y, this.paddle.w, this.paddle.h, 7);
       this.ctx.fill();
 
-      // Paddle center light accent
-      this.ctx.fillStyle = '#ffffaa';
-      this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 3, this.paddle.w * 0.5, 3);
+      this.ctx.fillStyle = '#ffffbb';
+      this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 3, this.paddle.w * 0.5, 2.5);
       this.ctx.restore();
 
-      // 7. Draw Balls (Glowing White)
+      // 6. Glowing White Balls
       this.ctx.save();
       this.ctx.shadowColor = '#ffffff';
-      this.ctx.shadowBlur = 10;
+      this.ctx.shadowBlur = 8;
       this.ctx.fillStyle = '#ffffff';
       for (const b of this.balls) {
         this.ctx.beginPath();
@@ -1049,7 +1108,6 @@ class MultaniGame {
   }
 }
 
-// Start game when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
   new MultaniGame();
 });
