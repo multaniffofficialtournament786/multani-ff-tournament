@@ -255,12 +255,12 @@ function injectVipLoaderStyles() {
     }
 
     .mff-rotating-coin {
-      width: 88px;
-      height: 88px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
       border-radius: 50%;
       animation: mffCoinTurn 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-      filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.8));
+      filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.85));
     }
 
     /* Typography */
@@ -380,7 +380,7 @@ export const Loader = {
             <div class="mff-logo-stage">
               <div class="mff-outer-ring"></div>
               <div class="mff-glow-disc"></div>
-              <img src="./1793357792725.png" alt="Logo" class="mff-rotating-coin" onerror="this.style.display='none'" />
+              <img src="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png" alt="Logo" class="mff-rotating-coin" />
             </div>
             <h1 class="mff-brand-title">MULTANI FF</h1>
             <span class="mff-sub-badge">OFFICIAL TOURNAMENT ARENA</span>
