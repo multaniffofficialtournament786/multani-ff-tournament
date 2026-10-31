@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>MULTANI BRICK BREAKER 100</title>
+<title>MULTANI BRICK BREAKER 100 FORTS</title>
 <style>
   * {
     box-sizing: border-box;
@@ -17,7 +17,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #050508;
+    background-color: #030408;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #fff;
   }
@@ -32,7 +32,7 @@
     flex-direction: column;
     overflow: hidden;
   }
-  /* Top HUD Dashboard */
+  /* Top Arcade HUD Header */
   #header {
     height: 66px;
     background: #070712;
@@ -109,7 +109,7 @@
     top: 72px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.78);
     border: 1px solid #00e5ff;
     color: #fff;
     padding: 3px 14px;
@@ -122,7 +122,7 @@
     white-space: nowrap;
   }
 
-  /* Canvas Area */
+  /* Gameplay Canvas Wrapper */
   #canvas-wrapper {
     position: relative;
     flex: 1;
@@ -135,7 +135,7 @@
     height: 100%;
   }
 
-  /* Level Clear Overlay (Background Image Fully Revealed) */
+  /* Level Complete Screen (Photo Visible, Clear Bricks) */
   #win-screen {
     position: absolute;
     inset: 0;
@@ -395,12 +395,12 @@ class SoundSys {
 }
 
 const photoData = [
-  { name: "Derawar Fort, Cholistan Desert", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80" },
+  { name: "Derawar Fort, Bahawalpur", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80" },
   { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=600&auto=format&fit=crop&q=80" },
   { name: "Badshahi Mosque, Lahore", url: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=600&auto=format&fit=crop&q=80" },
   { name: "Lahore Fort (Shahi Qila)", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&auto=format&fit=crop&q=80" },
   { name: "Rohtas Fort, Jhelum", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80" },
-  { name: "Ranikot Fort (Great Wall of Sindh)", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  { name: "Ranikot Fort, Sindh", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
   { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80" },
   { name: "Faisal Mosque, Islamabad", url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=600&auto=format&fit=crop&q=80" },
   { name: "Baltit Fort, Hunza Valley", url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" },
