@@ -32,7 +32,7 @@
     flex-direction: column;
     overflow: hidden;
   }
-  /* Top Arcade HUD Header */
+  /* Top HUD Dashboard */
   #header {
     height: 66px;
     background: #070712;
@@ -103,13 +103,13 @@
     color: #000;
   }
 
-  /* Landmark Name Pill */
+  /* Landmark Name Badge */
   #landmark-pill {
     position: absolute;
     top: 72px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.78);
+    background: rgba(0, 0, 0, 0.85);
     border: 1px solid #00e5ff;
     color: #fff;
     padding: 3px 14px;
@@ -122,7 +122,7 @@
     white-space: nowrap;
   }
 
-  /* Gameplay Canvas Wrapper */
+  /* Canvas Wrapper */
   #canvas-wrapper {
     position: relative;
     flex: 1;
@@ -135,7 +135,7 @@
     height: 100%;
   }
 
-  /* Level Complete Screen (Photo Visible, Clear Bricks) */
+  /* Win Screen: 100% Clear Photo & Next Button */
   #win-screen {
     position: absolute;
     inset: 0;
@@ -143,7 +143,7 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    padding-bottom: 50px;
+    padding-bottom: 45px;
     background: transparent;
     z-index: 50;
   }
@@ -171,7 +171,7 @@
   }
 
   .btn-huge {
-    width: 82%;
+    width: 84%;
     padding: 16px 0;
     font-size: 20px;
     font-weight: 900;
@@ -394,17 +394,18 @@ class SoundSys {
   }
 }
 
+/* REAL HISTORICAL PLACES PHOTOS */
 const photoData = [
-  { name: "Derawar Fort, Bahawalpur", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80" },
-  { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=600&auto=format&fit=crop&q=80" },
-  { name: "Badshahi Mosque, Lahore", url: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=600&auto=format&fit=crop&q=80" },
-  { name: "Lahore Fort (Shahi Qila)", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&auto=format&fit=crop&q=80" },
-  { name: "Rohtas Fort, Jhelum", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80" },
-  { name: "Ranikot Fort, Sindh", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
-  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80" },
-  { name: "Faisal Mosque, Islamabad", url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=600&auto=format&fit=crop&q=80" },
-  { name: "Baltit Fort, Hunza Valley", url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" },
-  { name: "Mohenjo-daro Ancient Citadel", url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80" }
+  { name: "Derawar Fort, Bahawalpur", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Derawar_Fort_by_Usman_Ghani.jpg/800px-Derawar_Fort_by_Usman_Ghani.jpg" },
+  { name: "Minar-e-Pakistan, Lahore", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Minar-e-Pakistan_Lahore.jpg/800px-Minar-e-Pakistan_Lahore.jpg" },
+  { name: "Badshahi Mosque, Lahore", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Badshahi_Mosque_front_view_Lahore.jpg/800px-Badshahi_Mosque_front_view_Lahore.jpg" },
+  { name: "Lahore Fort (Shahi Qila)", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Alamgiri_Gate_Lahore_Fort.jpg/800px-Alamgiri_Gate_Lahore_Fort.jpg" },
+  { name: "Rohtas Fort, Jhelum", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Rohtas_Fort_-_Sohail_Gate.jpg/800px-Rohtas_Fort_-_Sohail_Gate.jpg" },
+  { name: "Ranikot Fort, Sindh", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Ranikot_Fort_Sindh.jpg/800px-Ranikot_Fort_Sindh.jpg" },
+  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Tomb_of_Shah_Rukn-e-Alam.jpg/800px-Tomb_of_Shah_Rukn-e-Alam.jpg" },
+  { name: "Faisal Mosque, Islamabad", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Faisal_Mosque_Islamabad.jpg/800px-Faisal_Mosque_Islamabad.jpg" },
+  { name: "Baltit Fort, Hunza Valley", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Baltit_Fort_Hunza.jpg/800px-Baltit_Fort_Hunza.jpg" },
+  { name: "Mohenjo-daro Buddhist Stupa", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mohenjo-daro_Buddhist_Stupa.jpg/800px-Mohenjo-daro_Buddhist_Stupa.jpg" }
 ];
 
 const imgCache = {};
@@ -450,7 +451,7 @@ class MultaniGame {
     this.score = 0;
     this.lives = 3;
 
-    // Paddle elevated so it never gets covered by Android bottom navigation
+    // Paddle height elevated
     this.paddle = {
       w: 86,
       h: 15,
@@ -464,7 +465,12 @@ class MultaniGame {
     this.powerups = [];
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
-    this.maxBalls = 250;
+    
+    // STRICT MAX 100 BALLS
+    this.maxBalls = 100;
+
+    // FAST BASE SPEED (KISI BHI WAQT SLOW NAHI HOGI)
+    this.baseSpeed = 8.2;
 
     this.initEvents();
     this.resize();
@@ -575,9 +581,7 @@ class MultaniGame {
     this.levelModal.style.display = 'flex';
   }
 
-  /* ---------------------------------------------------------
-     HARD FORT & BORDER MAZE GENERATOR (100 Unique Forts)
-     --------------------------------------------------------- */
+  /* HARD FORT MAZE WITH TIGHT SLITS */
   loadLevel(lvl) {
     this.currentLevel = lvl;
     this.bricks = [];
@@ -592,127 +596,118 @@ class MultaniGame {
     const photoInfo = getPhoto(lvl);
     this.landmarkPill.textContent = photoInfo.item.name;
 
-    this.paddle.w = Math.max(58, 88 - Math.floor(lvl * 0.3));
+    this.paddle.w = Math.max(58, 86 - Math.floor(lvl * 0.28));
     this.paddle.x = (this.width - this.paddle.w) / 2;
     this.paddle.targetX = this.paddle.x;
 
     this.resetBallToPaddle();
 
     const cols = 18;
-    const rows = 23;
+    const rows = 24;
     const brickW = 18;
     const brickH = 14;
     const offsetX = 22;
     const offsetY = 70;
 
-    const fortType = (lvl - 1) % 10;
+    const fortStyle = (lvl - 1) % 10;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         let isSteel = false;
         let isBreakable = false;
 
-        // 1. OUTSIDE HARD FORTRESS BORDER (Always steel with tactical gates)
         const isBorder = (r === 0 || c === 0 || c === cols - 1 || r === rows - 1);
         if (isBorder) {
-          // Bottom wall gates: different gate opening position per fort
+          // Bottom wall: SIRF 1 YA 2 BALL JITNI TANG JAGAH (TIGHT SLITS)
           if (r === rows - 1) {
-            if (fortType === 0 && (c >= 7 && c <= 10)) isSteel = false; // Middle gate
-            else if (fortType === 1 && ((c >= 2 && c <= 4) || (c >= 13 && c <= 15))) isSteel = false; // Dual side gates
-            else if (fortType === 2 && (c >= 8 && c <= 9)) isSteel = false; // Narrow tunnel
-            else if (fortType === 3 && (c <= 4 || c >= 13)) isSteel = false; // Wide flanks
-            else if (fortType === 4 && (c >= 5 && c <= 12)) isSteel = false; // Grand entrance
-            else if (fortType >= 5 && (c >= 6 && c <= 11)) isSteel = false;
+            if (fortStyle === 0 && (c === 8 || c === 9)) isSteel = false;
+            else if (fortStyle === 1 && (c === 3 || c === 14)) isSteel = false;
+            else if (fortStyle === 2 && (c === 5 || c === 6)) isSteel = false;
+            else if (fortStyle === 3 && (c === 11 || c === 12)) isSteel = false;
+            else if (fortStyle === 4 && (c === 8)) isSteel = false;
+            else if (fortStyle === 5 && (c === 4 || c === 13)) isSteel = false;
+            else if (fortStyle === 6 && (c === 9)) isSteel = false;
+            else if (fortStyle === 7 && (c === 6 || c === 11)) isSteel = false;
+            else if (fortStyle === 8 && (c === 7 || c === 8)) isSteel = false;
+            else if (fortStyle === 9 && (c === 8)) isSteel = false;
             else isSteel = true;
           } else {
             isSteel = true;
           }
         }
 
-        // 2. INNER FORT WALLS & MAZES (10 completely different tough architectural layouts)
+        // Inner Fort Defense
         if (!isSteel && !isBorder) {
-          switch (fortType) {
-            case 0: // Original Screenshot Fortress: 3 horizontal slit bars + 2 lower pillars
-              if ((r === 4 || r === 7 || r === 10) && (c >= 2 && c <= 15 && c !== 8 && c !== 9)) {
-                isSteel = true;
-              } else if (r >= 14 && r <= 20 && (c === 5 || c === 12)) {
-                isSteel = true; // Two vertical towers
-              } else if (r >= 1 && r <= 13 && c >= 1 && c <= 16) {
-                isBreakable = true;
-              }
+          switch (fortStyle) {
+            case 0:
+              if (r === 4 && (c < 8 || c > 9)) isSteel = true;
+              else if (r === 8 && (c < 4 || (c > 5 && c < 12) || c > 13)) isSteel = true;
+              else if (r === 12 && (c < 8 || c > 9)) isSteel = true;
+              else if (r >= 14 && r <= 20 && (c === 5 || c === 12)) isSteel = true;
+              else if (r >= 1 && r <= 13 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 1: // The Great Citadel: Center dividing column with dual reinforced vaults
-              if (c === 8 && r >= 2 && r <= 15 && r !== 7) {
-                isSteel = true; // Central divide
-              } else if (r === 6 && ((c >= 1 && c <= 5) || (c >= 12 && c <= 16))) {
-                isSteel = true;
-              } else if (r === 12 && c >= 3 && c <= 14) {
-                isSteel = true;
-              } else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) {
-                isBreakable = true;
-              }
-              break;
-
-            case 2: // Diamond Vault Bastion: Enclosed diamond steel core
-              if ((Math.abs(c - 8.5) + Math.abs(r - 7)) === 4) {
-                isSteel = true;
-              } else if (r >= 2 && r <= 13 && c >= 2 && c <= 15) {
-                isBreakable = true;
-              }
-              break;
-
-            case 3: // Zigzag Trench Fort: Alternating steel defense corridors
-              if (r === 4 && c <= 13) isSteel = true;
-              else if (r === 8 && c >= 4) isSteel = true;
-              else if (r === 12 && c <= 13) isSteel = true;
+            case 1:
+              if (c === 8 && r >= 2 && r <= 16 && r !== 6) isSteel = true;
+              else if (r === 6 && (c === 2 || c === 3 || c === 13 || c === 14)) isSteel = true;
+              else if (r === 11 && (c < 7 || c > 9)) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 4: // Twin Fortress Keeps: Two heavily fortified steel towers
-              if ((c === 4 || c === 13) && r >= 3 && r <= 16 && r !== 9) {
-                isSteel = true;
-              } else if (r === 8 && (c <= 4 || c >= 13)) {
-                isSteel = true;
-              } else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) {
-                isBreakable = true;
-              }
-              break;
-
-            case 5: // Four Quadrant Prison: 4 separate cells
-              if (c === 8 && r >= 2 && r <= 14 && r !== 5 && r !== 11) isSteel = true;
-              else if (r === 8 && c >= 2 && c <= 15 && c !== 4 && c !== 13) isSteel = true;
+            case 2:
+              if ((r === 4 || r === 12) && c >= 4 && c <= 13 && c !== 8) isSteel = true;
+              else if ((c === 4 || c === 13) && r >= 4 && r <= 12 && r !== 8) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 6: // Funnel Canyon: Converging steel barriers leading to dense core
-              if (r === 4 && (c <= 4 || c >= 13)) isSteel = true;
-              else if (r === 7 && (c <= 6 || c >= 11)) isSteel = true;
-              else if (r === 10 && (c <= 7 || c >= 10)) isSteel = true;
+            case 3:
+              if (r === 4 && c <= 14) isSteel = true;
+              else if (r === 8 && c >= 3) isSteel = true;
+              else if (r === 12 && c <= 14) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 7: // Honeycomb Fortress: Strategic steel barricades
-              if ((r === 4 || r === 8 || r === 12) && (c % 3 === 0)) isSteel = true;
+            case 4:
+              if ((c === 4 || c === 13) && r >= 3 && r <= 17 && r !== 10) isSteel = true;
+              else if (r === 8 && (c <= 4 || c >= 13)) isSteel = true;
+              else if (r === 13 && (c >= 6 && c <= 11 && c !== 8 && c !== 9)) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 8: // Concentric Ring Walls: Outer and inner ring
-              if ((r === 3 || r === 12) && c >= 3 && c <= 14 && (c < 7 || c > 10)) isSteel = true;
+            case 5:
+              if ((r === 5 || r === 10) && (c % 4 !== 0)) isSteel = true;
+              else if ((c === 5 || c === 12) && r >= 13 && r <= 19) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 6:
+              if (r === 4 && (c <= 5 || c >= 12)) isSteel = true;
+              else if (r === 7 && (c <= 7 || c >= 10)) isSteel = true;
+              else if (r === 10 && (c < 8 || c > 9)) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 7:
+              if (c === 8 && r >= 2 && r <= 15 && r !== 5 && r !== 11) isSteel = true;
+              else if (r === 8 && c >= 2 && c <= 15 && c !== 4 && c !== 12) isSteel = true;
+              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              break;
+
+            case 8:
+              if ((r === 3 || r === 12) && c >= 3 && c <= 14 && c !== 8) isSteel = true;
               else if ((c === 3 || c === 14) && r >= 3 && r <= 12 && r !== 7) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
 
-            case 9: // Milestone Boss Fortress: Armored Core
-              if (r === 3 && c >= 5 && c <= 12) isSteel = true;
-              else if (r === 6 && (c <= 5 || c >= 12)) isSteel = true;
-              else if (r === 10 && c >= 4 && c <= 13 && c !== 8 && c !== 9) isSteel = true;
+            case 9:
+              if (r === 3 && c >= 4 && c <= 13) isSteel = true;
+              else if (r === 7 && (c <= 6 || c >= 11)) isSteel = true;
+              else if (r === 11 && c >= 3 && c <= 14 && c !== 8 && c !== 9) isSteel = true;
               else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
               break;
           }
         }
 
-        // Push Bricks to Level
         if (isSteel) {
           this.bricks.push({
             x: offsetX + c * (brickW + 1),
@@ -720,25 +715,24 @@ class MultaniGame {
             w: brickW,
             h: brickH,
             isSteel: true,
-            color: '#1a1f33' // Dark charcoal fort wall color
+            color: '#1a1f33'
           });
         } else if (isBreakable) {
           let hp = 1;
-          if (lvl > 15 && Math.random() < 0.25) hp = 2;
-          if (lvl > 40 && Math.random() < 0.2) hp = 3;
+          if (lvl > 10 && Math.random() < 0.3) hp = 2;
+          if (lvl > 30 && Math.random() < 0.22) hp = 3;
 
           let pPower = null;
           const roll = Math.random();
-          if (roll < 0.14) pPower = '2X';
-          else if (roll < 0.20) pPower = '3X';
-          else if (roll < 0.23) pPower = '4X';
-          else if (roll < 0.25) pPower = '5X';
+          if (roll < 0.08) pPower = '2X';
+          else if (roll < 0.12) pPower = '3X';
+          else if (roll < 0.15) pPower = '4X';
+          else if (roll < 0.16) pPower = '5X';
 
-          // Dense Pink, Cyan, Orange stripes (from screenshot)
-          let col = '#ff007f'; // Pink
+          let col = '#ff007f';
           const stripe = (r + c + lvl) % 3;
-          if (stripe === 1) col = '#00e5ff'; // Cyan
-          else if (stripe === 2) col = '#ff9900'; // Orange
+          if (stripe === 1) col = '#00e5ff';
+          else if (stripe === 2) col = '#ff9900';
 
           this.bricks.push({
             x: offsetX + c * (brickW + 1),
@@ -759,13 +753,14 @@ class MultaniGame {
   }
 
   resetBallToPaddle() {
+    const spd = this.baseSpeed + Math.min(3, this.currentLevel * 0.05);
     this.balls = [{
       x: this.paddle.x + this.paddle.w / 2,
       y: this.paddle.y - 8,
       vx: 0,
       vy: 0,
       radius: 5.5,
-      speed: 4.8 + Math.min(3, this.currentLevel * 0.05),
+      speed: spd,
       active: true
     }];
   }
@@ -790,10 +785,10 @@ class MultaniGame {
     for (let i = 0; added < need && i < currentList.length; i++) {
       const src = currentList[i];
       for (let k = 1; k < factor && added < need; k++) {
-        const spreadAngle = (Math.random() - 0.5) * 1.6;
+        const spreadAngle = (Math.random() - 0.5) * 1.5;
         const currentAngle = Math.atan2(src.vy, src.vx) || -Math.PI / 2;
         const newAngle = currentAngle + spreadAngle;
-        const spd = Math.hypot(src.vx, src.vy) || 5;
+        const spd = Math.max(this.baseSpeed, Math.hypot(src.vx, src.vy));
 
         this.balls.push({
           x: src.x,
@@ -811,9 +806,9 @@ class MultaniGame {
   }
 
   createExplosion(x, y, color) {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       const ang = Math.random() * Math.PI * 2;
-      const spd = Math.random() * 3 + 1;
+      const spd = Math.random() * 3 + 1.5;
       this.particles.push({
         x: x,
         y: y,
@@ -828,16 +823,16 @@ class MultaniGame {
   updateHUD() {
     this.dispLvl.textContent = this.currentLevel;
     this.dispScore.textContent = this.score;
-    this.dispBalls.textContent = this.balls.length;
+    this.dispBalls.textContent = Math.min(this.maxBalls, this.balls.length);
     this.dispLives.textContent = '❤️'.repeat(Math.max(0, this.lives));
   }
 
   update() {
     if (this.state !== 'PLAYING') return;
 
-    this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.35;
+    this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.4;
 
-    // Powerups falling
+    // Powerups Falling Faster
     for (let i = this.powerups.length - 1; i >= 0; i--) {
       const p = this.powerups[i];
       p.y += p.speed;
@@ -864,16 +859,21 @@ class MultaniGame {
       const pt = this.particles[i];
       pt.x += pt.vx;
       pt.y += pt.vy;
-      pt.life -= 0.04;
+      pt.life -= 0.05;
       if (pt.life <= 0) this.particles.splice(i, 1);
     }
 
-    // Sub-steps continuous physics
-    const subSteps = 2;
+    // 3 Sub-steps for high speed precision without tunnel glitching
+    const subSteps = 3;
     for (let step = 0; step < subSteps; step++) {
       for (let i = 0; i < this.balls.length; i++) {
         const b = this.balls[i];
         if (!b.active) continue;
+
+        // Ensure vertical velocity never lags or stalls horizontally
+        if (Math.abs(b.vy) < 2.5) {
+          b.vy = (b.vy < 0 ? -1 : 1) * 3.5;
+        }
 
         b.x += b.vx / subSteps;
         b.y += b.vy / subSteps;
@@ -891,7 +891,7 @@ class MultaniGame {
           b.vy = Math.abs(b.vy);
         }
 
-        // Paddle Collision (At elevated position)
+        // Paddle Collision (Fast bounce)
         if (
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
@@ -902,7 +902,7 @@ class MultaniGame {
           b.y = this.paddle.y - b.radius;
           const hitPos = (b.x - (this.paddle.x + this.paddle.w / 2)) / (this.paddle.w / 2);
           const bounceAngle = hitPos * (Math.PI * 0.42) - Math.PI / 2;
-          const spd = Math.hypot(b.vx, b.vy);
+          const spd = Math.max(this.baseSpeed, Math.hypot(b.vx, b.vy));
           b.vx = Math.cos(bounceAngle) * spd;
           b.vy = Math.sin(bounceAngle) * spd;
           this.snd.hitPaddle();
@@ -937,7 +937,7 @@ class MultaniGame {
                     y: br.y + br.h / 2,
                     type: br.powerup,
                     r: 12,
-                    speed: 2.2
+                    speed: 3.5 // Fast falling powerups
                   });
                 }
                 this.bricks.splice(j, 1);
@@ -951,16 +951,16 @@ class MultaniGame {
         }
 
         // Lost Ball
-        if (b.y > this.height + 20) {
+        if (b.y > this.height + 25) {
           b.active = false;
         }
       }
     }
 
     this.balls = this.balls.filter(b => b.active);
-    this.dispBalls.textContent = this.balls.length;
+    this.dispBalls.textContent = Math.min(this.maxBalls, this.balls.length);
 
-    // Check Win (All breakables cleared)
+    // Check Win
     const remainingBreakable = this.bricks.filter(b => !b.isSteel).length;
     if (remainingBreakable === 0) {
       this.handleLevelWin();
@@ -987,7 +987,6 @@ class MultaniGame {
     this.state = 'WIN';
     this.snd.win();
     this.saveProgress();
-    // Sab fort walls aur bricks clear taaki photo 100% crystal-clear dikhe
     this.bricks = [];
     this.powerups = [];
     this.balls = [];
@@ -999,7 +998,7 @@ class MultaniGame {
     this.ctx.save();
     this.ctx.scale(this.scaleX, this.scaleY);
 
-    // 1. Background Image
+    // 1. Draw Real Place Photo
     const photo = getPhoto(this.currentLevel);
     if (photo.img && photo.img.complete && photo.img.naturalWidth !== 0) {
       this.ctx.drawImage(photo.img, 0, 0, this.width, this.height);
@@ -1072,7 +1071,7 @@ class MultaniGame {
       }
       this.ctx.globalAlpha = 1;
 
-      // 5. Glowing Orange Paddle
+      // 5. Paddle
       this.ctx.save();
       this.ctx.shadowColor = '#ff6600';
       this.ctx.shadowBlur = 16;
@@ -1085,7 +1084,7 @@ class MultaniGame {
       this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 3, this.paddle.w * 0.5, 2.5);
       this.ctx.restore();
 
-      // 6. Glowing White Balls
+      // 6. Glowing Fast Balls (Strict Max 100)
       this.ctx.save();
       this.ctx.shadowColor = '#ffffff';
       this.ctx.shadowBlur = 8;
