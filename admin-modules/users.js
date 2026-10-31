@@ -51,11 +51,16 @@ export function renderUsersList(list) {
     const userEmail = u.email || 'No email added';
     const avatarUrl = u.avatar_url || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
     
-    const userBalance = Number(
-      u.balance !== undefined && u.balance !== null ? u.balance :
-      (u.wallet_balance !== undefined && u.wallet_balance !== null ? u.wallet_balance :
-      (u.wallet !== undefined && u.wallet !== null ? u.wallet :
-      (u.amount !== undefined && u.amount !== null ? u.amount : 0)))
+    // Supabase column: wallet_balance (Real Wallet)
+    const realWalletBalance = Number(
+      u.wallet_balance !== undefined && u.wallet_balance !== null ? u.wallet_balance :
+      (u.balance !== undefined && u.balance !== null ? u.balance : 0)
+    );
+
+    // Supabase column: total_won (Winning Amount)
+    const wonAmount = Number(
+      u.total_won !== undefined && u.total_won !== null ? u.total_won :
+      (u.won !== undefined && u.won !== null ? u.won : 0)
     );
     
     const lastSeenTime = u.last_seen || u.updated_at || u.created_at;
@@ -86,8 +91,9 @@ export function renderUsersList(list) {
             </div>
           </div>
           <div class="shrink-0 text-right">
-            <span class="font-gaming font-bold text-yellow-400 text-sm block">PKR ${userBalance}</span>
-            <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'}">
+            <span class="font-gaming font-bold text-yellow-400 text-sm block">PKR ${realWalletBalance}</span>
+            <span class="font-gaming font-bold text-emerald-400 text-[11px] block">Won: PKR ${wonAmount}</span>
+            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${u.is_banned ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'}">
               ${u.is_banned ? 'BANNED' : 'ACTIVE'}
             </span>
           </div>
@@ -109,7 +115,7 @@ export function renderUsersList(list) {
               <i class="fa-brands fa-whatsapp text-sm"></i> WA
             </a>
           ` : ''}
-          <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${userBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 transition cursor-pointer">
+          <button onclick="openWalletModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}', ${realWalletBalance})" class="bg-amber-600 hover:bg-amber-500 text-white py-1.5 px-3 rounded-xl font-bold text-xs flex items-center gap-1 transition cursor-pointer">
             <i class="fa-solid fa-wallet"></i> Edit Balance
           </button>
           <button onclick="openPlayerHistoryModal('${u.id}', '${escapeHTML(u.free_fire_name || 'Player')}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black py-1.5 px-3 rounded-xl font-bold text-xs font-gaming transition flex items-center justify-center gap-1.5 cursor-pointer">
@@ -141,9 +147,10 @@ export async function saveWalletBalance() {
     return;
   }
 
+  // Supabase ke dono columns update honge
   const { error } = await sbClient.from('profiles').update({
-    balance: newBalance,
     wallet_balance: newBalance,
+    balance: newBalance,
     updated_at: new Date().toISOString()
   }).eq('id', userId);
 
