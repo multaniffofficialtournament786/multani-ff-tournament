@@ -1,4 +1,3 @@
-
 // ==========================================
 // MULTANI FF OFFICIAL - MASTER MODULE LOADER
 // SAFE UPDATED VERSION
@@ -122,6 +121,32 @@ window.renderProfile = renderProfile;
 window.renderForgotPassword = renderForgotPassword;
 window.uploadAvatarPhoto = uploadAvatarPhoto;
 window.saveUserProfile = saveUserProfile;
+
+// SAFE LOGOUT HANDLER
+window.handleAppLogout = async () => {
+  try {
+    Loader.show('Logging out...');
+    Drawer.close();
+
+    if (sbClient) {
+      await sbClient.auth.signOut();
+    }
+
+    state.currentUser = null;
+    state.currentProfile = null;
+    localStorage.clear();
+    sessionStorage.clear();
+
+    Toast.show('Logout successful!', 'success');
+    await Router.navigate('login', null, false);
+  } catch (error) {
+    console.error('Logout error:', error);
+    Toast.show('Logout complete', 'info');
+    await Router.navigate('login', null, false);
+  } finally {
+    Loader.hide();
+  }
+};
 
 // ==========================================
 // 4. GAME & APP ACTIONS
@@ -679,6 +704,20 @@ function bindHeaderAndUIEvents() {
     };
   }
 
+  // LOGOUT BUTTON EVENT BINDING
+  const btnLogout =
+    document.getElementById('btn-drawer-logout');
+
+  if (btnLogout && btnLogout.dataset.bound !== 'true') {
+    btnLogout.dataset.bound = 'true';
+
+    btnLogout.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.handleAppLogout();
+    };
+  }
+
   const chatForm =
     document.getElementById('chat-modal-form');
 
@@ -836,4 +875,3 @@ window.addEventListener(
     );
   }
 );
-                         
