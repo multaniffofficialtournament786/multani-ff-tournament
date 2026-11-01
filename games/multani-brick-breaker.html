@@ -34,7 +34,7 @@
   }
   /* Top HUD Dashboard */
   #header {
-    height: 66px;
+    height: 58px;
     background: #070712;
     border-bottom: 2px solid #ff007f;
     display: flex;
@@ -48,7 +48,7 @@
     flex-direction: column;
   }
   .title-main {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 900;
     color: #ff007f;
     letter-spacing: 0.5px;
@@ -56,7 +56,7 @@
     text-shadow: 0 0 8px rgba(255,0,127,0.8);
   }
   .title-sub {
-    font-size: 9px;
+    font-size: 8px;
     color: #00e5ff;
     letter-spacing: 1px;
     font-weight: bold;
@@ -76,7 +76,7 @@
     font-weight: 800;
   }
   .stat-val {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 900;
   }
   .val-lvl { color: #ffffff; }
@@ -93,7 +93,7 @@
     border: 1px solid #00e5ff;
     color: #00e5ff;
     border-radius: 5px;
-    padding: 6px 8px;
+    padding: 5px 7px;
     font-size: 10px;
     font-weight: bold;
     cursor: pointer;
@@ -106,15 +106,15 @@
   /* Landmark Name Pill */
   #landmark-pill {
     position: absolute;
-    top: 72px;
+    top: 6px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.88);
     border: 1px solid #00e5ff;
     color: #fff;
-    padding: 4px 16px;
-    border-radius: 15px;
-    font-size: 11px;
+    padding: 3px 14px;
+    border-radius: 12px;
+    font-size: 10px;
     font-weight: bold;
     box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
     z-index: 15;
@@ -122,7 +122,6 @@
     white-space: nowrap;
   }
 
-  /* Canvas and Background Photo Layer */
   #canvas-wrapper {
     position: relative;
     flex: 1;
@@ -132,7 +131,6 @@
     background: #000;
   }
 
-  /* Dedicated Real Photo Image (Never blocked by CORS) */
   #real-photo {
     position: absolute;
     inset: 0;
@@ -146,13 +144,11 @@
     transition: opacity 0.5s ease, filter 0.5s ease;
   }
 
-  /* When level is cleared, photo becomes 100% full bright */
   #real-photo.revealed {
     opacity: 1 !important;
     filter: brightness(1) contrast(1) !important;
   }
 
-  /* Transparent gameplay canvas on top of photo */
   canvas {
     position: absolute;
     inset: 0;
@@ -163,7 +159,6 @@
     background: transparent;
   }
 
-  /* Level Complete Overlay */
   #win-screen {
     position: absolute;
     inset: 0;
@@ -288,7 +283,7 @@
 
   #tap-hint {
     position: absolute;
-    bottom: 240px;
+    bottom: 200px;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
@@ -343,14 +338,12 @@
   </header>
 
   <div id="canvas-wrapper">
-    <!-- 100% GUARANTEED REAL PLACE PHOTO LAYER -->
     <img id="real-photo" referrerpolicy="no-referrer" alt="Fort Landmark" />
 
     <div id="landmark-pill">Derawar Fort, Bahawalpur</div>
     <canvas id="gameCanvas"></canvas>
     <div id="tap-hint">TAP TO LAUNCH BALL</div>
 
-    <!-- Win Screen: Background Photo Clearly Revealed -->
     <div id="win-screen">
       <div class="win-card">
         <h2>FORT DESTROYED!</h2>
@@ -427,7 +420,6 @@ class SoundSys {
   }
 }
 
-/* REAL PAKISTANI FORTS & LANDMARKS (Direct high-availability images) */
 const photoData = [
   { name: "Derawar Fort, Bahawalpur", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=85" },
   { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=800&auto=format&fit=crop&q=85" },
@@ -473,14 +465,19 @@ class MultaniGame {
     this.score = 0;
     this.lives = 3;
 
-    // Paddle safely elevated above bottom gesture area
+    // Paddle setup
     this.paddle = {
-      w: 86,
-      h: 15,
-      x: 157,
-      y: this.height - 135,
-      targetX: 157
+      w: 84,
+      h: 14,
+      x: 158,
+      y: this.height - 110,
+      targetX: 158
     };
+
+    // Drag-based touch controls (no teleporting on tap)
+    this.isDraggingPaddle = false;
+    this.touchStartX = 0;
+    this.paddleStartOriginX = 0;
 
     this.balls = [];
     this.bricks = [];
@@ -488,11 +485,8 @@ class MultaniGame {
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
 
-    // Strict 100 balls limit
     this.maxBalls = 100;
-
-    // Fast arcade speed so ball never stalls or feels slow
-    this.baseSpeed = 8.4;
+    this.baseSpeed = 8.5;
 
     this.initEvents();
     this.resize();
@@ -512,33 +506,61 @@ class MultaniGame {
   }
 
   initEvents() {
-    const handleMove = (clientX) => {
+    const getCanvasPos = (clientX, clientY) => {
       const rect = this.canvas.getBoundingClientRect();
-      const canvasX = (clientX - rect.left) * (this.width / rect.width);
-      this.paddle.targetX = Math.max(8, Math.min(this.width - this.paddle.w - 8, canvasX - this.paddle.w / 2));
+      return {
+        x: (clientX - rect.left) * (this.width / rect.width),
+        y: (clientY - rect.top) * (this.height / rect.height)
+      };
     };
 
-    const handlePointerStart = (clientX) => {
+    const onStart = (clientX, clientY) => {
       this.snd.init();
       if (this.state === 'WAIT_LAUNCH') {
         this.launchBall();
-      } else {
-        handleMove(clientX);
+        return;
+      }
+      const pos = getCanvasPos(clientX, clientY);
+      // Grab only near paddle or paddle area to avoid jumping
+      if (pos.y >= this.paddle.y - 70) {
+        this.isDraggingPaddle = true;
+        this.touchStartX = pos.x;
+        this.paddleStartOriginX = this.paddle.targetX;
       }
     };
 
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) handleMove(e.touches[0].clientX);
-    }, { passive: false });
+    const onMove = (clientX, clientY) => {
+      if (!this.isDraggingPaddle) return;
+      const pos = getCanvasPos(clientX, clientY);
+      const deltaX = pos.x - this.touchStartX;
+      const newX = this.paddleStartOriginX + deltaX;
+      this.paddle.targetX = Math.max(6, Math.min(this.width - this.paddle.w - 6, newX));
+    };
 
+    const onEnd = () => {
+      this.isDraggingPaddle = false;
+    };
+
+    // Touch events with relative movement
     window.addEventListener('touchstart', (e) => {
       if (e.target === this.canvas && e.touches.length > 0) {
-        handlePointerStart(e.touches[0].clientX);
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
       }
     }, { passive: false });
 
-    window.addEventListener('mousemove', (e) => handleMove(e.clientX));
-    this.canvas.addEventListener('mousedown', (e) => handlePointerStart(e.clientX));
+    window.addEventListener('touchmove', (e) => {
+      if (this.isDraggingPaddle && e.touches.length > 0) {
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', onEnd);
+    window.addEventListener('touchcancel', onEnd);
+
+    // Mouse drag support
+    this.canvas.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
+    window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', onEnd);
 
     this.btnSfx.addEventListener('click', () => {
       this.snd.enabled = !this.snd.enabled;
@@ -603,7 +625,7 @@ class MultaniGame {
     this.levelModal.style.display = 'flex';
   }
 
-  /* HARD FORT WITH TIGHT SLITS (1-2 ball entrance holes) */
+  /* High-density grid filling right below header with solid fort borders */
   loadLevel(lvl) {
     this.currentLevel = lvl;
     this.bricks = [];
@@ -611,28 +633,29 @@ class MultaniGame {
     this.particles = [];
     this.balls = [];
     this.state = 'WAIT_LAUNCH';
+    this.isDraggingPaddle = false;
     this.tapHint.style.display = 'block';
     this.winScreen.style.display = 'none';
     this.gameoverScreen.style.display = 'none';
 
-    // Direct Photo Attachment (Bypasses any Canvas CORS bug)
     const photo = photoData[(lvl - 1) % photoData.length];
     this.landmarkPill.textContent = photo.name;
     this.bgImg.src = photo.url;
-    this.bgImg.classList.remove('revealed'); // Dimmed during gameplay
+    this.bgImg.classList.remove('revealed');
 
-    this.paddle.w = Math.max(58, 86 - Math.floor(lvl * 0.28));
+    this.paddle.w = Math.max(54, 84 - Math.floor(lvl * 0.25));
     this.paddle.x = (this.width - this.paddle.w) / 2;
     this.paddle.targetX = this.paddle.x;
 
     this.resetBallToPaddle();
 
-    const cols = 18;
-    const rows = 24;
-    const brickW = 18;
-    const brickH = 14;
-    const offsetX = 22;
-    const offsetY = 70;
+    // 25 Columns x 38 Rows of compact bricks
+    const cols = 25;
+    const rows = 38;
+    const brickW = 15;
+    const brickH = 11;
+    const offsetX = 12;
+    const offsetY = 32; // Begins directly under the header buttons
 
     const fortStyle = (lvl - 1) % 10;
 
@@ -641,102 +664,103 @@ class MultaniGame {
         let isSteel = false;
         let isBreakable = false;
 
-        const isBorder = (r === 0 || c === 0 || c === cols - 1 || r === rows - 1);
-        if (isBorder) {
-          // Bottom wall: TIGHT 1-2 BALL ENTRANCES ONLY
+        const isOuterBorder = (r === 0 || c === 0 || c === cols - 1 || r === rows - 1);
+
+        if (isOuterBorder) {
+          // Bottom wall: precise slits (entrance holes)
           if (r === rows - 1) {
-            if (fortStyle === 0 && (c === 8 || c === 9)) isSteel = false;
-            else if (fortStyle === 1 && (c === 3 || c === 14)) isSteel = false;
-            else if (fortStyle === 2 && (c === 5 || c === 6)) isSteel = false;
-            else if (fortStyle === 3 && (c === 11 || c === 12)) isSteel = false;
-            else if (fortStyle === 4 && (c === 8)) isSteel = false; // 1-brick hole
-            else if (fortStyle === 5 && (c === 4 || c === 13)) isSteel = false;
-            else if (fortStyle === 6 && (c === 9)) isSteel = false;
-            else if (fortStyle === 7 && (c === 6 || c === 11)) isSteel = false;
-            else if (fortStyle === 8 && (c === 7 || c === 8)) isSteel = false;
-            else if (fortStyle === 9 && (c === 8)) isSteel = false;
+            if (fortStyle === 0 && (c === 11 || c === 12 || c === 13)) isSteel = false;
+            else if (fortStyle === 1 && (c === 4 || c === 5 || c === 19 || c === 20)) isSteel = false;
+            else if (fortStyle === 2 && (c === 8 || c === 9 || c === 15 || c === 16)) isSteel = false;
+            else if (fortStyle === 3 && (c === 12 || c === 13)) isSteel = false;
+            else if (fortStyle === 4 && (c === 11 || c === 12)) isSteel = false;
+            else if (fortStyle === 5 && (c === 5 || c === 6 || c === 18 || c === 19)) isSteel = false;
+            else if (fortStyle === 6 && (c === 12 || c === 13)) isSteel = false;
+            else if (fortStyle === 7 && (c === 7 || c === 8 || c === 16 || c === 17)) isSteel = false;
+            else if (fortStyle === 8 && (c === 10 || c === 11 || c === 13 || c === 14)) isSteel = false;
+            else if (fortStyle === 9 && (c === 12 || c === 13)) isSteel = false;
             else isSteel = true;
           } else {
             isSteel = true;
           }
         }
 
-        // Inner Mazes & Defensive Slits
-        if (!isSteel && !isBorder) {
+        // Inner Fort Bastions, Walls & Chambers
+        if (!isSteel && !isOuterBorder) {
           switch (fortStyle) {
             case 0:
-              if (r === 4 && (c < 8 || c > 9)) isSteel = true;
-              else if (r === 8 && (c < 4 || (c > 5 && c < 12) || c > 13)) isSteel = true;
-              else if (r === 12 && (c < 8 || c > 9)) isSteel = true;
-              else if (r >= 14 && r <= 20 && (c === 5 || c === 12)) isSteel = true;
-              else if (r >= 1 && r <= 13 && c >= 1 && c <= 16) isBreakable = true;
+              if (r === 8 && (c < 11 || c > 13)) isSteel = true;
+              else if (r === 16 && (c < 6 || (c > 8 && c < 16) || c > 18)) isSteel = true;
+              else if (r === 24 && (c < 11 || c > 13)) isSteel = true;
+              else if (r >= 26 && r <= 34 && (c === 7 || c === 17)) isSteel = true;
+              else if (r >= 1 && r <= 25) isBreakable = true;
               break;
 
             case 1:
-              if (c === 8 && r >= 2 && r <= 16 && r !== 6) isSteel = true;
-              else if (r === 6 && (c === 2 || c === 3 || c === 13 || c === 14)) isSteel = true;
-              else if (r === 11 && (c < 7 || c > 9)) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if (c === 12 && r >= 3 && r <= 26 && r !== 10) isSteel = true;
+              else if (r === 10 && (c === 3 || c === 4 || c === 20 || c === 21)) isSteel = true;
+              else if (r === 18 && (c < 10 || c > 14)) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 2:
-              if ((r === 4 || r === 12) && c >= 4 && c <= 13 && c !== 8) isSteel = true;
-              else if ((c === 4 || c === 13) && r >= 4 && r <= 12 && r !== 8) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if ((r === 7 || r === 20) && c >= 6 && c <= 18 && c !== 12) isSteel = true;
+              else if ((c === 6 || c === 18) && r >= 7 && r <= 20 && r !== 14) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 3:
-              if (r === 4 && c <= 14) isSteel = true;
-              else if (r === 8 && c >= 3) isSteel = true;
-              else if (r === 12 && c <= 14) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if (r === 7 && c <= 19) isSteel = true;
+              else if (r === 14 && c >= 5) isSteel = true;
+              else if (r === 21 && c <= 19) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 4:
-              if ((c === 4 || c === 13) && r >= 3 && r <= 17 && r !== 10) isSteel = true;
-              else if (r === 8 && (c <= 4 || c >= 13)) isSteel = true;
-              else if (r === 13 && (c >= 6 && c <= 11 && c !== 8 && c !== 9)) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if ((c === 6 || c === 18) && r >= 5 && r <= 26 && r !== 15) isSteel = true;
+              else if (r === 12 && (c <= 6 || c >= 18)) isSteel = true;
+              else if (r === 20 && (c >= 9 && c <= 15 && c !== 12)) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 5:
-              if ((r === 5 || r === 10) && (c % 4 !== 0)) isSteel = true;
-              else if ((c === 5 || c === 12) && r >= 13 && r <= 19) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if ((r === 8 || r === 17) && (c % 4 !== 0)) isSteel = true;
+              else if ((c === 7 || c === 17) && r >= 20 && r <= 32) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 6:
-              if (r === 4 && (c <= 5 || c >= 12)) isSteel = true;
-              else if (r === 7 && (c <= 7 || c >= 10)) isSteel = true;
-              else if (r === 10 && (c < 8 || c > 9)) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if (r === 6 && (c <= 8 || c >= 16)) isSteel = true;
+              else if (r === 12 && (c <= 10 || c >= 14)) isSteel = true;
+              else if (r === 18 && (c < 11 || c > 13)) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 7:
-              if (c === 8 && r >= 2 && r <= 15 && r !== 5 && r !== 11) isSteel = true;
-              else if (r === 8 && c >= 2 && c <= 15 && c !== 4 && c !== 12) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if (c === 12 && r >= 3 && r <= 25 && r !== 8 && r !== 18) isSteel = true;
+              else if (r === 13 && c >= 3 && c <= 21 && c !== 6 && c !== 18) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 8:
-              if ((r === 3 || r === 12) && c >= 3 && c <= 14 && c !== 8) isSteel = true;
-              else if ((c === 3 || c === 14) && r >= 3 && r <= 12 && r !== 7) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if ((r === 5 || r === 20) && c >= 5 && c <= 19 && c !== 12) isSteel = true;
+              else if ((c === 5 || c === 19) && r >= 5 && r <= 20 && r !== 12) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
 
             case 9:
-              if (r === 3 && c >= 4 && c <= 13) isSteel = true;
-              else if (r === 7 && (c <= 6 || c >= 11)) isSteel = true;
-              else if (r === 11 && c >= 3 && c <= 14 && c !== 8 && c !== 9) isSteel = true;
-              else if (r >= 1 && r <= 14 && c >= 1 && c <= 16) isBreakable = true;
+              if (r === 5 && c >= 5 && c <= 19) isSteel = true;
+              else if (r === 12 && (c <= 9 || c >= 15)) isSteel = true;
+              else if (r === 19 && c >= 4 && c <= 20 && c !== 12 && c !== 13) isSteel = true;
+              else if (r >= 1 && r <= 26) isBreakable = true;
               break;
           }
         }
 
         if (isSteel) {
           this.bricks.push({
-            x: offsetX + c * (brickW + 1),
-            y: offsetY + r * (brickH + 1),
+            x: offsetX + c * brickW,
+            y: offsetY + r * brickH,
             w: brickW,
             h: brickH,
             isSteel: true,
@@ -744,15 +768,15 @@ class MultaniGame {
           });
         } else if (isBreakable) {
           let hp = 1;
-          if (lvl > 10 && Math.random() < 0.3) hp = 2;
-          if (lvl > 30 && Math.random() < 0.22) hp = 3;
+          if (lvl > 15 && Math.random() < 0.25) hp = 2;
+          if (lvl > 40 && Math.random() < 0.18) hp = 3;
 
           let pPower = null;
           const roll = Math.random();
-          if (roll < 0.08) pPower = '2X';
-          else if (roll < 0.12) pPower = '3X';
-          else if (roll < 0.15) pPower = '4X';
-          else if (roll < 0.16) pPower = '5X';
+          if (roll < 0.04) pPower = '2X';
+          else if (roll < 0.065) pPower = '3X';
+          else if (roll < 0.08) pPower = '4X';
+          else if (roll < 0.09) pPower = '5X';
 
           let col = '#ff007f';
           const stripe = (r + c + lvl) % 3;
@@ -760,8 +784,8 @@ class MultaniGame {
           else if (stripe === 2) col = '#ff9900';
 
           this.bricks.push({
-            x: offsetX + c * (brickW + 1),
-            y: offsetY + r * (brickH + 1),
+            x: offsetX + c * brickW,
+            y: offsetY + r * brickH,
             w: brickW,
             h: brickH,
             hp: hp,
@@ -778,13 +802,13 @@ class MultaniGame {
   }
 
   resetBallToPaddle() {
-    const spd = this.baseSpeed + Math.min(3, this.currentLevel * 0.05);
+    const spd = this.baseSpeed + Math.min(3, this.currentLevel * 0.04);
     this.balls = [{
       x: this.paddle.x + this.paddle.w / 2,
-      y: this.paddle.y - 8,
+      y: this.paddle.y - 7,
       vx: 0,
       vy: 0,
-      radius: 5.5,
+      radius: 4.5,
       speed: spd,
       active: true
     }];
@@ -794,7 +818,7 @@ class MultaniGame {
     if (this.state !== 'WAIT_LAUNCH') return;
     this.state = 'PLAYING';
     this.tapHint.style.display = 'none';
-    const angle = -Math.PI / 2 + (Math.random() * 0.4 - 0.2);
+    const angle = -Math.PI / 2 + (Math.random() * 0.35 - 0.175);
     const spd = this.balls[0].speed;
     this.balls[0].vx = Math.cos(angle) * spd;
     this.balls[0].vy = Math.sin(angle) * spd;
@@ -820,7 +844,7 @@ class MultaniGame {
           y: src.y,
           vx: Math.cos(newAngle) * spd,
           vy: Math.sin(newAngle) * spd,
-          radius: 5,
+          radius: 4.5,
           speed: spd,
           active: true
         });
@@ -831,9 +855,9 @@ class MultaniGame {
   }
 
   createExplosion(x, y, color) {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const ang = Math.random() * Math.PI * 2;
-      const spd = Math.random() * 3 + 1.5;
+      const spd = Math.random() * 3 + 1;
       this.particles.push({
         x: x,
         y: y,
@@ -855,7 +879,7 @@ class MultaniGame {
   update() {
     if (this.state !== 'PLAYING') return;
 
-    this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.4;
+    this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.45;
 
     // Powerups falling
     for (let i = this.powerups.length - 1; i >= 0; i--) {
@@ -888,31 +912,30 @@ class MultaniGame {
       if (pt.life <= 0) this.particles.splice(i, 1);
     }
 
-    // Sub-steps for precise fast bouncing
-    const subSteps = 3;
+    // Sub-stepping for ultra solid collision detection (Zero wall tunneling)
+    const subSteps = 4;
     for (let step = 0; step < subSteps; step++) {
       for (let i = 0; i < this.balls.length; i++) {
         const b = this.balls[i];
         if (!b.active) continue;
 
-        // Ensure vertical velocity never stalls
-        if (Math.abs(b.vy) < 2.5) {
-          b.vy = (b.vy < 0 ? -1 : 1) * 3.5;
+        if (Math.abs(b.vy) < 2.2) {
+          b.vy = (b.vy < 0 ? -1 : 1) * 3.2;
         }
 
         b.x += b.vx / subSteps;
         b.y += b.vy / subSteps;
 
-        // Screen Boundary
-        if (b.x - b.radius <= 4) {
-          b.x = 4 + b.radius;
+        // Outer boundaries
+        if (b.x - b.radius <= 2) {
+          b.x = 2 + b.radius;
           b.vx = Math.abs(b.vx);
-        } else if (b.x + b.radius >= this.width - 4) {
-          b.x = this.width - 4 - b.radius;
+        } else if (b.x + b.radius >= this.width - 2) {
+          b.x = this.width - 2 - b.radius;
           b.vx = -Math.abs(b.vx);
         }
-        if (b.y - b.radius <= 4) {
-          b.y = 4 + b.radius;
+        if (b.y - b.radius <= 2) {
+          b.y = 2 + b.radius;
           b.vy = Math.abs(b.vy);
         }
 
@@ -921,8 +944,8 @@ class MultaniGame {
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
           b.y - b.radius <= this.paddle.y + this.paddle.h &&
-          b.x >= this.paddle.x - 4 &&
-          b.x <= this.paddle.x + this.paddle.w + 4
+          b.x >= this.paddle.x - 3 &&
+          b.x <= this.paddle.x + this.paddle.w + 3
         ) {
           b.y = this.paddle.y - b.radius;
           const hitPos = (b.x - (this.paddle.x + this.paddle.w / 2)) / (this.paddle.w / 2);
@@ -933,20 +956,43 @@ class MultaniGame {
           this.snd.hitPaddle();
         }
 
-        // Brick & Fort Wall Collision
+        // High-precision Brick & Fort Wall Collision (Clamping ball strictly outside)
         for (let j = 0; j < this.bricks.length; j++) {
           const br = this.bricks[j];
-          if (
-            b.x + b.radius > br.x &&
-            b.x - b.radius < br.x + br.w &&
-            b.y + b.radius > br.y &&
-            b.y - b.radius < br.y + br.h
-          ) {
-            const prevX = b.x - b.vx / subSteps;
-            if (prevX <= br.x || prevX >= br.x + br.w) {
-              b.vx = -b.vx;
+
+          // AABB + radius test
+          const nearestX = Math.max(br.x, Math.min(b.x, br.x + br.w));
+          const nearestY = Math.max(br.y, Math.min(b.y, br.y + br.h));
+          const distX = b.x - nearestX;
+          const distY = b.y - nearestY;
+
+          if (distX * distX + distY * distY < b.radius * b.radius) {
+            // Overlap penetration depth
+            const overlapLeft = (b.x + b.radius) - br.x;
+            const overlapRight = (br.x + br.w) - (b.x - b.radius);
+            const overlapTop = (b.y + b.radius) - br.y;
+            const overlapBottom = (br.y + br.h) - (b.y - b.radius);
+
+            const minOverlapX = Math.min(overlapLeft, overlapRight);
+            const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+            // Rebound along the smallest penetration axis & push out immediately
+            if (minOverlapX < minOverlapY) {
+              if (overlapLeft < overlapRight) {
+                b.x = br.x - b.radius;
+                b.vx = -Math.abs(b.vx);
+              } else {
+                b.x = br.x + br.w + b.radius;
+                b.vx = Math.abs(b.vx);
+              }
             } else {
-              b.vy = -b.vy;
+              if (overlapTop < overlapBottom) {
+                b.y = br.y - b.radius;
+                b.vy = -Math.abs(b.vy);
+              } else {
+                b.y = br.y + br.h + b.radius;
+                b.vy = Math.abs(b.vy);
+              }
             }
 
             if (!br.isSteel) {
@@ -961,8 +1007,8 @@ class MultaniGame {
                     x: br.x + br.w / 2,
                     y: br.y + br.h / 2,
                     type: br.powerup,
-                    r: 12,
-                    speed: 3.5
+                    r: 10,
+                    speed: 3.2
                   });
                 }
                 this.bricks.splice(j, 1);
@@ -985,14 +1031,14 @@ class MultaniGame {
     this.balls = this.balls.filter(b => b.active);
     this.dispBalls.textContent = Math.min(this.maxBalls, this.balls.length);
 
-    // Check Win
+    // Win condition check
     const remainingBreakable = this.bricks.filter(b => !b.isSteel).length;
     if (remainingBreakable === 0) {
       this.handleLevelWin();
       return;
     }
 
-    // Check Lives Loss
+    // Lives Check
     if (this.balls.length === 0) {
       this.lives--;
       this.updateHUD();
@@ -1012,46 +1058,43 @@ class MultaniGame {
     this.state = 'WIN';
     this.snd.win();
     this.saveProgress();
-    // Clear canvas elements
     this.bricks = [];
     this.powerups = [];
     this.balls = [];
-    // REVEAL REAL PHOTO 100% CRYSTAL CLEAR
     this.bgImg.classList.add('revealed');
     document.getElementById('win-score-txt').textContent = `FORT CLEARED! SCORE: ${this.score}`;
     this.winScreen.style.display = 'flex';
   }
 
   render() {
-    // Clear canvas so background HTML <img> is clearly visible underneath
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.save();
     this.ctx.scale(this.scaleX, this.scaleY);
 
     if (this.state !== 'WIN') {
-      // 1. Draw Fort Border & Bricks
+      // 1. Draw Bricks & Solid Walls
       for (const br of this.bricks) {
         if (br.isSteel) {
-          this.ctx.fillStyle = '#1c2136';
+          this.ctx.fillStyle = '#1c2236';
           this.ctx.fillRect(br.x, br.y, br.w, br.h);
-          this.ctx.strokeStyle = '#2d3756';
+          this.ctx.strokeStyle = '#323d60';
           this.ctx.lineWidth = 1;
           this.ctx.strokeRect(br.x, br.y, br.w, br.h);
         } else {
           this.ctx.fillStyle = br.color;
           this.ctx.shadowColor = br.color;
-          this.ctx.shadowBlur = 6;
+          this.ctx.shadowBlur = 4;
           this.ctx.fillRect(br.x, br.y, br.w, br.h);
 
-          this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-          this.ctx.lineWidth = 1;
+          this.ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+          this.ctx.lineWidth = 0.8;
           this.ctx.strokeRect(br.x, br.y, br.w, br.h);
 
           if (br.powerup) {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.beginPath();
-            this.ctx.arc(br.x + br.w / 2, br.y + br.h / 2, 2.5, 0, Math.PI * 2);
+            this.ctx.arc(br.x + br.w / 2, br.y + br.h / 2, 2, 0, Math.PI * 2);
             this.ctx.fill();
           }
         }
@@ -1067,14 +1110,14 @@ class MultaniGame {
 
         this.ctx.save();
         this.ctx.shadowColor = col;
-        this.ctx.shadowBlur = 14;
+        this.ctx.shadowBlur = 12;
         this.ctx.fillStyle = col;
         this.ctx.beginPath();
         this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         this.ctx.fill();
 
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = 'bold 9px sans-serif';
+        this.ctx.font = 'bold 8px sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(p.type, p.x, p.y);
@@ -1085,27 +1128,27 @@ class MultaniGame {
       for (const pt of this.particles) {
         this.ctx.fillStyle = pt.color;
         this.ctx.globalAlpha = Math.max(0, pt.life);
-        this.ctx.fillRect(pt.x, pt.y, 3, 3);
+        this.ctx.fillRect(pt.x, pt.y, 2.5, 2.5);
       }
       this.ctx.globalAlpha = 1;
 
       // 4. Paddle
       this.ctx.save();
       this.ctx.shadowColor = '#ff6600';
-      this.ctx.shadowBlur = 16;
+      this.ctx.shadowBlur = 14;
       this.ctx.fillStyle = '#ff6600';
       this.ctx.beginPath();
-      this.ctx.roundRect(this.paddle.x, this.paddle.y, this.paddle.w, this.paddle.h, 7);
+      this.ctx.roundRect(this.paddle.x, this.paddle.y, this.paddle.w, this.paddle.h, 6);
       this.ctx.fill();
 
       this.ctx.fillStyle = '#ffffbb';
-      this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 3, this.paddle.w * 0.5, 2.5);
+      this.ctx.fillRect(this.paddle.x + this.paddle.w * 0.25, this.paddle.y + 2.5, this.paddle.w * 0.5, 2);
       this.ctx.restore();
 
-      // 5. Glowing Fast Balls (Strict Max 100)
+      // 5. Glowing Balls
       this.ctx.save();
       this.ctx.shadowColor = '#ffffff';
-      this.ctx.shadowBlur = 8;
+      this.ctx.shadowBlur = 7;
       this.ctx.fillStyle = '#ffffff';
       for (const b of this.balls) {
         this.ctx.beginPath();
