@@ -103,29 +103,6 @@ export function renderAuth(mode = 'login') {
             <div class="arena-input-box"><i class="fa-solid fa-users"></i><input type="text" id="reg-ref" class="arena-field" placeholder="Referral Code UID (Optional)" /></div>
             <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">REGISTER</button>
           </form>
-
-          <!-- GMAIL OTP VERIFICATION FORM -->
-          <form id="signup-otp-form" class="hidden">
-            <div style="background: rgba(0, 240, 255, 0.08); border: 1px solid var(--accent-cyan); border-radius: 10px; padding: 12px; margin-bottom: 14px; text-align: center;">
-              <i class="fa-solid fa-envelope-circle-check" style="color: var(--accent-cyan); font-size: 24px; margin-bottom: 6px;"></i>
-              <p style="font-size: 13px; color: #fff; margin-bottom: 4px;">Gmail par Confirmation Code bhej diya gaya hai!</p>
-              <span id="target-gmail-text" style="font-size: 12px; color: var(--accent-gold); font-weight: bold;"></span>
-            </div>
-
-            <div class="arena-input-box">
-              <i class="fa-solid fa-key"></i>
-              <input type="text" id="signup-otp-code" class="arena-field" placeholder="Enter 6-digit confirmation code" required />
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="background: #00e676; color: #000; font-weight: 800; margin-bottom: 10px;">
-              VERIFY & CREATE ACCOUNT
-            </button>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-              <span id="btn-resend-signup-otp" style="font-size: 12px; color: var(--accent-cyan); cursor: pointer; text-decoration: underline;">Resend Code (3 left)</span>
-              <span id="btn-cancel-signup-otp" style="font-size: 12px; color: var(--danger); cursor: pointer;">Change Details</span>
-            </div>
-          </form>
         `}
 
         <div style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:16px;">
@@ -155,50 +132,7 @@ export function renderAuth(mode = 'login') {
       }
     };
   } else {
-    let pendingRegistration = null;
-
     const signupForm = document.getElementById('signup-form');
-    const otpForm = document.getElementById('signup-otp-form');
-    const targetGmailText = document.getElementById('target-gmail-text');
-    const btnResend = document.getElementById('btn-resend-signup-otp');
-
-    // Helper functions for daily 3 resend limit
-    const getTodayDateStr = () => new Date().toISOString().split('T')[0];
-
-    const getResendCount = (email) => {
-      try {
-        const key = `resend_otp_${email}_${getTodayDateStr()}`;
-        return parseInt(localStorage.getItem(key) || '0', 10);
-      } catch (err) {
-        return 0;
-      }
-    };
-
-    const incrementResendCount = (email) => {
-      try {
-        const key = `resend_otp_${email}_${getTodayDateStr()}`;
-        const current = getResendCount(email);
-        localStorage.setItem(key, String(current + 1));
-        return current + 1;
-      } catch (err) {
-        return 1;
-      }
-    };
-
-    const updateResendButtonUI = (email) => {
-      if (!btnResend) return;
-      const count = getResendCount(email);
-      const remaining = Math.max(0, 3 - count);
-      if (remaining > 0) {
-        btnResend.innerText = `Resend Code (${remaining} left)`;
-        btnResend.style.opacity = '1';
-        btnResend.style.pointerEvents = 'auto';
-      } else {
-        btnResend.innerText = 'Limit Reached (Try tomorrow)';
-        btnResend.style.opacity = '0.5';
-        btnResend.style.pointerEvents = 'none';
-      }
-    };
 
     signupForm.onsubmit = async (e) => {
       e.preventDefault();
@@ -252,141 +186,52 @@ export function renderAuth(mode = 'login') {
           if (refCheck) validReferrerUid = refCheck.free_fire_uid;
         }
 
-        Loader.show("Gmail par code send ho raha hai...");
+        Loader.show("Creating account...");
 
-        const { data, error } = await sbClient.auth.signUp({
+        const { data: signUpData, error: signUpError } = await sbClient.auth.signUp({
           email,
           password
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
 
-        pendingRegistration = {
-          email,
-          password,
-          name,
-          ign,
-          uid,
-          phone,
-          referred_by: validReferrerUid
-        };
-
-        Loader.hide();
-        Toast.show("Confirmation code aapke Gmail par bhej diya gaya hai!", "success");
-
-        if (targetGmailText) targetGmailText.innerText = email;
-        const subTitle = document.getElementById('auth-subtitle');
-        if (subTitle) subTitle.innerText = "Gmail Confirmation Code verify karein.";
-
-        updateResendButtonUI(email);
-
-        signupForm.classList.add('hidden');
-        otpForm.classList.remove('hidden');
-
-      } catch (err) {
-        Loader.hide();
-        Toast.show(err.message || "Registration failed.", "error");
-      }
-    };
-
-    otpForm.onsubmit = async (e) => {
-      e.preventDefault();
-      if (!pendingRegistration) {
-        Toast.show("Kuch galat hua. Dubara register karein.", "error");
-        return;
-      }
-
-      const token = document.getElementById('signup-otp-code').value.trim();
-      if (!token) {
-        Toast.show("Please enter confirmation code!", "error");
-        return;
-      }
-
-      Loader.show("Code verify ho raha hai...");
-
-      try {
-        const { data: verifyData, error: verifyError } = await sbClient.auth.verifyOtp({
-          email: pendingRegistration.email,
-          token: token,
-          type: 'signup'
-        });
-
-        if (verifyError) throw verifyError;
-
-        const userId = verifyData.user?.id || (await sbClient.auth.getUser()).data.user?.id;
-
+        const userId = signUpData.user?.id;
         if (!userId) {
-          throw new Error("Verification to ho gayi lekin user session create nahi hua.");
+          throw new Error("User creation me masla aaya, dubara koshish karein.");
         }
 
-        await sbClient.from('profiles').upsert([{
+        const { error: profileError } = await sbClient.from('profiles').upsert([{
           id: userId,
-          email: pendingRegistration.email,
-          full_name: pendingRegistration.name,
-          free_fire_name: pendingRegistration.ign,
-          free_fire_uid: pendingRegistration.uid,
-          phone: pendingRegistration.phone,
-          referred_by: pendingRegistration.referred_by,
+          email: email,
+          full_name: name,
+          free_fire_name: ign,
+          free_fire_uid: uid,
+          phone: phone,
+          referred_by: validReferrerUid,
           ref_claimed: false,
           wallet_balance: 0,
           is_banned: false,
           is_admin: false
         }]);
 
+        if (profileError) throw profileError;
+
+        // Auto Login if session isn't automatically saved
+        if (!signUpData.session) {
+          await sbClient.auth.signInWithPassword({ email, password });
+        }
+
         Loader.hide();
         Sound.playBrandName();
-        Toast.show("Account verify ho gaya aur ban gaya!", "success");
+        Toast.show("Account kamyabi se ban gaya!", "success");
         await syncAuthAndProfile();
         window.Router.navigate('home');
 
       } catch (err) {
         Loader.hide();
-        Toast.show(err.message || "Ghalat ya expired code!", "error");
+        Toast.show(err.message || "Registration failed.", "error");
       }
     };
-
-    // Resend handler with strict 3-per-day limit
-    if (btnResend) {
-      btnResend.onclick = async () => {
-        if (!pendingRegistration?.email) return;
-
-        const currentCount = getResendCount(pendingRegistration.email);
-        if (currentCount >= 3) {
-          Toast.show("Aaj ki 3 attempts poori ho chuki hain! Kal dubara try karein.", "error");
-          updateResendButtonUI(pendingRegistration.email);
-          return;
-        }
-
-        Loader.show("Code dobara bhej rahe hain...");
-        try {
-          const { error } = await sbClient.auth.resend({
-            type: 'signup',
-            email: pendingRegistration.email
-          });
-          Loader.hide();
-
-          if (error) throw error;
-
-          const updated = incrementResendCount(pendingRegistration.email);
-          updateResendButtonUI(pendingRegistration.email);
-
-          Toast.show(`Naya code bhej diya gaya! (${3 - updated} attempts baqi hain)`, "success");
-        } catch (err) {
-          Loader.hide();
-          Toast.show(err.message || "Code send failed.", "error");
-        }
-      };
-    }
-
-    const btnCancel = document.getElementById('btn-cancel-signup-otp');
-    if (btnCancel) {
-      btnCancel.onclick = () => {
-        otpForm.classList.add('hidden');
-        signupForm.classList.remove('hidden');
-        const subTitle = document.getElementById('auth-subtitle');
-        if (subTitle) subTitle.innerText = "Create an account to join tournaments.";
-      };
-    }
   }
 }
 
