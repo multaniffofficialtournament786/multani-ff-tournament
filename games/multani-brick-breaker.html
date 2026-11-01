@@ -461,9 +461,10 @@ class MultaniGame {
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
 
-    // Strict 50 Balls Limit
     this.maxBalls = 50;
-    this.baseSpeed = 8.5;
+
+    // Ball speed slow aur comfortable kar di (8.5 se kam karke 6.2)
+    this.baseSpeed = 6.2;
 
     this.initEvents();
     this.resize();
@@ -773,7 +774,7 @@ class MultaniGame {
   }
 
   resetBallToPaddle() {
-    const spd = this.baseSpeed + Math.min(2.5, this.currentLevel * 0.03);
+    const spd = this.baseSpeed + Math.min(2.0, this.currentLevel * 0.02);
     this.balls = [{
       x: this.paddle.x + this.paddle.w / 2,
       y: this.paddle.y - 7,
@@ -886,8 +887,8 @@ class MultaniGame {
         const b = this.balls[i];
         if (!b.active) continue;
 
-        if (Math.abs(b.vy) < 2.0) {
-          b.vy = (b.vy < 0 ? -1 : 1) * 3.0;
+        if (Math.abs(b.vy) < 1.6) {
+          b.vy = (b.vy < 0 ? -1 : 1) * 2.4;
         }
 
         b.x += b.vx / subSteps;
@@ -969,7 +970,7 @@ class MultaniGame {
                     y: br.y + br.h / 2,
                     type: br.powerup,
                     r: 9,
-                    speed: 3.2
+                    speed: 2.8
                   });
                 }
                 this.bricks.splice(j, 1);
