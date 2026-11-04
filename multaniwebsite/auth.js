@@ -86,7 +86,7 @@ export function renderAuth(mode = 'login') {
             </div>
             <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:14px;">
               <span onclick="window.renderForgotPassword()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Forgot Password?</span>
-              <span onclick="window.renderVerifyAccount()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Verify Account?</span>
+              <span onclick="window.startVerifyAccountProcess()" style="font-size:12px; color:var(--primary); cursor:pointer; font-weight:600;">Verify Account?</span>
             </div>
             <button type="submit" class="btn btn-primary" style="background:#ff5733; margin-bottom:12px;">LOGIN</button>
           </form>
@@ -208,9 +208,35 @@ export function renderAuth(mode = 'login') {
   };
 }
 
-export function renderVerifyAccount() {
+// Button dabane par turant OTP bhejne aur UI dikhane ka function
+export async function startVerifyAccountProcess() {
+  const currentEmail = state.currentUser?.email || state.currentProfile?.email || '';
+  if (!currentEmail) {
+    Toast.show("Pehle login karein.", "error");
+    window.Router.navigate('login');
+    return;
+  }
+
+  Loader.show("Gmail par OTP bheja ja raha hai...");
+  try {
+    const { data, error } = await sbClient.functions.invoke('send-reset-otp', { body: { email: currentEmail.toLowerCase() } });
+    if (error || !data?.success) {
+      throw new Error(data?.message || error?.message || "OTP send nahi hua.");
+    }
+    Toast.show("OTP aapke Gmail par bhej diya gaya hai!", "success");
+    renderVerifyOTPPage(currentEmail);
+  } catch (err) {
+    Toast.show(err.message || "OTP send karne me error aaya.", "error");
+  } finally {
+    Loader.hide();
+  }
+}
+
+window.startVerifyAccountProcess = startVerifyAccountProcess;
+
+// Verification Page UI: Pehle OTP, fir New Password aur Confirm Password
+export function renderVerifyOTPPage(userEmail) {
   const view = document.getElementById('app-view');
-  const currentEmail = state.currentUser?.email || '';
 
   view.innerHTML = `
     <div class="view-container">
@@ -219,52 +245,62 @@ export function renderVerifyAccount() {
         <h3 style="font-family:var(--font-gaming);font-size:18px;color:var(--accent-gold);">VERIFY ACCOUNT</h3>
       </div>
       <div class="player-hero-card" style="padding:14px;margin-bottom:14px;">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.4;">
-          Naya password confirm karein aur apna account verify karein taake wallet aur referral access open ho sake.
+        <p style="font-size:12px;color:var(--success);margin-bottom:12px;">
+          <i class="fa-solid fa-circle-check"></i> OTP code <b>${escapeHTML(userEmail)}</b> par bhej diya gaya hai.
         </p>
 
-        <form id="direct-verify-pass-form">
+        <form id="verify-account-form">
           <div class="form-group" style="margin-bottom:12px;">
             <label class="form-label">Email</label>
-            <input type="email" class="form-input" value="${escapeHTML(currentEmail)}" readonly style="background:rgba(255,255,255,0.05); color:#888; cursor:not-allowed;" />
+            <input type="email" id="va-email" class="form-input" value="${escapeHTML(userEmail)}" readonly style="background:rgba(255,255,255,0.05); color:#888; cursor:not-allowed;" />
           </div>
+
+          <div class="form-group" style="margin-bottom:12px;">
+            <label class="form-label">OTP Code</label>
+            <input type="text" id="va-otp" class="form-input" placeholder="6-digit OTP code enter karein" inputmode="numeric" required />
+          </div>
+
           <div class="form-group" style="margin-bottom:12px;">
             <label class="form-label">New Password</label>
-            <input type="password" id="va-newpass" class="form-input" placeholder="Kam az kam 6 characters" minlength="6" required />
+            <input type="password" id="va-newpass" class="form-input" placeholder="Kam az kam 8 characters" minlength="8" required />
           </div>
+
           <div class="form-group" style="margin-bottom:16px;">
             <label class="form-label">Confirm Password</label>
-            <input type="password" id="va-confpass" class="form-input" placeholder="Password dobara likhein" minlength="6" required />
+            <input type="password" id="va-confpass" class="form-input" placeholder="Password dobara likhein" minlength="8" required />
           </div>
-          <button type="submit" class="btn btn-primary" style="background:#ff5733; width:100%;"><i class="fa-solid fa-shield-halved"></i> VERIFY & SAVE PASSWORD</button>
+
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" onclick="window.startVerifyAccountProcess()" class="btn" style="flex:1; background:#333; color:#aaa; font-size:12px; padding:10px;">Resend OTP</button>
+            <button type="submit" class="btn btn-primary" style="flex:2; background:#ff5733; font-weight:bold; padding:10px;"><i class="fa-solid fa-shield-halved"></i> VERIFY ACCOUNT</button>
+          </div>
         </form>
       </div>
     </div>`;
 
-  document.getElementById('direct-verify-pass-form').onsubmit = async (e) => {
+  document.getElementById('verify-account-form').onsubmit = async (e) => {
     e.preventDefault();
-    const newPassword = document.getElementById('va-newpass').value.trim();
-    const confirmPassword = document.getElementById('va-confpass').value.trim();
+    const otp = document.getElementById('va-otp').value.trim();
+    const newPassword = document.getElementById('va-newpass').value;
+    const confirmPassword = document.getElementById('va-confpass').value;
 
-    if (newPassword.length < 6) {
-      Toast.show("Password kam az kam 6 characters ka hona chahiye.", "error");
+    if (newPassword.length < 8) {
+      Toast.show("Password kam az kam 8 characters ka hona chahiye.", "error");
       return;
     }
     if (newPassword !== confirmPassword) {
-      Toast.show("Dono passwords match nahi kar rahe!", "error");
-      return;
-    }
-    if (!state.currentUser) {
-      Toast.show("Pehle login karein.", "error");
+      Toast.show("Passwords match nahi kar rahe!", "error");
       return;
     }
 
-    Loader.show("Verifying account...");
+    Loader.show("Verifying account & saving password...");
     try {
-      const { error: authError } = await sbClient.auth.updateUser({
-        password: newPassword
+      const { data, error } = await sbClient.functions.invoke('verify-reset-otp', {
+        body: { email: userEmail, otp: otp, new_password: newPassword }
       });
-      if (authError) throw authError;
+      if (error || !data?.success) {
+        throw new Error(data?.message || error?.message || "OTP ghalat ya expire ho gaya.");
+      }
 
       const { error: profileError } = await sbClient.from('profiles')
         .update({ is_verified: true, updated_at: new Date().toISOString() })
@@ -272,7 +308,7 @@ export function renderVerifyAccount() {
       if (profileError) throw profileError;
 
       await syncAuthAndProfile();
-      Toast.show("Account verify ho gaya! Referral & Wallet open ho gaye.", "success");
+      Toast.show("Account kamyabi se verify ho gaya!", "success");
       renderProfile();
     } catch (err) {
       Toast.show(err.message || "Account verification failed.", "error");
@@ -281,8 +317,6 @@ export function renderVerifyAccount() {
     }
   };
 }
-
-window.renderVerifyAccount = renderVerifyAccount;
 
 export function renderForgotPassword() {
   const view = document.getElementById('app-view');
@@ -403,20 +437,20 @@ export function renderProfile() {
             <small style="color:#8e9bb0; font-size:11px; margin-top:5px; display:block;">🔒 Email address permanent locked hai.</small>
           </div>
 
-          <!-- VERIFICATION BUTTON YA VERIFIED BADGE -->
+          <!-- VERIFICATION STATUS -->
           <div style="margin: 16px 0;">
             ${isVerified ? `
               <div style="padding:10px; background:rgba(0,230,118,0.15); border:1px solid #00e676; border-radius:8px; color:#00e676; font-weight:bold; text-align:center;">
                 <i class="fa-solid fa-circle-check"></i> Account Verified
               </div>
             ` : `
-              <button type="button" onclick="window.renderVerifyAccount()" class="btn" style="width:100%; padding:11px; background:#ff9800; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
-                <i class="fa-solid fa-triangle-exclamation"></i> Verify Account (Set Password)
+              <button type="button" onclick="window.startVerifyAccountProcess()" class="btn" style="width:100%; padding:11px; background:#ff9800; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+                <i class="fa-solid fa-triangle-exclamation"></i> VERIFY ACCOUNT (SET PASSWORD)
               </button>
             `}
           </div>
 
-          <!-- REFERRAL SECTION (Agar account verified ho tabhi dikhega) -->
+          <!-- REFERRAL CODE SECTION (Sirf Verified user ko show hoga) -->
           ${isVerified ? `
             <div class="form-group">
               <label class="form-label">Referral Code (UID)</label>
