@@ -135,8 +135,8 @@
     object-fit: cover;
     object-position: center;
     z-index: 1;
-    opacity: 0.35;
-    filter: brightness(0.65) contrast(1.1);
+    opacity: 0.45;
+    filter: brightness(0.75) contrast(1.1);
     transition: opacity 0.5s ease, filter 0.5s ease;
   }
 
@@ -319,7 +319,7 @@
 
   <div id="canvas-wrapper">
     <img id="real-photo" referrerpolicy="no-referrer" alt="Fort Landmark" />
-    <div id="landmark-pill">Derawar Fort, Bahawalpur</div>
+    <div id="landmark-pill">Fort Landmark</div>
     <canvas id="gameCanvas"></canvas>
     <div id="tap-hint">TAP TO LAUNCH BALL</div>
 
@@ -398,18 +398,8 @@ class SoundSys {
   }
 }
 
-const photoData = [
-  { name: "Derawar Fort, Bahawalpur", url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=85" },
-  { name: "Minar-e-Pakistan, Lahore", url: "https://images.unsplash.com/photo-1590059390046-81534a6e87f7?w=800&auto=format&fit=crop&q=85" },
-  { name: "Badshahi Mosque, Lahore", url: "https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=800&auto=format&fit=crop&q=85" },
-  { name: "Lahore Fort (Shahi Qila)", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&auto=format&fit=crop&q=85" },
-  { name: "Rohtas Fort, Jhelum", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=85" },
-  { name: "Ranikot Fort, Sindh", url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=85" },
-  { name: "Tomb of Shah Rukn-e-Alam, Multan", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=85" },
-  { name: "Faisal Mosque, Islamabad", url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=800&auto=format&fit=crop&q=85" },
-  { name: "Baltit Fort, Hunza Valley", url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=85" },
-  { name: "Mohenjo-daro Ancient Citadel", url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=85" }
-];
+// Single permanent background photo
+const FIXED_BG_URL = "https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg";
 
 class MultaniGame {
   constructor() {
@@ -461,7 +451,6 @@ class MultaniGame {
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
 
-    // Ball limit strictly 25
     this.maxBalls = 25;
     this.baseSpeed = 6.2;
 
@@ -612,9 +601,8 @@ class MultaniGame {
     this.winScreen.style.display = 'none';
     this.gameoverScreen.style.display = 'none';
 
-    const photo = photoData[(lvl - 1) % photoData.length];
-    this.landmarkPill.textContent = photo.name;
-    this.bgImg.src = photo.url;
+    this.landmarkPill.textContent = `Fort Level ${lvl}`;
+    this.bgImg.src = FIXED_BG_URL;
     this.bgImg.classList.remove('revealed');
 
     this.paddle.w = Math.max(54, 84 - Math.floor(lvl * 0.25));
@@ -848,6 +836,62 @@ class MultaniGame {
     this.dispLives.textContent = '❤️'.repeat(Math.max(0, this.lives));
   }
 
+  resolveBallCollisions() {
+    const len = this.balls.length;
+    for (let i = 0; i < len; i++) {
+      const b1 = this.balls[i];
+      if (!b1.active) continue;
+
+      for (let j = i + 1; j < len; j++) {
+        const b2 = this.balls[j];
+        if (!b2.active) continue;
+
+        const dx = b2.x - b1.x;
+        const dy = b2.y - b1.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = b1.radius + b2.radius;
+
+        if (dist < minDist && dist > 0.0001) {
+          // Normal vector
+          const nx = dx / dist;
+          const ny = dy / dist;
+
+          // Push apart to prevent sticking
+          const overlap = (minDist - dist) * 0.5;
+          b1.x -= nx * overlap;
+          b1.y -= ny * overlap;
+          b2.x += nx * overlap;
+          b2.y += ny * overlap;
+
+          // Relative velocity
+          const kx = b1.vx - b2.vx;
+          const ky = b1.vy - b2.vy;
+          const p = 2 * (nx * kx + ny * ky) / 2;
+
+          // Swap & bounce velocities
+          b1.vx -= p * nx;
+          b1.vy -= p * ny;
+          b2.vx += p * nx;
+          b2.vy += p * ny;
+
+          // Anti-stuck angle jitter: directional shift so balls don't trace identical lines
+          const jitter1 = (Math.random() - 0.5) * 0.22;
+          const jitter2 = (Math.random() - 0.5) * 0.22;
+
+          const spd1 = Math.hypot(b1.vx, b1.vy);
+          let ang1 = Math.atan2(b1.vy, b1.vx) + jitter1;
+          b1.vx = Math.cos(ang1) * spd1;
+          b1.vy = Math.sin(ang1) * spd1;
+
+          const spd2 = Math.hypot(b2.vx, b2.vy);
+          let ang2 = Math.atan2(b2.vy, b2.vx) + jitter2;
+          b2.vx = Math.cos(ang2) * spd2;
+          b2.vy = Math.sin(ang2) * spd2;
+        }
+      }
+    }
+  }
+
   update() {
     if (this.state !== 'PLAYING') return;
 
@@ -882,10 +926,16 @@ class MultaniGame {
 
     const subSteps = 2;
     for (let step = 0; step < subSteps; step++) {
+      // Ball-to-ball collisions per sub-step
+      if (this.balls.length > 1) {
+        this.resolveBallCollisions();
+      }
+
       for (let i = 0; i < this.balls.length; i++) {
         const b = this.balls[i];
         if (!b.active) continue;
 
+        // Prevent balls from moving only horizontally
         if (Math.abs(b.vy) < 1.6) {
           b.vy = (b.vy < 0 ? -1 : 1) * 2.4;
         }
@@ -893,18 +943,23 @@ class MultaniGame {
         b.x += b.vx / subSteps;
         b.y += b.vy / subSteps;
 
+        // Wall collisions + slight jitter to prevent infinite bouncing
         if (b.x - b.radius <= 2) {
           b.x = 2 + b.radius;
           b.vx = Math.abs(b.vx);
+          b.vy += (Math.random() - 0.5) * 0.2;
         } else if (b.x + b.radius >= this.width - 2) {
           b.x = this.width - 2 - b.radius;
           b.vx = -Math.abs(b.vx);
+          b.vy += (Math.random() - 0.5) * 0.2;
         }
         if (b.y - b.radius <= 2) {
           b.y = 2 + b.radius;
           b.vy = Math.abs(b.vy);
+          b.vx += (Math.random() - 0.5) * 0.2;
         }
 
+        // Paddle collision
         if (
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
@@ -921,6 +976,7 @@ class MultaniGame {
           this.snd.hitPaddle();
         }
 
+        // Brick collision
         for (let j = 0; j < this.bricks.length; j++) {
           const br = this.bricks[j];
 
@@ -955,6 +1011,10 @@ class MultaniGame {
                 b.vy = Math.abs(b.vy);
               }
             }
+
+            // Anti-trap nudge: slightly adjust trajectory when hitting steel or bricks
+            b.vx += (Math.random() - 0.5) * 0.25;
+            b.vy += (Math.random() - 0.5) * 0.25;
 
             if (!br.isSteel) {
               br.hp--;
