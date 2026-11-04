@@ -15,109 +15,137 @@ html,body{
 #game{
  position:relative;width:100%;height:100%;
  height:100dvh;overflow:hidden;
+ display:flex;flex-direction:column;
  background:#071c35;
 }
-canvas{width:100%;height:100%;display:block;touch-action:none}
-.hud{
- position:absolute;top:env(safe-area-inset-top,8px);
- left:10px;right:54px;display:flex;
- justify-content:space-between;pointer-events:none;
- gap:8px;z-index:3;
+
+/* Compact Top Header Bar (Screen k bahar / gameplay area se alag) */
+#topBar{
+ flex-shrink:0;
+ width:100%;
+ background:#080e1a;
+ border-bottom:1.5px solid #1e2d42;
+ padding:calc(env(safe-area-inset-top, 4px) + 2px) 8px 4px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:6px;
+ z-index:10;
 }
+
+.hud-group{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ flex:1;
+}
+
 .panel{
- min-width:90px;padding:6px 10px;
- background:rgba(8, 14, 25, 0.88);
- border:1.8px solid #283955;border-radius:12px;
- box-shadow:0 0 12px rgba(0, 186, 255, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.08);
- backdrop-filter:blur(4px);
+ flex:1;
+ padding:3px 6px;
+ background:rgba(18, 28, 45, 0.95);
+ border:1px solid #283955;border-radius:6px;
+ text-align:center;
 }
 .panel small{
- display:block;color:#9cb5d9;font-size:8.5px;
- letter-spacing:1.5px;font-weight:bold;margin-bottom:2px
+ display:block;color:#9cb5d9;font-size:7.5px;
+ letter-spacing:1px;font-weight:bold;line-height:1;
+ margin-bottom:2px;
 }
-.panel strong{font-size:clamp(15px,3.8vw,20px);letter-spacing:1px}
-#hpText{color:#32ffc0;text-shadow:0 0 10px #00ffab}
-#levelText{color:#ff55a3;text-shadow:0 0 10px #ff2a70}
-#scoreText{color:#ffc64c;text-shadow:0 0 10px #ff9a00}
+.panel strong{
+ font-size:12px;letter-spacing:0.5px;line-height:1;
+ display:block;
+}
+#hpText{color:#32ffc0;text-shadow:0 0 6px #00ffab}
+#levelText{color:#ff55a3;text-shadow:0 0 6px #ff2a70}
+#scoreText{color:#ffc64c;text-shadow:0 0 6px #ff9a00}
+
 #hpBar,#lvlBar{
- height:4px;background:#182335;margin-top:4px;
- border-radius:4px;overflow:hidden
+ height:3px;background:#182335;margin-top:3px;
+ border-radius:3px;overflow:hidden
 }
 #hpFill{height:100%;width:100%;background:#32ffc0;transition:width 0.2s}
 #lvlFill{height:100%;width:0%;background:#ff55a3;transition:width 0.2s}
 
-/* 3-Dots Menu Button */
+/* 3-Dots Menu Button Chota */
 #menuBtn{
- position:absolute;top:env(safe-area-inset-top,8px);right:10px;
- width:40px;height:40px;border-radius:12px;
- background:rgba(12, 22, 38, 0.92);border:1.8px solid #38bdf8;
- color:#38bdf8;font-size:22px;line-height:1;cursor:pointer;
+ width:28px;height:28px;border-radius:6px;
+ background:#0f1d30;border:1px solid #38bdf8;
+ color:#38bdf8;font-size:16px;line-height:1;cursor:pointer;
  display:flex;align-items:center;justify-content:center;
- box-shadow:0 0 12px rgba(56, 189, 248, 0.4);
- z-index:5;pointer-events:auto;
+ flex-shrink:0;
 }
 #menuBtn:active{transform:scale(0.92)}
 
+/* Canvas Container */
+#canvasContainer{
+ position:relative;
+ width:100%;
+ flex:1;
+ overflow:hidden;
+}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+
 /* Boss Health Bar */
 #bossHud{
- position:absolute;top:70px;left:20px;right:20px;
+ position:absolute;top:10px;left:20px;right:20px;
  z-index:4;pointer-events:none;display:none;
  text-align:center;
 }
-#bossName{font-size:12px;font-weight:900;letter-spacing:2px;color:#ff3355;text-shadow:0 0 8px #ff0033;margin-bottom:4px}
+#bossName{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#ff3355;text-shadow:0 0 8px #ff0033;margin-bottom:3px}
 #bossBarOutline{
- width:100%;height:9px;background:rgba(15,15,25,0.85);
+ width:100%;height:7px;background:rgba(15,15,25,0.85);
  border:1.5px solid #ff3355;border-radius:10px;overflow:hidden;
- box-shadow:0 0 12px rgba(255,50,80,0.5);
+ box-shadow:0 0 10px rgba(255,50,80,0.5);
 }
 #bossBarFill{width:100%;height:100%;background:linear-gradient(90deg,#ff8800,#ff0055);transition:width 0.1s}
 
 .brand{
- position:absolute;top:76px;left:0;right:0;
+ position:absolute;top:10px;left:0;right:0;
  text-align:center;pointer-events:none;
- color:rgba(255, 255, 255, 0.45);font-size:10px;letter-spacing:3px;
+ color:rgba(255, 255, 255, 0.45);font-size:9.5px;letter-spacing:2px;
  font-weight:900
 }
 
 /* Controls */
 .controls{
- position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+ position:absolute;bottom:calc(12px + env(safe-area-inset-bottom,0px));
  left:0;right:0;display:flex;align-items:center;
  justify-content:space-between;padding:0 16px;z-index:4;
  pointer-events:none
 }
 .control-btn{
  pointer-events:auto;
- width:clamp(62px,17vw,80px);
- height:clamp(62px,17vw,80px);
+ width:clamp(56px,16vw,72px);
+ height:clamp(56px,16vw,72px);
  border-radius:50%;display:flex;align-items:center;
  justify-content:center;user-select:none;
  -webkit-user-select:none;touch-action:none;
  background:radial-gradient(circle at 35% 25%,#9aafc9,#28384f 55%,#101827 75%);
- border:4px solid #ff4d66;
- box-shadow:0 0 12px #ff415c,0 0 20px rgba(255, 48, 68, 0.4);
- color:white;font-size:30px;font-weight:900;
+ border:3.5px solid #ff4d66;
+ box-shadow:0 0 10px #ff415c,0 0 18px rgba(255, 48, 68, 0.4);
+ color:white;font-size:26px;font-weight:900;
  cursor:pointer;transition:transform 0.08s;
 }
 .control-btn:active{transform:scale(0.92);filter:brightness(1.3)}
 
 #fire{
  pointer-events:auto;
- width:clamp(82px,23vw,104px);
- height:clamp(82px,23vw,104px);
+ width:clamp(74px,21vw,94px);
+ height:clamp(74px,21vw,94px);
  flex-direction:column;gap:2px;
- font-size:13px;font-weight:900;color:#ffdc72;
- border:5px solid #ffaa22;
+ font-size:11px;font-weight:900;color:#ffdc72;
+ border:4px solid #ffaa22;
  background:radial-gradient(circle at 35% 25%,#7a582c,#2a1d17 65%,#0d0f14);
- box-shadow:0 0 16px #ff9a1a,0 0 28px rgba(255, 141, 36, 0.55);
+ box-shadow:0 0 14px #ff9a1a,0 0 24px rgba(255, 141, 36, 0.55);
  cursor:pointer;
 }
-#fire span{font-size:30px;line-height:1}
+#fire span{font-size:26px;line-height:1}
 #fire:active{transform:scale(0.92);filter:brightness(1.35)}
 
 /* Modals */
 .modal-overlay{
- position:absolute;inset:0;z-index:15;
+ position:absolute;inset:0;z-index:20;
  display:flex;align-items:center;justify-content:center;
  background:rgba(2, 7, 19, 0.92);backdrop-filter:blur(8px);
  padding:18px;
@@ -130,12 +158,12 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
  box-shadow:0 0 35px rgba(255, 156, 36, 0.35);
  max-height:88vh;overflow-y:auto;
 }
-.card h1{font-size:22px;color:#ffc14d;margin:0 0 8px;letter-spacing:1px}
+.card h1{font-size:20px;color:#ffc14d;margin:0 0 8px;letter-spacing:1px}
 .card p{color:#c2d0e6;line-height:1.5;font-size:13px}
 .action{
- width:100%;padding:13px;margin-top:12px;
+ width:100%;padding:12px;margin-top:12px;
  border:0;border-radius:10px;font-weight:900;
- font-size:15px;color:#101018;cursor:pointer;
+ font-size:14px;color:#101018;cursor:pointer;
  background:linear-gradient(90deg,#ffd875,#ff922b);
  box-shadow:0 0 16px rgba(255, 174, 51, 0.4);
 }
@@ -149,10 +177,10 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 .setting-row{
  display:flex;align-items:center;justify-content:space-between;
  padding:10px 14px;background:rgba(255,255,255,0.06);
- border-radius:10px;margin-bottom:10px;font-size:14px;font-weight:bold;
+ border-radius:10px;margin-bottom:10px;font-size:13px;font-weight:bold;
 }
 .toggle-btn{
- padding:6px 14px;border-radius:8px;border:none;
+ padding:5px 12px;border-radius:6px;border:none;
  font-weight:900;cursor:pointer;color:#fff;
 }
 .toggle-on{background:#10b981;box-shadow:0 0 8px #10b981}
@@ -160,12 +188,12 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 
 /* Level Grid */
 .level-grid{
- display:grid;grid-template-columns:repeat(5, 1fr);gap:8px;
+ display:grid;grid-template-columns:repeat(5, 1fr);gap:6px;
  max-height:220px;overflow-y:auto;padding:8px 4px;
  margin-top:10px;border-radius:8px;background:rgba(0,0,0,0.3);
 }
 .lvl-slot{
- padding:8px 0;border-radius:8px;font-size:12px;font-weight:900;
+ padding:6px 0;border-radius:6px;font-size:11px;font-weight:900;
  text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);
 }
 .lvl-unlocked{background:#1e3a8a;color:#93c5fd;border-color:#3b82f6}
@@ -177,40 +205,45 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 
 <body>
 <div id="game">
- <canvas id="screen"></canvas>
 
- <div class="hud">
-  <div class="panel">
-   <small>HULL / HP</small>
-   <strong id="hpText">100%</strong>
-   <div id="hpBar"><div id="hpFill"></div></div>
+ <!-- Choti aur Bahar Alag Top Bar -->
+ <div id="topBar">
+  <div class="hud-group">
+   <div class="panel">
+    <small>HP</small>
+    <strong id="hpText">100%</strong>
+    <div id="hpBar"><div id="hpFill"></div></div>
+   </div>
+   <div class="panel">
+    <small>STAGE <span id="currentLevel">1</span>/500</small>
+    <strong id="levelText">L1</strong>
+    <div id="lvlBar"><div id="lvlFill"></div></div>
+   </div>
+   <div class="panel">
+    <small>SCORE</small>
+    <strong id="scoreText">0000</strong>
+   </div>
   </div>
-  <div class="panel" style="text-align:center">
-   <small>STAGE <span id="currentLevel">1</span>/500</small>
-   <strong id="levelText">LEVEL 1</strong>
-   <div id="lvlBar"><div id="lvlFill"></div></div>
-  </div>
-  <div class="panel" style="text-align:right">
-   <small>MISSION SCORE</small>
-   <strong id="scoreText">0000</strong>
-  </div>
+  <button id="menuBtn" aria-label="Settings Menu">⋮</button>
  </div>
 
- <!-- 3-Dots Menu -->
- <button id="menuBtn" aria-label="Settings Menu">⋮</button>
+ <!-- Gameplay Screen Area -->
+ <div id="canvasContainer">
+  <canvas id="screen"></canvas>
 
- <!-- Boss Health Bar -->
- <div id="bossHud">
-  <div id="bossName">⚠️ MEGA TITAN BOSS ⚠️</div>
-  <div id="bossBarOutline"><div id="bossBarFill"></div></div>
- </div>
+  <!-- Boss Health Bar -->
+  <div id="bossHud">
+   <div id="bossName">⚠️ MEGA TITAN BOSS ⚠️</div>
+   <div id="bossBarOutline"><div id="bossBarFill"></div></div>
+  </div>
 
- <div class="brand" id="phaseIndicator">PHASE 1: FIGHTER JET DELTA</div>
+  <div class="brand" id="phaseIndicator">PHASE 1: FIGHTER JET DELTA</div>
 
- <div class="controls">
-  <button class="control-btn" id="left" aria-label="Move left">◀</button>
-  <button class="control-btn" id="fire"><span>🔥</span>FIRE</button>
-  <button class="control-btn" id="right" aria-label="Move right">▶</button>
+  <div class="controls">
+   <button class="control-btn" id="left" aria-label="Move left">◀</button>
+   <button class="control-btn" id="fire"><span>🔥</span>FIRE</button>
+   <button class="control-btn" id="right" aria-label="Move right">▶</button>
+  </div>
  </div>
 
  <!-- Start / Over Modal -->
@@ -230,7 +263,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
  <div class="modal-overlay hidden" id="winModal">
   <div class="card" style="border-color:#32ffc0;box-shadow:0 0 35px rgba(50,255,192,0.4)">
    <h1 style="color:#32ffc0">🎖 MISSION VICTORY!</h1>
-   <p id="winDesc">LEVEL 1 COMPLETED!<br>Health 100% Full restore kar di gayi hai.<br>Tayyar ho aglay mission ke liye?</p>
+   <p id="winDesc">LEVEL 1 COMPLETED!<br>Health 100% restore kar di gayi hai.<br>Tayyar ho aglay mission ke liye?</p>
    <button class="action" id="nextLvlBtn" style="background:linear-gradient(90deg,#32ffc0,#0ea5e9);color:#041527">NEXT LEVEL ▶</button>
   </div>
  </div>
@@ -250,7 +283,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
     <button class="toggle-btn toggle-on" id="sfxToggle">ON</button>
    </div>
 
-   <p style="margin:14px 0 4px;font-weight:bold;text-align:left;color:#93c5fd">SELECT UNLOCKED LEVEL (1-500):</p>
+   <p style="margin:14px 0 4px;font-weight:bold;text-align:left;color:#93c5fd;font-size:12px;">SELECT LEVEL (1-500):</p>
    <div class="level-grid" id="levelsGrid"></div>
 
    <button class="action alt" id="closeMenuBtn">RESUME MISSION ▶</button>
@@ -264,6 +297,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 
 const canvas=document.getElementById("screen");
 const ctx=canvas.getContext("2d");
+const container=document.getElementById("canvasContainer");
 const $=id=>document.getElementById(id);
 
 let W=0,H=0,DPR=1;
@@ -280,9 +314,8 @@ let musicEnabled=true;
 let enemies=[],bullets=[],enemyBullets=[],sparks=[],bgObjects=[];
 const keys={left:false,right:false,fire:false};
 
-const player={x:0,y:0,w:54,h:80,speed:360,inv:0};
+const player={x:0,y:0,w:50,h:75,speed:360,inv:0};
 
-// Built-in Web Audio API: Sound Effects & BGM Generator
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 let actx = null;
 
@@ -339,7 +372,6 @@ function playBlastSFX(){
  }catch(e){}
 }
 
-// Retro Arcade Cyber BGM Melodic Sequencer
 let bgmStep = 0;
 const bgmNotes = [110, 110, 130, 146, 110, 110, 164, 146, 98, 98, 123, 130, 82, 98, 110, 130];
 function stepBGM(){
@@ -360,7 +392,6 @@ function stepBGM(){
 }
 setInterval(stepBGM, 200);
 
-// 100 Dynamic Enemy Phases
 const ENEMY_PHASES = [
  "FIGHTER JET DELTA", "FLYING TANK BATTALION", "APACHE ATTACK CHOPPERS", "HYPERSONIC ROCKETS", "DRONE SWARM ALPHA",
  "T-REX TITAN DINOS", "VENOM CYBER SPIDERS", "FIRE DRAGON BEASTS", "CYBER MECH SOLDIERS", "ALIEN UFO INVADERS",
@@ -384,7 +415,6 @@ const ENEMY_PHASES = [
  "TITAN BEHEMOTH FLIERS", "CYBER MECHA LEGION", "ANNIHILATOR DRONES", "VOID EMPEROR ARMADA", "APOCALYPSE SKY FLEET"
 ];
 
-// Rich Graphic Scenery Themes
 const THEMES = [
  {name:"CYBERPUNK NEON METROPOLIS", skyTop:"#0f051d", skyBot:"#290849", kind:"city", glow:"#00f0ff"},
  {name:"DEEP SPACE NEBULA & MOONS", skyTop:"#02040d", skyBot:"#110a2e", kind:"space", glow:"#9d4edd"},
@@ -402,12 +432,12 @@ function getCurrentTheme(lvl){
 
 function resize(){
  DPR=Math.min(window.devicePixelRatio||1,1.5);
- W=canvas.clientWidth;H=canvas.clientHeight;
+ W=container.clientWidth;H=container.clientHeight;
  canvas.width=Math.round(W*DPR);
  canvas.height=Math.round(H*DPR);
  ctx.setTransform(DPR,0,0,DPR,0,0);
  player.x=Math.max(30,Math.min(W-30,player.x||W/2));
- player.y=H*0.74;
+ player.y=H*0.78;
 
  bgObjects=[];
  for(let i=0;i<7;i++){
@@ -422,7 +452,6 @@ function resize(){
  }
 }
 window.addEventListener("resize",resize);
-resize();
 
 function drawGamingEnvironment(dt){
  const theme = getCurrentTheme(level);
@@ -795,7 +824,7 @@ function goToNextLevel(){
  showBanner(`STAGE ${level} STARTED!`);
 
  $("currentLevel").textContent = level;
- $("levelText").textContent = `STAGE ${level}`;
+ $("levelText").textContent = `L${level}`;
  $("lvlFill").style.width = "0%";
  paused = false;
 }
@@ -826,11 +855,9 @@ function update(dt){
    }
   }
 
-  // Bullets update
   bullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;});
   bullets=bullets.filter(b=>b.y>-30&&b.x>-10&&b.x<W+10);
 
-  // Enemy Bullets update
   enemyBullets.forEach(eb=>{eb.x+=eb.vx*dt;eb.y+=eb.vy*dt;});
   enemyBullets=enemyBullets.filter(eb=>{
    if(eb.y>H+30||eb.y<-30||eb.x<-30||eb.x>W+30) return false;
@@ -844,7 +871,6 @@ function update(dt){
    return true;
   });
 
-  // Enemies update
   enemies.forEach(e=>{
    e.y+=e.v*dt;
    e.x+=Math.sin(elapsed*2 + e.phase)*25*dt;
@@ -870,7 +896,6 @@ function update(dt){
    }
   });
 
-  // Boss Logic & Safe Hit Check
   if(activeBoss){
    if(activeBoss.y < activeBoss.targetY){
     activeBoss.y += 90 * dt;
@@ -911,7 +936,6 @@ function update(dt){
 
   player.inv=Math.max(0,player.inv-dt);
 
-  // Bullets vs Regular Enemies
   enemies=enemies.filter(e=>{
    if(e.hit){explosion(e.x,e.y);return false}
    for(const b of bullets){
@@ -932,14 +956,12 @@ function update(dt){
   if(hp<=0)endGame();
  }
 
- // Sparks animation
  sparks.forEach(s=>{
   s.x+=s.vx*dt;s.y+=s.vy*dt;
   s.vx*=0.97;s.vy*=0.97;s.life-=dt;
  });
  sparks=sparks.filter(s=>s.life>0);
 
- // Draw Bullets
  bullets.forEach(b=>{
   ctx.shadowBlur=12;ctx.shadowColor="#ffe144";
   ctx.fillStyle="#ffff88";
@@ -953,7 +975,6 @@ function update(dt){
  });
  ctx.shadowBlur=0;
 
- // Draw Enemies
  enemies.forEach(e=>{
   drawEntity(level, e.subKind, e.x, e.y, e.w, e.h, false);
  });
@@ -962,7 +983,6 @@ function update(dt){
   drawEntity(level, 0, activeBoss.x, activeBoss.y, activeBoss.w, activeBoss.h, true);
  }
 
- // Explosions
  sparks.forEach(s=>{
   ctx.globalAlpha=Math.min(1,s.life*2.2);
   ctx.fillStyle=s.color;
@@ -1021,7 +1041,7 @@ function startLevel(lvl){
  killsNeeded = 10 + Math.floor(level * 0.8);
  activeBoss = null;
  enemies = []; bullets = []; enemyBullets = []; sparks = [];
- player.x = W/2; player.y = H*0.74; player.inv = 0;
+ player.x = W/2; player.y = H*0.78; player.inv = 0;
  gameOver = false; paused = false; running = true;
  $("bossHud").style.display = "none";
  $("mainModal").classList.add("hidden");
@@ -1029,7 +1049,7 @@ function startLevel(lvl){
  $("menuModal").classList.add("hidden");
 
  $("currentLevel").textContent = level;
- $("levelText").textContent = `STAGE ${level}`;
+ $("levelText").textContent = `L${level}`;
  $("lvlFill").style.width = "0%";
  const phaseNumber = Math.min(100, Math.floor((level - 1) / 5) + 1);
  $("phaseIndicator").textContent = `PHASE ${phaseNumber}: ` + (ENEMY_PHASES[phaseNumber-1]||"WAR SQUAD");
@@ -1051,7 +1071,6 @@ $("nextLvlBtn").addEventListener("click",()=>{
  goToNextLevel();
 });
 
-// 3-Dots Menu Setup
 function buildLevelGrid(){
  const grid = $("levelsGrid");
  grid.innerHTML = "";
@@ -1131,6 +1150,8 @@ function loop(now){
  else drawGamingEnvironment(dt);
  requestAnimationFrame(loop);
 }
+
+resize();
 requestAnimationFrame(t=>{
  last=t;
  requestAnimationFrame(loop);
