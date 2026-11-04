@@ -8,6 +8,13 @@ export async function renderWithdrawal() {
   }
   await syncAuthAndProfile();
 
+  // Strict Lock: Agar account verify nahi hai to Withdrawal screen khulne hi na do
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap withdraw le sakte hain.", "warning");
+    window.Router.navigate('profile');
+    return;
+  }
+
   let withdrawHistoryHtml = `<p style="font-size:12px; color:var(--text-dim); text-align:center; padding:16px;">No withdrawal requests yet.</p>`;
   try {
     const { data: wList, error: wErr } = await sbClient.from('withdrawals').select('*').eq('user_id', state.currentUser.id).order('created_at', { ascending: false });
@@ -113,6 +120,12 @@ export function calculateWithdrawalNet() {
 export async function submitWithdrawalRequest(e) {
   e.preventDefault();
   if (!state.currentUser) return;
+
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap withdraw le sakte hain.", "warning");
+    window.Router.navigate('profile');
+    return;
+  }
 
   const amount = parseFloat(document.getElementById('wd-amount').value);
   const method = document.getElementById('wd-method').value;
