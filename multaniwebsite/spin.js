@@ -6,6 +6,9 @@ export async function renderDailySpin() {
     window.Router.navigate('login'); 
     return; 
   }
+
+  // Verification Check
+  const isVerified = (state.currentProfile?.is_verified === true);
   
   let slots = [];
   let userHistory = null;
@@ -54,7 +57,7 @@ export async function renderDailySpin() {
     }
   }
 
-  const rewardWonText = userHistory ? `You won: ${userHistory.reward_name}` : 'SPIN & WIN FREE COINS';
+  const rewardWonText = userHistory ? `You won: ${userHistory.reward_name}` : (isVerified ? 'SPIN & WIN FREE COINS' : '⚠️ FIRST ACCOUNT VERIFIED KAREIN');
 
   const view = document.getElementById('app-view');
   view.innerHTML = `
@@ -62,8 +65,15 @@ export async function renderDailySpin() {
       <div style="margin-bottom:8px;">
         <span style="font-family:var(--font-gaming); font-size:11px; letter-spacing:3px; color:var(--primary); font-weight:700;">MULTANI FF OFFICIAL TOURNAMENT</span>
         <h2 style="font-family:var(--font-gaming); font-size:24px; font-weight:800; color:#ffaa00; text-transform:uppercase; text-shadow:0 2px 6px rgba(0,0,0,0.8); margin-top:2px;">DAILY SPIN</h2>
-        <p style="font-size:11px; font-weight:700; color:#00e676; text-transform:uppercase; letter-spacing:1px;" id="won-reward-subtitle">${rewardWonText}</p>
+        <p style="font-size:11px; font-weight:700; color:${isVerified ? '#00e676' : '#ff9800'}; text-transform:uppercase; letter-spacing:1px;" id="won-reward-subtitle">${rewardWonText}</p>
       </div>
+
+      ${!isVerified ? `
+        <div style="background:rgba(255,152,0,0.15); border:1px solid #ff9800; border-radius:var(--radius-sm); padding:10px; margin-bottom:12px; text-align:center; font-size:12px; color:#fff;">
+          ⚠️ <strong>Account Not Verified!</strong> Daily Spin aur Wallet use karne ke liye pehle profile se account verify karein.
+          <button onclick="window.Router.navigate('profile')" style="margin-top:6px; display:block; width:100%; padding:6px; background:#ff9800; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">VERIFY NOW</button>
+        </div>
+      ` : ''}
 
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:8px 10px; margin-bottom:10px; text-align:left; font-size:11px; color:var(--text-muted);">
         <div style="color:var(--accent-gold); font-weight:bold; margin-bottom:3px;">🎯 DAILY REWARD INFORMATION:</div>
@@ -147,6 +157,15 @@ export function startCountdownTimer() {
 }
 
 export async function triggerDailySpin() {
+  // Verification Check: Spin rokne ke liye
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap Daily Spin use kar sakte hain.", "warning");
+    setTimeout(() => {
+      window.Router.navigate('profile');
+    }, 1200);
+    return;
+  }
+
   const btn = document.getElementById('wheel-center-btn');
   const btnNow = document.getElementById('btn-spin-now');
   if (btn) btn.disabled = true;
@@ -222,3 +241,5 @@ export async function triggerDailySpin() {
     renderDailySpin();
   }
 }
+
+window.triggerDailySpin = triggerDailySpin;
