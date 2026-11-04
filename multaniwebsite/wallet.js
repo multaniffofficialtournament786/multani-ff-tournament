@@ -8,6 +8,8 @@ export async function renderWallet() {
   }
   await syncAuthAndProfile();
   
+  const isVerified = (state.currentProfile?.is_verified === true);
+
   let deposits = [];
   let transactions = [];
   try {
@@ -41,12 +43,19 @@ export async function renderWallet() {
   const view = document.getElementById('app-view');
   view.innerHTML = `
     <div class="view-container">
+      ${!isVerified ? `
+        <div style="background:rgba(255,152,0,0.15); border:1px solid #ff9800; border-radius:var(--radius-sm); padding:10px; margin-bottom:12px; text-align:center; font-size:12px; color:#fff;">
+          ⚠️ <strong>Account Not Verified!</strong> Wallet transactions aur withdrawals ke liye pehle apna account verify karein.
+          <button onclick="window.Router.navigate('profile')" style="margin-top:6px; display:block; width:100%; padding:6px; background:#ff9800; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">VERIFY NOW</button>
+        </div>
+      ` : ''}
+
       <div class="wallet-hero">
         <span class="wallet-balance-title">Current Balance</span>
         <div class="wallet-amount">PKR ${state.currentProfile?.wallet_balance || 0}</div>
         <div style="display:flex; gap:10px;">
-          <button class="btn btn-primary" style="flex:1;" onclick="window.Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
-          <button class="btn btn-secondary" style="flex:1;" onclick="window.Router.navigate('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="window.handleWalletAction('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
+          <button class="btn btn-secondary" style="flex:1;" onclick="window.handleWalletAction('deposit')"><i class="fa-solid fa-circle-arrow-down"></i> Add Cash</button>
         </div>
       </div>
 
@@ -71,6 +80,19 @@ export async function renderWallet() {
 
   filterWalletHistory('all');
 }
+
+// Verification Guard: Withdraw aur Deposit ke liye
+export function handleWalletAction(targetPage) {
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap Wallet use kar sakte hain.", "warning");
+    setTimeout(() => {
+      window.Router.navigate('profile');
+    }, 1200);
+    return;
+  }
+  window.Router.navigate(targetPage);
+}
+window.handleWalletAction = handleWalletAction;
 
 export function toggleTransactionHistory() {
   const wrapper = document.getElementById('wallet-history-wrapper');
@@ -147,6 +169,13 @@ export function renderDeposit() {
   if (!state.currentUser) { 
     window.Router.navigate('login'); 
     return; 
+  }
+
+  // Verification Check Deposit Screen par bhi
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap payment add kar sakte hain.", "warning");
+    window.Router.navigate('profile');
+    return;
   }
 
   document.getElementById('app-view').innerHTML = `
