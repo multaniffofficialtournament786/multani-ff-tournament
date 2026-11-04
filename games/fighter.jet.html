@@ -205,7 +205,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
   <div id="bossBarOutline"><div id="bossBarFill"></div></div>
  </div>
 
- <div class="brand" id="phaseIndicator">PHASE 1: JET SQUADRON</div>
+ <div class="brand" id="phaseIndicator">PHASE 1: FIGHTER JET DELTA</div>
 
  <div class="controls">
   <button class="control-btn" id="left" aria-label="Move left">◀</button>
@@ -219,7 +219,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
    <h1 id="modalTitle">✈ AIR FORCE 500</h1>
    <p id="modalDesc">MULTANI FF OFFICIAL<br>
    <b>500 HARDCORE CAMPAIGN MISSIONS</b><br><br>
-   • Har level naye gaming photo environments!<br>
+   • Har level naye gaming environments!<br>
    • 100 Mukhtalif Dushman + Har 10 Level baad Mega Boss!<br>
    • Complete hone par agla level unlock aur health 100%!</p>
    <button class="action" id="startBtn">START MISSION 1 ▶</button>
@@ -277,7 +277,7 @@ let bannerTimer=0, bannerText="";
 let soundEnabled=true;
 let musicEnabled=true;
 
-let enemies=[],bullets=[],enemyBullets=[],sparks=[],clouds=[],bgObjects=[];
+let enemies=[],bullets=[],enemyBullets=[],sparks=[],bgObjects=[];
 const keys={left:false,right:false,fire:false};
 
 const player={x:0,y:0,w:54,h:80,speed:360,inv:0};
@@ -285,7 +285,6 @@ const player={x:0,y:0,w:54,h:80,speed:360,inv:0};
 // Built-in Web Audio API: Sound Effects & BGM Generator
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 let actx = null;
-let bgmOsc = null, bgmGain = null, bgmTimer = null;
 
 function initAudio(){
  if(!actx) actx = new AudioContextClass();
@@ -385,7 +384,7 @@ const ENEMY_PHASES = [
  "TITAN BEHEMOTH FLIERS", "CYBER MECHA LEGION", "ANNIHILATOR DRONES", "VOID EMPEROR ARMADA", "APOCALYPSE SKY FLEET"
 ];
 
-// Rich Gaming Graphic Scenery Themes (Rendered as procedural paintings)
+// Rich Graphic Scenery Themes
 const THEMES = [
  {name:"CYBERPUNK NEON METROPOLIS", skyTop:"#0f051d", skyBot:"#290849", kind:"city", glow:"#00f0ff"},
  {name:"DEEP SPACE NEBULA & MOONS", skyTop:"#02040d", skyBot:"#110a2e", kind:"space", glow:"#9d4edd"},
@@ -425,21 +424,17 @@ function resize(){
 window.addEventListener("resize",resize);
 resize();
 
-// Real Illustrated Gaming Photo Background Painting
 function drawGamingEnvironment(dt){
  const theme = getCurrentTheme(level);
 
- // 1. Sky Horizon Painting
  const skyGrad = ctx.createLinearGradient(0,0,0,H);
  skyGrad.addColorStop(0, theme.skyTop);
  skyGrad.addColorStop(1, theme.skyBot);
  ctx.fillStyle = skyGrad;
  ctx.fillRect(0,0,W,H);
 
- // 2. Celestial Visuals (Moons / Sun / Giant Planets)
  ctx.save();
  if(theme.kind === "space"){
-  // Glowing Galaxy Moons
   ctx.fillStyle="#e0c3fc";ctx.shadowColor="#9d4edd";ctx.shadowBlur=30;
   ctx.beginPath();ctx.arc(W*0.8, H*0.2, 34, 0, Math.PI*2);ctx.fill();
   ctx.fillStyle="rgba(255,255,255,0.8)";
@@ -447,20 +442,17 @@ function drawGamingEnvironment(dt){
    ctx.fillRect((i*67)%W, (i*89)%H, 2, 2);
   }
  } else if(theme.kind === "city"){
-  // Neon Cyber Grid Horizon
   ctx.strokeStyle="rgba(0, 240, 255, 0.2)";
   ctx.lineWidth=1.5;
   for(let x=0;x<W;x+=40){
    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
   }
  } else if(theme.kind === "lava"){
-  // Volcanic Glow
   ctx.fillStyle="rgba(255, 60, 0, 0.18)";
   ctx.fillRect(0, H*0.6, W, H*0.4);
  }
  ctx.restore();
 
- // 3. Scrolling Architectural / Natural Structures
  bgObjects.forEach(obj=>{
   obj.y += obj.speed * dt;
   if(obj.y > H + 180){
@@ -470,13 +462,11 @@ function drawGamingEnvironment(dt){
 
   ctx.save();
   if(theme.kind === "city"){
-   // Cyberpunk Skyscrapers with Glowing Windows
    ctx.fillStyle="#090d19";
    ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
    ctx.strokeStyle="rgba(0,240,255,0.4)";
    ctx.lineWidth=1.5;
    ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
-   // Windows
    ctx.fillStyle=theme.glow;
    for(let wy=obj.y+10; wy<obj.y+obj.h-10; wy+=18){
     for(let wx=obj.x - obj.w/2 + 8; wx<obj.x + obj.w/2 - 8; wx+=16){
@@ -484,7 +474,6 @@ function drawGamingEnvironment(dt){
     }
    }
   } else if(theme.kind === "space"){
-   // Cosmic Floating Asteroid Fortresses
    ctx.fillStyle="#1c1630";
    ctx.beginPath();
    ctx.ellipse(obj.x, obj.y, obj.w*0.5, obj.h*0.35, 0, 0, Math.PI*2);
@@ -492,7 +481,6 @@ function drawGamingEnvironment(dt){
    ctx.strokeStyle="rgba(157, 78, 221, 0.4)";
    ctx.stroke();
   } else if(theme.kind === "lava"){
-   // Fiery Volcano Mountain with Lava Cracks
    ctx.fillStyle="#2b0a04";
    ctx.beginPath();
    ctx.moveTo(obj.x, obj.y);
@@ -502,7 +490,6 @@ function drawGamingEnvironment(dt){
    ctx.strokeStyle="#ff5500";ctx.lineWidth=2;
    ctx.beginPath();ctx.moveTo(obj.x, obj.y);ctx.lineTo(obj.x+10, obj.y+obj.h);ctx.stroke();
   } else if(theme.kind === "desert"){
-   // Ancient Pyramids & Dunes
    ctx.fillStyle="#3a220b";
    ctx.beginPath();
    ctx.moveTo(obj.x, obj.y);
@@ -511,7 +498,6 @@ function drawGamingEnvironment(dt){
    ctx.closePath();ctx.fill();
    ctx.strokeStyle="#f59e0b";ctx.stroke();
   } else {
-   // Natural Islands / Glaciers
    ctx.fillStyle="rgba(20, 60, 80, 0.7)";
    ctx.beginPath();
    ctx.ellipse(obj.x, obj.y, obj.w*0.55, obj.h*0.35, 0, 0, Math.PI*2);
@@ -522,7 +508,6 @@ function drawGamingEnvironment(dt){
  });
 }
 
-// Procedural Enemy & Mega Boss Graphics
 function drawEntity(type, subKind, x, y, w, h, isBoss=false){
  ctx.save();
  ctx.translate(x,y);
@@ -534,7 +519,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.shadowColor = "#ff2244";
   ctx.shadowBlur = 20;
 
-  // Boss Armor Hull
   ctx.fillStyle = "#1e2230";
   ctx.strokeStyle = "#ff3355";
   ctx.lineWidth = 3;
@@ -544,7 +528,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.lineTo(-54, 18);ctx.closePath();
   ctx.fill();ctx.stroke();
 
-  // Heavy Cannons
   ctx.fillStyle = "#4a5568";
   ctx.fillRect(-48, 12, 10, 26);
   ctx.fillRect(38, 12, 10, 26);
@@ -552,12 +535,10 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.fillRect(-46, 36, 6, 6);
   ctx.fillRect(40, 36, 6, 6);
 
-  // Glowing Plasma Core
   ctx.fillStyle = Math.floor(elapsed*15)%2===0 ? "#ff2255" : "#ffbb00";
   ctx.beginPath();ctx.arc(0, 0, 18, 0, Math.PI*2);ctx.fill();
   ctx.strokeStyle = "#ffffff";ctx.lineWidth = 2;ctx.stroke();
 
-  // Wings
   ctx.fillStyle = "#334155";
   ctx.beginPath();
   ctx.moveTo(-54, 0); ctx.lineTo(-88, 22); ctx.lineTo(-50, 26);
@@ -571,7 +552,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
  const phaseIdx = Math.floor((level - 1) / 5) % 10;
 
  if(phaseIdx === 0 || phaseIdx === 4){
-  // FIGHTER JET
   ctx.scale(w/60, h/84);
   ctx.rotate(Math.PI);
   ctx.fillStyle="#ff8800";
@@ -585,7 +565,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.fillRect(-4,-15,8,18);
 
  }else if(phaseIdx === 1 || phaseIdx === 5){
-  // TANK / GROUND MECHA
   ctx.scale(w/60, h/70);
   ctx.fillStyle="#2b394a";
   ctx.fillRect(-22,-20,44,40);
@@ -596,7 +575,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.beginPath();ctx.arc(0,-4,12,0,Math.PI*2);ctx.fill();
 
  }else if(phaseIdx === 2 || phaseIdx === 7){
-  // HELICOPTER
   ctx.scale(w/60, h/70);
   ctx.save();
   ctx.rotate(elapsed*28);
@@ -610,7 +588,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.fillStyle="#1e293b";ctx.fillRect(-4,-36,8,24);
 
  }else if(phaseIdx === 3 || phaseIdx === 8){
-  // DINOSAURS & FIRE DRAGONS
   ctx.scale(w/65, h/75);
   const wingY = Math.sin(elapsed*16)*14;
   ctx.fillStyle="#7f1d1d";
@@ -626,7 +603,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
   ctx.fillRect(-5,20,3,3); ctx.fillRect(2,20,3,3);
 
  }else{
-  // CYBER SPIDERS / ALIEN UFOS
   ctx.scale(w/60, h/65);
   ctx.fillStyle="#065f46";
   ctx.beginPath();ctx.ellipse(0,0,28,15,0,0,Math.PI*2);ctx.fill();
@@ -644,7 +620,6 @@ function drawEntity(type, subKind, x, y, w, h, isBoss=false){
  ctx.restore();
 }
 
-// Player Jet
 function drawPlayerJet(x,y,w,h){
  ctx.save();
  ctx.translate(x,y);
@@ -661,7 +636,6 @@ function drawPlayerJet(x,y,w,h){
  ctx.moveTo(5,34);ctx.lineTo(8,34+flameH);ctx.lineTo(11,34);
  ctx.fill();
 
- // Main Wings
  ctx.fillStyle = "#2563eb";
  ctx.beginPath();
  ctx.moveTo(0,-38); ctx.lineTo(9,-6); ctx.lineTo(29,14);
@@ -671,18 +645,15 @@ function drawPlayerJet(x,y,w,h){
  ctx.fill();
  ctx.strokeStyle = "#93c5fd";ctx.lineWidth = 1.6;ctx.stroke();
 
- // Wing Tips Highlights
  ctx.fillStyle = "#60a5fa";
  ctx.fillRect(-27,14,3,9);ctx.fillRect(24,14,3,9);
 
- // Center Fuselage
  ctx.fillStyle = "#e2e8f0";
  ctx.beginPath();
  ctx.moveTo(0,-42); ctx.lineTo(6,-12); ctx.lineTo(6,30);
  ctx.lineTo(-6,30); ctx.lineTo(-6,-12); ctx.closePath();
  ctx.fill();
 
- // Cockpit
  const glass = ctx.createLinearGradient(0,-24,0,-2);
  glass.addColorStop(0,"#fde047");glass.addColorStop(0.5,"#ca8a04");glass.addColorStop(1,"#451a03");
  ctx.fillStyle = glass;
@@ -733,7 +704,7 @@ function spawnEnemy(){
 }
 
 function spawnMegaBoss(){
- const bossHP = 400 + (level * 80);
+ const bossHP = 350 + (level * 60);
  activeBoss = {
   x: W/2,
   y: -120,
@@ -748,7 +719,7 @@ function spawnMegaBoss(){
  };
 
  $("bossHud").style.display="block";
- $("bossName").textContent = `⚠️ LEVEL ${level} MEGA BOSS BATTLE ⚠️`;
+ $("bossName").textContent = `⚠️ STAGE ${level} MEGA BOSS BATTLE ⚠️`;
  updateBossBar();
  showBanner(`⚠️ LEVEL ${level} BOSS INCOMING! ⚠️`);
 }
@@ -766,10 +737,10 @@ function showBanner(txt){
 
 function explosion(x,y,isPlayer=false,big=false){
  playBlastSFX();
- const count = big ? 60 : (isPlayer ? 40 : 20);
+ const count = big ? 55 : (isPlayer ? 40 : 20);
  for(let i=0;i<count;i++){
   const a=Math.random()*Math.PI*2;
-  const speed=30+Math.random()*(big?320:(isPlayer?220:130));
+  const speed=30+Math.random()*(big?300:(isPlayer?220:130));
   sparks.push({
    x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
    life:0.4+Math.random()*0.6,
@@ -791,7 +762,7 @@ function checkLevelAdvance(){
 
 function triggerWinPopup(){
  paused = true;
- if(level > maxUnlockedLevel){
+ if(level >= maxUnlockedLevel){
   maxUnlockedLevel = level + 1;
   localStorage.setItem("multani_max_lvl", String(maxUnlockedLevel));
  }
@@ -802,7 +773,7 @@ function triggerWinPopup(){
 
 function goToNextLevel(){
  $("winModal").classList.add("hidden");
- hp = 100; // Full health restore on advancing!
+ hp = 100;
  updateHpUI();
 
  if(level >= 500){
@@ -812,6 +783,12 @@ function goToNextLevel(){
  level++;
  levelKills = 0;
  killsNeeded = 10 + Math.floor(level * 0.8);
+ activeBoss = null;
+ enemies = [];
+ bullets = [];
+ enemyBullets = [];
+ sparks = [];
+ $("bossHud").style.display = "none";
 
  const phaseNumber = Math.min(100, Math.floor((level - 1) / 5) + 1);
  $("phaseIndicator").textContent = `PHASE ${phaseNumber}: ${ENEMY_PHASES[phaseNumber-1] || "WAR SQUAD"}`;
@@ -893,7 +870,7 @@ function update(dt){
    }
   });
 
-  // Boss Logic
+  // Boss Logic & Safe Hit Check
   if(activeBoss){
    if(activeBoss.y < activeBoss.targetY){
     activeBoss.y += 90 * dt;
@@ -910,7 +887,9 @@ function update(dt){
     }
    }
 
-   bullets.forEach(b=>{
+   for(let i=0; i<bullets.length; i++){
+    const b = bullets[i];
+    if(!activeBoss) break;
     if(!b.used && Math.abs(b.x - activeBoss.x) < activeBoss.w*0.5 && Math.abs(b.y - activeBoss.y) < activeBoss.h*0.5){
      b.used = true;
      activeBoss.hp -= 20;
@@ -920,11 +899,14 @@ function update(dt){
       explosion(activeBoss.x, activeBoss.y, false, true);
       score += 1500;
       activeBoss = null;
+      enemies = [];
+      enemyBullets = [];
       $("bossHud").style.display="none";
       triggerWinPopup();
+      break;
      }
     }
-   });
+   }
   }
 
   player.inv=Math.max(0,player.inv-dt);
