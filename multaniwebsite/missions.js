@@ -110,6 +110,8 @@ export async function renderMissionsUI() {
 
   wrap.innerHTML = `<p style="color:var(--text-dim); text-align:center; padding:10px; font-size:12px;">Loading live daily missions...</p>`;
 
+  const isVerified = (state.currentProfile?.is_verified === true);
+
   let dbMissions = [];
   try {
     const { data, error } = await sbClient
@@ -137,11 +139,9 @@ export async function renderMissionsUI() {
     ];
   }
 
-  // Database se 5th bonus mission filter karke nikalna agar database mein shamil ho
   const basicMissions = dbMissions.filter(m => m.action_type !== 'all_missions' && !m.title.includes('تمام'));
   const hasDbBonus = dbMissions.find(m => m.action_type === 'all_missions' || m.title.includes('تمام'));
 
-  // Check karna ke kya tamam basic tasks claim ho chuke hain
   let allDone = basicMissions.length > 0;
   basicMissions.forEach(bm => {
     const key = `m_${bm.id}`;
@@ -150,7 +150,19 @@ export async function renderMissionsUI() {
     }
   });
 
-  let html = basicMissions.map(m => {
+  let html = '';
+
+  // Agar user verified nahi hai to alert banner dikhayein
+  if (!isVerified) {
+    html += `
+      <div style="background:rgba(255,152,0,0.15); border:1px solid #ff9800; border-radius:8px; padding:10px; margin-bottom:12px; text-align:center; font-size:12px; color:#fff;">
+        ⚠️ <strong>Account Not Verified!</strong> مشنز کے کوائنز کلیم کرنے کے لیے پہلے پروفائل سے اکاؤنٹ ویریفائی کریں۔
+        <button onclick="closeDailyMissionsModal(); window.Router.navigate('profile');" style="margin-top:6px; display:block; width:100%; padding:6px; background:#ff9800; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">VERIFY NOW</button>
+      </div>
+    `;
+  }
+
+  html += basicMissions.map(m => {
     let isReady = false;
     let progressText = '';
     const claimKey = `m_${m.id}`;
@@ -197,7 +209,6 @@ export async function renderMissionsUI() {
     `;
   }).join('');
 
-  // 5th Bonus Mission: sirf ek dafa render hoga aur strict allDone check par chalega
   const bonusRewardCoins = hasDbBonus?.reward_coins || 2;
   const bonusClaimKey = hasDbBonus ? `m_${hasDbBonus.id}` : 'allBonus';
   const isBonusClaimed = !!state.userMissionState.claimed[bonusClaimKey] || !!state.userMissionState.claimed['allBonus'];
@@ -231,6 +242,16 @@ export async function claimMissionReward(missionKey, coinAmount, desc) {
   if (!state.currentUser) {
     Toast.show("Pehle apna account login karein!", "info");
     window.Router.navigate('login');
+    return;
+  }
+
+  // Verification Check: Unverified user reward claim nahi kar sakega
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Tabhi aap Daily Missions ke coins claim kar sakte hain.", "warning");
+    closeDailyMissionsModal();
+    setTimeout(() => {
+      window.Router.navigate('profile');
+    }, 1200);
     return;
   }
 
@@ -270,3 +291,8 @@ export async function claimMissionReward(missionKey, coinAmount, desc) {
     Toast.show("Transfer failed: " + (err.message || "Dubara koshish karein"), "error");
   }
 }
+
+window.claimMissionReward = claimMissionReward;
+window.openDailyMissionsModal = openDailyMissionsModal;
+window.closeDailyMissionsModal = closeDailyMissionsModal;
+window.toggleMissionsRulesDropdown = toggleMissionsRulesDropdown;
