@@ -2,800 +2,1508 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  
-  <!-- GOOGLE SEARCH CONSOLE VERIFICATION -->
-  <meta name="google-site-verification" content="AoFuCJIFEHGeGRieVxZp5WBCI6JI84rj_bLzmDuz0s8" />
-
-  <!-- ADVANCED SEO META TAGS -->
-  <title>Multani FF Official Tournament - Pakistan's #1 Free Fire Esports & Custom Room Platform</title>
-  <meta name="description" content="Welcome to Multani FF Official Tournament, Pakistan's leading Free Fire esports platform. Join daily custom room matches, Solo, Duo, and Squad tournaments, compete with top players, and win real cash prizes with instant Easypaisa and SadaPay withdrawals on Multani FF Official Tournament." />
-  <meta name="keywords" content="Multani FF Official Tournament, Multani FF tournament, Free Fire tournament Pakistan, Multani FF esports platform, Free Fire custom room matches Pakistan, win cash prizes Free Fire, Multani FF official website, Free Fire daily esports tournament Pakistan, Multani FF gaming zone" />
-  <meta name="author" content="Muhammad Nadeem" />
-  <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#0a0a0f" />
-  
-  <!-- INSTANT IMAGE PRELOAD (NO DELAY / NO CHOPPY LOADING) -->
-  <link rel="preload" as="image" href="./multaniwebsite/1793357792725.png" />
-  <link rel="preload" as="image" href="https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>MULTANI FF - Admin Console</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
+  <!-- Firebase App & Messaging SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcP8vr_PaSFLJ1XadDL3HG4Ny9DRvOjXQ",
+      authDomain: "multani-ff-admin.firebaseapp.com",
+      projectId: "multani-ff-admin",
+      storageBucket: "multani-ff-admin.firebasestorage.app",
+      messagingSenderId: "263780759644",
+      appId: "1:263780759644:web:864be0b5d12df3524b8e99",
+      measurementId: "G-3Q5KEP9GGL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    window.requestAdminNotificationPermission = async function() {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          const currentToken = await getToken(messaging, {
+            vapidKey: 'BApFHrn7CrPBOt6Ik_gEOdUGQb2OLaPbqtY0MEuctwqjDWjquDFJUBQptUKkWuqQU6vNUxNfjL-FQimi7-JyRn8'
+          });
+          if (currentToken && window.currentAdminUser) {
+            const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
+            const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
+            const tmpClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            await tmpClient.from('admin_fcm_tokens').upsert({
+              user_id: window.currentAdminUser.id,
+              fcm_token: currentToken
+            }, { onConflict: 'fcm_token' });
+
+            alert("Notifications Enabled & Saved Successfully!");
+          } else {
+            alert("Please login first to save notification token.");
+          }
+        } else {
+          alert("Notification permission denied.");
+        }
+      } catch (err) {
+        console.error("Notification permission error:", err);
+      }
+    };
+
+    onMessage(messaging, (payload) => {
+      if (payload.notification) {
+        if (Notification.permission === 'granted') {
+          new Notification(payload.notification.title, {
+            body: payload.notification.body,
+            icon: '/favicon.ico'
+          });
+        }
+      }
+    });
+  </script>
+
   <style>
-    :root {
-      --bg-base: #06070a;
-      --bg-surface: #0e1118;
-      --bg-card: #151922;
-      --border-color: #262f40;
-      --primary: #ff4624;
-      --primary-glow: rgba(255, 70, 36, 0.45);
-      --accent-cyan: #00f0ff;
-      --accent-cyan-glow: rgba(0, 240, 255, 0.4);
-      --accent-gold: #ffbe00;
-      --accent-gold-glow: rgba(255, 190, 0, 0.4);
-      --success: #00e676;
-      --danger: #ff1744;
-      --text-main: #f3f4f6;
-      --text-muted: #8e9bb0;
-      --text-dim: #5c687a;
-      --header-height: 56px;
-      --bottom-nav-height: 64px;
-      --max-app-width: 430px;
-      --font-gaming: 'Rajdhani', sans-serif;
-      --font-ui: 'Inter', sans-serif;
-      --radius: 14px;
-      --radius-sm: 8px;
-      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; width: 100%; overflow: hidden; }
-    body { background-color: #020203; color: var(--text-main); font-family: var(--font-ui); min-height: 100dvh; display: flex; justify-content: center; align-items: center; user-select: none; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    .font-gaming { font-family: 'Rajdhani', sans-serif; }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
     
-    #app-container { 
-      width: 100%; 
-      max-width: var(--max-app-width); 
-      height: 100dvh; 
-      background-color: var(--bg-base); 
-      display: flex; 
-      flex-direction: column; 
-      position: relative; 
-      overflow: hidden; 
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 2px rgba(255, 70, 36, 0.3); 
+    .horizontal-filter-scroll {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
     }
-    @media (min-width: 431px) { #app-container { height: 94vh; border-radius: 28px; border: 1px solid #1f2636; } }
-
-    .app-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); background: rgba(14, 17, 24, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-    .header-bar { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
-    .brand-logo { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .brand-sub { font-family: var(--font-gaming); font-size: 10px; letter-spacing: 3px; color: var(--primary); font-weight: 700; line-height: 1; }
-    .brand-main { font-family: var(--font-gaming); font-size: 19px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffffff, #ffb39e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .icon-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); position: relative; }
-    .icon-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.05); }
-    .header-actions { display: flex; align-items: center; gap: 6px; }
-    .avatar-btn { padding: 0; overflow: hidden; border: 1.5px solid var(--primary); }
-    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
-    .sub-header-title { font-family: var(--font-gaming); font-size: 18px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .sub-header-spacer { width: 38px; }
-
-    .drawer-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 150; }
-    .side-drawer { position: absolute; top: 0; left: -320px; width: 290px; height: 100%; background: var(--bg-surface); border-right: 1px solid var(--border-color); z-index: 200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 20px 16px; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
-    .side-drawer.open { transform: translateX(320px); }
-    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
-    .drawer-user-info { display: flex; align-items: center; gap: 12px; }
-    .avatar-round { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
-    .user-meta h3 { font-family: var(--font-gaming); font-size: 18px; color: var(--text-main); line-height: 1.1; }
-    .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
-    .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
-    .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
-    .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
-    .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
-    .drawer-link.logout-link { color: var(--danger); }
-    .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
-    .drawer-footer { padding-top: 12px; text-align: center; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
-
-    .main-content { 
-      flex: 1; 
-      overflow-y: auto; 
-      overflow-x: hidden; 
-      padding-bottom: 85px; 
-      position: relative; 
-      -webkit-overflow-scrolling: touch; 
+    .horizontal-filter-scroll::-webkit-scrollbar {
+      display: none;
     }
-    .view-container { padding: 16px; animation: fadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .screenshot-card {
-      border: 1.5px solid #ff770055;
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
+    @keyframes blink-green {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .blink-heart { animation: blink-green 1.2s infinite ease-in-out; }
+
+    @keyframes admin-glow {
+      0% { box-shadow: 0 0 4px #ff5722, inset 0 0 4px #ff5722; }
+      50% { box-shadow: 0 0 12px #ff7043, inset 0 0 6px #ff7043; }
+      100% { box-shadow: 0 0 4px #ff5722, inset 0 0 4px #ff5722; }
+    }
+    .admin-glowing-avatar {
+      animation: admin-glow 1.8s infinite ease-in-out;
+      border: 2px solid #ff7043;
+    }
+
+    .admin-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background-color: #0e1118;
+      border-top: 1px solid #262f40;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 100;
+    }
+    .admin-nav-btn {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      gap: 3px;
+      flex: 1;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: bold;
+      text-transform: uppercase;
       position: relative;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      background-color: transparent !important;
-      background-size: cover !important;
-      background-position: center !important;
-      overflow: hidden;
     }
-    .screenshot-card > * { position: relative; z-index: 2; }
-
-    .screenshot-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .screenshot-card-logo { width: 22px; height: 22px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
-    .screenshot-brand-text { font-family: var(--font-gaming); font-size: 11px; letter-spacing: 1px; color: #ffbe00; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
-    .screenshot-title { font-family: var(--font-gaming); font-size: 22px; font-weight: 800; color: #ffaa00; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.98); }
-    .screenshot-subtitle { font-size: 10px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-shadow: 0 1px 5px rgba(0,0,0,0.98); }
-
-    .rules-dropdown-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 14px; overflow: hidden; }
-    .rules-dropdown-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1e29; transition: var(--transition); }
-    .rules-dropdown-header:hover { background: #222736; }
-    .rules-dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; padding: 0 14px; background: #12151d; font-size: 12px; color: #c7cbd1; line-height: 1.6; }
-    .rules-dropdown-container.open .rules-dropdown-content { max-height: 2500px; padding: 12px 14px; }
-    .rules-arrow { transition: transform 0.3s ease; color: var(--accent-gold); font-size: 12px; }
-
-    .filter-tab-btn { padding: 8px 10px; border-radius: 8px; font-family: var(--font-gaming); font-size: 11px; font-weight: 700; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); white-space: nowrap; cursor: pointer; transition: var(--transition); text-align: center; }
-    .filter-tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px var(--primary-glow); }
-
-    @keyframes ledGlow {
-      0%, 100% { box-shadow: 0 0 10px #ff1744, inset 0 0 10px rgba(0,240,255,0.3); }
-      33% { box-shadow: 0 0 12px #00f0ff, inset 0 0 10px rgba(255,190,0,0.3); }
-      66% { box-shadow: 0 0 12px #ffbe00, inset 0 0 10px rgba(0,230,118,0.3); }
-    }
-    .led-signboard { background: #020305; border: 3px solid transparent; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; overflow: hidden; position: relative; box-shadow: 0 0 18px rgba(0, 240, 255, 0.35); animation: ledGlow 3s infinite ease-in-out; background-image: radial-gradient(circle, #151c28 1px, transparent 1px); background-size: 6px 6px; }
-    .led-signboard i { color: #ffbe00; font-size: 16px; filter: drop-shadow(0 0 6px #ffbe00); }
-    .ticker-viewport { overflow: hidden; white-space: nowrap; width: 100%; position: relative; }
-    .ticker-content { display: inline-block; font-family: var(--font-gaming); font-size: 14px; font-weight: 800; letter-spacing: 1.5px; background: linear-gradient(90deg, #ff1744, #00f0ff, #ffbe00, #00e676, #ff1744); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)); padding-left: 100%; animation: smoothTicker linear infinite; animation-play-state: paused; }
-    .ticker-content.active { animation-play-state: running; }
-
-    @keyframes smoothTicker {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
-    }
-  
-    .bottom-nav { height: var(--bottom-nav-height); background: rgba(14, 17, 24, 0.98); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 110; position: absolute; bottom: 0; left: 0; right: 0; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; gap: 4px; width: 20%; transition: var(--transition); cursor: pointer; }
-    .nav-item i { font-size: 18px; }
-    .nav-item.active { color: var(--primary); }
-
-    .category-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 14px; scrollbar-width: none; }
-    .category-scroll-container::-webkit-scrollbar { display: none; }
-    
-    .cat-item { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; cursor: pointer; gap: 6px; }
-    .cat-circle { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2b1218, #150a0d); border: 2px solid var(--primary); box-shadow: 0 4px 14px rgba(255, 70, 36, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 18px; transition: var(--transition); }
-    .cat-circle:active { transform: scale(0.92); }
-    .cat-label { font-size: 11px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-    .cat-item.active-action .cat-circle { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan); transform: scale(1.05); }
-
-    #admin-float-widget { position: absolute; bottom: 120px; right: 18px; z-index: 300; touch-action: none; user-select: none; cursor: grab; display: flex; flex-direction: column-reverse; align-items: center; }
-    #admin-float-widget:active { cursor: grabbing; }
-    .bot-bubble { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #1f293d, #0f131a); border: 2px solid var(--primary); box-shadow: 0 4px 20px rgba(255, 70, 36, 0.5), 0 0 10px rgba(0, 240, 255, 0.3); display: flex; align-items: center; justify-content: center; position: relative; }
-    .bot-bubble img { width: 34px; height: 34px; object-fit: contain; }
-    .bot-badge-tag { margin-top: -6px; background: #ff4624; color: #fff; font-family: var(--font-gaming); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.3); }
-    .support-popup-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 10px; align-items: center; animation: popUpAnim 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .support-popup-menu.show { display: flex; }
-    @keyframes popUpAnim { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    
-    .support-action-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ffbe00, #ff9800); border: 2px solid #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); cursor: pointer; text-decoration: none; transition: var(--transition); }
-    .support-action-btn:active { transform: scale(0.9); }
-
-    #chat-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 400; display: flex; flex-direction: column; justify-content: flex-end; }
-    .chat-dialog { height: 82%; background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .chat-dialog-header { padding: 14px 16px; background: #151922; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
-    .chat-user-header { display: flex; align-items: center; gap: 10px; }
-    .chat-online-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00e676; border-radius: 50%; border: 2px solid #151922; }
-    .chat-dialog-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-    
-    .chat-row { display: flex; flex-direction: column; width: 100%; }
-    .chat-row.mine { align-items: flex-end; }
-    .chat-row.theirs { align-items: flex-start; }
-    
-    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
-    .chat-bubble.mine { background: linear-gradient(135deg, #ff4624, #e03212); color: #fff; border-bottom-right-radius: 2px; }
-    .chat-bubble.theirs { background: #1c2233; color: #eee; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
-    .chat-time-tag { font-size: 9px; opacity: 0.7; margin-top: 4px; font-family: monospace; }
-    .chat-input-bar { padding: 10px 14px; background: #151922; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
-
-    #share-modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 500; display: flex; flex-direction: column; justify-content: flex-end; }
-    .share-sheet { background: #0e1118; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1.5px solid var(--border-color); padding: 20px 16px 35px 16px; display: flex; flex-direction: column; gap: 16px; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-    .share-options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
-    .share-app-icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; color: var(--text-main); font-size: 11px; font-weight: 600; }
-    .share-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-
-    #pull-refresh-indicator { text-align: center; padding: 10px; font-family: var(--font-gaming); font-size: 12px; color: var(--accent-cyan); display: none; }
-
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: var(--radius-sm); font-family: var(--font-gaming); font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: none; cursor: pointer; transition: var(--transition); }
-    .btn-primary { background: linear-gradient(135deg, #ff5733, #e62200); color: #fff; box-shadow: 0 4px 18px var(--primary-glow); }
-    .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
-    .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; }
-    .form-group { margin-bottom: 14px; }
-    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-    .form-input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ui); font-size: 14px; outline: none; transition: var(--transition); }
-    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .player-hero-card { background: linear-gradient(145deg, #181d29, #0f131a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.5); }
-    .hero-profile-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
-    .hero-avatar { width: 52px; height: 52px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
-    .hero-details h2 { font-family: var(--font-gaming); font-size: 20px; font-weight: 700; line-height: 1.1; }
-    .hero-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.04); }
-    .stat-box { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-    .stat-val { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; color: #fff; }
-    .stat-val.gold { color: var(--accent-gold); }
-    .stat-val.green { color: var(--success); }
-    .section-title { font-family: var(--font-gaming); font-size: 17px; font-weight: 700; text-transform: uppercase; margin: 18px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
-    
-    .tournaments-stack-as8 { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-    .t-card-as8-large { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); position: relative; }
-    .t-card-thumb-large { width: 100%; height: 160px; position: relative; background: #000; cursor: pointer; }
-    .t-card-thumb-large img { width: 100%; height: 100%; object-fit: cover; }
-    .t-card-info-large { padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #11151e; }
-    .t-card-title-large { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; }
-    .t-card-meta-large { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
-
-    .room-slots-container { background: #090c12; border: 1.5px solid #262f40; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; }
-    .room-slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; }
-    .slot-card { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #131722; border: 1px solid #1f2636; border-radius: 6px; }
-    .slot-card.occupied { background: #1c2233; border-color: var(--accent-cyan); }
-    .slot-card.my-slot { background: linear-gradient(135deg, rgba(255, 70, 36, 0.25), #1c2233); border-color: var(--primary); }
-    .slot-num { font-family: var(--font-gaming); font-size: 12px; font-weight: 700; color: var(--text-dim); width: 22px; }
-    .slot-card.occupied .slot-num { color: var(--accent-gold); }
-    .slot-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .slot-card.occupied .slot-name { color: #fff; }
-    .slot-card.my-slot .slot-name { color: var(--primary); font-weight: 700; }
-
-    .wallet-hero { background: linear-gradient(135deg, #1d1b28, #10121a); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 16px; }
-    .wallet-balance-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
-    .wallet-amount { font-family: var(--font-gaming); font-size: 38px; font-weight: 800; color: var(--accent-gold); margin: 6px 0 14px 0; }
-    .tx-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; overflow: hidden; word-break: break-word; }
-    .tx-info { flex: 1; min-width: 0; padding-right: 8px; }
-    .tx-info h4 { font-size: 14px; font-weight: 600; white-space: normal; overflow-wrap: break-word; }
-    .tx-info span { font-size: 11px; color: var(--text-dim); display: block; white-space: normal; overflow-wrap: break-word; }
-    .tx-amount { font-family: var(--font-gaming); font-size: 16px; font-weight: 700; flex-shrink: 0; }
-    .tx-positive { color: var(--success); }
-    .tx-negative { color: var(--danger); }
-    .toast-container { position: absolute; bottom: 80px; left: 16px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-    .toast-msg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; color: #fff; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
-    .toast-msg.toast-success { border-color: var(--success); }
-    .toast-msg.toast-error { border-color: var(--danger); }
-    .toast-msg.toast-info { border-color: var(--accent-cyan); }
-    .global-loader { position: absolute; inset: 0; background: rgba(6, 7, 10, 0.88); backdrop-filter: blur(6px); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
-    .spinner-flame { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .loader-text { font-family: var(--font-gaming); letter-spacing: 1px; font-size: 15px; color: var(--text-muted); }
-    .hidden { display: none !important; }
-    .text-accent { color: var(--accent-cyan) !important; }
-    .text-gold { color: var(--accent-gold) !important; }
-    .empty-state { text-align: center; padding: 40px 16px; color: var(--text-dim); }
-    .empty-state i { font-size: 40px; margin-bottom: 12px; }
-    
-    .social-footer { background: #090c12; border-top: 1px solid var(--border-color); padding: 14px 16px; text-align: center; margin-top: 20px; border-radius: var(--radius-sm); }
-    .social-footer p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-family: var(--font-gaming); letter-spacing: 1px; font-weight: 700; }
-    .social-icons-row { display: flex; justify-content: center; gap: 12px; }
-    .social-icon-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; transition: var(--transition); border: 1px solid var(--border-color); color: #fff; }
-    .social-icon-btn.whatsapp { background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676; }
-    .social-icon-btn.tiktok { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
-    .social-icon-btn.youtube { background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); color: #ff1744; }
-    .social-icon-btn:active { transform: scale(0.95); }
-
-    /* ARENA AUTH STYLE OVERRIDES */
-    .arena-login-wrap { max-width: 380px; margin: 0 auto; padding: 20px 4px; }
-    .arena-title { font-family: var(--font-gaming); font-size: 28px; font-weight: 800; color: #ff5733; letter-spacing: 1.5px; text-align: center; margin-bottom: 4px; text-transform: uppercase; }
-    .arena-subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
-    .arena-input-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; transition: var(--transition); }
-    .arena-input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .arena-input-box i { color: var(--text-dim); font-size: 15px; width: 18px; text-align: center; }
-    .arena-field { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; font-family: var(--font-ui); }
-
-    /* ANIMATED DRAGON & LIGHTING VIP FRAMES */
-    @keyframes dragonGlowGold {
-      0%, 100% { box-shadow: 0 0 20px #ffbe00, 0 0 40px #ff5500, inset 0 0 12px #ffbe00; border-color: #ffbe00; transform: scale(1); }
-      50% { box-shadow: 0 0 35px #ffea75, 0 0 60px #ff7700, inset 0 0 20px #ffea75; border-color: #ffea75; transform: scale(1.03); }
-    }
-    @keyframes dragonGlowSilver {
-      0%, 100% { box-shadow: 0 0 15px #00f0ff, 0 0 30px #0055ff, inset 0 0 10px #00f0ff; border-color: #00f0ff; }
-      50% { box-shadow: 0 0 25px #80f8ff, 0 0 45px #0088ff, inset 0 0 18px #80f8ff; border-color: #80f8ff; }
-    }
-    @keyframes dragonGlowBronze {
-      0%, 100% { box-shadow: 0 0 15px #ff7700, 0 0 30px #aa2200, inset 0 0 10px #ff7700; border-color: #ff7700; }
-      50% { box-shadow: 0 0 25px #ffa14a, 0 0 45px #dd4400, inset 0 0 18px #ffa14a; border-color: #ffa14a; }
-    }
-    .vip-frame-1 { border: 3px solid #ffbe00; border-radius: 50%; animation: dragonGlowGold 1.8s infinite ease-in-out; }
-    .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
-    .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
-
-    /* ALL DRAWER LINKS UNIFORM COLOR */
-    .side-drawer .drawer-nav .drawer-link {
-      color: #c7cbd1 !important;
-    }
-    .side-drawer .drawer-nav .drawer-link i {
-      color: #8e9bb0 !important;
-    }
-    .side-drawer .drawer-nav .drawer-link:hover,
-    .side-drawer .drawer-nav .drawer-link:active {
-      background: var(--bg-card) !important;
-      color: #ffffff !important;
-    }
-    .side-drawer .drawer-nav .drawer-link:hover i,
-    .side-drawer .drawer-nav .drawer-link:active i {
-      color: var(--primary) !important;
+    .admin-nav-btn i { font-size: 18px; }
+    .admin-nav-btn:hover, .admin-nav-btn:active { color: #ff4624; }
+    .admin-center-plus {
+      position: relative;
+      top: -18px;
+      background: linear-gradient(135deg, #ff4624, #ff8424);
+      border: 4px solid #06070a;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 22px;
+      box-shadow: 0 4px 15px rgba(255, 70, 36, 0.4);
+      cursor: pointer;
     }
 
-    /* Sirf Logout red rahega */
-    .side-drawer .drawer-nav .drawer-link.logout-link {
-      color: var(--danger) !important;
-    }
-    .side-drawer .drawer-nav .drawer-link.logout-link i {
-      color: var(--danger) !important;
-    }
-
-    /* ========================================================
-       VIP INSTANT APP-LOADER (DIRECT ZERO-SECOND DISPLAY)
-       ======================================================== */
-    #mff-vip-splash {
+    /* VIP OFFLINE MODAL DESIGN */
+    #vip-offline-screen {
+      display: none;
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, #071728 0%, #030a13 65%, #010408 100%);
-      z-index: 99999999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 45px 20px;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      overflow: hidden;
-      user-select: none;
-    }
-
-    .mff-corner {
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      border-color: #00f0ff;
-      border-style: solid;
-      opacity: 0.9;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
-    }
-    .mff-top-left { top: 20px; left: 20px; border-width: 3px 0 0 3px; }
-    .mff-top-right { top: 20px; right: 20px; border-width: 3px 3px 0 0; }
-    .mff-bottom-left { bottom: 20px; left: 20px; border-width: 0 0 3px 3px; }
-    .mff-bottom-right { bottom: 20px; right: 20px; border-width: 0 3px 3px 0; }
-
-    .mff-center-wrap {
-      display: flex;
-      flex-direction: column;
+      z-index: 9999999;
+      background: rgba(6, 7, 10, 0.94);
+      backdrop-filter: blur(10px);
       align-items: center;
       justify-content: center;
-      margin-top: auto;
-      margin-bottom: auto;
+      padding: 20px;
     }
-
-    .mff-logo-stage {
-      position: relative;
-      width: 140px;
-      height: 140px;
+    .vip-popup-card {
+      background: linear-gradient(160deg, #151922 0%, #0e1118 100%);
+      border: 2px solid #ff4624;
+      border-radius: 24px;
+      padding: 30px 22px;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 0 35px rgba(255, 70, 36, 0.45);
+      animation: vipBoxGlow 2s infinite alternate ease-in-out;
+    }
+    @keyframes vipBoxGlow {
+      0% { transform: scale(1); box-shadow: 0 0 25px rgba(255, 70, 36, 0.35); }
+      100% { transform: scale(1.02); box-shadow: 0 0 45px rgba(255, 70, 36, 0.65); }
+    }
+    .vip-offline-icon-circle {
+      width: 75px;
+      height: 75px;
+      background: rgba(255, 70, 36, 0.12);
+      border: 2px solid #ff4624;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      perspective: 900px;
-      margin-bottom: 24px;
+      margin: 0 auto 16px;
+      font-size: 32px;
+      color: #ff4624;
+      box-shadow: 0 0 20px rgba(255, 70, 36, 0.35);
     }
-
-    .mff-outer-ring {
-      position: absolute;
-      width: 136px;
-      height: 136px;
-      border-radius: 50%;
-      border: 2px dashed rgba(0, 240, 255, 0.45);
-      animation: mffRingSpin 9s linear infinite;
-    }
-
-    .mff-glow-disc {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.25) 0%, rgba(3, 10, 19, 0.8) 75%);
-      box-shadow: 0 0 35px rgba(0, 240, 255, 0.35), inset 0 0 16px rgba(0, 240, 255, 0.45);
-    }
-
-    .mff-rotating-coin {
-      width: 118px;
-      height: 118px;
-      object-fit: cover;
-      border-radius: 50%;
-      position: relative;
-      z-index: 2;
-      display: block;
-      animation: mffCoinTurn 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
-      border: 2px solid rgba(0, 240, 255, 0.7);
-      background-color: #030a13;
-    }
-
-    .mff-brand-title {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 3px;
+    .vip-retry-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ff4624, #ff8424);
       color: #ffffff;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      text-align: center;
-      margin: 0;
-      text-shadow: 0 0 16px rgba(0, 240, 255, 0.65), 0 2px 4px rgba(0, 0, 0, 0.85);
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 70, 36, 0.45);
+      transition: all 0.2s;
     }
-
-    .mff-sub-badge {
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: #80f0ff;
-      text-transform: uppercase;
-      opacity: 0.92;
-    }
-
-    .mff-divider {
-      width: 130px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #00f0ff, transparent);
-      margin-top: 14px;
-    }
-
-    .mff-bottom-wrap {
-      width: 100%;
-      max-width: 280px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .mff-status-text {
-      color: #a4c1db;
-      font-size: 13px;
-      letter-spacing: 1px;
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .mff-track-bar {
-      width: 100%;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .mff-fill-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 40%;
-      background: linear-gradient(90deg, #0072ff, #00f0ff, #70ffe2);
-      box-shadow: 0 0 12px #00f0ff;
-      border-radius: 10px;
-      animation: mffProgressAnim 1.6s ease-in-out infinite;
-    }
-
-    @keyframes mffCoinTurn {
-      0% { transform: rotateY(0deg); }
-      50% { transform: rotateY(180deg); }
-      100% { transform: rotateY(360deg); }
-    }
-
-    @keyframes mffRingSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes mffProgressAnim {
-      0% { left: -45%; width: 35%; }
-      50% { width: 60%; }
-      100% { left: 105%; width: 40%; }
+    .vip-retry-btn:active {
+      transform: scale(0.97);
     }
   </style>
 </head>
-<body>
+<body class="bg-[#06070a] text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row relative pb-20 md:pb-0">
 
-  <!-- ZERO-SECOND DIRECT VIP LOADING SCREEN (NO BLACK SCREEN) -->
-  <div id="mff-vip-splash">
-    <div class="mff-corner mff-top-left"></div>
-    <div class="mff-corner mff-top-right"></div>
-    <div class="mff-corner mff-bottom-left"></div>
-    <div class="mff-corner mff-bottom-right"></div>
-
-    <div class="mff-center-wrap">
-      <div class="mff-logo-stage">
-        <div class="mff-outer-ring"></div>
-        <div class="mff-glow-disc"></div>
-        <img id="mff-logo-img" 
-             src="./multaniwebsite/1793357792725.png" 
-             alt="Multani FF Logo" 
-             class="mff-rotating-coin" 
-             onerror="this.src='https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multaniwebsite/1793357792725.png'" />
+  <!-- VIP OFFLINE POPUP -->
+  <div id="vip-offline-screen">
+    <div class="vip-popup-card">
+      <div class="vip-offline-icon-circle">
+        <i class="fa-solid fa-wifi"></i>
       </div>
-      <h1 class="mff-brand-title">MULTANI FF</h1>
-      <span class="mff-sub-badge">OFFICIAL TOURNAMENT ARENA</span>
-      <div class="mff-divider"></div>
-    </div>
-
-    <div class="mff-bottom-wrap">
-      <span id="mff-loader-text" class="mff-status-text">Loading the Arena...</span>
-      <div class="mff-track-bar">
-        <div class="mff-fill-line"></div>
+      <div style="color: #ff4624; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 2.5px; margin-bottom: 6px;">
+        MULTANI FF OFFICIAL
       </div>
+      <h2 style="color: #ffffff; font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 800; margin: 0 0 10px; text-transform: uppercase;">
+        Connection Lost!
+      </h2>
+      <p style="color: #94a3b8; font-size: 12px; line-height: 1.6; margin: 0 0 22px;">
+        Aapka internet connection band hai. Please apna Mobile Data ya Wi-Fi check karein aur dobara koshish karein.
+      </p>
+      <button class="vip-retry-btn" onclick="retryConnectionNow()">
+        <i class="fa-solid fa-rotate-right mr-1"></i> Retry Connection
+      </button>
     </div>
   </div>
 
-  <div id="app-container">
-    <header id="main-header" class="app-header">
-      <div id="master-header-bar" class="header-bar">
-        <button id="btn-hamburger" class="icon-btn" aria-label="Open Menu">
-          <i class="fa-solid fa-bars-staggered"></i>
-        </button>
-        <div class="brand-logo" onclick="Router.navigate('home')">
-          <span class="brand-sub">MULTANI FF</span>
-          <span class="brand-main">ARENA</span>
-        </div>
-        <div class="header-actions">
-          <button id="btn-header-share" class="icon-btn" onclick="openShareModal()" title="Share App">
-            <i class="fa-solid fa-share-nodes" style="color:var(--accent-cyan);"></i>
-          </button>
-          <button id="btn-header-notif" class="icon-btn" onclick="Router.navigate('notifications')" style="position:relative;">
-            <i class="fa-solid fa-bell"></i>
-            <span id="header-notif-badge" class="hidden" style="position:absolute; top:6px; right:6px; width:9px; height:9px; background:var(--primary); border-radius:50%; border:1px solid #0e1118;"></span>
-          </button>
-          <button id="btn-header-profile" class="icon-btn avatar-btn" onclick="Router.navigate('profile')">
-            <img id="header-avatar-img" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
-          </button>
-        </div>
+  <!-- AUTH OVERLAY -->
+  <div id="admin-auth-screen" class="fixed inset-0 bg-[#06070a] z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <i class="fa-solid fa-shield-halved text-[#ff4624] text-4xl mb-2"></i>
+        <h2 class="font-gaming text-2xl font-bold tracking-wider text-white">MULTANI FF ADMIN</h2>
+        <p class="text-xs text-gray-400">Master Control Console</p>
       </div>
 
-      <div id="sub-header-bar" class="header-bar hidden">
-        <button id="btn-back" class="icon-btn back-btn" onclick="Router.back()">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Back</span>
+      <form id="admin-login-form" class="space-y-3 pt-2" onsubmit="handleAdminLogin(event)">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Admin Email</label>
+          <input type="email" id="adm-email" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="email" />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Password</label>
+          <div class="relative">
+            <input type="password" id="adm-pass" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 pr-10 text-xs text-white outline-none focus:border-[#ff4624]" required autocomplete="current-password" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
+              <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" id="btn-adm-login" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+          AUTHENTICATE CONSOLE
         </button>
-        <h1 id="sub-header-title" class="sub-header-title">Page</h1>
-        <div class="sub-header-spacer"></div>
+      </form>
+      <div id="admin-auth-msg" class="text-xs text-center text-red-500 hidden pt-1"></div>
+    </div>
+  </div>
+
+  <div id="mobile-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#0e1118] border-r border-[#262f40] transform -translate-x-full md:translate-x-0 md:static md:w-64 transition-transform duration-300 ease-in-out flex flex-col justify-between shrink-0">
+    <div class="flex flex-col h-full">
+      <div class="p-4 border-b border-[#262f40] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-shield-halved text-[#ff4624] text-2xl"></i>
+          <div>
+            <h2 class="font-gaming text-xl font-bold tracking-wider text-white">MULTANI FF</h2>
+            <span class="text-[10px] text-gray-400 uppercase tracking-widest block font-bold">Admin Console</span>
+          </div>
+        </div>
+        <button onclick="toggleSidebar(false)" class="md:hidden text-gray-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <nav class="p-3 space-y-1 overflow-y-auto sidebar-scroll flex-1 text-sm">
+        <button onclick="selectTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white">
+          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        </button>
+        <button onclick="selectTab('tournaments')" id="nav-tournaments" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-trophy w-5"></i> Tournaments & Rooms
+        </button>
+        <button onclick="selectTab('winners')" id="nav-winners" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-medal w-5 text-yellow-400"></i> Declare Winners
+        </button>
+        <button onclick="selectTab('games')" id="nav-games" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gamepad w-5 text-emerald-400"></i> Games Manager
+        </button>
+        <button onclick="selectTab('daily_missions')" id="nav-daily_missions" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-list-check w-5 text-pink-400"></i> Daily Missions
+        </button>
+        <button onclick="selectTab('referral_rewards_mgmt')" id="nav-referral_rewards_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gift w-5 text-amber-400"></i> Referral Rewards
+        </button>
+        <button onclick="selectTab('daily_spin_mgmt')" id="nav-daily_spin_mgmt" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-dharmachakra w-5 text-cyan-400"></i> Daily Spin Slots & Stats
+        </button>
+        <button onclick="selectTab('daily_spin_history')" id="nav-daily_spin_history" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-clock-rotate-left w-5 text-purple-400"></i> Spin History
+        </button>
+        <button onclick="selectTab('deposits')" id="nav-deposits" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-money-bill-transfer w-5"></i> Deposit Slips
+          <span id="badge-deposits" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
+        <button onclick="selectTab('withdrawals')" id="nav-withdrawals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-money-bill-transfer w-5 text-amber-400"></i> Withdrawal Requests
+          <span id="badge-withdrawals" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
+        <button onclick="selectTab('diamond_requests')" id="nav-diamond_requests" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-gem w-5 text-amber-400"></i> Diamond Requests
+          <span id="badge-diamond_requests" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
+        <button onclick="selectTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-users w-5"></i> Gamers & Balance
+        </button>
+        <button onclick="selectTab('chat_control')" id="nav-chat_control" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-comments w-5 text-indigo-400"></i> Chat Control
+        </button>
+        <button onclick="selectTab('support')" id="nav-support" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-headset w-5 text-green-400"></i> Support Messages
+          <span id="badge-support" class="ml-auto bg-[#ff4624] text-white text-[11px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+        </button>
+        <button onclick="selectTab('tutorials')" id="nav-tutorials" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-video w-5 text-cyan-400"></i> Tutorials & Ads Manager
+        </button>
+        <button onclick="selectTab('banned')" id="nav-banned" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-ban w-5 text-red-500"></i> Banned Players
+        </button>
+        <button onclick="selectTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition">
+          <i class="fa-solid fa-bullhorn w-5 text-red-400"></i> Announcement Ticker
+        </button>
+      </nav>
+
+      <div class="p-3 border-t border-[#262f40] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img id="admin-user-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-[#ff4624]" />
+          <div class="text-xs">
+            <p id="admin-user-name" class="font-bold text-white">Master Admin</p>
+            <p class="text-emerald-400 text-[10px]">Active Session</p>
+          </div>
+        </div>
+        <button onclick="adminSignOut()" title="Logout" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-power-off"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+    <header class="h-14 bg-[#0e1118] border-b border-[#262f40] px-3 md:px-6 flex items-center justify-between shrink-0 z-30 gap-2">
+      <div class="flex items-center gap-2">
+        <button id="btn-back-dashboard" onclick="selectTab('overview')" class="text-gray-300 hover:text-white bg-[#151922] border border-[#262f40] px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hidden">
+          <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Dashboard
+        </button>
+        <button id="btn-open-sidebar" onclick="toggleSidebar(true)" class="md:hidden text-white p-2 rounded-lg bg-[#151922] border border-[#262f40]">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <h1 id="panel-title" class="font-gaming text-base md:text-xl font-bold uppercase tracking-wide text-white truncate">Dashboard</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="requestAdminNotificationPermission()" class="bg-[#151922] border border-[#ff4624] text-[#ff4624] hover:bg-[#ff4624] hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+          <i class="fa-solid fa-bell"></i> <span class="hidden sm:inline">NOTIFICATIONS</span>
+        </button>
       </div>
     </header>
 
-    <!-- FULLSCREEN GAME PLAYER MODAL -->
-    <div id="game-player-modal" class="hidden" style="position:fixed; inset:0; background:#000; z-index:999; display:flex; flex-direction:column;">
-      <div style="background:#0e1118; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); height:50px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-gamepad" style="color:var(--accent-gold);"></i>
-          <span id="active-game-title" style="font-family:var(--font-gaming); font-size:16px; font-weight:700; color:#fff;">Game</span>
-        </div>
-        <button onclick="closeGamePlayer()" class="btn btn-secondary btn-sm" style="padding:6px 12px; font-size:11px; background:#ff1744; border:none; color:#fff; border-radius:6px; cursor:pointer;">
-          <i class="fa-solid fa-xmark"></i> EXIT
-        </button>
-      </div>
-      <iframe id="game-iframe" src="" style="width:100%; height:calc(100% - 50px); border:none; flex:1;" allow="autoplay; fullscreen; gamepad"></iframe>
-    </div>
-
-    <!-- DAILY MISSIONS MODAL SHEET -->
-    <div id="daily-missions-modal-overlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:998; display:flex; flex-direction:column; justify-content:flex-end;">
-      <div class="share-sheet" style="max-height:90vh; overflow-y:auto; padding:20px 16px 30px 16px; background:#0e1118; border-top-left-radius:24px; border-top-right-radius:24px; border-top:2px solid var(--accent-gold);">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:14px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-bullseye" style="color:var(--accent-gold); font-size:20px;"></i>
-            <h3 style="font-family:var(--font-gaming); font-size:19px; color:#ffaa00; text-transform:uppercase;">DAILY MISSIONS & REWARDS</h3>
+    <div class="flex-1 overflow-y-auto p-3 md:p-6 space-y-5">
+      <!-- DASHBOARD OVERVIEW -->
+      <section id="section-overview" class="space-y-4">
+        <div class="grid grid-cols-2 gap-2.5 w-full max-w-full md:max-w-2xl">
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] uppercase font-bold text-gray-400">Total Approved Deposits</span>
+            <h3 id="stat-total-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ffbe00] mt-1">PKR 0</h3>
           </div>
-          <button onclick="closeDailyMissionsModal()" class="icon-btn" style="width:32px; height:32px;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div id="daily-missions-cards-wrap" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
-
-        <!-- ACCORDION RULES & INSTRUCTIONS -->
-        <div id="missions-rules-container" class="rules-dropdown-container" style="margin-bottom:12px; border-color:#ffbe0088; background:#121620;">
-          <div class="rules-dropdown-header" onclick="toggleMissionsRulesDropdown()" style="background:#181e2b; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; cursor:pointer;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:18px;">🎁</span>
-              <span style="font-family:var(--font-gaming); font-size:14px; font-weight:800; color:var(--accent-gold); letter-spacing:0.5px;">انعام کلیم کرنے کا طریقہ اور مکمل قوانین (Rules)</span>
+          <div class="bg-[#151922] border border-[#262f40] p-3 rounded-xl cursor-pointer relative flex flex-col justify-between" onclick="selectTab('deposits')">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] uppercase font-bold text-gray-400">Pending Slips</span>
+              <button onclick="event.stopPropagation(); loadDashboardStats(); loadDeposits(); alert('Refreshed!');" class="text-cyan-400 hover:text-cyan-300 text-xs p-1" title="Refresh Stats"><i class="fa-solid fa-rotate"></i></button>
             </div>
-            <span id="missions-rules-arrow" style="color:var(--accent-gold); font-size:13px; transition:transform 0.3s ease;">&#9660;</span>
-          </div>
-
-          <div id="missions-rules-content" style="display:none; text-align:right; direction:rtl; padding:14px; font-size:13px; line-height:2; color:#e0e6ed; border-top:1px solid #262f40;">
-            <div style="color:var(--accent-gold); font-weight:bold; font-size:14px; margin-bottom:8px;">🎯 ڈیلی مشنز اور انعامات کی تمام شرائط و ضوابط:</div>
-            <p>1. <strong>روزانہ لاگ اِن (1 کوائن):</strong> ایپ میں لاگ اِن ہوتے ہی یہ مشن مکمل ہو جائے گا اور کھلاڑی 1 کوائن کلیم کر سکے گا۔</p>
-            <p>2. <strong>10 الگ الگ گیمز (1 کوائن):</strong> کھلاڑی کو لسٹ میں موجود 10 مختلف گیمز کھیلنی ہوں گی۔ ایک ہی گیم کو بار بار کھولنے یا ریفریش کرنے سے مشن شمار نہیں ہوگا، اور ہر گیم کو کم از کم 30 سیکنڈز تک ایکٹو کھیلنا لازمی ہے۔</p>
-            <p>3. <strong>1 گھنٹہ گیمز کھیلنا (5 کوائنز):</strong> پورا 1 گھنٹہ (60 منٹ یعنی 3600 سیکنڈز) گیمز کھیلنا لازمی ہے۔ اگر آپ سکرین بند کریں گے یا ایپ سے باہر جائیں گے تو ٹائمر خودبخود رک جائے گا۔</p>
-            <p>4. <strong>ایک ٹورنامنٹ کھیلنا (1 کوائن):</strong> کھلاڑی کو <u>آج کی تاریخ میں</u> کم از کم ایک نیا ٹورنامنٹ یا کسٹم روم میچ جوائن کرنا ہوگا۔ پرانے جوائن شدہ میچز پر اگلے دن کوائن نہیں ملے گا۔</p>
-            <p>5. <strong>اضافی بونس (2 کوائنز):</strong> جب اوپر دیے گئے چاروں مشنز مکمل کلیم ہو جائیں گے تو 2 اضافی کوائنز کا بونس بٹن فوری ان لاک ہو جائے گا۔</p>
-            <p>6. <strong>فوری والیٹ ٹرانسفر:</strong> کلیم بٹن دباتے ہی کوائنز خودبخود آپ کے مین والیٹ بیلنس میں جمع ہو جائیں گے جنہیں آپ ڈائمنڈز یا ٹورنامنٹ انٹری کے لیے استعمال کر سکتے ہیں۔</p>
-            <p>7. <strong>روزانہ ری سیٹ:</strong> تمام ڈیلی مشنز روزانہ رات 12:00 بجے (پاکستان ٹائم) ری سیٹ ہو جائیں گے اور اگلے دن کھلاڑی کو دوبارہ مشنز مکمل کرنے ہوں گے۔</p>
-            <p>8. <strong>سخت فیئر پلے پالیسی:</strong> کسی بھی قسم کی چیٹنگ، ہیک یا آٹو کلکر کا استعمال کرنے پر اکاؤنٹ مستقل بلاک کر دیا جائے گا۔</p>
+            <h3 id="stat-pending-deposits" class="text-base md:text-lg font-bold font-gaming text-[#ff4624] mt-1">0</h3>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- SHARE MODAL SHEET -->
-    <div id="share-modal-overlay" class="hidden">
-      <div class="share-sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-          <h3 style="font-family:var(--font-gaming); font-size:16px; color:#fff;">SHARE APP & EARN</h3>
-          <button onclick="closeShareModal()" class="icon-btn" style="width:30px; height:30px;"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-[#151922] border border-[#262f40] p-3.5 rounded-xl w-full max-w-full md:max-w-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Players</span>
+            <h3 id="stat-total-players" class="text-lg font-bold font-gaming text-white mt-0.5">0</h3>
+          </div>
+          <button onclick="openAllPlayersModal()" class="bg-[#ff4624]/20 border border-[#ff4624]/40 hover:bg-[#ff4624] text-[#ff4624] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming transition flex items-center gap-1.5">
+            <i class="fa-solid fa-list-ul"></i> LIST
+          </button>
         </div>
-        <p style="font-size:12px; color:var(--text-muted);">Apne dosto ko app share karein aur jab wo register karte waqt aapki UID referral code mein dalein, toh aapko 3 coins milenge!</p>
-        
-        <div class="share-options-grid">
-          <a id="share-whatsapp" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
-            <span>WhatsApp</span>
-          </a>
-          <a id="share-facebook" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#1877f2;"><i class="fa-brands fa-facebook-f"></i></div>
-            <span>Facebook</span>
-          </a>
-          <a id="share-telegram" href="#" target="_blank" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:#0088cc;"><i class="fa-brands fa-telegram"></i></div>
-            <span>Telegram</span>
-          </a>
-          <div onclick="copyShareText()" class="share-app-icon-item">
-            <div class="share-icon-circle" style="background:var(--accent-gold); color:#000;"><i class="fa-solid fa-copy"></i></div>
-            <span>Copy Link</span>
+
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3">Quick Actions</h3>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <button onclick="selectTab('tournaments')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-[#ff4624] transition"><i class="fa-solid fa-trophy text-[#ff4624] text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Matches</p></button>
+            <button onclick="selectTab('winners')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-yellow-400 transition"><i class="fa-solid fa-medal text-yellow-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Winners</p></button>
+            <button onclick="selectTab('games')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition"><i class="fa-solid fa-gamepad text-emerald-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Games</p></button>
+            <button onclick="selectTab('daily_missions')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-pink-400 transition"><i class="fa-solid fa-list-check text-pink-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Missions</p></button>
+            <button onclick="selectTab('referral_rewards_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition"><i class="fa-solid fa-gift text-amber-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Referrals</p></button>
+            <button onclick="selectTab('daily_spin_mgmt')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-dharmachakra text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Daily Spin</p></button>
+            <button onclick="selectTab('daily_spin_history')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-purple-400 transition"><i class="fa-solid fa-clock-rotate-left text-purple-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Spin Logs</p></button>
+            <button onclick="selectTab('deposits')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-emerald-400 transition relative">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Deposits</p>
+              <span id="quick-badge-deposits" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('withdrawals')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-money-bill-transfer text-amber-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Withdraw</p>
+              <span id="quick-badge-withdrawals" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('diamond_requests')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-amber-400 transition relative">
+              <i class="fa-solid fa-gem text-amber-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Diamonds</p>
+              <span id="quick-badge-diamond_requests" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('users')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-blue-400 transition"><i class="fa-solid fa-users text-blue-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Gamers</p></button>
+            <button onclick="selectTab('support')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-green-400 transition relative">
+              <i class="fa-solid fa-headset text-green-400 text-base"></i>
+              <p class="text-[10px] font-bold mt-1 text-gray-200">Support</p>
+              <span id="nav-badge-support" class="absolute top-1.5 right-1.5 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button onclick="selectTab('tutorials')" id="nav-tutorials-btn" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-cyan-400 transition"><i class="fa-solid fa-video text-cyan-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Tutorials</p></button>
+            <button onclick="selectTab('banned')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-500 transition"><i class="fa-solid fa-ban text-red-500 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Banned</p></button>
+            <button onclick="selectTab('settings')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-red-400 transition"><i class="fa-solid fa-bullhorn text-red-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Ticker</p></button>
+            <button onclick="selectTab('chat_control')" class="p-2.5 bg-[#0e1118] border border-[#262f40] rounded-lg text-center hover:border-indigo-400 transition"><i class="fa-solid fa-comments text-indigo-400 text-base"></i><p class="text-[10px] font-bold mt-1 text-gray-200">Chat Room</p></button>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
 
-    <div id="drawer-overlay" class="drawer-overlay hidden" onclick="Drawer.close()"></div>
-    <aside id="side-drawer" class="side-drawer">
-      <div class="drawer-header">
-        <div class="drawer-user-info">
-          <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-round" />
-          <div class="user-meta">
-            <h3 id="drawer-name">Guest Gamer</h3>
-            <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+      <!-- GAMES MANAGER SECTION -->
+      <section id="section-games" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+            <i class="fa-solid fa-gamepad text-emerald-400"></i> Add & Manage Website Games
+          </h2>
+          <input type="hidden" id="edit-game-id" />
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Game Title</label>
+            <input type="text" id="game-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Whack Monster 3D" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Game File / Web Link</label>
+            <input type="text" id="game-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://.../games/whack-monster.html" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Game Category</label>
+            <select id="game-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
+              <option value="Action">Action</option>
+              <option value="Arcade">Arcade</option>
+              <option value="Puzzle">Puzzle</option>
+              <option value="Racing">Racing</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Game Logo / Poster</label>
+            <input type="file" id="game-logo-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="game-active" class="w-4 h-4 accent-[#ff4624]" checked />
+            <label for="game-active" class="text-xs text-gray-300">Active Game (Visible to players)</label>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="resetGameForm()" id="btn-cancel-game" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
+            <button onclick="saveGameCard()" id="btn-save-game" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+              SAVE GAME
+            </button>
           </div>
         </div>
-        <button id="btn-close-drawer" class="icon-btn" onclick="Drawer.close()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
 
-      <nav class="drawer-nav">
-        <button onclick="Router.navigate('games')" class="drawer-link"><i class="fa-solid fa-gamepad"></i> Mini Games</button>
-        <a href="chat.html" class="drawer-link" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
-        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
-        <button onclick="Router.navigate('spin')" class="drawer-link"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
-        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
-        <button onclick="Router.navigate('winners')" class="drawer-link"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
-        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
-        <button onclick="Router.navigate('withdrawal')" class="drawer-link"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
-        <button onclick="Router.navigate('deposit')" class="drawer-link"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
-        <button onclick="Router.navigate('diamonds')" class="drawer-link"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
-        <button onclick="Router.navigate('invite')" class="drawer-link"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</button>
-        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
-        <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="fa-solid fa-bell"></i> Notifications</span>
-          <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
-        </button>
-        <button onclick="openShareModal()" class="drawer-link"><i class="fa-solid fa-share-nodes"></i> Share App</button>
-        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile & VIP Protocol</button>
-        <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules (A to Z)</button>
-        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
-        <div class="drawer-divider"></div>
-        <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-      </nav>
-      <div class="drawer-footer">
-        <p>MULTANI FF OFFICIAL TOURNAMENT</p>
-      </div>
-    </aside>
+        <div class="space-y-3 w-full max-w-full md:max-w-xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Games Library</h3>
+          <div id="admin-games-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading games...</p>
+          </div>
+        </div>
+      </section>
 
-    <main id="app-view" class="main-content">
-      <div id="pull-refresh-indicator">🔄 Pull down to refresh...</div>
-    </main>
-
-    <div id="admin-float-widget">
-      <div class="bot-bubble" id="float-main-btn" title="Support & Socials">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'" alt="Support Bot" />
-        <span id="float-chat-badge" class="hidden" style="position:absolute; top:-2px; right:-2px; background:var(--primary); color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0e1118;">0</span>
-      </div>
-
-      <div id="support-popup-menu" class="support-popup-menu">
-        <a href="https://www.instagram.com/multani.ff.gaming?stkn=NnBiYTN1eTM0eXc1" target="_blank" class="support-action-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://youtube.com/@multaniff-b2k?si=ZSI9KImSRvDH8U17" target="_blank" class="support-action-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-        <a href="https://www.tiktok.com/@multaniffgaming7" target="_blank" class="support-action-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="support-action-btn" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://www.facebook.com/profile.php?id=61594305788808" target="_blank" class="support-action-btn" title="Facebook Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
-        <div onclick="ChatModal.open(); toggleSupportMenu(false);" class="support-action-btn" title="Admin Support Chat"><i class="fa-solid fa-headset"></i></div>
-      </div>
-      <span class="bot-badge-tag">MENU</span>
-    </div>
-
-    <div id="chat-modal-overlay" class="hidden">
-      <div class="chat-dialog">
-        <div class="chat-dialog-header">
-          <div class="chat-user-header">
-            <div class="chat-avatar-status" style="position:relative;">
-              <div style="width:36px; height:36px; border-radius:50%; background:#ff4624; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#fff;">STT</div>
-              <span class="chat-online-dot"></span>
+      <!-- DAILY MISSIONS SECTION -->
+      <section id="section-daily_missions" class="space-y-4 hidden w-full">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-pink-400"></i> Manage Daily Missions & Rewards
+          </h2>
+          <input type="hidden" id="edit-mission-id" />
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mission Title</label>
+            <input type="text" id="mission-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Play 1 Tournament Match" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Description / Task Details</label>
+            <input type="text" id="mission-desc" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Join any room match today to complete this mission." />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Reward (Coins)</label>
+              <input type="number" id="mission-reward" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none" value="5" required />
             </div>
             <div>
-              <h4 style="font-size:14px; font-weight:bold; color:#fff;">Multani FF Official Support</h4>
-              <p style="font-size:10px; color:#00e676;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> Online • Instant Help</p>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Target Count</label>
+              <input type="number" id="mission-target" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none" value="1" required />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Action Type</label>
+              <select id="mission-action-type" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-white outline-none">
+                <option value="custom">Custom Task</option>
+                <option value="match_play">Play Match</option>
+                <option value="deposit">Deposit Coin</option>
+                <option value="spin">Spin Wheel</option>
+              </select>
             </div>
           </div>
-          <button onclick="ChatModal.close()" class="icon-btn" style="color:#aaa;"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-
-        <div id="chat-modal-messages" class="chat-dialog-body">
-          <div class="chat-row theirs">
-            <div class="chat-bubble theirs">
-              Assalam-o-Alaikum! Welcome to Multani FF Official. Room ID, Deposit ya kisi bhi problem k liye yahan message karein.
-            </div>
-            <div class="chat-time-tag" style="text-align:left; padding-left:4px; color:#6b7280;">Support Desk</div>
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="mission-active" class="w-4 h-4 accent-[#ff4624]" checked />
+            <label for="mission-active" class="text-xs text-gray-300">Active Mission</label>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="resetDailyMissionForm()" id="btn-cancel-mission" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
+            <button onclick="saveDailyMission()" id="btn-save-mission" class="w-full bg-pink-600 hover:bg-pink-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+              SAVE MISSION
+            </button>
           </div>
         </div>
 
-        <form id="chat-modal-form" class="chat-input-bar">
-          <input type="text" id="chat-modal-input" class="form-input" placeholder="Type message to admin..." style="margin-bottom:0;" autocomplete="off" required />
-          <button type="submit" class="btn btn-primary" style="width:44px; height:44px; padding:0; border-radius:8px; flex-shrink:0;">
-            <i class="fa-solid fa-paper-plane"></i>
+        <div class="space-y-3 w-full max-w-full md:max-w-xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Available Daily Missions</h3>
+          <div id="admin-missions-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading daily missions...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAT CONTROL SECTION -->
+      <section id="section-chat_control" class="space-y-3 hidden w-full max-w-full md:max-w-2xl mx-auto flex flex-col h-full">
+        <div class="horizontal-filter-scroll">
+          <button id="btn-toggle-chat-active" onclick="toggleGlobalChatActive()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
+            <i class="fa-solid fa-power-off text-[11px]"></i> <span id="lbl-chat-active">CHAT: ON</span>
           </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- JOIN COMMUNITY POPUP (WHATSAPP CHANNEL) -->
-    <div id="community-popup-overlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:700; display:flex; align-items:center; justify-content:center; padding:16px;">
-      <div style="background:#0e1118; border:1.5px solid var(--border-color); border-radius:16px; padding:24px 20px; width:100%; max-width:340px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
-        <div style="width:60px; height:60px; border-radius:50%; background:rgba(37, 211, 102, 0.15); border:2px solid #25d366; display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto; color:#25d366; font-size:28px;">
-          <i class="fa-brands fa-whatsapp"></i>
+          <button id="btn-toggle-chat-lock" onclick="toggleGlobalChatLock()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-[#262f40] bg-[#151922] text-gray-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
+            <i class="fa-solid fa-lock text-yellow-400 text-[11px]"></i> <span id="lbl-chat-lock">INPUT: UNLOCKED</span>
+          </button>
+          <button onclick="openMutePlayerModal()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-amber-500/40 bg-amber-950/40 text-amber-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
+            <i class="fa-solid fa-volume-xmark text-[11px]"></i> <span>MUTED PLAYERS (<strong id="chat-stat-muted">0</strong>)</span>
+          </button>
+          <button onclick="clearAllChatMessages()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-red-500/40 bg-red-950/40 text-red-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
+            <i class="fa-solid fa-trash-can text-[11px]"></i> <span>CLEAR ALL</span>
+          </button>
+          <button onclick="loadChatControlData()" class="px-3 py-1.5 rounded-full text-xs font-bold font-gaming uppercase border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 flex items-center gap-1.5 shrink-0 transition cursor-pointer">
+            <i class="fa-solid fa-rotate text-[11px]"></i> <span>REFRESH</span>
+          </button>
         </div>
-        <h3 style="font-family:var(--font-gaming); font-size:20px; color:#fff; margin-bottom:8px; text-transform:uppercase;">JOIN OUR COMMUNITY</h3>
-        <p style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:20px;">Get tournament updates, match results and exclusive rewards — join our official WhatsApp channel and never miss out!</p>
-        <a href="https://whatsapp.com/channel/0029Vb9CdLqHbFV9Q7mBEB1v" target="_blank" class="btn btn-primary" style="background:#25d366; color:#fff; margin-bottom:10px; text-decoration:none;" onclick="closeCommunityPopup()">JOIN NOW</a>
-        <button onclick="closeCommunityPopup()" class="btn btn-secondary" style="background:transparent; border:none; color:var(--text-dim); font-size:12px; padding:8px;">MAYBE LATER</button>
+
+        <div class="bg-[#0b0e14] border border-[#262f40] rounded-2xl flex flex-col flex-1 h-[530px] overflow-hidden relative shadow-2xl">
+          <div class="p-2.5 bg-[#0e1118] border-b border-[#262f40] flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 blink-heart"></span>
+              <span class="font-gaming font-bold text-white uppercase tracking-wider text-sm">MULTANI FF CHAT ROOM</span>
+              <span class="text-[10px] text-gray-400 font-mono">(Online: <strong id="chat-stat-online" class="text-emerald-400">1</strong>)</span>
+            </div>
+            <input type="text" id="chat-msg-search-input" oninput="filterChatMessagesList()" placeholder="🔍 Filter msg or UID..." class="bg-[#06070a] border border-[#262f40] rounded-lg px-2.5 py-1 text-[11px] text-white outline-none focus:border-[#ff4624] w-36 sm:w-44" />
+          </div>
+
+          <div id="pinned-announcement-banner" class="hidden px-3 py-1.5 bg-[#ff4624]/10 border-b border-[#ff4624]/40 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 truncate pr-2">
+              <i class="fa-solid fa-thumbtack text-[#ff4624] text-xs shrink-0"></i>
+              <span id="pinned-msg-text" class="text-yellow-400 font-bold truncate">Announcement</span>
+            </div>
+            <button onclick="dismissPinnedAnnouncementUI()" class="text-gray-400 hover:text-white text-[10px] uppercase font-bold shrink-0">Dismiss</button>
+          </div>
+
+          <div class="p-1.5 text-center bg-[#06070a]/40 border-b border-[#262f40]/40">
+            <button id="btn-load-more-chat" onclick="loadMoreChatMessages()" class="text-[11px] font-bold font-gaming text-amber-400 hover:text-amber-300 transition flex items-center justify-center gap-1 mx-auto">
+              <i class="fa-solid fa-rotate-left text-[10px]"></i> Load Old Messages
+            </button>
+          </div>
+
+          <div id="chat-messages-moderation-list" class="flex-1 overflow-y-auto p-3 space-y-4 sidebar-scroll flex flex-col">
+            <p class="text-gray-500 text-xs text-center py-8">Loading chat messages...</p>
+          </div>
+
+          <form id="admin-chat-form" onsubmit="handleAdminSendMessage(event)" class="p-2 bg-[#0e1118] border-t border-[#262f40] flex items-center gap-2">
+            <button type="button" onclick="insertAdminEmoji()" class="w-9 h-9 rounded-full bg-[#151922] text-yellow-400 hover:bg-[#1f242d] flex items-center justify-center shrink-0 text-base transition" title="Insert Emoji">
+              😊
+            </button>
+            <input type="text" id="admin-chat-send-input" placeholder="Type a message..." class="flex-1 bg-[#151922] border border-[#262f40] rounded-full px-4 py-2 text-xs text-white outline-none focus:border-emerald-500 transition" autocomplete="off" required />
+            <button type="submit" id="btn-send-chat-msg" class="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shrink-0 shadow-lg transition" title="Send Message">
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- REFERRAL REWARDS -->
+      <section id="section-referral_rewards_mgmt" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Referral Rewards Management</h3>
+          <button onclick="openAddReferralRewardModal()" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-3 py-1.5 rounded-lg text-xs font-bold font-gaming uppercase"><i class="fa-solid fa-plus"></i> Add New Reward</button>
+        </div>
+        <div id="admin-referral-rewards-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading referral rewards...</p>
+        </div>
+      </section>
+
+      <!-- DAILY SPIN MANAGEMENT -->
+      <section id="section-daily_spin_mgmt" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin 8 Slots & Today's Stats</h3>
+          <button onclick="loadAdminDailySpinMgmt()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-w-2xl space-y-3">
+          <h4 class="font-gaming text-xs font-bold text-yellow-400 uppercase"><i class="fa-solid fa-chart-line mr-1"></i> Today's Daily Spin Analytics</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">Total Spins Today</span>
+              <span id="spin-stat-total" class="font-gaming text-xl font-bold text-white">0</span>
+            </div>
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">Coins Given Today</span>
+              <span id="spin-stat-coins" class="font-gaming text-xl font-bold text-yellow-400">0</span>
+            </div>
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">8-Coin (Limit 2)</span>
+              <span id="spin-stat-8c" class="font-gaming text-xl font-bold text-cyan-400">0 / 2</span>
+            </div>
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">5-Coin (Limit 3)</span>
+              <span id="spin-stat-5c" class="font-gaming text-xl font-bold text-emerald-400">0 / 3</span>
+            </div>
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">Empty Results</span>
+              <span id="spin-stat-empty" class="font-gaming text-xl font-bold text-gray-400">0</span>
+            </div>
+            <div class="bg-[#0e1118] p-2.5 rounded-lg border border-[#262f40] text-center">
+              <span class="text-[10px] text-gray-400 uppercase font-bold block">Try Again Results</span>
+              <span id="spin-stat-try" class="font-gaming text-xl font-bold text-purple-400">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="admin-daily-spin-slots-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading daily spin slots...</p>
+        </div>
+      </section>
+
+      <!-- DAILY SPIN HISTORY -->
+      <section id="section-daily_spin_history" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl gap-2 flex-wrap">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Daily Spin History</h3>
+          <div class="flex items-center gap-2">
+            <input type="text" id="spin-history-search" oninput="filterSpinHistory()" placeholder="Search username, reward, date..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+            <button onclick="loadAdminSpinHistory()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i></button>
+          </div>
+        </div>
+        <div id="admin-spin-history-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading spin history...</p>
+        </div>
+      </section>
+
+      <!-- TOURNAMENTS -->
+      <section id="section-tournaments" class="space-y-4 hidden">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1">
+          <button onclick="filterTournaments('all')" id="filter-btn-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All Matches</button>
+          <button onclick="filterTournaments('upcoming')" id="filter-btn-upcoming" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Upcoming</button>
+          <button onclick="filterTournaments('live')" id="filter-btn-live" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Live</button>
+          <button onclick="filterTournaments('completed')" id="filter-btn-completed" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Completed</button>
+        </div>
+        <div id="tournaments-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading tournaments...</p>
+        </div>
+      </section>
+
+      <!-- DEPOSITS -->
+      <section id="section-deposits" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Pending Deposit Slips</h3>
+        <div id="deposits-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading deposit slips...</p>
+        </div>
+      </section>
+
+      <!-- WITHDRAWAL REQUESTS -->
+      <section id="section-withdrawals" class="space-y-4 hidden w-full">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;" class="w-full max-w-full md:max-w-2xl">
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Pending Withdrawals</span>
+            <div id="admin-stat-pending" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #ffbe00; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Approved Withdrawals</span>
+            <div id="admin-stat-approved" style="font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; color: #00e676; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Withdrawal Amount</span>
+            <div id="admin-stat-total-amt" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #00f0ff; margin-top: 4px;">PKR 0</div>
+          </div>
+          <div style="background: #151922; border: 1px solid #262f40; border-radius: 12px; padding: 14px; text-align: center;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #8e9bb0;">Total Fees Earned</span>
+            <div id="admin-stat-fees" style="font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 800; color: #ffbe00; margin-top: 4px;">PKR 0</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Withdrawal Requests</h3>
+          <button onclick="loadAdminWithdrawals()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div id="admin-withdrawal-requests-list" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading withdrawal requests...</p>
+        </div>
+      </section>
+
+      <!-- DIAMOND REQUESTS -->
+      <section id="section-diamond_requests" class="space-y-4 hidden w-full">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Player Diamond Redemption Requests</h3>
+          <button onclick="loadAdminDiamondRequests()" class="bg-[#151922] border border-[#262f40] text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full md:max-w-2xl">
+          <button onclick="filterDiamondRequests('all')" id="diamond-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ff4624] text-white whitespace-nowrap">All</button>
+          <button onclick="filterDiamondRequests('pending')" id="diamond-filter-pending" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Pending</button>
+          <button onclick="filterDiamondRequests('approved')" id="diamond-filter-approved" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Approved</button>
+          <button onclick="filterDiamondRequests('delivered')" id="diamond-filter-delivered" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Delivered</button>
+          <button onclick="filterDiamondRequests('rejected')" id="diamond-filter-rejected" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#151922] text-gray-400 border border-[#262f40] whitespace-nowrap">Rejected</button>
+        </div>
+
+        <div id="admin-diamond-requests-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading diamond requests...</p>
+        </div>
+      </section>
+
+      <!-- WINNERS SECTION -->
+      <section id="section-winners" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-w-2xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Declare Match Winners (1st - 4th)</h2>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Tournament</label>
+            <select id="win-tournament" onchange="onWinnerTournamentChange(this.value)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-yellow-400 uppercase block"><i class="fa-solid fa-trophy"></i> 1st Place (Booyah)</span>
+              <select id="win-u1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="1st Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-gray-300 uppercase block"><i class="fa-solid fa-medal"></i> 2nd Place</span>
+              <select id="win-u2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="2nd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-amber-600 uppercase block"><i class="fa-solid fa-award"></i> 3rd Place</span>
+              <select id="win-u3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="3rd Prize" />
+            </div>
+
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-cyan-400 uppercase block"><i class="fa-solid fa-star"></i> 4th Place</span>
+              <select id="win-u4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+                <option value="">Choose player...</option>
+              </select>
+              <input type="number" id="win-amt4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="4th Prize" />
+            </div>
+          </div>
+
+          <button id="btn-declare-winners-submit" onclick="submitAllWinnersDeclaration()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            ANNOUNCE ALL WINNERS & COMPLETE MATCH
+          </button>
+        </div>
+
+        <div class="space-y-3 w-full max-w-full md:max-w-2xl pt-2">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Declared Winners List</h3>
+          <div id="admin-declared-winners-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading declared winners...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- USERS & WALLET EDIT -->
+      <section id="section-users" class="space-y-3 hidden">
+        <div class="flex items-center justify-between w-full max-w-full md:max-w-2xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Gamers & Wallet Control</h3>
+          <input type="text" id="user-search-input" oninput="filterUsersList()" placeholder="Search name, UID, email..." class="bg-[#151922] border border-[#262f40] rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-[#ff4624] w-48 sm:w-64" />
+        </div>
+        <div id="users-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading gamers...</p>
+        </div>
+      </section>
+
+      <!-- TUTORIALS & ADS -->
+      <section id="section-tutorials" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+            <i class="fa-solid fa-video text-cyan-400"></i> Manage Video Tutorials & Ads
+          </h2>
+          <input type="hidden" id="edit-tutorial-id" />
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Video Title / Ad Title</label>
+            <input type="text" id="tut-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. HOW TO DEPOSIT COINS" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Link (Auto-detects YouTube, TikTok, FB, etc.)</label>
+            <input type="text" id="tut-link" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="https://youtube.com/... or https://tiktok.com/..." required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 1 Text (Subtitle / Top Text)</label>
+            <input type="text" id="tut-line1" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. COMPLETE STEP-BY-STEP WEBSITE GUIDE" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Line 2 Text (Description / Detail Text)</label>
+            <input type="text" id="tut-line2" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Tap below to watch complete step-by-step guidance." />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Card / Banner Photo</label>
+            <input type="file" id="tut-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-gray-300 outline-none" />
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="resetTutorialForm()" id="btn-cancel-tut" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hidden">CANCEL</button>
+            <button onclick="saveTutorialCard()" id="btn-save-tut" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+              SAVE TUTORIAL / AD CARD
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3 w-full max-w-full md:max-w-xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Existing Carousel Cards</h3>
+          <div id="admin-tutorials-list" class="space-y-3">
+            <p class="text-gray-500 text-xs text-center py-4">Loading cards...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUPPORT -->
+      <section id="section-support" class="space-y-4 hidden">
+        <div id="support-inbox-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-xl">
+          <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase mb-3 flex items-center justify-between">
+            <span><i class="fa-solid fa-comments text-purple-400 mr-2"></i> Player Support Inboxes</span>
+            <span id="inbox-count" class="text-xs font-mono text-cyan-400 font-normal">0 Chats</span>
+          </h3>
+          <div id="support-inbox-list" class="space-y-2">
+            <p class="text-gray-500 text-xs py-4 text-center">Loading players...</p>
+          </div>
+        </div>
+
+        <div id="support-chat-view" class="bg-[#151922] border border-[#262f40] rounded-xl p-4 w-full max-w-full md:max-xl hidden flex flex-col h-[520px]">
+          <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
+            <button onclick="closePlayerChat()" class="text-gray-400 hover:text-white flex items-center gap-1.5 text-xs font-bold">
+              <i class="fa-solid fa-arrow-left"></i> All Chats
+            </button>
+            <div class="flex items-center gap-2">
+              <img id="active-chat-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border border-[#ff4624]" />
+              <div class="text-center">
+                <h4 id="active-chat-username" class="font-bold text-sm text-white">Player</h4>
+                <p id="active-chat-uid" class="text-[10px] text-cyan-400 font-mono">UID: --</p>
+              </div>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          <div id="active-chat-messages" class="flex-1 overflow-y-auto p-2 space-y-2.5 my-2 sidebar-scroll"></div>
+          <form id="admin-reply-form" class="flex gap-2 pt-2 border-t border-[#262f40]">
+            <input type="text" id="admin-reply-input" placeholder="Type message to player..." class="flex-1 bg-[#06070a] border border-[#262f40] rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-[#ff4624]" autocomplete="off" required />
+            <button type="submit" class="bg-[#ff4624] hover:bg-[#e03212] text-white px-4 py-2 rounded-lg font-bold text-xs font-gaming uppercase">SEND</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- BANNED -->
+      <section id="section-banned" class="space-y-3 hidden w-full">
+        <h3 class="font-gaming text-sm font-bold text-gray-400 uppercase">Banned Players</h3>
+        <div id="banned-cards-container" class="space-y-3 w-full max-w-full md:max-w-2xl">
+          <p class="text-gray-500 text-xs text-center py-4">Loading banned players...</p>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="section-settings" class="space-y-4 hidden">
+        <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl w-full max-w-full md:max-xl space-y-4">
+          <h2 class="font-gaming text-lg font-bold text-white uppercase">Announcement & Notice Ticker</h2>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scrolling Announcement Text</label>
+            <textarea id="set-ticker-text" rows="3" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter announcement text..."></textarea>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="set-ticker-enabled" class="w-4 h-4 accent-[#ff4624]" />
+            <label for="set-ticker-enabled" class="text-xs text-gray-300">Show ticker on gamer homepage</label>
+          </div>
+          <button onclick="saveSiteSettings()" id="btn-save-ticker" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase text-xs tracking-wider transition">
+            Save Announcement
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <div class="admin-bottom-nav">
+    <button class="admin-nav-btn" onclick="selectTab('overview')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="admin-nav-btn" onclick="openAllPlayersModal()">
+      <i class="fa-solid fa-users"></i>
+      <span>Players</span>
+    </button>
+    <div class="admin-center-plus" onclick="openCreateTournamentModal()">
+      <i class="fa-solid fa-plus"></i>
+    </div>
+    <button class="admin-nav-btn" onclick="selectTab('support')">
+      <i class="fa-solid fa-headset"></i>
+      <span>Support</span>
+      <span id="nav-badge-support" class="absolute top-1 right-3 bg-[#ff4624] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+    </button>
+    <button class="admin-nav-btn" onclick="selectTab('deposits')">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Deposits</span>
+    </button>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-mute-player" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-5 w-full max-w-md space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 id="modal-action-title" class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-amber-400"></i> Restrict Player
+        </h3>
+        <button onclick="closeMutePlayerModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <input type="hidden" id="mute-player-id" />
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Target Player</label>
+          <input type="text" id="mute-player-name-display" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" readonly />
+        </div>
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Action Type</label>
+          <select id="mute-restriction-type" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="mute">Mute (Cannot Send Messages)</option>
+            <option value="ban">Platform Ban (Account Blocked)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Duration</label>
+          <select id="mute-duration-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="15m">15 Minutes</option>
+            <option value="30m">30 Minutes</option>
+            <option value="1h">1 Hour</option>
+            <option value="2h">2 Hours</option>
+            <option value="24h" selected>24 Hours (1 Day)</option>
+            <option value="7d">7 Days</option>
+            <option value="permanent">Permanent</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-400 uppercase font-bold mb-1">Reason (Optional)</label>
+          <input type="text" id="mute-reason-input" placeholder="e.g. Abusive language, match fixing" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" />
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeMutePlayerModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold">CANCEL</button>
+        <button onclick="confirmApplyChatRestriction()" id="btn-confirm-mute-submit" class="w-1/2 bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-lg text-xs font-bold font-gaming uppercase tracking-wider">APPLY</button>
       </div>
     </div>
-
-    <nav id="bottom-nav" class="bottom-nav hidden">
-      <div class="nav-item" data-page="home" onclick="Router.navigate('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
-      <div class="nav-item" data-page="tournaments" onclick="Router.navigate('tournaments')"><i class="fa-solid fa-trophy"></i><span>Matches</span></div>
-      <div class="nav-item" data-page="withdrawal" onclick="Router.navigate('withdrawal')"><i class="fa-solid fa-money-bill-transfer"></i><span>Withdraw</span></div>
-      <div class="nav-item" data-page="winners" onclick="Router.navigate('winners')"><i class="fa-solid fa-medal"></i><span>Winners</span></div>
-      <div class="nav-item" data-page="wallet" onclick="Router.navigate('wallet')"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
-    </nav>
   </div>
 
-  <div id="toast-container" class="toast-container"></div>
-  <div id="global-loader" class="global-loader hidden">
-    <div class="spinner-flame"></div>
-    <span id="global-loader-text" class="loader-text">Loading...</span>
+  <div id="modal-all-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-lg space-y-3 max-h-[92vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base sm:text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-users text-[#ff4624]"></i> All Registered Players
+        </h3>
+        <button onclick="closeAllPlayersModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="relative">
+        <input type="text" id="all-players-search" oninput="filterAllPlayersModal()" placeholder="Search name, UID, email..." class="w-full bg-[#06070a] border border-[#262f40] rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+      <div id="modal-all-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading players...</p>
+      </div>
+    </div>
   </div>
 
-  <!-- MULTANI WEBSITE JS MODULE CONNECTION -->
-  <script type="module" src="./multaniwebsite/main.js"></script>
+  <div id="modal-edit-wallet" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-sm space-y-3">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Player Wallet</h3>
+      <input type="hidden" id="edit-wallet-user-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Player Name</label>
+        <input type="text" id="edit-wallet-username" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-gray-400 outline-none" readonly />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">New Balance (PKR)</label>
+        <input type="number" id="edit-wallet-amount" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="Enter amount" required />
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeWalletModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveWalletBalance()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">UPDATE</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- MULTANI FF OFFICIAL OFFLINE SYSTEM -->
-  <script>
-  (function () {
-    if (!("serviceWorker" in navigator)) {
-      console.log("Service Worker supported nahi hai.");
-      return;
+  <div id="modal-player-history" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 id="modal-history-title" class="font-gaming text-lg font-bold text-white uppercase">Player Payment History</h3>
+        <button onclick="closePlayerHistoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-history-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll">
+        <p class="text-gray-400 text-xs text-center py-4">Loading history...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-referral-reward" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
+      <h3 id="ref-modal-title" class="font-gaming text-lg font-bold text-white uppercase">Add Referral Reward</h3>
+      <input type="hidden" id="edit-ref-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Required Referrals (Invites)</label>
+        <input type="number" id="ref-req" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 20" required />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Name</label>
+        <input type="text" id="ref-name" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. Elite Membership - Weekly" required />
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Type</label>
+          <select id="ref-type" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none">
+            <option value="membership">Membership</option>
+            <option value="diamonds">Diamonds</option>
+            <option value="coins">Coins</option>
+            <option value="cash">Cash</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value</label>
+          <input type="text" id="ref-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" placeholder="e.g. 7 or 500" required />
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pt-1">
+        <input type="checkbox" id="ref-active" class="w-4 h-4 accent-[#ff4624]" checked />
+        <label for="ref-active" class="text-xs text-gray-300">Active Reward</label>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeReferralRewardModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveReferralReward()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-daily-spin-slot" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-5 w-full max-w-md space-y-3">
+      <h3 class="font-gaming text-lg font-bold text-white uppercase">Edit Daily Spin Slot</h3>
+      <input type="hidden" id="edit-spin-slot-id" />
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Slot Number (1 to 8)</label>
+        <input type="number" id="spin-slot-num" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" readonly />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Name</label>
+        <input type="text" id="spin-slot-name" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Type</label>
+          <select id="spin-slot-type" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none">
+            <option value="coin">Coin</option>
+            <option value="coins">Coins</option>
+            <option value="empty">Empty</option>
+            <option value="try_again">Try Again</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Reward Value (Number)</label>
+          <input type="number" id="spin-slot-val" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pt-1">
+        <input type="checkbox" id="spin-slot-active" class="w-4 h-4 accent-[#ff4624]" />
+        <label for="spin-slot-active" class="text-xs text-gray-300">Active Slot</label>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeDailySpinSlotModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button onclick="saveDailySpinSlot()" class="w-1/2 bg-[#ff4624] text-white py-2 rounded text-xs font-bold font-gaming uppercase">UPDATE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-players" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-3 max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40] gap-3">
+        <h3 id="modal-players-title" class="font-gaming text-sm sm:text-base font-bold text-white uppercase break-words leading-tight flex-1">Tournament Players</h3>
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="closePlayersModal()" class="bg-[#151922] border border-[#262f40] hover:bg-[#ff4624] text-gray-300 hover:text-white px-2.5 py-1 rounded text-xs font-bold font-gaming transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> BACK
+          </button>
+          <button onclick="closePlayersModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+      </div>
+      <div id="modal-players-body" class="flex-1 overflow-y-auto space-y-2 p-1 sidebar-scroll"></div>
+    </div>
+  </div>
+
+  <div id="modal-edit-tournament" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 sm:p-5 w-full max-w-md space-y-3 max-h-[82vh] overflow-y-auto sidebar-scroll pb-12 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base sm:text-lg font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-[#ff4624]"></i> Edit Tournament
+        </h3>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      
+      <input type="hidden" id="edit-t-id" />
+      
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Title</label>
+        <input type="text" id="edit-t-title" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Mode</label>
+          <select id="edit-t-mode" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Squad">Squad</option>
+            <option value="Solo">Solo</option>
+            <option value="Duo">Duo</option>
+            <option value="Clash Squad">Clash Squad</option>
+            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
+            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Map</label>
+          <select id="edit-t-map" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Bermuda">Bermuda</option>
+            <option value="Purgatory">Purgatory</option>
+            <option value="Kalahari">Kalahari</option>
+            <option value="Alpine">Alpine</option>
+            <option value="Nexterra">Nexterra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
+          <input type="number" id="edit-t-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Total Slots</label>
+          <input type="number" id="edit-t-max" placeholder="Slots (e.g. 12, 48)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+        </div>
+      </div>
+
+      <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg space-y-2">
+        <span class="text-xs font-bold text-[#ff4624] uppercase block">Prize Pool Setup</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">1st Prize</label>
+            <input type="number" id="edit-t-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">2nd Prize</label>
+            <input type="number" id="edit-t-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">3rd Prize</label>
+            <input type="number" id="edit-t-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">4th Prize</label>
+            <input type="number" id="edit-t-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
+        <input type="datetime-local" id="edit-t-date" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#ff4624]" />
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Change Match Photo</label>
+        <input type="file" id="edit-t-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2 text-xs text-gray-300 outline-none" />
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeEditModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2.5 rounded-lg text-xs font-bold hover:bg-[#262f40] transition">CANCEL</button>
+        <button onclick="saveEditedTournament()" id="btn-save-edit" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg text-xs font-bold font-gaming uppercase tracking-wider transition">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-match" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-xl p-4 w-full max-w-md space-y-2.5 max-h-[82vh] overflow-y-auto sidebar-scroll shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-[#ff4624]"></i> New Tournament
+        </h3>
+        <button onclick="closeCreateTournamentModal()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Tournament Title</label>
+        <input type="text" id="m-title" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 4-PRIZE Battle Royal" required />
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Mode</label>
+          <select id="m-mode" onchange="handleAdminModeChange()" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Squad">Squad</option>
+            <option value="Solo">Solo</option>
+            <option value="Duo">Duo</option>
+            <option value="Clash Squad">Clash Squad</option>
+            <option value="Lone Wolf 1v1">Lone Wolf 1v1</option>
+            <option value="Lone Wolf 2v2">Lone Wolf 2v2</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Map</label>
+          <select id="m-map" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none focus:border-[#ff4624]">
+            <option value="Bermuda">Bermuda</option>
+            <option value="Purgatory">Purgatory</option>
+            <option value="Kalahari">Kalahari</option>
+            <option value="Alpine">Alpine</option>
+            <option value="Nexterra">Nexterra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Fee (PKR)</label>
+          <input type="number" id="m-fee" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="50" required />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Max Slots</label>
+          <input type="number" id="m-max" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" value="48" required />
+        </div>
+      </div>
+
+      <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-lg space-y-2">
+        <span class="text-[11px] font-bold text-[#ff4624] uppercase block">Prize Pool Setup (Only 1st is required)</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">1st Prize</label>
+            <input type="number" id="m-prize-1" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="e.g. 1200" required />
+          </div>
+          <div>
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">2nd Prize</label>
+            <input type="number" id="m-prize-2" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
+          </div>
+          <div>
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">3rd Prize</label>
+            <input type="number" id="m-prize-3" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
+          </div>
+          <div>
+            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">4th Prize</label>
+            <input type="number" id="m-prize-4" class="w-full bg-[#151922] border border-[#262f40] rounded p-1.5 text-xs text-white outline-none" placeholder="Optional" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Match Date & Time</label>
+        <input type="datetime-local" id="m-date" class="w-full bg-[#06070a] border border-[#262f40] rounded p-2 text-xs text-white outline-none" required />
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Choose Banner From Gallery</label>
+        <input type="file" id="m-file" accept="image/*" class="w-full bg-[#06070a] border border-[#262f40] rounded p-1.5 text-xs text-gray-300 outline-none" />
+      </div>
+
+      <div class="flex gap-2 pt-2 sticky bottom-0 bg-[#0e1118] pb-1">
+        <button onclick="closeCreateTournamentModal()" class="w-1/2 bg-[#151922] text-gray-300 py-2 rounded text-xs font-bold">CANCEL</button>
+        <button id="btn-save-match" onclick="saveNewTournament()" class="w-1/2 bg-[#ff4624] hover:bg-[#e03212] text-white py-2 rounded text-xs font-bold font-gaming uppercase tracking-wider">CREATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCRIPT: CONNECTING ALL MODULES -->
+  <script type="module">
+    import { sbClient, state } from './admin-modules/config.js';
+    import { checkAdminAuth, handleAdminLogin, togglePasswordVisibility, adminSignOut } from './admin-modules/auth.js';
+    import { loadDashboardStats } from './admin-modules/dashboard.js';
+    import { 
+      loadTournaments, filterTournaments, updateTournamentStatus, 
+      updateTournamentCredentials, deleteTournament, openEditModal, 
+      closeEditModal, saveEditedTournament, viewTournamentPlayers, 
+      closePlayersModal, kickPlayerFromMatch, openCreateTournamentModal, 
+      closeCreateTournamentModal, handleAdminModeChange, saveNewTournament 
+    } from './admin-modules/tournaments.js';
+    import { loadWinnerSelectOptions, onWinnerTournamentChange, submitAllWinnersDeclaration, loadDeclaredWinners } from './admin-modules/winners.js';
+    import { loadDeposits, reviewDeposit } from './admin-modules/deposits.js';
+    import { loadAdminWithdrawals, reviewWithdrawalRequest } from './admin-modules/withdrawals.js';
+    import { loadAdminDiamondRequests, filterDiamondRequests, updateDiamondReqStatus, deleteDiamondRequest } from './admin-modules/diamonds.js';
+    import { 
+      loadUsers, filterUsersList, openWalletModal, closeWalletModal, saveWalletBalance, 
+      openAllPlayersModal, closeAllPlayersModal, filterAllPlayersModal, openPlayerHistoryModal, 
+      closePlayerHistoryModal, banPlayerFromPlatform, loadBannedUsers, unbanPlayerDirect 
+    } from './admin-modules/users.js';
+    import { 
+      loadChatControlData, setupRealtimeChat, toggleGlobalChatActive, toggleGlobalChatLock, 
+      insertAdminEmoji, handleAdminSendMessage, loadMoreChatMessages, filterChatMessagesList, 
+      togglePinMessage, dismissPinnedAnnouncementUI, openTimedRestrictionModal, closeMutePlayerModal, 
+      confirmApplyChatRestriction, unmutePlayerDirect, deleteSingleChatMessage, clearAllChatMessages, 
+      openMutePlayerModal 
+    } from './admin-modules/chat.js';
+    import { loadSupportInbox, openPlayerChat, closePlayerChat, initSupportForm } from './admin-modules/support.js';
+    import { loadAdminDailySpinMgmt, openDailySpinSlotModal, closeDailySpinSlotModal, saveDailySpinSlot, loadAdminSpinHistory, filterSpinHistory } from './admin-modules/daily_spin.js';
+    import { loadAdminReferralRewards, openAddReferralRewardModal, closeReferralRewardModal, editReferralReward, saveReferralReward, deleteReferralReward } from './admin-modules/referrals.js';
+    import { loadTutorialsManager, saveTutorialCard, editTutorialCard, resetTutorialForm, deleteTutorialCard } from './admin-modules/tutorials.js';
+    import { loadSettings, saveSiteSettings } from './admin-modules/settings.js';
+    import { loadGamesManager, saveGameCard, editGameCard, resetGameForm, toggleGameActiveStatus, deleteGameCard } from './admin-modules/games.js';
+    import { loadDailyMissionsManager, saveDailyMission, editDailyMission, resetDailyMissionForm, toggleMissionActiveStatus, deleteDailyMission } from './admin-modules/daily_missions.js';
+
+    // Global Functions for HTML Button Clicks
+    Object.assign(window, {
+      toggleSidebar, selectTab,
+      togglePasswordVisibility, handleAdminLogin, adminSignOut,
+      loadDashboardStats,
+      loadTournaments, filterTournaments, updateTournamentStatus, updateTournamentCredentials,
+      deleteTournament, openEditModal, closeEditModal, saveEditedTournament, viewTournamentPlayers,
+      closePlayersModal, kickPlayerFromMatch, openCreateTournamentModal, closeCreateTournamentModal,
+      handleAdminModeChange, saveNewTournament,
+      onWinnerTournamentChange, submitAllWinnersDeclaration,
+      loadDeposits, reviewDeposit,
+      loadAdminWithdrawals, reviewWithdrawalRequest,
+      loadAdminDiamondRequests, filterDiamondRequests, updateDiamondReqStatus, deleteDiamondRequest,
+      filterUsersList, openWalletModal, closeWalletModal, saveWalletBalance, openAllPlayersModal,
+      closeAllPlayersModal, filterAllPlayersModal, openPlayerHistoryModal, closePlayerHistoryModal,
+      banPlayerFromPlatform, unbanPlayerDirect,
+      toggleGlobalChatActive, toggleGlobalChatLock, insertAdminEmoji, handleAdminSendMessage,
+      loadMoreChatMessages, filterChatMessagesList, togglePinMessage, dismissPinnedAnnouncementUI,
+      openTimedRestrictionModal, closeMutePlayerModal, confirmApplyChatRestriction, unmutePlayerDirect,
+      deleteSingleChatMessage, clearAllChatMessages, openMutePlayerModal, loadChatControlData,
+      openPlayerChat, closePlayerChat,
+      loadAdminDailySpinMgmt, openDailySpinSlotModal, closeDailySpinSlotModal, saveDailySpinSlot, loadAdminSpinHistory, filterSpinHistory,
+      loadAdminReferralRewards, openAddReferralRewardModal, closeReferralRewardModal, editReferralReward, saveReferralReward, deleteReferralReward,
+      loadTutorialsManager, saveTutorialCard, editTutorialCard, resetTutorialForm, deleteTutorialCard,
+      loadSettings, saveSiteSettings,
+      loadGamesManager, saveGameCard, editGameCard, resetGameForm, toggleGameActiveStatus, deleteGameCard,
+      loadDailyMissionsManager, saveDailyMission, editDailyMission, resetDailyMissionForm, toggleMissionActiveStatus, deleteDailyMission
+    });
+
+    const tabs = [
+      'overview', 'tournaments', 'winners', 'games', 'daily_missions',
+      'referral_rewards_mgmt', 'daily_spin_mgmt', 'daily_spin_history',
+      'deposits', 'withdrawals', 'diamond_requests', 'users',
+      'chat_control', 'tutorials', 'support', 'banned', 'settings'
+    ];
+
+    function toggleSidebar(forceState = null) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      if (forceState === false) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      } else if (forceState === true) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      }
     }
 
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./service-worker.js")
-        .then(function () {
-          console.log("MULTANI FF Offline System Ready");
-        })
-        .catch(function (error) {
-          console.error("Offline System Error:", error);
-        });
+    function selectTab(tabId, pushHistory = true) {
+      toggleSidebar(false);
+
+      if (pushHistory && history.state?.tab !== tabId) {
+        history.pushState({ tab: tabId }, '', '#' + tabId);
+      }
+
+      if (tabId !== 'chat_control' && state.chatRealtimeChannel) {
+        sbClient.removeChannel(state.chatRealtimeChannel);
+        state.chatRealtimeChannel = null;
+      }
+
+      tabs.forEach(t => {
+        const sec = document.getElementById(`section-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if(sec) sec.classList.add('hidden');
+        if(nav) nav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-gray-400 hover:bg-[#151922] hover:text-white transition";
+      });
+
+      const activeSec = document.getElementById(`section-${tabId}`);
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if(activeSec) activeSec.classList.remove('hidden');
+      if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold bg-[#ff4624] text-white";
+
+      const backBtn = document.getElementById('btn-back-dashboard');
+      const openSideBtn = document.getElementById('btn-open-sidebar');
+
+      if (tabId === 'overview') {
+        document.getElementById('panel-title').innerText = "DASHBOARD";
+        backBtn.classList.add('hidden');
+        openSideBtn.classList.remove('hidden');
+        loadDashboardStats();
+      } else {
+        document.getElementById('panel-title').innerText = tabId.toUpperCase().replace(/_/g, ' ');
+        backBtn.classList.remove('hidden');
+        openSideBtn.classList.add('hidden');
+      }
+
+      if (tabId === 'tournaments') loadTournaments();
+      if (tabId === 'games') loadGamesManager();
+      if (tabId === 'daily_missions') loadDailyMissionsManager();
+      if (tabId === 'referral_rewards_mgmt') loadAdminReferralRewards();
+      if (tabId === 'daily_spin_mgmt') loadAdminDailySpinMgmt();
+      if (tabId === 'daily_spin_history') loadAdminSpinHistory();
+      if (tabId === 'deposits') loadDeposits();
+      if (tabId === 'withdrawals') loadAdminWithdrawals();
+      if (tabId === 'diamond_requests') loadAdminDiamondRequests();
+      if (tabId === 'winners') { loadWinnerSelectOptions(); loadDeclaredWinners(); }
+      if (tabId === 'users') loadUsers();
+      if (tabId === 'chat_control') {
+        loadChatControlData();
+        setupRealtimeChat();
+      }
+      if (tabId === 'tutorials') loadTutorialsManager();
+      if (tabId === 'banned') loadBannedUsers();
+      if (tabId === 'settings') loadSettings();
+      if (tabId === 'support') loadSupportInbox();
+    }
+
+    window.addEventListener('popstate', (e) => {
+      const targetTab = e.state?.tab || 'overview';
+      selectTab(targetTab, false);
     });
-  })();
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initSupportForm();
+      checkAdminAuth();
+    });
+  </script>
+
+  <!-- OFFLINE SERVICE WORKER & VIP POPUP SCRIPT -->
+  <script>
+    // 1. Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('SW Registered Scope:', reg.scope))
+          .catch((err) => console.error('SW Failed:', err));
+      });
+    }
+
+    // 2. VIP Offline Modal Controls
+    const vipModal = document.getElementById('vip-offline-screen');
+
+    function showVipOfflineModal() {
+      if (vipModal) vipModal.style.display = 'flex';
+    }
+
+    function hideVipOfflineModal() {
+      if (vipModal) vipModal.style.display = 'none';
+    }
+
+    function retryConnectionNow() {
+      if (navigator.onLine) {
+        hideVipOfflineModal();
+        window.location.reload();
+      } else {
+        alert("⚠️ Internet abhi bhi band hai! Kripya pehle internet on karein.");
+      }
+    }
+
+    window.addEventListener('offline', showVipOfflineModal);
+    window.addEventListener('online', () => {
+      hideVipOfflineModal();
+      window.location.reload();
+    });
+
+    // Check status immediately
+    if (!navigator.onLine) {
+      showVipOfflineModal();
+    }
   </script>
 </body>
 </html>
