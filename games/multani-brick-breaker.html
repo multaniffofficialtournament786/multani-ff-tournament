@@ -398,7 +398,6 @@ class SoundSys {
   }
 }
 
-// Single permanent background photo
 const FIXED_BG_URL = "https://raw.githubusercontent.com/multaniffofficialtournament786/multani-ff-tournament/main/multani-runner/multani-runner/multani-runner/sounds/1792388836123.jpg";
 
 class MultaniGame {
@@ -451,7 +450,8 @@ class MultaniGame {
     this.particles = [];
     this.state = 'WAIT_LAUNCH';
 
-    this.maxBalls = 25;
+    // Ball limit updated to 40
+    this.maxBalls = 40;
     this.baseSpeed = 6.2;
 
     this.initEvents();
@@ -629,16 +629,16 @@ class MultaniGame {
 
         if (isOuterBorder) {
           if (r === rows - 1) {
-            if (fortStyle === 0 && (c === 9 || c === 10)) isSteel = false;
-            else if (fortStyle === 1 && (c === 4 || c === 15)) isSteel = false;
-            else if (fortStyle === 2 && (c === 6 || c === 13)) isSteel = false;
-            else if (fortStyle === 3 && (c === 9 || c === 10)) isSteel = false;
-            else if (fortStyle === 4 && (c === 9)) isSteel = false;
-            else if (fortStyle === 5 && (c === 4 || c === 15)) isSteel = false;
-            else if (fortStyle === 6 && (c === 10)) isSteel = false;
-            else if (fortStyle === 7 && (c === 6 || c === 13)) isSteel = false;
-            else if (fortStyle === 8 && (c === 8 || c === 11)) isSteel = false;
-            else if (fortStyle === 9 && (c === 9 || c === 10)) isSteel = false;
+            if (fortStyle === 0 && (c >= 8 && c <= 11)) isSteel = false;
+            else if (fortStyle === 1 && ((c >= 3 && c <= 5) || (c >= 14 && c <= 16))) isSteel = false;
+            else if (fortStyle === 2 && ((c >= 5 && c <= 7) || (c >= 12 && c <= 14))) isSteel = false;
+            else if (fortStyle === 3 && (c >= 8 && c <= 11)) isSteel = false;
+            else if (fortStyle === 4 && (c >= 8 && c <= 11)) isSteel = false;
+            else if (fortStyle === 5 && ((c >= 3 && c <= 5) || (c >= 14 && c <= 16))) isSteel = false;
+            else if (fortStyle === 6 && (c >= 9 && c <= 11)) isSteel = false;
+            else if (fortStyle === 7 && ((c >= 5 && c <= 7) || (c >= 12 && c <= 14))) isSteel = false;
+            else if (fortStyle === 8 && (c >= 7 && c <= 12)) isSteel = false;
+            else if (fortStyle === 9 && (c >= 8 && c <= 11)) isSteel = false;
             else isSteel = true;
           } else {
             isSteel = true;
@@ -648,9 +648,9 @@ class MultaniGame {
         if (!isSteel && !isOuterBorder) {
           switch (fortStyle) {
             case 0:
-              if (r === 6 && (c < 9 || c > 10)) isSteel = true;
+              if (r === 6 && (c < 8 || c > 11)) isSteel = true;
               else if (r === 12 && (c < 5 || (c > 7 && c < 12) || c > 14)) isSteel = true;
-              else if (r === 18 && (c < 9 || c > 10)) isSteel = true;
+              else if (r === 18 && (c < 8 || c > 11)) isSteel = true;
               else if (r >= 20 && r <= 25 && (c === 5 || c === 14)) isSteel = true;
               else if (r >= 1 && r <= 19) isBreakable = true;
               break;
@@ -658,27 +658,27 @@ class MultaniGame {
             case 1:
               if (c === 9 && r >= 3 && r <= 20 && r !== 8) isSteel = true;
               else if (r === 8 && (c === 3 || c === 4 || c === 15 || c === 16)) isSteel = true;
-              else if (r === 14 && (c < 8 || c > 11)) isSteel = true;
+              else if (r === 14 && (c < 7 || c > 12)) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
 
             case 2:
-              if ((r === 5 || r === 15) && c >= 5 && c <= 14 && c !== 9) isSteel = true;
+              if ((r === 5 || r === 15) && c >= 5 && c <= 14 && (c < 8 || c > 11)) isSteel = true;
               else if ((c === 5 || c === 14) && r >= 5 && r <= 15 && r !== 10) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
 
             case 3:
-              if (r === 5 && c <= 15) isSteel = true;
-              else if (r === 10 && c >= 4) isSteel = true;
-              else if (r === 15 && c <= 15) isSteel = true;
+              if (r === 5 && c <= 14) isSteel = true;
+              else if (r === 10 && c >= 5) isSteel = true;
+              else if (r === 15 && c <= 14) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
 
             case 4:
-              if ((c === 5 || c === 14) && r >= 4 && r <= 20 && r !== 11) isSteel = true;
+              if ((c === 5 || c === 14) && r >= 4 && r <= 20 && (r < 10 || r > 12)) isSteel = true;
               else if (r === 9 && (c <= 5 || c >= 14)) isSteel = true;
-              else if (r === 15 && (c >= 7 && c <= 12 && c !== 9)) isSteel = true;
+              else if (r === 15 && (c >= 7 && c <= 12 && (c < 9 || c > 10))) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
 
@@ -690,8 +690,8 @@ class MultaniGame {
 
             case 6:
               if (r === 5 && (c <= 6 || c >= 13)) isSteel = true;
-              else if (r === 9 && (c <= 8 || c >= 11)) isSteel = true;
-              else if (r === 14 && (c < 9 || c > 10)) isSteel = true;
+              else if (r === 9 && (c <= 7 || c >= 12)) isSteel = true;
+              else if (r === 14 && (c < 8 || c > 11)) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
 
@@ -702,7 +702,7 @@ class MultaniGame {
               break;
 
             case 8:
-              if ((r === 4 || r === 15) && c >= 4 && c <= 15 && c !== 9) isSteel = true;
+              if ((r === 4 || r === 15) && c >= 4 && c <= 15 && (c < 8 || c > 11)) isSteel = true;
               else if ((c === 4 || c === 15) && r >= 4 && r <= 15 && r !== 9) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
@@ -710,7 +710,7 @@ class MultaniGame {
             case 9:
               if (r === 4 && c >= 4 && c <= 15) isSteel = true;
               else if (r === 9 && (c <= 7 || c >= 12)) isSteel = true;
-              else if (r === 14 && c >= 3 && c <= 16 && c !== 9 && c !== 10) isSteel = true;
+              else if (r === 14 && c >= 3 && c <= 16 && (c < 8 || c > 11)) isSteel = true;
               else if (r >= 1 && r <= 20) isBreakable = true;
               break;
           }
@@ -777,7 +777,7 @@ class MultaniGame {
     if (this.state !== 'WAIT_LAUNCH') return;
     this.state = 'PLAYING';
     this.tapHint.style.display = 'none';
-    const angle = -Math.PI / 2 + (Math.random() * 0.3 - 0.15);
+    const angle = -Math.PI / 2 + (Math.random() * 0.16 - 0.08);
     const spd = this.balls[0].speed;
     this.balls[0].vx = Math.cos(angle) * spd;
     this.balls[0].vy = Math.sin(angle) * spd;
@@ -793,9 +793,9 @@ class MultaniGame {
     for (let i = 0; added < need && i < currentList.length; i++) {
       const src = currentList[i];
       for (let k = 1; k < factor && added < need; k++) {
-        const spreadAngle = (Math.random() - 0.5) * 1.4;
-        const currentAngle = Math.atan2(src.vy, src.vx) || -Math.PI / 2;
-        const newAngle = currentAngle + spreadAngle;
+        const spreadAngle = (Math.random() - 0.5) * 0.8;
+        const baseAngle = -Math.PI / 2;
+        const newAngle = baseAngle + spreadAngle;
         const spd = Math.max(this.baseSpeed, Math.hypot(src.vx, src.vy));
 
         this.balls.push({
@@ -852,31 +852,34 @@ class MultaniGame {
         const minDist = b1.radius + b2.radius;
 
         if (dist < minDist && dist > 0.0001) {
-          // Normal vector
           const nx = dx / dist;
           const ny = dy / dist;
 
-          // Push apart to prevent sticking
           const overlap = (minDist - dist) * 0.5;
           b1.x -= nx * overlap;
           b1.y -= ny * overlap;
           b2.x += nx * overlap;
           b2.y += ny * overlap;
 
-          // Relative velocity
           const kx = b1.vx - b2.vx;
           const ky = b1.vy - b2.vy;
           const p = 2 * (nx * kx + ny * ky) / 2;
 
-          // Swap & bounce velocities
           b1.vx -= p * nx;
           b1.vy -= p * ny;
           b2.vx += p * nx;
           b2.vy += p * ny;
 
-          // Anti-stuck angle jitter: directional shift so balls don't trace identical lines
-          const jitter1 = (Math.random() - 0.5) * 0.22;
-          const jitter2 = (Math.random() - 0.5) * 0.22;
+          // Upward push
+          if (b1.y > 400 && b1.vy > 0 && Math.random() < 0.6) {
+            b1.vy = -Math.abs(b1.vy);
+          }
+          if (b2.y > 400 && b2.vy > 0 && Math.random() < 0.6) {
+            b2.vy = -Math.abs(b2.vy);
+          }
+
+          const jitter1 = (Math.random() - 0.5) * 0.25;
+          const jitter2 = (Math.random() - 0.5) * 0.25;
 
           const spd1 = Math.hypot(b1.vx, b1.vy);
           let ang1 = Math.atan2(b1.vy, b1.vx) + jitter1;
@@ -926,7 +929,6 @@ class MultaniGame {
 
     const subSteps = 2;
     for (let step = 0; step < subSteps; step++) {
-      // Ball-to-ball collisions per sub-step
       if (this.balls.length > 1) {
         this.resolveBallCollisions();
       }
@@ -935,48 +937,44 @@ class MultaniGame {
         const b = this.balls[i];
         if (!b.active) continue;
 
-        // Prevent balls from moving only horizontally
-        if (Math.abs(b.vy) < 1.6) {
-          b.vy = (b.vy < 0 ? -1 : 1) * 2.4;
+        if (Math.abs(b.vy) < 2.0) {
+          b.vy = (b.vy < 0 ? -1 : 1) * 2.8;
         }
 
         b.x += b.vx / subSteps;
         b.y += b.vy / subSteps;
 
-        // Wall collisions + slight jitter to prevent infinite bouncing
+        // Wall collisions
         if (b.x - b.radius <= 2) {
           b.x = 2 + b.radius;
           b.vx = Math.abs(b.vx);
-          b.vy += (Math.random() - 0.5) * 0.2;
         } else if (b.x + b.radius >= this.width - 2) {
           b.x = this.width - 2 - b.radius;
           b.vx = -Math.abs(b.vx);
-          b.vy += (Math.random() - 0.5) * 0.2;
         }
         if (b.y - b.radius <= 2) {
           b.y = 2 + b.radius;
           b.vy = Math.abs(b.vy);
-          b.vx += (Math.random() - 0.5) * 0.2;
         }
 
-        // Paddle collision
+        // Paddle Collision
         if (
           b.vy > 0 &&
           b.y + b.radius >= this.paddle.y &&
           b.y - b.radius <= this.paddle.y + this.paddle.h &&
-          b.x >= this.paddle.x - 3 &&
-          b.x <= this.paddle.x + this.paddle.w + 3
+          b.x >= this.paddle.x - 4 &&
+          b.x <= this.paddle.x + this.paddle.w + 4
         ) {
           b.y = this.paddle.y - b.radius;
           const hitPos = (b.x - (this.paddle.x + this.paddle.w / 2)) / (this.paddle.w / 2);
-          const bounceAngle = hitPos * (Math.PI * 0.42) - Math.PI / 2;
+          const bounceAngle = hitPos * (Math.PI * 0.32) - Math.PI / 2;
           const spd = Math.max(this.baseSpeed, Math.hypot(b.vx, b.vy));
           b.vx = Math.cos(bounceAngle) * spd;
           b.vy = Math.sin(bounceAngle) * spd;
           this.snd.hitPaddle();
         }
 
-        // Brick collision
+        // Brick & Steel collisions
         for (let j = 0; j < this.bricks.length; j++) {
           const br = this.bricks[j];
 
@@ -1012,9 +1010,7 @@ class MultaniGame {
               }
             }
 
-            // Anti-trap nudge: slightly adjust trajectory when hitting steel or bricks
-            b.vx += (Math.random() - 0.5) * 0.25;
-            b.vy += (Math.random() - 0.5) * 0.25;
+            b.vx += (Math.random() - 0.5) * 0.3;
 
             if (!br.isSteel) {
               br.hp--;
