@@ -8,7 +8,12 @@ export async function renderWallet() {
   }
   await syncAuthAndProfile();
   
-  const isVerified = (state.currentProfile?.is_verified === true);
+  // Strict Lock: Agar account verify nahi hai to Wallet khulne hi na do
+  if (state.currentProfile?.is_verified !== true) {
+    Toast.show("First Account Verified Karein! Wallet system locked hai.", "warning");
+    window.Router.navigate('profile');
+    return;
+  }
 
   let deposits = [];
   let transactions = [];
@@ -43,13 +48,6 @@ export async function renderWallet() {
   const view = document.getElementById('app-view');
   view.innerHTML = `
     <div class="view-container">
-      ${!isVerified ? `
-        <div style="background:rgba(255,152,0,0.15); border:1px solid #ff9800; border-radius:var(--radius-sm); padding:10px; margin-bottom:12px; text-align:center; font-size:12px; color:#fff;">
-          ⚠️ <strong>Account Not Verified!</strong> Wallet transactions aur withdrawals ke liye pehle apna account verify karein.
-          <button onclick="window.Router.navigate('profile')" style="margin-top:6px; display:block; width:100%; padding:6px; background:#ff9800; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">VERIFY NOW</button>
-        </div>
-      ` : ''}
-
       <div class="wallet-hero">
         <span class="wallet-balance-title">Current Balance</span>
         <div class="wallet-amount">PKR ${state.currentProfile?.wallet_balance || 0}</div>
@@ -171,7 +169,7 @@ export function renderDeposit() {
     return; 
   }
 
-  // Verification Check Deposit Screen par bhi
+  // Verification Check Deposit Screen par
   if (state.currentProfile?.is_verified !== true) {
     Toast.show("First Account Verified Karein! Tabhi aap payment add kar sakte hain.", "warning");
     window.Router.navigate('profile');
