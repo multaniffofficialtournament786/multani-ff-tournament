@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MULTANI FF - SMM Manual Admin Panel</title>
+  <title>MULTANI FF - SMM Service Control</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,46 +11,65 @@
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #06070a; color: #f3f4f6; }
     .font-gaming { font-family: 'Rajdhani', sans-serif; }
-    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
+    .horizontal-scroll {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 10px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
+    }
+    .horizontal-scroll::-webkit-scrollbar { display: none; }
   </style>
 </head>
-<body class="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
+<body class="p-3 md:p-6 max-w-3xl mx-auto space-y-5 pb-20">
 
-  <!-- Header -->
-  <div class="flex items-center justify-between border-b border-[#262f40] pb-4">
-    <div>
-      <h1 class="font-gaming text-2xl font-bold tracking-wider text-white">⚡ MULTANI SMM MANUAL ADMIN</h1>
-      <p class="text-xs text-gray-400">Manage Manual Services & Track Customer Orders</p>
-    </div>
-    <a href="admin.html" class="bg-[#151922] border border-[#262f40] hover:border-[#ff4624] text-gray-300 px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-      <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Back to Main Admin
+  <!-- Professional Compact Header -->
+  <div class="flex items-center justify-between border-b border-[#262f40] pb-3">
+    <h1 class="font-gaming text-lg md:text-xl font-bold tracking-wider text-white uppercase">SMM SERVICE CONTROL</h1>
+    <a href="admin.html" class="bg-[#151922] border border-[#262f40] hover:border-[#ff4624] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+      <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Back
     </a>
   </div>
 
-  <!-- TOP 4 CLICKABLE STATUS COUNTERS -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-    <div onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
-      <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-list text-cyan-400"></i> All Orders</span>
-      <h3 id="stat-all-orders" class="text-2xl font-bold font-gaming text-white mt-2">0</h3>
-    </div>
-    <div onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
-      <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-clock text-amber-400"></i> Pending</span>
-      <h3 id="stat-pending-orders" class="text-2xl font-bold font-gaming text-amber-400 mt-2">0</h3>
-    </div>
-    <div onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
-      <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-spinner text-blue-400"></i> Processing</span>
-      <h3 id="stat-processing-orders" class="text-2xl font-bold font-gaming text-blue-400 mt-2">0</h3>
-    </div>
-    <div onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
-      <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> Completed</span>
-      <h3 id="stat-completed-orders" class="text-2xl font-bold font-gaming text-emerald-400 mt-2">0</h3>
-    </div>
+  <!-- HORIZONTAL SCROLLABLE COMPACT STATUS BUTTONS -->
+  <div class="horizontal-scroll">
+    <button onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+      <i class="fa-solid fa-list text-cyan-400 text-sm"></i>
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-gray-400 block">All Orders</span>
+        <h3 id="stat-all-orders" class="text-base font-bold font-gaming text-white">0</h3>
+      </div>
+    </button>
+    <button onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+      <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-gray-400 block">Pending</span>
+        <h3 id="stat-pending-orders" class="text-base font-bold font-gaming text-amber-400">0</h3>
+      </div>
+    </button>
+    <button onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+      <i class="fa-solid fa-spinner text-blue-400 text-sm"></i>
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-gray-400 block">Processing</span>
+        <h3 id="stat-processing-orders" class="text-base font-bold font-gaming text-blue-400">0</h3>
+      </div>
+    </button>
+    <button onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+      <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-gray-400 block">Completed</span>
+        <h3 id="stat-completed-orders" class="text-base font-bold font-gaming text-emerald-400">0</h3>
+      </div>
+    </button>
   </div>
 
   <!-- ADD MANUAL SMM SERVICE FORM -->
-  <div class="bg-[#0e1118] border border-[#262f40] p-5 rounded-2xl space-y-4 shadow-xl">
-    <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+  <div class="bg-[#0e1118] border border-[#262f40] p-4 md:p-5 rounded-2xl space-y-4 shadow-xl">
+    <h2 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
       <i class="fa-solid fa-circle-plus text-cyan-400"></i> Add Manual SMM Service
     </h2>
     <div class="space-y-3 text-xs">
@@ -66,108 +85,104 @@
           </button>
 
           <!-- DROPDOWN POPUP LIST WITH ICONS -->
-          <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto sidebar-scroll p-1.5 space-y-1">
+          <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto sidebar-scroll p-1.5 space-y-1">
             
-            <!-- YouTube Group -->
-            <div class="text-[10px] font-bold text-red-500 uppercase px-2 py-1 tracking-wider"><i class="fa-brands fa-youtube"></i> YouTube Services</div>
+            <div class="text-[10px] font-bold text-red-500 uppercase px-2 py-1"><i class="fa-brands fa-youtube"></i> YouTube Services</div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Views
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Shorts Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Shorts Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Shorts Views
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Shorts Views
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Subscribers', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Subscribers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Subscribers
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Subscribers
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Likes', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Likes
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Likes
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Comments', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Comments
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Comments
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Watch Time', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Watch Time')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Watch Time
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Watch Time
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Live Stream', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Live Stream')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Live Stream
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Live Stream
             </div>
             <div onclick="selectServiceItem('YouTube', 'YouTube Views + Likes Combo', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Views + Likes (Combo)
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views + Likes (Combo)
             </div>
 
-            <!-- TikTok Group -->
-            <div class="text-[10px] font-bold text-cyan-400 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-tiktok"></i> TikTok Services</div>
+            <div class="text-[10px] font-bold text-cyan-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-tiktok"></i> TikTok Services</div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Views', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Views
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Followers', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Followers
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Followers
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Likes', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Likes
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Likes
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Shares', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Shares
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Shares
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Comments', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Comments
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Comments
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Live', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Live')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Live
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Live
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Saves', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Saves')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Saves
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Saves
             </div>
             <div onclick="selectServiceItem('TikTok', 'TikTok Views + Likes Combo', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Views + Likes (Combo)
+              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views + Likes (Combo)
             </div>
 
-            <!-- Facebook Group -->
-            <div class="text-[10px] font-bold text-blue-500 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-facebook"></i> Facebook Services</div>
+            <div class="text-[10px] font-bold text-blue-500 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-facebook"></i> Facebook Services</div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Page Followers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Page Followers
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Followers
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Page Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Page Likes
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Likes
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Post Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Post Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Post Likes
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Post Likes
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Reactions', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reactions')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Reactions
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reactions
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Video Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Video Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Video Views
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Video Views
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Reels Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reels Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Reels Views
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reels Views
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Comments', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Comments
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Comments
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Shares', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Shares
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Shares
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Group Members', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Group Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Group Members
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Group Members
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Live Viewers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Live Viewers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Live Viewers
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Live Viewers
             </div>
             <div onclick="selectServiceItem('Facebook', 'Facebook Views + Likes Combo', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Views + Likes (Combo)
+              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Views + Likes (Combo)
             </div>
 
-            <!-- WhatsApp & Others -->
-            <div class="text-[10px] font-bold text-emerald-400 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-whatsapp"></i> WhatsApp & Other Services</div>
+            <div class="text-[10px] font-bold text-emerald-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp & Others</div>
             <div onclick="selectServiceItem('WhatsApp', 'WhatsApp Channel Followers', '<i class=\'fa-brands fa-whatsapp text-emerald-400\'></i> WhatsApp Channel Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i> WhatsApp Channel Followers
+              <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp Channel Followers
             </div>
             <div onclick="selectServiceItem('Instagram', 'Instagram Followers', '<i class=\'fa-brands fa-instagram text-pink-500\'></i> Instagram Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-instagram text-pink-500 text-base"></i> Instagram Followers
+              <i class="fa-brands fa-instagram text-pink-500"></i> Instagram Followers
             </div>
             <div onclick="selectServiceItem('Telegram', 'Telegram Members', '<i class=\'fa-brands fa-telegram text-cyan-500\'></i> Telegram Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-telegram text-cyan-500 text-base"></i> Telegram Members
+              <i class="fa-brands fa-telegram text-cyan-500"></i> Telegram Members
             </div>
 
           </div>
@@ -204,7 +219,7 @@
           <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
         </div>
       </div>
-      <button onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
+      <button onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
         SAVE MANUAL SERVICE
       </button>
     </div>
@@ -212,9 +227,9 @@
 
   <!-- ORDERS DETAILS MODAL -->
   <div id="orders-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-5 w-full max-w-2xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
-        <h3 id="modal-orders-title" class="font-gaming text-lg font-bold text-white uppercase">Orders List</h3>
+        <h3 id="modal-orders-title" class="font-gaming text-base md:text-lg font-bold text-white uppercase">Orders List</h3>
         <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
@@ -245,7 +260,6 @@
       document.getElementById('custom-service-dropdown').classList.add('hidden');
     }
 
-    // Close dropdown when clicking outside
     window.addEventListener('click', function(e) {
       const btn = document.getElementById('dropdown-toggle-btn');
       const dropdown = document.getElementById('custom-service-dropdown');
@@ -315,17 +329,17 @@
       container.innerHTML = '';
       orders.forEach(order => {
         container.innerHTML += `
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs">
-            <div class="space-y-1">
-              <p class="text-white font-bold">Order ID: <span class="text-cyan-400">${order.id.slice(0,8)}...</span></p>
-              <p class="text-gray-400">Link: <a href="${order.link}" target="_blank" class="text-amber-400 underline truncate max-w-[200px] inline-block align-bottom">${order.link}</a></p>
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
+            <div class="space-y-1 truncate flex-1">
+              <p class="text-white font-bold">ID: <span class="text-cyan-400">${order.id.slice(0,8)}</span></p>
+              <p class="text-gray-400 truncate">Link: <a href="${order.link}" target="_blank" class="text-amber-400 underline">${order.link}</a></p>
               <p class="text-gray-400">Qty: <strong class="text-white">${order.quantity}</strong> | Charge: <strong class="text-emerald-400">$${order.charge}</strong></p>
             </div>
-            <div class="text-right space-y-2">
+            <div class="text-right space-y-2 shrink-0">
               <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : order.status === 'Processing' ? 'bg-blue-950 text-blue-400 border border-blue-500/40' : 'bg-amber-950 text-amber-400 border border-amber-500/40'}">${order.status}</span>
               <div class="flex gap-1 justify-end pt-1">
-                <button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">Process</button>
-                <button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">Complete</button>
+                ${order.status === 'Pending' ? `<button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Approve</button>` : ''}
+                ${order.status !== 'Completed' ? `<button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Complete</button>` : '<span class="text-emerald-400 text-[10px] font-bold block">Done</span>'}
               </div>
             </div>
           </div>
@@ -342,7 +356,7 @@
       if (error) {
         alert('Error updating status: ' + error.message);
       } else {
-        alert(`Order marked as ${newStatus}!`);
+        alert(`Order status updated to ${newStatus}!`);
         loadSmmAdminStats();
         openOrdersModal('All');
       }
