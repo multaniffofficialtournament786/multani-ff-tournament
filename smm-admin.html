@@ -55,51 +55,124 @@
     </h2>
     <div class="space-y-3 text-xs">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template / Category</label>
-          <select id="service-template-select" onchange="fillServiceTemplate(this)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
-            <option value="">-- Choose or Custom Service --</option>
-            <optgroup label="YouTube Services">
-              <option value="YouTube|YouTube Views">YouTube Views</option>
-              <option value="YouTube|YouTube Shorts Views">YouTube Shorts Views</option>
-              <option value="YouTube|YouTube Subscribers">YouTube Subscribers</option>
-              <option value="YouTube|YouTube Likes">YouTube Likes</option>
-              <option value="YouTube|YouTube Comments">YouTube Comments</option>
-              <option value="YouTube|YouTube Watch Time">YouTube Watch Time</option>
-              <option value="YouTube|YouTube Live Stream">YouTube Live Stream</option>
-              <option value="YouTube|YouTube Views + Likes Combo">YouTube Views + Likes (Combo)</option>
-            </optgroup>
-            <optgroup label="TikTok Services">
-              <option value="TikTok|TikTok Views">TikTok Views</option>
-              <option value="TikTok|TikTok Followers">TikTok Followers</option>
-              <option value="TikTok|TikTok Likes">TikTok Likes</option>
-              <option value="TikTok|TikTok Shares">TikTok Shares</option>
-              <option value="TikTok|TikTok Comments">TikTok Comments</option>
-              <option value="TikTok|TikTok Live">TikTok Live</option>
-              <option value="TikTok|TikTok Saves">TikTok Saves</option>
-              <option value="TikTok|TikTok Views + Likes Combo">TikTok Views + Likes (Combo)</option>
-            </optgroup>
-            <optgroup label="Facebook Services">
-              <option value="Facebook|Facebook Page Followers">Facebook Page Followers</option>
-              <option value="Facebook|Facebook Page Likes">Facebook Page Likes</option>
-              <option value="Facebook|Facebook Post Likes">Facebook Post Likes</option>
-              <option value="Facebook|Facebook Reactions">Facebook Reactions</option>
-              <option value="Facebook|Facebook Video Views">Facebook Video Views</option>
-              <option value="Facebook|Facebook Reels Views">Facebook Reels Views</option>
-              <option value="Facebook|Facebook Comments">Facebook Comments</option>
-              <option value="Facebook|Facebook Shares">Facebook Shares</option>
-              <option value="Facebook|Facebook Group Members">Facebook Group Members</option>
-              <option value="Facebook|Facebook Live Viewers">Facebook Live Viewers</option>
-              <option value="Facebook|Facebook Views + Likes Combo">Facebook Views + Likes (Combo)</option>
-            </optgroup>
-            <optgroup label="WhatsApp & Others">
-              <option value="WhatsApp|WhatsApp Channel Followers">WhatsApp Channel Followers</option>
-              <option value="Instagram|Instagram Followers">Instagram Followers</option>
-              <option value="Instagram|Instagram Likes">Instagram Likes</option>
-              <option value="Telegram|Telegram Members">Telegram Members</option>
-            </optgroup>
-          </select>
+        <!-- CUSTOM ICON DROPDOWN BUTTON -->
+        <div class="relative">
+          <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
+          <button type="button" onclick="toggleServiceDropdown()" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624]">
+            <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300">
+              <i class="fa-solid fa-list-ul"></i> Choose Service with Icon...
+            </span>
+            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+          </button>
+
+          <!-- DROPDOWN POPUP LIST WITH ICONS -->
+          <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto sidebar-scroll p-1.5 space-y-1">
+            
+            <!-- YouTube Group -->
+            <div class="text-[10px] font-bold text-red-500 uppercase px-2 py-1 tracking-wider"><i class="fa-brands fa-youtube"></i> YouTube Services</div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Views
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Shorts Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Shorts Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Shorts Views
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Subscribers', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Subscribers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Subscribers
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Likes', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Likes
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Comments', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Comments
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Watch Time', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Watch Time')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Watch Time
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Live Stream', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Live Stream')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Live Stream
+            </div>
+            <div onclick="selectServiceItem('YouTube', 'YouTube Views + Likes Combo', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-youtube text-red-500 text-base"></i> YouTube Views + Likes (Combo)
+            </div>
+
+            <!-- TikTok Group -->
+            <div class="text-[10px] font-bold text-cyan-400 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-tiktok"></i> TikTok Services</div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Views', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Views
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Followers', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Followers
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Likes', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Likes
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Shares', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Shares
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Comments', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Comments
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Live', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Live')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Live
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Saves', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Saves')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Saves
+            </div>
+            <div onclick="selectServiceItem('TikTok', 'TikTok Views + Likes Combo', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-tiktok text-cyan-400 text-base"></i> TikTok Views + Likes (Combo)
+            </div>
+
+            <!-- Facebook Group -->
+            <div class="text-[10px] font-bold text-blue-500 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-facebook"></i> Facebook Services</div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Page Followers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Page Followers
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Page Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Page Likes
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Post Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Post Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Post Likes
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Reactions', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reactions')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Reactions
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Video Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Video Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Video Views
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Reels Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reels Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Reels Views
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Comments', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Comments
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Shares', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Shares
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Group Members', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Group Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Group Members
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Live Viewers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Live Viewers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Live Viewers
+            </div>
+            <div onclick="selectServiceItem('Facebook', 'Facebook Views + Likes Combo', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-facebook text-blue-500 text-base"></i> Facebook Views + Likes (Combo)
+            </div>
+
+            <!-- WhatsApp & Others -->
+            <div class="text-[10px] font-bold text-emerald-400 uppercase px-2 py-1 mt-2 tracking-wider"><i class="fa-brands fa-whatsapp"></i> WhatsApp & Other Services</div>
+            <div onclick="selectServiceItem('WhatsApp', 'WhatsApp Channel Followers', '<i class=\'fa-brands fa-whatsapp text-emerald-400\'></i> WhatsApp Channel Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i> WhatsApp Channel Followers
+            </div>
+            <div onclick="selectServiceItem('Instagram', 'Instagram Followers', '<i class=\'fa-brands fa-instagram text-pink-500\'></i> Instagram Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-instagram text-pink-500 text-base"></i> Instagram Followers
+            </div>
+            <div onclick="selectServiceItem('Telegram', 'Telegram Members', '<i class=\'fa-brands fa-telegram text-cyan-500\'></i> Telegram Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+              <i class="fa-brands fa-telegram text-cyan-500 text-base"></i> Telegram Members
+            </div>
+
+          </div>
         </div>
+
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">Category Name</label>
           <input type="text" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / TikTok" required />
@@ -160,13 +233,26 @@
       loadSmmAdminStats();
     }
 
-    function fillServiceTemplate(selectEl) {
-      const val = selectEl.value;
-      if (!val) return;
-      const parts = val.split('|');
-      document.getElementById('srv-category').value = parts[0];
-      document.getElementById('srv-name').value = parts[1];
+    function toggleServiceDropdown() {
+      const dropdown = document.getElementById('custom-service-dropdown');
+      dropdown.classList.toggle('hidden');
     }
+
+    function selectServiceItem(category, serviceName, htmlLabel) {
+      document.getElementById('srv-category').value = category;
+      document.getElementById('srv-name').value = serviceName;
+      document.getElementById('selected-service-label').innerHTML = htmlLabel;
+      document.getElementById('custom-service-dropdown').classList.add('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(e) {
+      const btn = document.getElementById('dropdown-toggle-btn');
+      const dropdown = document.getElementById('custom-service-dropdown');
+      if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
 
     async function loadSmmAdminStats() {
       const { data, error } = await supabase.from('smm_orders').select('*');
@@ -200,13 +286,13 @@
         alert('Database Error: ' + error.message);
       } else { 
         alert('Manual Service added successfully!'); 
-        document.getElementById('service-template-select').value = '';
         document.getElementById('srv-category').value = '';
         document.getElementById('srv-name').value = ''; 
         document.getElementById('srv-custom-id').value = '';
         document.getElementById('srv-rate').value = ''; 
         document.getElementById('srv-min').value = ''; 
         document.getElementById('srv-max').value = ''; 
+        document.getElementById('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
       }
     }
 
