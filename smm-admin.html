@@ -56,26 +56,67 @@
     <div class="space-y-3 text-xs">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Category (Select or Type Custom)</label>
-          <input list="category-options" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / Custom" required />
-          <datalist id="category-options">
-            <option value="YouTube">
-            <option value="Facebook">
-            <option value="TikTok">
-            <option value="WhatsApp">
-            <option value="Instagram">
-            <option value="Telegram">
-          </datalist>
+          <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template / Category</label>
+          <select id="service-template-select" onchange="fillServiceTemplate(this)" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="">-- Choose or Custom Service --</option>
+            <optgroup label="YouTube Services">
+              <option value="YouTube|YouTube Views">YouTube Views</option>
+              <option value="YouTube|YouTube Shorts Views">YouTube Shorts Views</option>
+              <option value="YouTube|YouTube Subscribers">YouTube Subscribers</option>
+              <option value="YouTube|YouTube Likes">YouTube Likes</option>
+              <option value="YouTube|YouTube Comments">YouTube Comments</option>
+              <option value="YouTube|YouTube Watch Time">YouTube Watch Time</option>
+              <option value="YouTube|YouTube Live Stream">YouTube Live Stream</option>
+              <option value="YouTube|YouTube Views + Likes Combo">YouTube Views + Likes (Combo)</option>
+            </optgroup>
+            <optgroup label="TikTok Services">
+              <option value="TikTok|TikTok Views">TikTok Views</option>
+              <option value="TikTok|TikTok Followers">TikTok Followers</option>
+              <option value="TikTok|TikTok Likes">TikTok Likes</option>
+              <option value="TikTok|TikTok Shares">TikTok Shares</option>
+              <option value="TikTok|TikTok Comments">TikTok Comments</option>
+              <option value="TikTok|TikTok Live">TikTok Live</option>
+              <option value="TikTok|TikTok Saves">TikTok Saves</option>
+              <option value="TikTok|TikTok Views + Likes Combo">TikTok Views + Likes (Combo)</option>
+            </optgroup>
+            <optgroup label="Facebook Services">
+              <option value="Facebook|Facebook Page Followers">Facebook Page Followers</option>
+              <option value="Facebook|Facebook Page Likes">Facebook Page Likes</option>
+              <option value="Facebook|Facebook Post Likes">Facebook Post Likes</option>
+              <option value="Facebook|Facebook Reactions">Facebook Reactions</option>
+              <option value="Facebook|Facebook Video Views">Facebook Video Views</option>
+              <option value="Facebook|Facebook Reels Views">Facebook Reels Views</option>
+              <option value="Facebook|Facebook Comments">Facebook Comments</option>
+              <option value="Facebook|Facebook Shares">Facebook Shares</option>
+              <option value="Facebook|Facebook Group Members">Facebook Group Members</option>
+              <option value="Facebook|Facebook Live Viewers">Facebook Live Viewers</option>
+              <option value="Facebook|Facebook Views + Likes Combo">Facebook Views + Likes (Combo)</option>
+            </optgroup>
+            <optgroup label="WhatsApp & Others">
+              <option value="WhatsApp|WhatsApp Channel Followers">WhatsApp Channel Followers</option>
+              <option value="Instagram|Instagram Followers">Instagram Followers</option>
+              <option value="Instagram|Instagram Likes">Instagram Likes</option>
+              <option value="Telegram|Telegram Members">Telegram Members</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-gray-400 uppercase mb-1">Category Name</label>
+          <input type="text" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / TikTok" required />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
+          <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube Views [HQ]" required />
         </div>
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">Service ID (Manual)</label>
           <input type="text" id="srv-custom-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 101" />
         </div>
       </div>
-      <div>
-        <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
-        <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube Monetization Watchtime [HQ]" />
-      </div>
+
       <div class="grid grid-cols-3 gap-2">
         <div>
           <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Rate per 1000</label>
@@ -119,6 +160,14 @@
       loadSmmAdminStats();
     }
 
+    function fillServiceTemplate(selectEl) {
+      const val = selectEl.value;
+      if (!val) return;
+      const parts = val.split('|');
+      document.getElementById('srv-category').value = parts[0];
+      document.getElementById('srv-name').value = parts[1];
+    }
+
     async function loadSmmAdminStats() {
       const { data, error } = await supabase.from('smm_orders').select('*');
       if (data) {
@@ -151,6 +200,7 @@
         alert('Database Error: ' + error.message);
       } else { 
         alert('Manual Service added successfully!'); 
+        document.getElementById('service-template-select').value = '';
         document.getElementById('srv-category').value = '';
         document.getElementById('srv-name').value = ''; 
         document.getElementById('srv-custom-id').value = '';
