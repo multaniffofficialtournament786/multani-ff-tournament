@@ -49,15 +49,15 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- ADD SMM PROVIDER FORM -->
+    <!-- ADD SMM PROVIDER & LIVE BALANCE -->
     <div class="bg-[#0e1118] border border-[#262f40] p-5 rounded-2xl space-y-4 shadow-xl">
       <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-        <i class="fa-solid fa-plug text-[#ff4624]"></i> Add SMM Provider API
+        <i class="fa-solid fa-plug text-[#ff4624]"></i> Add SMM Provider API & Wallet
       </h2>
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">Provider Name</label>
-          <input type="text" id="prov-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. PerfectPanel / JAP" />
+          <input type="text" id="prov-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Decent SMM" />
         </div>
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">API URL (Endpoint)</label>
@@ -65,11 +65,19 @@
         </div>
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">API Key / Token</label>
-          <input type="password" id="prov-key" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="Enter provider API key securely" />
+          <input type="password" id="prov-key" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="Enter provider API key" />
         </div>
         <button onclick="saveSmmProvider()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
           SAVE PROVIDER API
         </button>
+      </div>
+
+      <!-- SAVED PROVIDERS & WALLET BALANCE LIST -->
+      <div class="pt-4 border-t border-[#262f40] space-y-3">
+        <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase">Connected Providers & Balances</h3>
+        <div id="providers-balance-list" class="space-y-2">
+          <p class="text-gray-500 text-xs text-center py-2">Loading providers...</p>
+        </div>
       </div>
     </div>
 
@@ -79,6 +87,12 @@
         <i class="fa-solid fa-layer-group text-cyan-400"></i> Add / Configure SMM Service
       </h2>
       <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-400 uppercase mb-1">Select Provider</label>
+          <select id="srv-provider-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
+            <option value="">-- Choose Provider --</option>
+          </select>
+        </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-gray-400 uppercase mb-1">Category</label>
@@ -93,25 +107,25 @@
           </div>
           <div>
             <label class="block font-bold text-gray-400 uppercase mb-1">Service ID (API)</label>
-            <input type="text" id="srv-provider-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 102" />
+            <input type="text" id="srv-provider-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 3737" />
           </div>
         </div>
         <div>
           <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
-          <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Instagram Followers [Real]" />
+          <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. TikTok Followers" />
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Rate per 1000</label>
-            <input type="number" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="1.50" />
+            <input type="number" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100" />
           </div>
           <div>
             <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Min Qty</label>
-            <input type="number" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="10" />
+            <input type="number" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="50" />
           </div>
           <div>
             <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Max Qty</label>
-            <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="10000" />
+            <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
           </div>
         </div>
         <button onclick="saveSmmService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
@@ -127,18 +141,18 @@
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    async function initSmmAdmin() {
+      loadSmmAdminStats();
+      loadProvidersList();
+    }
+
     async function loadSmmAdminStats() {
       const { data, error } = await supabase.from('smm_orders').select('status');
       if (data) {
-        let all = data.length;
-        let pending = data.filter(o => o.status === 'Pending').length;
-        let processing = data.filter(o => o.status === 'Processing').length;
-        let completed = data.filter(o => o.status === 'Completed').length;
-
-        document.getElementById('stat-all-orders').innerText = all;
-        document.getElementById('stat-pending-orders').innerText = pending;
-        document.getElementById('stat-processing-orders').innerText = processing;
-        document.getElementById('stat-completed-orders').innerText = completed;
+        document.getElementById('stat-all-orders').innerText = data.length;
+        document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
+        document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
+        document.getElementById('stat-completed-orders').innerText = data.filter(o => o.status === 'Completed').length;
       }
     }
 
@@ -147,36 +161,104 @@
       const api_url = document.getElementById('prov-url').value;
       const api_key = document.getElementById('prov-key').value;
       if (!name || !api_url || !api_key) { alert('Please fill all provider fields.'); return; }
+      
       const { error } = await supabase.from('smm_providers').insert([{ name, api_url, api_key }]);
-      if (error) alert('Error: ' + error.message);
-      else { 
+      if (error) {
+        alert('Database Error: ' + error.message + '\n(Make sure smm_providers table exists in Supabase!)');
+      } else { 
         alert('Provider added successfully!'); 
         document.getElementById('prov-name').value = ''; 
         document.getElementById('prov-url').value = ''; 
         document.getElementById('prov-key').value = ''; 
+        loadProvidersList();
+      }
+    }
+
+    async function loadProvidersList() {
+      const { data, error } = await supabase.from('smm_providers').select('*');
+      const select = document.getElementById('srv-provider-select');
+      const container = document.getElementById('providers-balance-list');
+      
+      select.innerHTML = '<option value="">-- Choose Provider --</option>';
+      container.innerHTML = '';
+
+      if (data && data.length > 0) {
+        data.forEach(prov => {
+          select.innerHTML += `<option value="${prov.id}">${prov.name}</option>`;
+          
+          // Render provider card with balance check button
+          container.innerHTML += `
+            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg flex items-center justify-between">
+              <div>
+                <p class="font-bold text-white text-xs">${prov.name}</p>
+                <p class="text-[10px] text-gray-400 truncate max-w-[180px]">${prov.api_url}</p>
+              </div>
+              <div class="text-right">
+                <span id="bal-${prov.id}" class="font-gaming text-xs font-bold text-emerald-400 block">Click to check</span>
+                <button onclick="fetchProviderBalance('${prov.id}', '${prov.api_url}', '${prov.api_key}')" class="text-[10px] bg-[#151922] border border-[#262f40] text-cyan-400 px-2 py-0.5 rounded mt-1 hover:border-cyan-400">Check Balance</button>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        container.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">No provider added yet.</p>';
+      }
+    }
+
+    async function fetchProviderBalance(id, url, key) {
+      const balEl = document.getElementById(`bal-${id}`);
+      balEl.innerText = "Checking...";
+      try {
+        // Standard SMM Panel API balance request using fetch
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ key: key, action: 'balance' })
+        });
+        const result = await response.json();
+        if (result.balance !== undefined) {
+          balEl.innerText = `${result.balance} ${result.currency || ''}`;
+        } else {
+          balEl.innerText = "API Error / Key Invalid";
+        }
+      } catch (err) {
+        // Fallback for CORS restriction in browser (CORS policy blocks direct client-side SMM API calls)
+        balEl.innerText = "CORS Blocked (Use Server API)";
+        console.warn("Direct browser fetch blocked by CORS:", err);
       }
     }
 
     async function saveSmmService() {
+      const provider_id = document.getElementById('srv-provider-select').value;
       const category = document.getElementById('srv-category').value;
       const provider_service_id = document.getElementById('srv-provider-id').value;
       const name = document.getElementById('srv-name').value;
       const rate = document.getElementById('srv-rate').value;
       const min = document.getElementById('srv-min').value;
       const max = document.getElementById('srv-max').value;
-      if (!name || !rate || !min || !max) { alert('Please fill all service fields.'); return; }
-      const { error } = await supabase.from('smm_services').insert([{ category, provider_service_id, name, rate, min, max }]);
-      if (error) alert('Error: ' + error.message);
-      else { 
+
+      if (!provider_id || !name || !rate || !min || !max || !provider_service_id) { 
+        alert('Please select a provider and fill all service fields.'); 
+        return; 
+      }
+
+      const { error } = await supabase.from('smm_services').insert([{ 
+        provider_id, category, provider_service_id, name, rate, min, max 
+      }]);
+
+      if (error) {
+        alert('Database Error: ' + error.message);
+      } else { 
         alert('Service added successfully!'); 
         document.getElementById('srv-name').value = ''; 
+        document.getElementById('srv-provider-id').value = '';
         document.getElementById('srv-rate').value = ''; 
         document.getElementById('srv-min').value = ''; 
         document.getElementById('srv-max').value = ''; 
       }
     }
 
-    window.addEventListener('DOMContentLoaded', loadSmmAdminStats);
+    window.addEventListener('DOMContentLoaded', initSmmAdmin);
   </script>
 </body>
 </html>
