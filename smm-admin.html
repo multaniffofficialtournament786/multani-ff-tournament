@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MULTANI FF - SMM Admin Control Center</title>
+  <title>MULTANI FF - SMM Manual Admin Panel</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,122 +15,96 @@
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
   </style>
 </head>
-<body class="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+<body class="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
 
   <!-- Header -->
   <div class="flex items-center justify-between border-b border-[#262f40] pb-4">
     <div>
-      <h1 class="font-gaming text-2xl font-bold tracking-wider text-white">⚡ MULTANI SMM ADMIN CONSOLE</h1>
-      <p class="text-xs text-gray-400">Independent SMM Provider & Order Management Panel</p>
+      <h1 class="font-gaming text-2xl font-bold tracking-wider text-white">⚡ MULTANI SMM MANUAL ADMIN</h1>
+      <p class="text-xs text-gray-400">Manage Manual Services & Track Customer Orders</p>
     </div>
     <a href="admin.html" class="bg-[#151922] border border-[#262f40] hover:border-[#ff4624] text-gray-300 px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
       <i class="fa-solid fa-arrow-left text-[#ff4624]"></i> Back to Main Admin
     </a>
   </div>
 
-  <!-- TOP 4 STATUS COUNTERS -->
+  <!-- TOP 4 CLICKABLE STATUS COUNTERS -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-    <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl flex flex-col justify-between shadow-lg">
+    <div onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
       <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-list text-cyan-400"></i> All Orders</span>
       <h3 id="stat-all-orders" class="text-2xl font-bold font-gaming text-white mt-2">0</h3>
     </div>
-    <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl flex flex-col justify-between shadow-lg">
+    <div onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
       <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-clock text-amber-400"></i> Pending</span>
       <h3 id="stat-pending-orders" class="text-2xl font-bold font-gaming text-amber-400 mt-2">0</h3>
     </div>
-    <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl flex flex-col justify-between shadow-lg">
+    <div onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
       <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-spinner text-blue-400"></i> Processing</span>
       <h3 id="stat-processing-orders" class="text-2xl font-bold font-gaming text-blue-400 mt-2">0</h3>
     </div>
-    <div class="bg-[#151922] border border-[#262f40] p-4 rounded-xl flex flex-col justify-between shadow-lg">
+    <div onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 p-4 rounded-xl flex flex-col justify-between shadow-lg cursor-pointer transition">
       <span class="text-[11px] uppercase font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> Completed</span>
       <h3 id="stat-completed-orders" class="text-2xl font-bold font-gaming text-emerald-400 mt-2">0</h3>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- ADD SMM PROVIDER & LIVE BALANCE -->
-    <div class="bg-[#0e1118] border border-[#262f40] p-5 rounded-2xl space-y-4 shadow-xl">
-      <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-        <i class="fa-solid fa-plug text-[#ff4624]"></i> Add SMM Provider API & Wallet
-      </h2>
-      <div class="space-y-3 text-xs">
+  <!-- ADD MANUAL SMM SERVICE FORM -->
+  <div class="bg-[#0e1118] border border-[#262f40] p-5 rounded-2xl space-y-4 shadow-xl">
+    <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
+      <i class="fa-solid fa-circle-plus text-cyan-400"></i> Add Manual SMM Service
+    </h2>
+    <div class="space-y-3 text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Provider Name</label>
-          <input type="text" id="prov-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. Decent SMM" />
+          <label class="block font-bold text-gray-400 uppercase mb-1">Category (Select or Type Custom)</label>
+          <input list="category-options" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / Custom" required />
+          <datalist id="category-options">
+            <option value="YouTube">
+            <option value="Facebook">
+            <option value="TikTok">
+            <option value="WhatsApp">
+            <option value="Instagram">
+            <option value="Telegram">
+          </datalist>
         </div>
         <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">API URL (Endpoint)</label>
-          <input type="text" id="prov-url" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="https://provider.com/api/v2" />
-        </div>
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">API Key / Token</label>
-          <input type="password" id="prov-key" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="Enter provider API key" />
-        </div>
-        <button onclick="saveSmmProvider()" class="w-full bg-[#ff4624] hover:bg-[#e03212] text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
-          SAVE PROVIDER API
-        </button>
-      </div>
-
-      <!-- SAVED PROVIDERS & WALLET BALANCE LIST -->
-      <div class="pt-4 border-t border-[#262f40] space-y-3">
-        <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase">Connected Providers & Balances</h3>
-        <div id="providers-balance-list" class="space-y-2">
-          <p class="text-gray-500 text-xs text-center py-2">Loading providers...</p>
+          <label class="block font-bold text-gray-400 uppercase mb-1">Service ID (Manual)</label>
+          <input type="text" id="srv-custom-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 101" />
         </div>
       </div>
+      <div>
+        <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
+        <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube Monetization Watchtime [HQ]" />
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div>
+          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Rate per 1000</label>
+          <input type="number" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100" />
+        </div>
+        <div>
+          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Min Qty</label>
+          <input type="number" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="50" />
+        </div>
+        <div>
+          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Max Qty</label>
+          <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
+        </div>
+      </div>
+      <button onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
+        SAVE MANUAL SERVICE
+      </button>
     </div>
+  </div>
 
-    <!-- ADD SMM SERVICE FORM -->
-    <div class="bg-[#0e1118] border border-[#262f40] p-5 rounded-2xl space-y-4 shadow-xl">
-      <h2 class="font-gaming text-lg font-bold text-white uppercase flex items-center gap-2">
-        <i class="fa-solid fa-layer-group text-cyan-400"></i> Add / Configure SMM Service
-      </h2>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Select Provider</label>
-          <select id="srv-provider-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
-            <option value="">-- Choose Provider --</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-gray-400 uppercase mb-1">Category</label>
-            <select id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]">
-              <option value="Instagram">Instagram</option>
-              <option value="Facebook">Facebook</option>
-              <option value="TikTok">TikTok</option>
-              <option value="YouTube">YouTube</option>
-              <option value="Telegram">Telegram</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-gray-400 uppercase mb-1">Service ID (API)</label>
-            <input type="text" id="srv-provider-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 3737" />
-          </div>
-        </div>
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
-          <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. TikTok Followers" />
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Rate per 1000</label>
-            <input type="number" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100" />
-          </div>
-          <div>
-            <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Min Qty</label>
-            <input type="number" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="50" />
-          </div>
-          <div>
-            <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Max Qty</label>
-            <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
-          </div>
-        </div>
-        <button onclick="saveSmmService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">
-          ADD SERVICE
-        </button>
+  <!-- ORDERS DETAILS MODAL -->
+  <div id="orders-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-5 w-full max-w-2xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
+        <h3 id="modal-orders-title" class="font-gaming text-lg font-bold text-white uppercase">Orders List</h3>
+        <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
+        <p class="text-gray-500 text-xs text-center py-6">Loading orders...</p>
       </div>
     </div>
   </div>
@@ -143,12 +117,12 @@
 
     async function initSmmAdmin() {
       loadSmmAdminStats();
-      loadProvidersList();
     }
 
     async function loadSmmAdminStats() {
-      const { data, error } = await supabase.from('smm_orders').select('status');
+      const { data, error } = await supabase.from('smm_orders').select('*');
       if (data) {
+        window.allSmmOrdersData = data;
         document.getElementById('stat-all-orders').innerText = data.length;
         document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
         document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
@@ -156,105 +130,85 @@
       }
     }
 
-    async function saveSmmProvider() {
-      const name = document.getElementById('prov-name').value;
-      const api_url = document.getElementById('prov-url').value;
-      const api_key = document.getElementById('prov-key').value;
-      if (!name || !api_url || !api_key) { alert('Please fill all provider fields.'); return; }
-      
-      const { error } = await supabase.from('smm_providers').insert([{ name, api_url, api_key }]);
-      if (error) {
-        alert('Database Error: ' + error.message + '\n(Make sure smm_providers table exists in Supabase!)');
-      } else { 
-        alert('Provider added successfully!'); 
-        document.getElementById('prov-name').value = ''; 
-        document.getElementById('prov-url').value = ''; 
-        document.getElementById('prov-key').value = ''; 
-        loadProvidersList();
-      }
-    }
-
-    async function loadProvidersList() {
-      const { data, error } = await supabase.from('smm_providers').select('*');
-      const select = document.getElementById('srv-provider-select');
-      const container = document.getElementById('providers-balance-list');
-      
-      select.innerHTML = '<option value="">-- Choose Provider --</option>';
-      container.innerHTML = '';
-
-      if (data && data.length > 0) {
-        data.forEach(prov => {
-          select.innerHTML += `<option value="${prov.id}">${prov.name}</option>`;
-          
-          // Render provider card with balance check button
-          container.innerHTML += `
-            <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-lg flex items-center justify-between">
-              <div>
-                <p class="font-bold text-white text-xs">${prov.name}</p>
-                <p class="text-[10px] text-gray-400 truncate max-w-[180px]">${prov.api_url}</p>
-              </div>
-              <div class="text-right">
-                <span id="bal-${prov.id}" class="font-gaming text-xs font-bold text-emerald-400 block">Click to check</span>
-                <button onclick="fetchProviderBalance('${prov.id}', '${prov.api_url}', '${prov.api_key}')" class="text-[10px] bg-[#151922] border border-[#262f40] text-cyan-400 px-2 py-0.5 rounded mt-1 hover:border-cyan-400">Check Balance</button>
-              </div>
-            </div>
-          `;
-        });
-      } else {
-        container.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">No provider added yet.</p>';
-      }
-    }
-
-    async function fetchProviderBalance(id, url, key) {
-      const balEl = document.getElementById(`bal-${id}`);
-      balEl.innerText = "Checking...";
-      try {
-        // Standard SMM Panel API balance request using fetch
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ key: key, action: 'balance' })
-        });
-        const result = await response.json();
-        if (result.balance !== undefined) {
-          balEl.innerText = `${result.balance} ${result.currency || ''}`;
-        } else {
-          balEl.innerText = "API Error / Key Invalid";
-        }
-      } catch (err) {
-        // Fallback for CORS restriction in browser (CORS policy blocks direct client-side SMM API calls)
-        balEl.innerText = "CORS Blocked (Use Server API)";
-        console.warn("Direct browser fetch blocked by CORS:", err);
-      }
-    }
-
-    async function saveSmmService() {
-      const provider_id = document.getElementById('srv-provider-select').value;
+    async function saveManualService() {
       const category = document.getElementById('srv-category').value;
-      const provider_service_id = document.getElementById('srv-provider-id').value;
+      const provider_service_id = document.getElementById('srv-custom-id').value || '1';
       const name = document.getElementById('srv-name').value;
       const rate = document.getElementById('srv-rate').value;
       const min = document.getElementById('srv-min').value;
       const max = document.getElementById('srv-max').value;
 
-      if (!provider_id || !name || !rate || !min || !max || !provider_service_id) { 
-        alert('Please select a provider and fill all service fields.'); 
+      if (!category || !name || !rate || !min || !max) { 
+        alert('Please fill all service fields including category.'); 
         return; 
       }
 
       const { error } = await supabase.from('smm_services').insert([{ 
-        provider_id, category, provider_service_id, name, rate, min, max 
+        category, provider_service_id, name, rate, min, max 
       }]);
 
       if (error) {
         alert('Database Error: ' + error.message);
       } else { 
-        alert('Service added successfully!'); 
+        alert('Manual Service added successfully!'); 
+        document.getElementById('srv-category').value = '';
         document.getElementById('srv-name').value = ''; 
-        document.getElementById('srv-provider-id').value = '';
+        document.getElementById('srv-custom-id').value = '';
         document.getElementById('srv-rate').value = ''; 
         document.getElementById('srv-min').value = ''; 
         document.getElementById('srv-max').value = ''; 
+      }
+    }
+
+    async function openOrdersModal(filterType) {
+      document.getElementById('orders-modal').classList.remove('hidden');
+      document.getElementById('modal-orders-title').innerText = `${filterType} Orders Details`;
+      const container = document.getElementById('modal-orders-body');
+      container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
+
+      let orders = window.allSmmOrdersData || [];
+      if (filterType !== 'All') {
+        orders = orders.filter(o => o.status.toLowerCase() === filterType.toLowerCase());
+      }
+
+      if (orders.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">No orders found in this category.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      orders.forEach(order => {
+        container.innerHTML += `
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs">
+            <div class="space-y-1">
+              <p class="text-white font-bold">Order ID: <span class="text-cyan-400">${order.id.slice(0,8)}...</span></p>
+              <p class="text-gray-400">Link: <a href="${order.link}" target="_blank" class="text-amber-400 underline truncate max-w-[200px] inline-block align-bottom">${order.link}</a></p>
+              <p class="text-gray-400">Qty: <strong class="text-white">${order.quantity}</strong> | Charge: <strong class="text-emerald-400">$${order.charge}</strong></p>
+            </div>
+            <div class="text-right space-y-2">
+              <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : order.status === 'Processing' ? 'bg-blue-950 text-blue-400 border border-blue-500/40' : 'bg-amber-950 text-amber-400 border border-amber-500/40'}">${order.status}</span>
+              <div class="flex gap-1 justify-end pt-1">
+                <button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">Process</button>
+                <button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">Complete</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function closeOrdersModal() {
+      document.getElementById('orders-modal').classList.add('hidden');
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      const { error } = await supabase.from('smm_orders').update({ status: newStatus }).eq('id', orderId);
+      if (error) {
+        alert('Error updating status: ' + error.message);
+      } else {
+        alert(`Order marked as ${newStatus}!`);
+        loadSmmAdminStats();
+        openOrdersModal('All');
       }
     }
 
