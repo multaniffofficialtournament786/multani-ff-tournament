@@ -37,32 +37,39 @@
 
   <!-- HORIZONTAL SCROLLABLE COMPACT STATUS BUTTONS -->
   <div class="horizontal-scroll">
-    <button onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+    <button onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-list text-cyan-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">All Orders</span>
-        <h3 id="stat-all-orders" class="text-base font-bold font-gaming text-white">0</h3>
+        <h3 id="stat-all-orders" class="text-sm font-bold font-gaming text-white">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+    <button onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Pending</span>
-        <h3 id="stat-pending-orders" class="text-base font-bold font-gaming text-amber-400">0</h3>
+        <h3 id="stat-pending-orders" class="text-sm font-bold font-gaming text-amber-400">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+    <button onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-spinner text-blue-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Processing</span>
-        <h3 id="stat-processing-orders" class="text-base font-bold font-gaming text-blue-400">0</h3>
+        <h3 id="stat-processing-orders" class="text-sm font-bold font-gaming text-blue-400">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 shadow-md transition cursor-pointer">
+    <button onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Completed</span>
-        <h3 id="stat-completed-orders" class="text-base font-bold font-gaming text-emerald-400">0</h3>
+        <h3 id="stat-completed-orders" class="text-sm font-bold font-gaming text-emerald-400">0</h3>
+      </div>
+    </button>
+    <button onclick="openAllServicesModal()" class="bg-[#151922] border border-[#262f40] hover:border-purple-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+      <i class="fa-solid fa-layer-group text-purple-400 text-sm"></i>
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-gray-400 block">Manage</span>
+        <h3 class="text-sm font-bold font-gaming text-purple-400">All Services</h3>
       </div>
     </button>
   </div>
@@ -238,6 +245,19 @@
     </div>
   </div>
 
+  <!-- ALL SERVICES LIST MODAL -->
+  <div id="services-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
+        <h3 class="font-gaming text-base md:text-lg font-bold text-white uppercase">All Configured Services</h3>
+        <button onclick="closeAllServicesModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modal-services-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
+        <p class="text-gray-500 text-xs text-center py-6">Loading services...</p>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT LOGIC -->
   <script>
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
@@ -246,6 +266,7 @@
 
     async function initSmmAdmin() {
       loadSmmAdminStats();
+      loadAllServices();
     }
 
     function toggleServiceDropdown() {
@@ -263,7 +284,7 @@
     window.addEventListener('click', function(e) {
       const btn = document.getElementById('dropdown-toggle-btn');
       const dropdown = document.getElementById('custom-service-dropdown');
-      if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+      if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.add('hidden');
       }
     });
@@ -276,6 +297,13 @@
         document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
         document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
         document.getElementById('stat-completed-orders').innerText = data.filter(o => o.status === 'Completed').length;
+      }
+    }
+
+    async function loadAllServices() {
+      const { data, error } = await supabase.from('smm_services').select('*');
+      if (data) {
+        window.allSmmServicesData = data;
       }
     }
 
@@ -307,6 +335,7 @@
         document.getElementById('srv-min').value = ''; 
         document.getElementById('srv-max').value = ''; 
         document.getElementById('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
+        loadAllServices();
       }
     }
 
@@ -349,6 +378,50 @@
 
     function closeOrdersModal() {
       document.getElementById('orders-modal').classList.add('hidden');
+    }
+
+    async function openAllServicesModal() {
+      document.getElementById('services-modal').classList.remove('hidden');
+      const container = document.getElementById('modal-services-body');
+      container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
+
+      await loadAllServices();
+      let services = window.allSmmServicesData || [];
+
+      if (services.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">No services added yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      services.forEach(srv => {
+        container.innerHTML += `
+          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
+            <div class="space-y-1 truncate flex-1">
+              <p class="text-white font-bold"><span class="text-cyan-400">[${srv.category}]</span> ${srv.name}</p>
+              <p class="text-gray-400">Rate/1k: <strong class="text-emerald-400">$${srv.rate}</strong> | Min: ${srv.min} - Max: ${srv.max}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <button onclick="deleteService('${srv.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function closeAllServicesModal() {
+      document.getElementById('services-modal').classList.add('hidden');
+    }
+
+    async function deleteService(serviceId) {
+      if (!confirm('Are you sure you want to delete this service?')) return;
+      const { error } = await supabase.from('smm_services').delete().eq('id', serviceId);
+      if (error) {
+        alert('Error deleting service: ' + error.message);
+      } else {
+        alert('Service deleted successfully!');
+        openAllServicesModal();
+      }
     }
 
     async function updateOrderStatus(orderId, newStatus) {
