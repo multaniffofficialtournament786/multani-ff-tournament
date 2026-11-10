@@ -92,7 +92,7 @@
     .uid-tag { font-size: 11px; color: var(--accent-cyan); font-weight: 500; }
     .drawer-nav { flex: 1; overflow-y: auto; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
     .drawer-link { display: flex; align-items: center; gap: 14px; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
-    .drawer-link i { width: 18px; font-size: 16px; color: var(--text-dim); }
+    .drawer-link i { width: 18px; font-size: 16px; }
     .drawer-link:hover, .drawer-link:active { background: var(--bg-card); color: #fff; }
     .drawer-link.logout-link { color: var(--danger); }
     .drawer-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
@@ -306,24 +306,15 @@
     .vip-frame-2 { border: 3px solid #00f0ff; border-radius: 50%; animation: dragonGlowSilver 2.2s infinite ease-in-out; }
     .vip-frame-3 { border: 3px solid #ff7700; border-radius: 50%; animation: dragonGlowBronze 2.4s infinite ease-in-out; }
 
-    /* ALL DRAWER LINKS UNIFORM COLOR */
+    /* SIDEBAR COLORFUL ICONS STYLING */
     .side-drawer .drawer-nav .drawer-link {
       color: #c7cbd1 !important;
-    }
-    .side-drawer .drawer-nav .drawer-link i {
-      color: #8e9bb0 !important;
     }
     .side-drawer .drawer-nav .drawer-link:hover,
     .side-drawer .drawer-nav .drawer-link:active {
       background: var(--bg-card) !important;
       color: #ffffff !important;
     }
-    .side-drawer .drawer-nav .drawer-link:hover i,
-    .side-drawer .drawer-nav .drawer-link:active i {
-      color: var(--primary) !important;
-    }
-
-    /* Sirf Logout red rahega */
     .side-drawer .drawer-nav .drawer-link.logout-link {
       color: var(--danger) !important;
     }
@@ -768,33 +759,37 @@
           <img id="drawer-avatar" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-round" />
           <div class="user-meta">
             <h3 id="drawer-name">Guest Gamer</h3>
-            <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad"></i> UID: --</span>
+            <span id="drawer-uid" class="uid-tag"><i class="fa-solid fa-gamepad" style="color:#00f0ff;"></i> UID: --</span>
           </div>
         </div>
         <button id="btn-close-drawer" class="icon-btn" onclick="Drawer.close()"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <nav class="drawer-nav">
-        <button onclick="Router.navigate('games')" class="drawer-link"><i class="fa-solid fa-gamepad"></i> Mini Games</button>
-        <a href="chat.html" class="drawer-link" style="text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-comments"></i> Chat Room</a>
-        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house"></i> Home</button>
-        <button onclick="Router.navigate('spin')" class="drawer-link"><i class="fa-solid fa-dharmachakra"></i> Daily Spin Wheel</button>
-        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy"></i> Tournaments</button>
-        <button onclick="Router.navigate('winners')" class="drawer-link"><i class="fa-solid fa-medal"></i> Hall of Winners</button>
-        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet"></i> Wallet & History</button>
-        <button onclick="Router.navigate('withdrawal')" class="drawer-link"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw / Cashout</button>
-        <button onclick="Router.navigate('deposit')" class="drawer-link"><i class="fa-solid fa-circle-arrow-down"></i> Deposit Money</button>
-        <button onclick="Router.navigate('diamonds')" class="drawer-link"><i class="fa-solid fa-gem"></i> Buy FF Diamonds</button>
-        <button onclick="Router.navigate('invite')" class="drawer-link"><i class="fa-solid fa-user-plus"></i> Invite Friends & Rewards</button>
-        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
+        <button onclick="Router.navigate('games')" class="drawer-link"><i class="fa-solid fa-gamepad" style="color: #a855f7;"></i> Mini Games</button>
+        <a href="chat.html" class="drawer-link" style="text-decoration: none; display: flex; align-items: center; gap: 14px;"><i class="fas fa-comments" style="color: #3b82f6;"></i> Chat Room</a>
+        <button onclick="Router.navigate('home')" class="drawer-link"><i class="fa-solid fa-house" style="color: #00f0ff;"></i> Home</button>
+        
+        <!-- SMM SERVICES BUTTON ADDED HERE IN 3-LINE MENU WITH COLORFUL ICON -->
+        <a href="smm-service-control.html" class="drawer-link" style="text-decoration: none; display: flex; align-items: center; gap: 14px;"><i class="fa-solid fa-bullhorn" style="color: #ec4899;"></i> SMM Services</a>
+
+        <button onclick="Router.navigate('spin')" class="drawer-link"><i class="fa-solid fa-dharmachakra" style="color: #ffbe00;"></i> Daily Spin Wheel</button>
+        <button onclick="Router.navigate('tournaments')" class="drawer-link"><i class="fa-solid fa-trophy" style="color: #ffaa00;"></i> Tournaments</button>
+        <button onclick="Router.navigate('winners')" class="drawer-link"><i class="fa-solid fa-medal" style="color: #eab308;"></i> Hall of Winners</button>
+        <button onclick="Router.navigate('wallet')" class="drawer-link"><i class="fa-solid fa-wallet" style="color: #10b981;"></i> Wallet & History</button>
+        <button onclick="Router.navigate('withdrawal')" class="drawer-link"><i class="fa-solid fa-money-bill-transfer" style="color: #06b6d4;"></i> Withdraw / Cashout</button>
+        <button onclick="Router.navigate('deposit')" class="drawer-link"><i class="fa-solid fa-circle-arrow-down" style="color: #22c55e;"></i> Deposit Money</button>
+        <button onclick="Router.navigate('diamonds')" class="drawer-link"><i class="fa-solid fa-gem" style="color: #f43f5e;"></i> Buy FF Diamonds</button>
+        <button onclick="Router.navigate('invite')" class="drawer-link"><i class="fa-solid fa-user-plus" style="color: #8b5cf6;"></i> Invite Friends & Rewards</button>
+        <button onclick="Router.navigate('leaderboard')" class="drawer-link"><i class="fa-solid fa-ranking-star" style="color: #fbbf24;"></i> Leaderboard</button>
         <button onclick="Router.navigate('notifications')" class="drawer-link" style="display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="fa-solid fa-bell"></i> Notifications</span>
+          <span><i class="fa-solid fa-bell" style="color: #f59e0b;"></i> Notifications</span>
           <span id="drawer-notif-badge" class="hidden" style="background:var(--primary); color:#fff; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:10px;">New</span>
         </button>
-        <button onclick="openShareModal()" class="drawer-link"><i class="fa-solid fa-share-nodes"></i> Share App</button>
-        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja"></i> Profile & VIP Protocol</button>
-        <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull"></i> Rules (A to Z)</button>
-        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved"></i> About Us</button>
+        <button onclick="openShareModal()" class="drawer-link"><i class="fa-solid fa-share-nodes" style="color: #06b6d4;"></i> Share App</button>
+        <button onclick="Router.navigate('profile')" class="drawer-link"><i class="fa-solid fa-user-ninja" style="color: #6366f1;"></i> Profile & VIP Protocol</button>
+        <button onclick="Router.navigate('rules')" class="drawer-link"><i class="fa-solid fa-book-skull" style="color: #ef4444;"></i> Rules (A to Z)</button>
+        <button onclick="Router.navigate('about')" class="drawer-link"><i class="fa-solid fa-shield-halved" style="color: #14b8a6;"></i> About Us</button>
         <div class="drawer-divider"></div>
         <button id="btn-drawer-logout" class="drawer-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
