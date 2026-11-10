@@ -1,14 +1,5 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
-  // App ki memory ya localStorage se direct real balance uthana
-  let directBalance = 0;
-  try {
-    const storedUser = JSON.parse(localStorage.getItem('mff_user_profile') || localStorage.getItem('supabase.auth.token') || '{}');
-    directBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? storedUser?.balance ?? walletBalance ?? 208;
-  } catch(e) {
-    directBalance = 208;
-  }
-
   container.innerHTML = `
     <div style="padding: 16px; max-width: 430px; margin: 0 auto; font-family: 'Inter', sans-serif;">
       
@@ -17,7 +8,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
         <h2 style="font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #00f0ff; text-transform: uppercase; margin: 0;">SMM SERVICES & ORDERS</h2>
         <div style="background: #151922; border: 1px solid #262f40; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-wallet" style="color: #ffbe00; font-size: 14px;"></i>
-          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ${directBalance}</span>
+          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR 208</span>
         </div>
       </div>
 
@@ -81,12 +72,41 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  loadServicesAndOrders(user, directBalance, refreshCallback);
+  loadServicesAndOrders(user, refreshCallback);
 }
 
-async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
+async function loadServicesAndOrders(user, refreshCallback) {
   const supabase = window.supabase?.createClient('https://yzirjidgdxhljbhhjfqp.supabase.co', 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5');
   if (!supabase) return;
+
+  let activeWallet = 208; // Default fallback to your active balance
+  let currentUserObj = user;
+
+  try {
+    let { data: sessionData } = await supabase.auth.getSession();
+    currentUserObj = sessionData?.session?.user || user;
+
+    if (currentUserObj) {
+      // Try fetching from profiles table where balance is stored for players
+      let { data: profileData } = await supabase.from('profiles').select('balance').eq('id', currentUserObj.id).single();
+      if (profileData && profileData.balance !== undefined) {
+        activeWallet = Number(profileData.balance) || 0;
+      } else {
+        let { data: walletData } = await supabase.from('wallets').select('balance').eq('user_id', currentUserObj.id).single();
+        if (walletData && walletData.balance !== undefined) {
+          activeWallet = Number(walletData.balance) || 0;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Balance fetch error:", e);
+  }
+
+  // Update wallet display immediately
+  const walletDisplay = document.getElementById('smm-wallet-display');
+  if (walletDisplay) {
+    walletDisplay.textContent = `PKR ${activeWallet}`;
+  }
 
   let allServices = [];
   let selectedSrv = null;
@@ -167,7 +187,7 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
   }
 
   // Load History
-  if (user) {
+  if (currentUserObj) {
     try {
       let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
       const histBox = document.getElementById('smm-orders-history');
@@ -197,7 +217,7 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
     smmFormElem.addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!selectedSrv) return alert('Please select a service.');
-      if (!user) return alert('Please login first.');
+      if (!currentUserObj) return alert('Please login first.');
 
       const link = document.getElementById('smm-link-input')?.value.trim();
       const qty = Number(document.getElementById('smm-qty-input')?.value) || 0;
@@ -206,7 +226,7 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
       const charge = (qty / 1000) * rate;
 
       if (qty < min) return alert(`Minimum quantity is ${min}`);
-      if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
+      if (activeWallet < charge) return alert('Insufficient tournament wallet balance!');
 
       const btn = document.getElementById('smm-submit-btn');
       if (btn) {
@@ -215,13 +235,14 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
       }
 
       try {
-        const newBal = currentWallet - charge;
-        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', user.id);
-        if (wUp.error) {
-          await supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+        const newBal = activeWallet - charge;
+        let pUp = await supabase.from('profiles').update({ balance: newBal }).eq('id', currentUserObj.id);
+        if (pUp.error) {
+          await supabase.from('wallets').update({ balance: newBal }).eq('user_id', currentUserObj.id);
         }
 
         await supabase.from('smm_orders').insert([{
+          user_id: currentUserObj.id,
           order_id: Math.floor(100000 + Math.random() * 900000),
           service_name: selectedSrv.name,
           link: link,
