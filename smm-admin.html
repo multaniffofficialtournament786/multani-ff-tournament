@@ -84,7 +84,7 @@
         <!-- CUSTOM ICON DROPDOWN BUTTON -->
         <div class="relative">
           <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
-          <button type="button" onclick="toggleServiceDropdown()" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624]">
+          <button type="button" onclick="toggleServiceDropdown(event)" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624]">
             <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300">
               <i class="fa-solid fa-list-ul"></i> Choose Service with Icon...
             </span>
@@ -226,7 +226,7 @@
           <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
         </div>
       </div>
-      <button onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
+      <button type="button" onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
         SAVE MANUAL SERVICE
       </button>
     </div>
@@ -269,7 +269,8 @@
       loadAllServices();
     }
 
-    function toggleServiceDropdown() {
+    function toggleServiceDropdown(e) {
+      if(e) e.stopPropagation();
       const dropdown = document.getElementById('custom-service-dropdown');
       dropdown.classList.toggle('hidden');
     }
