@@ -1,7 +1,5 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
-  const activeBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? walletBalance ?? 0;
-
   container.innerHTML = `
     <div style="padding: 16px; max-width: 430px; margin: 0 auto; font-family: 'Inter', sans-serif;">
       
@@ -10,7 +8,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
         <h2 style="font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #00f0ff; text-transform: uppercase; margin: 0;">SMM SERVICES & ORDERS</h2>
         <div style="background: #151922; border: 1px solid #262f40; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-wallet" style="color: #ffbe00; font-size: 14px;"></i>
-          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ${activeBalance}</span>
+          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ...</span>
         </div>
       </div>
 
@@ -74,13 +72,47 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  loadServicesAndOrders(user, activeBalance, refreshCallback);
+  loadServicesAndWallet(user, refreshCallback);
 }
 
-async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
+async function loadServicesAndWallet(user, refreshCallback) {
   const supabase = window.supabase?.createClient('https://yzirjidgdxhljbhhjfqp.supabase.co', 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5');
   if (!supabase) return;
 
+  let currentWallet = 0;
+  let currentUserObj = user;
+
+  // 1. Fetch Real Wallet Balance directly from Supabase
+  try {
+    if (!currentUserObj) {
+      let { data: sessionData } = await supabase.auth.getSession();
+      currentUserObj = sessionData?.session?.user || null;
+    }
+
+    if (currentUserObj) {
+      // Check wallets table first
+      let { data: wData } = await supabase.from('wallets').select('balance').eq('user_id', currentUserObj.id).single();
+      if (wData) {
+        currentWallet = Number(wData.balance) || 0;
+      } else {
+        // Fallback to profiles table
+        let { data: pData } = await supabase.from('profiles').select('balance').eq('id', currentUserObj.id).single();
+        if (pData) {
+          currentWallet = Number(pData.balance) || 0;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Wallet fetch error:", e);
+  }
+
+  // Update wallet display on screen
+  const walletDisplay = document.getElementById('smm-wallet-display');
+  if (walletDisplay) {
+    walletDisplay.textContent = `PKR ${currentWallet}`;
+  }
+
+  // 2. Fetch SMM Services
   let allServices = [];
   let selectedSrv = null;
 
@@ -159,9 +191,10 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
     if (totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
-  if (user) {
+  // 3. Load Orders History
+  if (currentUserObj) {
     try {
-      let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
+      let { data: ords } = await supabase.from('smm_orders').select('*').eq('user_id', currentUserObj.id).order('created_at', { ascending: false }).limit(10);
       const histBox = document.getElementById('smm-orders-history');
       if (histBox) {
         if (!ords || ords.length === 0) {
@@ -183,12 +216,13 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
     }
   }
 
+  // 4. Form Submit & Order Placement
   const smmFormElem = document.getElementById('app-smm-form');
   if (smmFormElem) {
     smmFormElem.addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!selectedSrv) return alert('Please select a service.');
-      if (!user) return alert('Please login first.');
+      if (!currentUserObj) return alert('Please login first.');
 
       const link = document.getElementById('smm-link-input')?.value.trim();
       const qty = Number(document.getElementById('smm-qty-input')?.value) || 0;
@@ -207,12 +241,13 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
 
       try {
         const newBal = currentWallet - charge;
-        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', user.id);
+        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', currentUserObj.id);
         if (wUp.error) {
-          await supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+          await supabase.from('profiles').update({ balance: newBal }).eq('id', currentUserObj.id);
         }
 
         await supabase.from('smm_orders').insert([{
+          user_id: currentUserObj.id,
           order_id: Math.floor(100000 + Math.random() * 900000),
           service_name: selectedSrv.name,
           link: link,
