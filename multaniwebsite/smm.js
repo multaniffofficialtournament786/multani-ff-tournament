@@ -1,12 +1,15 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
+  // Get active balance from state or profile if passed
+  const activeBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? walletBalance ?? 0;
+
   container.innerHTML = `
     <div class="view-container space-y-4">
       <div class="flex items-center justify-between border-b border-[#262f40] pb-3">
         <h2 class="font-gaming text-lg font-bold text-cyan-400">SMM SERVICES & ORDERS</h2>
         <div class="bg-[#151922] border border-[#262f40] px-3 py-1.5 rounded-lg flex items-center gap-2">
           <i class="fa-solid fa-wallet text-amber-400 text-sm"></i>
-          <span id="smm-wallet-display" class="text-xs font-bold text-amber-400">PKR ${walletBalance || 0}</span>
+          <span id="smm-wallet-display" class="text-xs font-bold text-amber-400">PKR ${activeBalance}</span>
         </div>
       </div>
 
@@ -69,7 +72,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  loadServicesAndOrders(user, walletBalance, refreshCallback);
+  loadServicesAndOrders(user, activeBalance, refreshCallback);
 }
 
 async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
@@ -80,26 +83,29 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
   let selectedSrv = null;
 
   try {
-    let { data: srvs } = await supabase.from('smm_services').select('*');
+    let { data: srvs, error } = await supabase.from('smm_services').select('*');
+    if (error) console.error("Error fetching services:", error);
     allServices = srvs || [];
 
-    const cats = [...new Set(allServices.map(s => s.category))];
+    const cats = [...new Set(allServices.map(s => s.category).filter(Boolean))];
     const catSel = document.getElementById('smm-cat-select');
-    if(catSel) {
+    if (catSel) {
       catSel.innerHTML = '<option value="">-- Choose Category --</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
     }
   } catch (e) {
-    console.error(e);
+    console.error("SMM Services load error:", e);
   }
 
   const catSelectElem = document.getElementById('smm-cat-select');
-  if(catSelectElem) {
+  if (catSelectElem) {
     catSelectElem.addEventListener('change', function() {
       const cat = this.value;
       const srvSel = document.getElementById('smm-srv-select');
+      if (!srvSel) return;
       srvSel.innerHTML = '<option value="">-- Choose Service --</option>';
       srvSel.disabled = true;
-      document.getElementById('smm-info-box').classList.add('hidden');
+      const infoBox = document.getElementById('smm-info-box');
+      if (infoBox) infoBox.classList.add('hidden');
       selectedSrv = null;
       calcTotal();
 
@@ -111,40 +117,47 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
   }
 
   const srvSelectElem = document.getElementById('smm-srv-select');
-  if(srvSelectElem) {
+  if (srvSelectElem) {
     srvSelectElem.addEventListener('change', function() {
       const srvId = this.value;
       selectedSrv = allServices.find(s => s.id == srvId);
       if (selectedSrv) {
-        document.getElementById('smm-info-rate').textContent = `${selectedSrv.rate} PKR`;
-        document.getElementById('smm-info-min').textContent = selectedSrv.min || 1;
-        document.getElementById('smm-info-box').classList.remove('hidden');
-        document.getElementById('smm-qty-input').value = selectedSrv.min || 10;
+        const rateElem = document.getElementById('smm-info-rate');
+        const minElem = document.getElementById('smm-info-min');
+        const infoBox = document.getElementById('smm-info-box');
+        const qtyInput = document.getElementById('smm-qty-input');
+
+        if (rateElem) rateElem.textContent = `${selectedSrv.rate} PKR`;
+        if (minElem) minElem.textContent = selectedSrv.min || 1;
+        if (infoBox) infoBox.classList.remove('hidden');
+        if (qtyInput) qtyInput.value = selectedSrv.min || 10;
         calcTotal();
       } else {
-        document.getElementById('smm-info-box').classList.add('hidden');
+        const infoBox = document.getElementById('smm-info-box');
+        if (infoBox) infoBox.classList.add('hidden');
       }
     });
   }
 
   const qtyInputElem = document.getElementById('smm-qty-input');
-  if(qtyInputElem) {
+  if (qtyInputElem) {
     qtyInputElem.addEventListener('input', calcTotal);
   }
 
   function calcTotal() {
+    const totalChargeElem = document.getElementById('smm-total-charge');
     if (!selectedSrv) {
-      const totalChargeElem = document.getElementById('smm-total-charge');
-      if(totalChargeElem) totalChargeElem.textContent = 'PKR 0';
+      if (totalChargeElem) totalChargeElem.textContent = 'PKR 0';
       return;
     }
-    const q = Number(document.getElementById('smm-qty-input').value) || 0;
+    const qElem = document.getElementById('smm-qty-input');
+    const q = qElem ? Number(qElem.value) || 0 : 0;
     const r = Number(selectedSrv.rate) || 0;
     const tot = (q / 1000) * r;
-    const totalChargeElem = document.getElementById('smm-total-charge');
-    if(totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
+    if (totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
+  // Load History
   if (user) {
     try {
       let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
@@ -165,19 +178,20 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
         }
       }
     } catch (e) {
-      console.error(e);
+      console.error("History load error:", e);
     }
   }
 
+  // Form Submit
   const smmFormElem = document.getElementById('app-smm-form');
-  if(smmFormElem) {
+  if (smmFormElem) {
     smmFormElem.addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!selectedSrv) return alert('Please select a service.');
       if (!user) return alert('Please login first.');
 
-      const link = document.getElementById('smm-link-input').value.trim();
-      const qty = Number(document.getElementById('smm-qty-input').value);
+      const link = document.getElementById('smm-link-input')?.value.trim();
+      const qty = Number(document.getElementById('smm-qty-input')?.value) || 0;
       const min = selectedSrv.min || 1;
       const rate = Number(selectedSrv.rate) || 0;
       const charge = (qty / 1000) * rate;
@@ -186,8 +200,10 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
       if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
 
       const btn = document.getElementById('smm-submit-btn');
-      btn.disabled = true;
-      btn.textContent = 'PLACING...';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'PLACING...';
+      }
 
       try {
         const newBal = currentWallet - charge;
@@ -210,8 +226,10 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
       } catch (err) {
         alert('Error: ' + err.message);
       } finally {
-        btn.disabled = false;
-        btn.textContent = 'PLACE SMM ORDER';
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'PLACE SMM ORDER';
+        }
       }
     });
   }
