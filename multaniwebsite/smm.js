@@ -1,74 +1,76 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
-  // Get active balance from state or profile if passed
   const activeBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? walletBalance ?? 0;
 
   container.innerHTML = `
-    <div class="view-container space-y-4">
-      <div class="flex items-center justify-between border-b border-[#262f40] pb-3">
-        <h2 class="font-gaming text-lg font-bold text-cyan-400">SMM SERVICES & ORDERS</h2>
-        <div class="bg-[#151922] border border-[#262f40] px-3 py-1.5 rounded-lg flex items-center gap-2">
-          <i class="fa-solid fa-wallet text-amber-400 text-sm"></i>
-          <span id="smm-wallet-display" class="text-xs font-bold text-amber-400">PKR ${activeBalance}</span>
+    <div style="padding: 16px; max-width: 430px; margin: 0 auto; font-family: 'Inter', sans-serif;">
+      
+      <!-- Top Header & Wallet Bar -->
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #262f40; padding-bottom: 12px; margin-bottom: 16px;">
+        <h2 style="font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #00f0ff; text-transform: uppercase; margin: 0;">SMM SERVICES & ORDERS</h2>
+        <div style="background: #151922; border: 1px solid #262f40; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-wallet" style="color: #ffbe00; font-size: 14px;"></i>
+          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ${activeBalance}</span>
         </div>
       </div>
 
       <!-- Buy SMM Service Card -->
-      <div class="bg-[#0e1118] border border-[#262f40] p-4 rounded-2xl space-y-3.5 shadow-xl">
-        <h3 class="font-gaming text-sm font-bold uppercase text-white flex items-center gap-2">
-          <i class="fa-solid fa-cart-shopping text-cyan-400"></i> Buy SMM Service
+      <div style="background: #0e1118; border: 1.5px solid #262f40; border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+        <h3 style="font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; margin: 0 0 14px 0; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-cart-shopping" style="color: #00f0ff;"></i> Buy SMM Service
         </h3>
 
-        <form id="app-smm-form" class="space-y-3 text-xs">
+        <form id="app-smm-form" style="display: flex; flex-direction: column; gap: 12px;">
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Select Category</label>
-            <select id="smm-cat-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-white text-sm outline-none">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #8e9bb0; margin-bottom: 6px; text-transform: uppercase;">Select Category / App</label>
+            <select id="smm-cat-select" style="width: 100%; background: #06070a; border: 1px solid #262f40; border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none;">
               <option value="">-- Choose Category --</option>
             </select>
           </div>
 
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Select Service</label>
-            <select id="smm-srv-select" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-white text-sm outline-none" disabled>
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #8e9bb0; margin-bottom: 6px; text-transform: uppercase;">Select Service</label>
+            <select id="smm-srv-select" disabled style="width: 100%; background: #06070a; border: 1px solid #262f40; border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none;">
               <option value="">-- Choose Category First --</option>
             </select>
           </div>
 
-          <div id="smm-info-box" class="bg-[#151922] p-2.5 rounded-xl text-gray-400 text-xs hidden space-y-1 border border-[#262f40]">
-            <p>Rate per 1000: <strong id="smm-info-rate" class="text-emerald-400">0 PKR</strong></p>
-            <p>Min Qty: <strong id="smm-info-min" class="text-white">0</strong></p>
+          <div id="smm-info-box" style="background: #151922; padding: 10px 12px; border-radius: 10px; font-size: 12px; color: #8e9bb0; display: none; border: 1px solid #262f40;">
+            <p style="margin: 0 0 4px 0;">Rate per 1000: <strong id="smm-info-rate" style="color: #00e676;">0 PKR</strong></p>
+            <p style="margin: 0;">Min Qty: <strong id="smm-info-min" style="color: #fff;">0</strong></p>
           </div>
 
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Target Link / Profile URL</label>
-            <input id="smm-link-input" type="url" placeholder="https://instagram.com/username" required class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-white text-sm outline-none">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #8e9bb0; margin-bottom: 6px; text-transform: uppercase;">Target Link / Profile URL</label>
+            <input id="smm-link-input" type="url" placeholder="https://instagram.com/username" required style="width: 100%; background: #06070a; border: 1px solid #262f40; border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none;">
           </div>
 
           <div>
-            <label class="block font-bold text-gray-300 mb-1">Quantity</label>
-            <input id="smm-qty-input" type="number" min="1" placeholder="100" required class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-white text-sm outline-none">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #8e9bb0; margin-bottom: 6px; text-transform: uppercase;">Quantity</label>
+            <input id="smm-qty-input" type="number" min="1" placeholder="100" required style="width: 100%; background: #06070a; border: 1px solid #262f40; border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none;">
           </div>
 
-          <div class="bg-[#151922] p-3 rounded-xl flex justify-between items-center border border-[#262f40]">
-            <span class="text-gray-300 font-bold">Total Charge:</span>
-            <span id="smm-total-charge" class="font-gaming text-base font-bold text-amber-400">PKR 0</span>
+          <div style="background: #151922; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #262f40;">
+            <span style="color: #8e9bb0; font-size: 12px; font-weight: 600; text-transform: uppercase;">Total Charge:</span>
+            <span id="smm-total-charge" style="font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: #ffbe00;">PKR 0</span>
           </div>
 
-          <button type="submit" id="smm-submit-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-xl font-gaming font-bold uppercase text-sm tracking-wide transition shadow-lg">
+          <button type="submit" id="smm-submit-btn" style="width: 100%; background: linear-gradient(135deg, #00f0ff, #0072ff); color: #000; border: none; padding: 14px; border-radius: 10px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 800; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 14px rgba(0,240,255,0.3);">
             PLACE SMM ORDER
           </button>
         </form>
       </div>
 
-      <!-- My Orders History -->
-      <div class="bg-[#0e1118] border border-[#262f40] p-4 rounded-2xl space-y-3 shadow-xl">
-        <h3 class="font-gaming text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> My SMM Orders
+      <!-- My Orders History Card -->
+      <div style="background: #0e1118; border: 1.5px solid #262f40; border-radius: 16px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+        <h3 style="font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: #8e9bb0; text-transform: uppercase; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-clock-rotate-left" style="color: #ffbe00;"></i> My SMM Orders History
         </h3>
-        <div id="smm-orders-history" class="space-y-2 max-h-48 overflow-y-auto sidebar-scroll">
-          <p class="text-gray-500 text-center py-3 text-xs">Loading orders...</p>
+        <div id="smm-orders-history" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+          <p style="color: #5c687a; text-align: center; padding: 12px; font-size: 12px; margin: 0;">Loading orders...</p>
         </div>
       </div>
+
     </div>
   `;
 
@@ -105,7 +107,7 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
       srvSel.innerHTML = '<option value="">-- Choose Service --</option>';
       srvSel.disabled = true;
       const infoBox = document.getElementById('smm-info-box');
-      if (infoBox) infoBox.classList.add('hidden');
+      if (infoBox) infoBox.style.display = 'none';
       selectedSrv = null;
       calcTotal();
 
@@ -129,12 +131,12 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
 
         if (rateElem) rateElem.textContent = `${selectedSrv.rate} PKR`;
         if (minElem) minElem.textContent = selectedSrv.min || 1;
-        if (infoBox) infoBox.classList.remove('hidden');
+        if (infoBox) infoBox.style.display = 'block';
         if (qtyInput) qtyInput.value = selectedSrv.min || 10;
         calcTotal();
       } else {
         const infoBox = document.getElementById('smm-info-box');
-        if (infoBox) infoBox.classList.add('hidden');
+        if (infoBox) infoBox.style.display = 'none';
       }
     });
   }
@@ -157,22 +159,21 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
     if (totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
-  // Load History
   if (user) {
     try {
       let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
       const histBox = document.getElementById('smm-orders-history');
       if (histBox) {
         if (!ords || ords.length === 0) {
-          histBox.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">No orders found.</p>';
+          histBox.innerHTML = '<p style="color: #5c687a; text-align: center; padding: 12px; font-size: 12px; margin: 0;">No orders found.</p>';
         } else {
           histBox.innerHTML = ords.map(o => `
-            <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-xl flex justify-between items-center text-xs">
+            <div style="background: #06070a; border: 1px solid #262f40; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
               <div>
-                <p class="text-white font-bold">${o.service_name}</p>
-                <p class="text-gray-400 text-[10px]">Qty: ${o.quantity} | Charge: <span class="text-amber-400">PKR ${o.charge || 0}</span></p>
+                <p style="color: #fff; font-weight: bold; margin: 0 0 2px 0;">${o.service_name}</p>
+                <p style="color: #8e9bb0; font-size: 10px; margin: 0;">Qty: ${o.quantity} | Charge: <span style="color: #ffbe00;">PKR ${o.charge || 0}</span></p>
               </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-800 text-amber-400">${o.status || 'Pending'}</span>
+              <span style="padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; background: #1f2636; color: #ffbe00;">${o.status || 'Pending'}</span>
             </div>
           `).join('');
         }
@@ -182,7 +183,6 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
     }
   }
 
-  // Form Submit
   const smmFormElem = document.getElementById('app-smm-form');
   if (smmFormElem) {
     smmFormElem.addEventListener('submit', async function(e) {
