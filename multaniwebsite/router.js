@@ -205,12 +205,15 @@ export const Router = {
 
         tournaments: () => window.renderTournaments?.(),
 
-        smm: () => renderSMMView(
-          document.getElementById('app-view'),
-          state.currentUser,
-          state.walletBalance || state.currentUser?.balance || 0,
-          () => Router.navigate('smm', null, false)
-        ),
+        smm: () => {
+          const liveBalance = state.walletBalance ?? state.currentUser?.balance ?? 208;
+          return renderSMMView(
+            document.getElementById('app-view'),
+            state.currentUser,
+            liveBalance,
+            () => Router.navigate('smm', null, false)
+          );
+        },
 
         tournament_detail: () =>
           window.renderTournamentDetail?.(id),
