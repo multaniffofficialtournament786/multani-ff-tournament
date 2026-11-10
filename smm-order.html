@@ -27,19 +27,19 @@ body{font-family:Inter,sans-serif;background:#06070a;color:#f3f4f6}
 </div>
 <div class="bg-[#151922] border border-[#262f40] px-3 py-1.5 rounded-lg flex items-center gap-2">
 <i class="fa-solid fa-wallet text-amber-400 text-sm"></i>
-<span id="player-wallet-balance" class="text-xs font-bold text-amber-400">PKR 0</span>
+<span id="player-wallet-balance" class="text-xs font-bold text-amber-400">Loading...</span>
 </div>
 </div>
 
-<!-- Order Form Card -->
+<!-- Player Order Form Card -->
 <div class="bg-[#0e1118] border border-[#262f40] p-4 md:p-6 rounded-2xl space-y-4 shadow-xl">
 <h2 class="font-gaming text-base font-bold uppercase text-white flex items-center gap-2">
-<i class="fa-solid fa-cart-shopping text-cyan-400"></i> New SMM Order
+<i class="fa-solid fa-cart-shopping text-cyan-400"></i> Buy SMM Service
 </h2>
 
-<form id="smm-order-form" class="space-y-3.5 text-xs">
+<form id="player-smm-order-form" class="space-y-3.5 text-xs">
 <div>
-<label class="block font-bold text-gray-300 mb-1">Select Category</label>
+<label class="block font-bold text-gray-300 mb-1">Select Category / App</label>
 <select id="order-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm outline-none focus:border-cyan-500">
 <option value="">-- Choose Category --</option>
 </select>
@@ -48,12 +48,12 @@ body{font-family:Inter,sans-serif;background:#06070a;color:#f3f4f6}
 <div>
 <label class="block font-bold text-gray-300 mb-1">Select Service</label>
 <select id="order-service" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm outline-none focus:border-cyan-500" disabled>
-<option value="">-- Choose Service First --</option>
+<option value="">-- Choose Category First --</option>
 </select>
 </div>
 
 <div id="service-info-box" class="bg-[#151922] p-3 rounded-xl text-gray-400 text-xs hidden space-y-1 border border-[#262f40]">
-<p>Rate per 1k: <strong id="info-rate" class="text-emerald-400">0 PKR</strong></p>
+<p>Rate per 1000: <strong id="info-rate" class="text-emerald-400">0 PKR</strong></p>
 <p>Min Qty: <strong id="info-min" class="text-white">0</strong> | Max Qty: <strong id="info-max" class="text-white">100000</strong></p>
 </div>
 
@@ -80,10 +80,10 @@ PLACE SMM ORDER
 </form>
 </div>
 
-<!-- My Orders History Section -->
+<!-- Player Recent Orders History -->
 <div class="bg-[#0e1118] border border-[#262f40] p-4 rounded-2xl space-y-3 shadow-xl">
 <h3 class="font-gaming font-bold text-sm text-gray-300 uppercase flex items-center gap-2">
-<i class="fa-solid fa-clock-rotate-left text-amber-400"></i> My Recent Orders
+<i class="fa-solid fa-clock-rotate-left text-amber-400"></i> My SMM Orders History
 </h3>
 <div id="player-orders-list" class="space-y-2 max-h-60 overflow-y-auto sidebar-scroll">
 <p class="text-gray-500 text-center py-4 text-xs">Loading your orders...</p>
@@ -110,13 +110,11 @@ const { data: { session } } = await supabaseClient.auth.getSession();
 if (session && session.user) {
 currentUser = session.user;
 fetchWallet(currentUser.id);
-fetchServices();
 fetchPlayerOrders(currentUser.id);
 } else {
-// Fallback for testing or guest
-$('player-wallet-balance').textContent = 'PKR 0';
-fetchServices();
+$('player-wallet-balance').textContent = 'PKR 0 (Guest)';
 }
+fetchServices();
 } catch (e) {
 console.error(e);
 }
@@ -134,6 +132,7 @@ userWalletBalance = data.balance || 0;
 $('player-wallet-balance').textContent = `PKR ${userWalletBalance}`;
 } catch (err) {
 console.error('Wallet fetch error:', err);
+$('player-wallet-balance').textContent = 'PKR 0';
 }
 }
 
@@ -222,9 +221,13 @@ container.innerHTML = '<p class="text-red-400 text-center py-2 text-xs">Could no
 }
 }
 
-$('smm-order-form').addEventListener('submit', async function(e) {
+$('player-smm-order-form').addEventListener('submit', async function(e) {
 e.preventDefault();
 if (!selectedServiceObj) return alert('Please select a service.');
+
+if (!currentUser) {
+return alert('Please login to your tournament account first to place an order.');
+}
 
 const link = $('order-link').value.trim();
 const quantity = Number($('order-quantity').value);
@@ -236,8 +239,8 @@ if (quantity < min) {
 return alert(`Minimum quantity for this service is ${min}`);
 }
 
-if (currentUser && userWalletBalance < totalCharge) {
-return alert('Insufficient wallet balance! Please deposit money first.');
+if (userWalletBalance < totalCharge) {
+return alert('Insufficient tournament wallet balance! Please deposit money first.');
 }
 
 const btn = $('submit-order-btn');
@@ -245,8 +248,7 @@ btn.disabled = true;
 btn.textContent = 'PLACING ORDER...';
 
 try {
-// 1. Deduct Wallet if logged in
-if (currentUser) {
+// 1. Deduct from tournament wallet
 const newBalance = userWalletBalance - totalCharge;
 let walletUpdate = await supabaseClient.from('wallets').update({ balance: newBalance }).eq('user_id', currentUser.id);
 if (walletUpdate.error) {
@@ -255,9 +257,8 @@ if (profileUpdate.error) throw new Error('Wallet deduction failed.');
 }
 userWalletBalance = newBalance;
 $('player-wallet-balance').textContent = `PKR ${userWalletBalance}`;
-}
 
-// 2. Insert Order into smm_orders table
+// 2. Insert into smm_orders for admin control
 const orderRecord = {
 order_id: Math.floor(100000 + Math.random() * 900000),
 service_name: selectedServiceObj.name,
@@ -270,10 +271,10 @@ status: 'Pending'
 const { error } = await supabaseClient.from('smm_orders').insert([orderRecord]);
 if (error) throw error;
 
-alert('SMM Order placed successfully! Admin will process it soon.');
+alert('SMM Order placed successfully! Amount deducted from wallet. Admin will process it soon.');
 $('order-link').value = '';
 $('order-quantity').value = '';
-if (currentUser) fetchPlayerOrders(currentUser.id);
+fetchPlayerOrders(currentUser.id);
 } catch (err) {
 console.error(err);
 alert('Order placement failed: ' + err.message);
