@@ -69,7 +69,6 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  // Logic integration
   loadServicesAndOrders(user, walletBalance, refreshCallback);
 }
 
@@ -86,120 +85,134 @@ async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
 
     const cats = [...new Set(allServices.map(s => s.category))];
     const catSel = document.getElementById('smm-cat-select');
-    catSel.innerHTML = '<option value="">-- Choose Category --</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    if(catSel) {
+      catSel.innerHTML = '<option value="">-- Choose Category --</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
   } catch (e) {
     console.error(e);
   }
 
-  document.getElementById('smm-cat-select').addEventListener('change', function() {
-    const cat = this.value;
-    const srvSel = document.getElementById('smm-srv-select');
-    srvSel.innerHTML = '<option value="">-- Choose Service --</option>';
-    srvSel.disabled = true;
-    document.getElementById('smm-info-box').classList.add('hidden');
-    selectedSrv = null;
-    calcTotal();
-
-    if (!cat) return;
-    const filtered = allServices.filter(s => s.category === cat);
-    srvSel.innerHTML = '<option value="">-- Choose Service --</option>' + filtered.map(s => `<option value="${s.id}">${s.name} (Rate: ${s.rate})</option>`).join('');
-    srvSel.disabled = false;
-  });
-
-  document.getElementById('smm-srv-select').addEventListener('change', function() {
-    const srvId = this.value;
-    selectedSrv = allServices.find(s => s.id == srvId);
-    if (selectedSrv) {
-      document.getElementById('smm-info-rate').textContent = `${selectedSrv.rate} PKR`;
-      document.getElementById('smm-info-min').textContent = selectedSrv.min || 1;
-      document.getElementById('smm-info-box').classList.remove('hidden');
-      document.getElementById('smm-qty-input').value = selectedSrv.min || 10;
-      calcTotal();
-    } else {
+  const catSelectElem = document.getElementById('smm-cat-select');
+  if(catSelectElem) {
+    catSelectElem.addEventListener('change', function() {
+      const cat = this.value;
+      const srvSel = document.getElementById('smm-srv-select');
+      srvSel.innerHTML = '<option value="">-- Choose Service --</option>';
+      srvSel.disabled = true;
       document.getElementById('smm-info-box').classList.add('hidden');
-    }
-  });
+      selectedSrv = null;
+      calcTotal();
 
-  document.getElementById('smm-qty-input').addEventListener('input', calcTotal);
+      if (!cat) return;
+      const filtered = allServices.filter(s => s.category === cat);
+      srvSel.innerHTML = '<option value="">-- Choose Service --</option>' + filtered.map(s => `<option value="${s.id}">${s.name} (Rate: ${s.rate})</option>`).join('');
+      srvSel.disabled = false;
+    });
+  }
+
+  const srvSelectElem = document.getElementById('smm-srv-select');
+  if(srvSelectElem) {
+    srvSelectElem.addEventListener('change', function() {
+      const srvId = this.value;
+      selectedSrv = allServices.find(s => s.id == srvId);
+      if (selectedSrv) {
+        document.getElementById('smm-info-rate').textContent = `${selectedSrv.rate} PKR`;
+        document.getElementById('smm-info-min').textContent = selectedSrv.min || 1;
+        document.getElementById('smm-info-box').classList.remove('hidden');
+        document.getElementById('smm-qty-input').value = selectedSrv.min || 10;
+        calcTotal();
+      } else {
+        document.getElementById('smm-info-box').classList.add('hidden');
+      }
+    });
+  }
+
+  const qtyInputElem = document.getElementById('smm-qty-input');
+  if(qtyInputElem) {
+    qtyInputElem.addEventListener('input', calcTotal);
+  }
 
   function calcTotal() {
     if (!selectedSrv) {
-      document.getElementById('smm-total-charge').textContent = 'PKR 0';
+      const totalChargeElem = document.getElementById('smm-total-charge');
+      if(totalChargeElem) totalChargeElem.textContent = 'PKR 0';
       return;
     }
     const q = Number(document.getElementById('smm-qty-input').value) || 0;
     const r = Number(selectedSrv.rate) || 0;
     const tot = (q / 1000) * r;
-    document.getElementById('smm-total-charge').textContent = `PKR ${tot.toFixed(2)}`;
+    const totalChargeElem = document.getElementById('smm-total-charge');
+    if(totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
-  // Load History
   if (user) {
     try {
       let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
       const histBox = document.getElementById('smm-orders-history');
-      if (!ords || ords.length === 0) {
-        histBox.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">No orders found.</p>';
-      } else {
-        histBox.innerHTML = ords.map(o => `
-          <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-xl flex justify-between items-center text-xs">
-            <div>
-              <p class="text-white font-bold">${o.service_name}</p>
-              <p class="text-gray-400 text-[10px]">Qty: ${o.quantity} | Charge: <span class="text-amber-400">PKR ${o.charge || 0}</span></p>
+      if (histBox) {
+        if (!ords || ords.length === 0) {
+          histBox.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">No orders found.</p>';
+        } else {
+          histBox.innerHTML = ords.map(o => `
+            <div class="bg-[#06070a] border border-[#262f40] p-2.5 rounded-xl flex justify-between items-center text-xs">
+              <div>
+                <p class="text-white font-bold">${o.service_name}</p>
+                <p class="text-gray-400 text-[10px]">Qty: ${o.quantity} | Charge: <span class="text-amber-400">PKR ${o.charge || 0}</span></p>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-800 text-amber-400">${o.status || 'Pending'}</span>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-800 text-amber-400">${o.status || 'Pending'}</span>
-          </div>
-        `).join('');
+          `).join('');
+        }
       }
     } catch (e) {
       console.error(e);
     }
   }
 
-  // Form Submit
-  document.getElementById('app-smm-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    if (!selectedSrv) return alert('Please select a service.');
-    if (!user) return alert('Please login first.');
+  const smmFormElem = document.getElementById('app-smm-form');
+  if(smmFormElem) {
+    smmFormElem.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!selectedSrv) return alert('Please select a service.');
+      if (!user) return alert('Please login first.');
 
-    const link = document.getElementById('smm-link-input').value.trim();
-    const qty = Number(document.getElementById('smm-qty-input').value);
-    const min = selectedSrv.min || 1;
-    const rate = Number(selectedSrv.rate) || 0;
-    const charge = (qty / 1000) * rate;
+      const link = document.getElementById('smm-link-input').value.trim();
+      const qty = Number(document.getElementById('smm-qty-input').value);
+      const min = selectedSrv.min || 1;
+      const rate = Number(selectedSrv.rate) || 0;
+      const charge = (qty / 1000) * rate;
 
-    if (qty < min) return alert(`Minimum quantity is ${min}`);
-    if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
+      if (qty < min) return alert(`Minimum quantity is ${min}`);
+      if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
 
-    const btn = document.getElementById('smm-submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'PLACING...';
+      const btn = document.getElementById('smm-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'PLACING...';
 
-    try {
-      // 1. Deduct wallet
-      const newBal = currentWallet - charge;
-      let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', user.id);
-      if (wUp.error) {
-        await supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+      try {
+        const newBal = currentWallet - charge;
+        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', user.id);
+        if (wUp.error) {
+          await supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+        }
+
+        await supabase.from('smm_orders').insert([{
+          order_id: Math.floor(100000 + Math.random() * 900000),
+          service_name: selectedSrv.name,
+          link: link,
+          quantity: qty,
+          charge: charge,
+          status: 'Pending'
+        }]);
+
+        alert('Order placed successfully! Wallet balance updated.');
+        if (typeof refreshCallback === 'function') refreshCallback();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'PLACE SMM ORDER';
       }
-
-      // 2. Insert order
-      await supabase.from('smm_orders').insert([{
-        order_id: Math.floor(100000 + Math.random() * 900000),
-        service_name: selectedSrv.name,
-        link: link,
-        quantity: qty,
-        charge: charge,
-        status: 'Pending'
-      }]);
-
-      alert('Order placed successfully! Wallet balance updated.');
-      if (typeof refreshCallback === 'function') refreshCallback();
-    } catch (err) {
-      alert('Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'PLACE SMM ORDER';
-    }
-  });
+    });
+  }
 }
