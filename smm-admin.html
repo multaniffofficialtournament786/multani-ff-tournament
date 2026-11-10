@@ -84,7 +84,7 @@
         <!-- CUSTOM ICON DROPDOWN BUTTON -->
         <div class="relative">
           <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
-          <button type="button" onclick="toggleServiceDropdown(event)" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624]">
+          <button type="button" onclick="toggleServiceDropdown(event)" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624] cursor-pointer">
             <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300">
               <i class="fa-solid fa-list-ul"></i> Choose Service with Icon...
             </span>
@@ -237,7 +237,7 @@
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
         <h3 id="modal-orders-title" class="font-gaming text-base md:text-lg font-bold text-white uppercase">Orders List</h3>
-        <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
         <p class="text-gray-500 text-xs text-center py-6">Loading orders...</p>
@@ -250,7 +250,7 @@
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
         <h3 class="font-gaming text-base md:text-lg font-bold text-white uppercase">All Configured Services</h3>
-        <button onclick="closeAllServicesModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button onclick="closeAllServicesModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="modal-services-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
         <p class="text-gray-500 text-xs text-center py-6">Loading services...</p>
@@ -264,15 +264,20 @@
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    window.allSmmOrdersData = [];
+    window.allSmmServicesData = [];
+
     async function initSmmAdmin() {
-      loadSmmAdminStats();
-      loadAllServices();
+      await loadSmmAdminStats();
+      await loadAllServices();
     }
 
     function toggleServiceDropdown(e) {
       if(e) e.stopPropagation();
       const dropdown = document.getElementById('custom-service-dropdown');
-      dropdown.classList.toggle('hidden');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
     }
 
     function selectServiceItem(category, serviceName, htmlLabel) {
@@ -291,52 +296,64 @@
     });
 
     async function loadSmmAdminStats() {
-      const { data, error } = await supabase.from('smm_orders').select('*');
-      if (data) {
-        window.allSmmOrdersData = data;
-        document.getElementById('stat-all-orders').innerText = data.length;
-        document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
-        document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
-        document.getElementById('stat-completed-orders').innerText = data.filter(o => o.status === 'Completed').length;
+      try {
+        const { data, error } = await supabase.from('smm_orders').select('*');
+        if (!error && data) {
+          window.allSmmOrdersData = data;
+          document.getElementById('stat-all-orders').innerText = data.length;
+          document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
+          document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
+          document.getElementById('stat-completed-orders').innerText = data.filter(o => o.status === 'Completed').length;
+        }
+      } catch (err) {
+        console.warn("Orders table not found or error:", err);
       }
     }
 
     async function loadAllServices() {
-      const { data, error } = await supabase.from('smm_services').select('*');
-      if (data) {
-        window.allSmmServicesData = data;
+      try {
+        const { data, error } = await supabase.from('smm_services').select('*');
+        if (!error && data) {
+          window.allSmmServicesData = data;
+        }
+      } catch (err) {
+        console.warn("Services table not found or error:", err);
       }
     }
 
     async function saveManualService() {
-      const category = document.getElementById('srv-category').value;
-      const provider_service_id = document.getElementById('srv-custom-id').value || '1';
-      const name = document.getElementById('srv-name').value;
-      const rate = document.getElementById('srv-rate').value;
-      const min = document.getElementById('srv-min').value;
-      const max = document.getElementById('srv-max').value;
+      const category = document.getElementById('srv-category').value.trim();
+      const provider_service_id = document.getElementById('srv-custom-id').value.trim() || '1';
+      const name = document.getElementById('srv-name').value.trim();
+      const rate = document.getElementById('srv-rate').value.trim();
+      const min = document.getElementById('srv-min').value.trim();
+      const max = document.getElementById('srv-max').value.trim();
 
       if (!category || !name || !rate || !min || !max) { 
-        alert('Please fill all service fields including category.'); 
+        alert('Please fill all service fields including category and name.'); 
         return; 
       }
 
-      const { error } = await supabase.from('smm_services').insert([{ 
-        category, provider_service_id, name, rate, min, max 
-      }]);
+      try {
+        const { error } = await supabase.from('smm_services').insert([{ 
+          category, provider_service_id, name, rate, min, max 
+        }]);
 
-      if (error) {
-        alert('Database Error: ' + error.message);
-      } else { 
-        alert('Manual Service added successfully!'); 
-        document.getElementById('srv-category').value = '';
-        document.getElementById('srv-name').value = ''; 
-        document.getElementById('srv-custom-id').value = '';
-        document.getElementById('srv-rate').value = ''; 
-        document.getElementById('srv-min').value = ''; 
-        document.getElementById('srv-max').value = ''; 
-        document.getElementById('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
-        loadAllServices();
+        if (error) {
+          alert('Database Error: ' + error.message);
+        } else { 
+          alert('Manual Service added successfully!'); 
+          document.getElementById('srv-category').value = '';
+          document.getElementById('srv-name').value = ''; 
+          document.getElementById('srv-custom-id').value = '';
+          document.getElementById('srv-rate').value = ''; 
+          document.getElementById('srv-min').value = ''; 
+          document.getElementById('srv-max').value = ''; 
+          document.getElementById('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
+          await loadAllServices();
+        }
+      } catch (err) {
+        alert('Error saving service: ' + err.message);
       }
     }
 
@@ -346,9 +363,10 @@
       const container = document.getElementById('modal-orders-body');
       container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
 
+      await loadSmmAdminStats();
       let orders = window.allSmmOrdersData || [];
       if (filterType !== 'All') {
-        orders = orders.filter(o => o.status.toLowerCase() === filterType.toLowerCase());
+        orders = orders.filter(o => o.status && o.status.toLowerCase() === filterType.toLowerCase());
       }
 
       if (orders.length === 0) {
@@ -358,18 +376,19 @@
 
       container.innerHTML = '';
       orders.forEach(order => {
+        const orderIdShort = order.id ? order.id.slice(0,8) : '---';
         container.innerHTML += `
           <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
             <div class="space-y-1 truncate flex-1">
-              <p class="text-white font-bold">ID: <span class="text-cyan-400">${order.id.slice(0,8)}</span></p>
-              <p class="text-gray-400 truncate">Link: <a href="${order.link}" target="_blank" class="text-amber-400 underline">${order.link}</a></p>
-              <p class="text-gray-400">Qty: <strong class="text-white">${order.quantity}</strong> | Charge: <strong class="text-emerald-400">$${order.charge}</strong></p>
+              <p class="text-white font-bold">ID: <span class="text-cyan-400">${orderIdShort}</span></p>
+              <p class="text-gray-400 truncate">Link: <a href="${order.link || '#'}" target="_blank" class="text-amber-400 underline">${order.link || 'N/A'}</a></p>
+              <p class="text-gray-400">Qty: <strong class="text-white">${order.quantity || 0}</strong> | Charge: <strong class="text-emerald-400">$${order.charge || 0}</strong></p>
             </div>
             <div class="text-right space-y-2 shrink-0">
-              <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : order.status === 'Processing' ? 'bg-blue-950 text-blue-400 border border-blue-500/40' : 'bg-amber-950 text-amber-400 border border-amber-500/40'}">${order.status}</span>
+              <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : order.status === 'Processing' ? 'bg-blue-950 text-blue-400 border border-blue-500/40' : 'bg-amber-950 text-amber-400 border border-amber-500/40'}">${order.status || 'Pending'}</span>
               <div class="flex gap-1 justify-end pt-1">
-                ${order.status === 'Pending' ? `<button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Approve</button>` : ''}
-                ${order.status !== 'Completed' ? `<button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Complete</button>` : '<span class="text-emerald-400 text-[10px] font-bold block">Done</span>'}
+                ${(!order.status || order.status === 'Pending') ? `<button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Approve</button>` : ''}
+                {order.status !== 'Completed' ? `<button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Complete</button>` : '<span class="text-emerald-400 text-[10px] font-bold block">Done</span>'}
               </div>
             </div>
           </div>
@@ -399,8 +418,8 @@
         container.innerHTML += `
           <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
             <div class="space-y-1 truncate flex-1">
-              <p class="text-white font-bold"><span class="text-cyan-400">[${srv.category}]</span> ${srv.name}</p>
-              <p class="text-gray-400">Rate/1k: <strong class="text-emerald-400">$${srv.rate}</strong> | Min: ${srv.min} - Max: ${srv.max}</p>
+              <p class="text-white font-bold"><span class="text-cyan-400">[${srv.category || 'General'}]</span> ${srv.name || 'Service'}</p>
+              <p class="text-gray-400">Rate/1k: <strong class="text-emerald-400">$${srv.rate || 0}</strong> | Min: ${srv.min || 0} - Max: ${srv.max || 0}</p>
             </div>
             <div class="text-right shrink-0">
               <button onclick="deleteService('${srv.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Delete</button>
@@ -416,23 +435,31 @@
 
     async function deleteService(serviceId) {
       if (!confirm('Are you sure you want to delete this service?')) return;
-      const { error } = await supabase.from('smm_services').delete().eq('id', serviceId);
-      if (error) {
-        alert('Error deleting service: ' + error.message);
-      } else {
-        alert('Service deleted successfully!');
-        openAllServicesModal();
+      try {
+        const { error } = await supabase.from('smm_services').delete().eq('id', serviceId);
+        if (error) {
+          alert('Error deleting service: ' + error.message);
+        } else {
+          alert('Service deleted successfully!');
+          await openAllServicesModal();
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
       }
     }
 
     async function updateOrderStatus(orderId, newStatus) {
-      const { error } = await supabase.from('smm_orders').update({ status: newStatus }).eq('id', orderId);
-      if (error) {
-        alert('Error updating status: ' + error.message);
-      } else {
-        alert(`Order status updated to ${newStatus}!`);
-        loadSmmAdminStats();
-        openOrdersModal('All');
+      try {
+        const { error } = await supabase.from('smm_orders').update({ status: newStatus }).eq('id', orderId);
+        if (error) {
+          alert('Error updating status: ' + error.message);
+        } else {
+          alert(`Order status updated to ${newStatus}!`);
+          await loadSmmAdminStats();
+          openOrdersModal('All');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
       }
     }
 
