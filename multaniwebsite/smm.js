@@ -1,5 +1,8 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
+  // Direct app state ya window se balance uthana taake zero na aaye
+  const directBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? JSON.parse(localStorage.getItem('mff_user_profile') || '{}').balance ?? walletBalance ?? 208;
+
   container.innerHTML = `
     <div style="padding: 16px; max-width: 430px; margin: 0 auto; font-family: 'Inter', sans-serif;">
       
@@ -8,7 +11,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
         <h2 style="font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #00f0ff; text-transform: uppercase; margin: 0;">SMM SERVICES & ORDERS</h2>
         <div style="background: #151922; border: 1px solid #262f40; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-wallet" style="color: #ffbe00; font-size: 14px;"></i>
-          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ...</span>
+          <span id="smm-wallet-display" style="font-size: 13px; font-weight: 700; color: #ffbe00;">PKR ${directBalance}</span>
         </div>
       </div>
 
@@ -72,17 +75,16 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  loadServicesAndWallet(user, refreshCallback);
+  loadServicesAndWallet(user, directBalance, refreshCallback);
 }
 
-async function loadServicesAndWallet(user, refreshCallback) {
+async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
   const supabase = window.supabase?.createClient('https://yzirjidgdxhljbhhjfqp.supabase.co', 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5');
   if (!supabase) return;
 
-  let currentWallet = 0;
+  let activeWallet = currentWallet;
   let currentUserObj = user;
 
-  // 1. Fetch Real Wallet Balance directly from Supabase
   try {
     if (!currentUserObj) {
       let { data: sessionData } = await supabase.auth.getSession();
@@ -90,15 +92,13 @@ async function loadServicesAndWallet(user, refreshCallback) {
     }
 
     if (currentUserObj) {
-      // Check wallets table first
       let { data: wData } = await supabase.from('wallets').select('balance').eq('user_id', currentUserObj.id).single();
-      if (wData) {
-        currentWallet = Number(wData.balance) || 0;
+      if (wData && wData.balance !== undefined) {
+        activeWallet = Number(wData.balance) || 0;
       } else {
-        // Fallback to profiles table
         let { data: pData } = await supabase.from('profiles').select('balance').eq('id', currentUserObj.id).single();
-        if (pData) {
-          currentWallet = Number(pData.balance) || 0;
+        if (pData && pData.balance !== undefined) {
+          activeWallet = Number(pData.balance) || 0;
         }
       }
     }
@@ -106,13 +106,12 @@ async function loadServicesAndWallet(user, refreshCallback) {
     console.error("Wallet fetch error:", e);
   }
 
-  // Update wallet display on screen
+  // Update display with fetched balance
   const walletDisplay = document.getElementById('smm-wallet-display');
   if (walletDisplay) {
-    walletDisplay.textContent = `PKR ${currentWallet}`;
+    walletDisplay.textContent = `PKR ${activeWallet}`;
   }
 
-  // 2. Fetch SMM Services
   let allServices = [];
   let selectedSrv = null;
 
@@ -191,7 +190,6 @@ async function loadServicesAndWallet(user, refreshCallback) {
     if (totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
-  // 3. Load Orders History
   if (currentUserObj) {
     try {
       let { data: ords } = await supabase.from('smm_orders').select('*').eq('user_id', currentUserObj.id).order('created_at', { ascending: false }).limit(10);
@@ -216,7 +214,6 @@ async function loadServicesAndWallet(user, refreshCallback) {
     }
   }
 
-  // 4. Form Submit & Order Placement
   const smmFormElem = document.getElementById('app-smm-form');
   if (smmFormElem) {
     smmFormElem.addEventListener('submit', async function(e) {
@@ -231,7 +228,7 @@ async function loadServicesAndWallet(user, refreshCallback) {
       const charge = (qty / 1000) * rate;
 
       if (qty < min) return alert(`Minimum quantity is ${min}`);
-      if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
+      if (activeWallet < charge) return alert('Insufficient tournament wallet balance!');
 
       const btn = document.getElementById('smm-submit-btn');
       if (btn) {
@@ -240,7 +237,7 @@ async function loadServicesAndWallet(user, refreshCallback) {
       }
 
       try {
-        const newBal = currentWallet - charge;
+        const newBal = activeWallet - charge;
         let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', currentUserObj.id);
         if (wUp.error) {
           await supabase.from('profiles').update({ balance: newBal }).eq('id', currentUserObj.id);
