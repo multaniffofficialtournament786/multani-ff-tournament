@@ -62,16 +62,16 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <span id="selected-service-label"><i class="fa-solid fa-list-ul text-amber-400 mr-2"></i> Choose Service Template...</span>
 <i class="fa-solid fa-chevron-down text-gray-400"></i>
 </button>
-<div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto sidebar-scroll p-2 space-y-1"></div>
+<div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto sidebar-scroll p-2 space-y-1"></div>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
 <div>
 <label class="block font-bold text-gray-300 mb-1">Category Name</label>
-<input id="srv-category" type="text" placeholder="YouTube / TikTok" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm">
+<input id="srv-category" type="text" placeholder="Instagram / TikTok" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm">
 </div>
 <div>
 <label class="block font-bold text-gray-300 mb-1">Service Name</label>
-<input id="srv-name" type="text" placeholder="YouTube Views [HQ]" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm">
+<input id="srv-name" type="text" placeholder="Instagram Followers [HQ]" class="w-full bg-[#06070a] border border-[#262f40] rounded-xl p-3.5 text-white text-sm">
 </div>
 </div>
 <div>
@@ -170,34 +170,117 @@ modal.classList.remove('flex');
 }
 
 const templates = [
+// INSTAGRAM
+['Instagram', 'Instagram Likes', 'instagram'],
+['Instagram', 'Instagram Followers', 'instagram'],
+['Instagram', 'Instagram Views', 'instagram'],
+['Instagram', 'Instagram Reel Views', 'instagram'],
+['Instagram', 'Instagram Story Views', 'instagram'],
+['Instagram', 'Instagram Comments', 'instagram'],
+['Instagram', 'Instagram Custom Comments', 'instagram'],
+['Instagram', 'Instagram Shares', 'instagram'],
+['Instagram', 'Instagram Saves', 'instagram'],
+
+// TIKTOK
+['TikTok', 'TikTok Likes', 'tiktok'],
+['TikTok', 'TikTok Followers', 'tiktok'],
+['TikTok', 'TikTok Views', 'tiktok'],
+['TikTok', 'TikTok Video Views', 'tiktok'],
+['TikTok', 'TikTok Live Views', 'tiktok'],
+['TikTok', 'TikTok Live Likes', 'tiktok'],
+['TikTok', 'TikTok Comments', 'tiktok'],
+['TikTok', 'TikTok Shares', 'tiktok'],
+['TikTok', 'TikTok Saves', 'tiktok'],
+
+// YOUTUBE
+['YouTube', 'YouTube Likes', 'youtube'],
+['YouTube', 'YouTube Subscribers', 'youtube'],
 ['YouTube', 'YouTube Views', 'youtube'],
 ['YouTube', 'YouTube Shorts Views', 'youtube'],
-['YouTube', 'YouTube Subscribers', 'youtube'],
-['YouTube', 'YouTube Likes', 'youtube'],
-['TikTok', 'TikTok Views', 'tiktok'],
-['TikTok', 'TikTok Followers', 'tiktok'],
+['YouTube', 'YouTube Comments', 'youtube'],
+['YouTube', 'YouTube Custom Comments', 'youtube'],
+['YouTube', 'YouTube Shares', 'youtube'],
+
+// FACEBOOK
+['Facebook', 'Facebook Likes', 'facebook'],
+['Facebook', 'Facebook Followers', 'facebook'],
+['Facebook', 'Facebook Page Likes', 'facebook'],
 ['Facebook', 'Facebook Page Followers', 'facebook'],
-['Instagram', 'Instagram Followers', 'instagram']
+['Facebook', 'Facebook Post Likes', 'facebook'],
+['Facebook', 'Facebook Video Views', 'facebook'],
+['Facebook', 'Facebook Reel Views', 'facebook'],
+['Facebook', 'Facebook Comments', 'facebook'],
+['Facebook', 'Facebook Shares', 'facebook'],
+
+// WHATSAPP
+['WhatsApp', 'WhatsApp Channel Followers', 'whatsapp'],
+['WhatsApp', 'WhatsApp Channel Views', 'whatsapp'],
+['WhatsApp', 'WhatsApp Poll Votes', 'whatsapp'],
+['WhatsApp', 'WhatsApp Reactions', 'whatsapp'],
+['WhatsApp', 'WhatsApp Post Views', 'whatsapp'],
+['WhatsApp', 'WhatsApp Likes', 'whatsapp'],
+
+// TELEGRAM
+['Telegram', 'Telegram Channel Members', 'telegram'],
+['Telegram', 'Telegram Group Members', 'telegram'],
+['Telegram', 'Telegram Post Views', 'telegram'],
+['Telegram', 'Telegram Reactions', 'telegram'],
+['Telegram', 'Telegram Likes', 'telegram'],
+['Telegram', 'Telegram Comments', 'telegram'],
+['Telegram', 'Telegram Poll Votes', 'telegram'],
+['Telegram', 'Telegram Story Views', 'telegram'],
+
+// SNAPCHAT
+['Snapchat', 'Snapchat Followers', 'snapchat'],
+['Snapchat', 'Snapchat Subscribers', 'snapchat'],
+['Snapchat', 'Snapchat Story Views', 'snapchat'],
+['Snapchat', 'Snapchat Spotlight Views', 'snapchat'],
+['Snapchat', 'Snapchat Profile Views', 'snapchat'],
+
+// X (TWITTER)
+['X (Twitter)', 'Twitter Followers', 'twitter'],
+['X (Twitter)', 'Twitter Likes', 'twitter'],
+['X (Twitter)', 'Twitter Views', 'twitter'],
+
+// PINTEREST
+['Pinterest', 'Pinterest Followers', 'pinterest'],
+['Pinterest', 'Pinterest Likes', 'pinterest'],
+['Pinterest', 'Pinterest Views', 'pinterest'],
+['Pinterest', 'Pinterest Saves', 'pinterest']
 ];
 
 const iconMap = {
-youtube: ['fa-brands fa-youtube', 'text-red-500'],
+instagram: ['fa-brands fa-instagram', 'text-pink-500'],
 tiktok: ['fa-brands fa-tiktok', 'text-cyan-400'],
+youtube: ['fa-brands fa-youtube', 'text-red-500'],
 facebook: ['fa-brands fa-facebook', 'text-blue-500'],
-instagram: ['fa-brands fa-instagram', 'text-pink-500']
+whatsapp: ['fa-brands fa-whatsapp', 'text-emerald-400'],
+telegram: ['fa-brands fa-telegram', 'text-cyan-500'],
+snapchat: ['fa-brands fa-snapchat', 'text-yellow-400'],
+twitter: ['fa-brands fa-x-twitter', 'text-gray-200'],
+pinterest: ['fa-brands fa-pinterest', 'text-red-600']
 };
 
 function renderTemplateDropdown() {
 const box = $('custom-service-dropdown');
 if (!box) return;
 box.innerHTML = '';
+let lastCategory = '';
 
 templates.forEach(([category, name, iconKey]) => {
+if (category !== lastCategory) {
+const heading = document.createElement('div');
+heading.className = 'text-[11px] font-bold text-amber-400 uppercase px-3 py-1.5 mt-2 bg-[#06070a]/60 rounded';
+heading.textContent = '--- ' + category + ' Services ---';
+box.appendChild(heading);
+lastCategory = category;
+}
+
 const [iconClass, iconColor] = iconMap[iconKey] || ['fa-solid fa-star', 'text-amber-400'];
 const item = document.createElement('button');
 item.type = 'button';
-item.className = 'w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#151922] text-gray-200 transition text-sm';
-item.innerHTML = `<i class="${iconClass} ${iconColor} text-base"></i><span>${escapeHtml(name)}</span>`;
+item.className = 'w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#151922] text-gray-200 transition text-sm';
+item.innerHTML = `<i class="${iconClass} ${iconColor} text-base w-5 text-center"></i><span>${escapeHtml(name)}</span>`;
 
 item.addEventListener('click', () => {
 $('srv-category').value = category;
@@ -313,7 +396,7 @@ state.currentFilter = filterType;
 openModal('orders-modal');
 
 if ($('modal-orders-title')) {
-$('modal-orders-title').textContent = filterType + ' Orders Details (' + filterType + ')';
+$('modal-orders-title').textContent = filterType + ' Orders Details';
 }
 
 const container = $('modal-orders-body');
