@@ -37,35 +37,35 @@
 
   <!-- HORIZONTAL SCROLLABLE COMPACT STATUS BUTTONS -->
   <div class="horizontal-scroll">
-    <button onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+    <button type="button" id="btn-all-orders" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-list text-cyan-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">All Orders</span>
         <h3 id="stat-all-orders" class="text-sm font-bold font-gaming text-white">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+    <button type="button" id="btn-pending" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Pending</span>
         <h3 id="stat-pending-orders" class="text-sm font-bold font-gaming text-amber-400">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+    <button type="button" id="btn-processing" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-spinner text-blue-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Processing</span>
         <h3 id="stat-processing-orders" class="text-sm font-bold font-gaming text-blue-400">0</h3>
       </div>
     </button>
-    <button onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+    <button type="button" id="btn-completed" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Completed</span>
         <h3 id="stat-completed-orders" class="text-sm font-bold font-gaming text-emerald-400">0</h3>
       </div>
     </button>
-    <button onclick="openAllServicesModal()" class="bg-[#151922] border border-[#262f40] hover:border-purple-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
+    <button type="button" id="btn-manage-services" class="bg-[#151922] border border-[#262f40] hover:border-purple-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
       <i class="fa-solid fa-layer-group text-purple-400 text-sm"></i>
       <div class="text-left">
         <span class="text-[10px] uppercase font-bold text-gray-400 block">Manage</span>
@@ -84,7 +84,7 @@
         <!-- CUSTOM ICON DROPDOWN BUTTON -->
         <div class="relative">
           <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
-          <button type="button" onclick="toggleServiceDropdown(event)" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624] cursor-pointer">
+          <button type="button" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624] cursor-pointer">
             <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300">
               <i class="fa-solid fa-list-ul"></i> Choose Service with Icon...
             </span>
@@ -95,100 +95,100 @@
           <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto sidebar-scroll p-1.5 space-y-1">
             
             <div class="text-[10px] font-bold text-red-500 uppercase px-2 py-1"><i class="fa-brands fa-youtube"></i> YouTube Services</div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Views" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Views">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Shorts Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Shorts Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Shorts Views" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Shorts Views">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Shorts Views
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Subscribers', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Subscribers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Subscribers" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Subscribers">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Subscribers
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Likes', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Likes" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Likes">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Likes
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Comments', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Comments" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Comments">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Comments
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Watch Time', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Watch Time')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Watch Time" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Watch Time">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Watch Time
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Live Stream', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Live Stream')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Live Stream" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Live Stream">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Live Stream
             </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Views + Likes Combo', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="YouTube" data-name="YouTube Views + Likes Combo" data-label="<i class='fa-brands fa-youtube text-red-500'></i> YouTube Views + Likes (Combo)">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views + Likes (Combo)
             </div>
 
             <div class="text-[10px] font-bold text-cyan-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-tiktok"></i> TikTok Services</div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Views', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Views" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Views">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Followers', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Followers" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Followers">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Followers
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Likes', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Likes" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Likes">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Likes
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Shares', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Shares" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Shares">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Shares
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Comments', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Comments" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Comments">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Comments
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Live', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Live')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Live" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Live">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Live
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Saves', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Saves')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Saves" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Saves">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Saves
             </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Views + Likes Combo', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="TikTok" data-name="TikTok Views + Likes Combo" data-label="<i class='fa-brands fa-tiktok text-cyan-400'></i> TikTok Views + Likes (Combo)">
               <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views + Likes (Combo)
             </div>
 
             <div class="text-[10px] font-bold text-blue-500 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-facebook"></i> Facebook Services</div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Page Followers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Page Followers" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Page Followers">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Followers
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Page Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Page Likes" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Page Likes">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Likes
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Post Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Post Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Post Likes" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Post Likes">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Post Likes
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Reactions', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reactions')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Reactions" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Reactions">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reactions
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Video Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Video Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Video Views" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Video Views">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Video Views
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Reels Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reels Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Reels Views" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Reels Views">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reels Views
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Comments', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Comments" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Comments">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Comments
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Shares', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Shares" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Shares">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Shares
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Group Members', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Group Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Group Members" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Group Members">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Group Members
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Live Viewers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Live Viewers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Live Viewers" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Live Viewers">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Live Viewers
             </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Views + Likes Combo', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Facebook" data-name="Facebook Views + Likes Combo" data-label="<i class='fa-brands fa-facebook text-blue-500'></i> Facebook Views + Likes (Combo)">
               <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Views + Likes (Combo)
             </div>
 
             <div class="text-[10px] font-bold text-emerald-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp & Others</div>
-            <div onclick="selectServiceItem('WhatsApp', 'WhatsApp Channel Followers', '<i class=\'fa-brands fa-whatsapp text-emerald-400\'></i> WhatsApp Channel Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="WhatsApp" data-name="WhatsApp Channel Followers" data-label="<i class='fa-brands fa-whatsapp text-emerald-400'></i> WhatsApp Channel Followers">
               <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp Channel Followers
             </div>
-            <div onclick="selectServiceItem('Instagram', 'Instagram Followers', '<i class=\'fa-brands fa-instagram text-pink-500\'></i> Instagram Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Instagram" data-name="Instagram Followers" data-label="<i class='fa-brands fa-instagram text-pink-500'></i> Instagram Followers">
               <i class="fa-brands fa-instagram text-pink-500"></i> Instagram Followers
             </div>
-            <div onclick="selectServiceItem('Telegram', 'Telegram Members', '<i class=\'fa-brands fa-telegram text-cyan-500\'></i> Telegram Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
+            <div class="service-option flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200" data-cat="Telegram" data-name="Telegram Members" data-label="<i class='fa-brands fa-telegram text-cyan-500'></i> Telegram Members">
               <i class="fa-brands fa-telegram text-cyan-500"></i> Telegram Members
             </div>
 
@@ -226,7 +226,7 @@
           <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
         </div>
       </div>
-      <button type="button" onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
+      <button type="button" id="save-service-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
         SAVE MANUAL SERVICE
       </button>
     </div>
@@ -237,7 +237,7 @@
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
         <h3 id="modal-orders-title" class="font-gaming text-base md:text-lg font-bold text-white uppercase">Orders List</h3>
-        <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button type="button" id="close-orders-modal" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
         <p class="text-gray-500 text-xs text-center py-6">Loading orders...</p>
@@ -250,7 +250,7 @@
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
         <h3 class="font-gaming text-base md:text-lg font-bold text-white uppercase">All Configured Services</h3>
-        <button onclick="closeAllServicesModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button type="button" id="close-services-modal" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="modal-services-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
         <p class="text-gray-500 text-xs text-center py-6">Loading services...</p>
@@ -258,7 +258,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- SCRIPT LOGIC WITH DIRECT EVENT LISTENERS -->
   <script>
     const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
@@ -267,33 +267,54 @@
     window.allSmmOrdersData = [];
     window.allSmmServicesData = [];
 
+    document.addEventListener("DOMContentLoaded", function () {
+      initSmmAdmin();
+
+      // Top 5 Buttons Events
+      document.getElementById('btn-all-orders').addEventListener('click', () => openOrdersModal('All'));
+      document.getElementById('btn-pending').addEventListener('click', () => openOrdersModal('Pending'));
+      document.getElementById('btn-processing').addEventListener('click', () => openOrdersModal('Processing'));
+      document.getElementById('btn-completed').addEventListener('click', () => openOrdersModal('Completed'));
+      document.getElementById('btn-manage-services').addEventListener('click', openAllServicesModal);
+
+      // Dropdown Toggle
+      document.getElementById('dropdown-toggle-btn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('custom-service-dropdown');
+        dropdown.classList.toggle('hidden');
+      });
+
+      // Dropdown Options Click
+      document.querySelectorAll('.service-option').forEach(item => {
+        item.addEventListener('click', function () {
+          const cat = this.getAttribute('data-cat');
+          const name = this.getAttribute('data-name');
+          const lbl = this.getAttribute('data-label');
+          document.getElementById('srv-category').value = cat;
+          document.getElementById('srv-name').value = name;
+          document.getElementById('selected-service-label').innerHTML = lbl;
+          document.getElementById('custom-service-dropdown').classList.add('hidden');
+        });
+      });
+
+      // Close dropdown on outside click
+      window.addEventListener('click', function () {
+        const dropdown = document.getElementById('custom-service-dropdown');
+        if (dropdown) dropdown.classList.add('hidden');
+      });
+
+      // Save Button Event
+      document.getElementById('save-service-btn').addEventListener('click', saveManualService);
+
+      // Modal Close Buttons
+      document.getElementById('close-orders-modal').addEventListener('click', closeOrdersModal);
+      document.getElementById('close-services-modal').addEventListener('click', closeAllServicesModal);
+    });
+
     async function initSmmAdmin() {
       await loadSmmAdminStats();
       await loadAllServices();
     }
-
-    function toggleServiceDropdown(e) {
-      if(e) e.stopPropagation();
-      const dropdown = document.getElementById('custom-service-dropdown');
-      if (dropdown) {
-        dropdown.classList.toggle('hidden');
-      }
-    }
-
-    function selectServiceItem(category, serviceName, htmlLabel) {
-      document.getElementById('srv-category').value = category;
-      document.getElementById('srv-name').value = serviceName;
-      document.getElementById('selected-service-label').innerHTML = htmlLabel;
-      document.getElementById('custom-service-dropdown').classList.add('hidden');
-    }
-
-    window.addEventListener('click', function(e) {
-      const btn = document.getElementById('dropdown-toggle-btn');
-      const dropdown = document.getElementById('custom-service-dropdown');
-      if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
-    });
 
     async function loadSmmAdminStats() {
       try {
@@ -465,8 +486,6 @@
         alert('Error: ' + err.message);
       }
     }
-
-    window.addEventListener('DOMContentLoaded', initSmmAdmin);
   </script>
 </body>
 </html>
