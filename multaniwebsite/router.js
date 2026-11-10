@@ -1,6 +1,6 @@
-
 import { state, Loader, Sound } from './config.js';
 import { syncAuthAndProfile, renderAuth, renderProfile } from './auth.js';
+import { renderSMMView } from './smm.js';
 
 // Prevent old navigation requests from overwriting new pages
 let navigationId = 0;
@@ -204,6 +204,13 @@ export const Router = {
         spin: () => window.renderDailySpin?.(),
 
         tournaments: () => window.renderTournaments?.(),
+
+        smm: () => renderSMMView(
+          document.getElementById('app-view'),
+          state.currentUser,
+          state.walletBalance || state.currentUser?.balance || 0,
+          () => Router.navigate('smm', null, false)
+        ),
 
         tournament_detail: () =>
           window.renderTournamentDetail?.(id),
