@@ -13,21 +13,13 @@
     .font-gaming { font-family: 'Rajdhani', sans-serif; }
     .sidebar-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #262f40; }
-    .horizontal-scroll {
-      display: flex;
-      overflow-x: auto;
-      white-space: nowrap;
-      gap: 10px;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      padding-bottom: 4px;
-    }
-    .horizontal-scroll::-webkit-scrollbar { display: none; }
+    .horizontal-scroll { display:flex; overflow-x:auto; white-space:nowrap; gap:10px; scrollbar-width:none; padding-bottom:4px; }
+    .horizontal-scroll::-webkit-scrollbar { display:none; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
   </style>
 </head>
 <body class="p-3 md:p-6 max-w-3xl mx-auto space-y-5 pb-20">
 
-  <!-- Professional Compact Header -->
   <div class="flex items-center justify-between border-b border-[#262f40] pb-3">
     <h1 class="font-gaming text-lg md:text-xl font-bold tracking-wider text-white uppercase">SMM SERVICE CONTROL</h1>
     <a href="admin.html" class="bg-[#151922] border border-[#262f40] hover:border-[#ff4624] text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
@@ -35,435 +27,287 @@
     </a>
   </div>
 
-  <!-- HORIZONTAL SCROLLABLE COMPACT STATUS BUTTONS -->
   <div class="horizontal-scroll">
-    <button type="button" onclick="openOrdersModal('All')" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
-      <i class="fa-solid fa-list text-cyan-400 text-sm"></i>
-      <div class="text-left">
-        <span class="text-[10px] uppercase font-bold text-gray-400 block">All Orders</span>
-        <h3 id="stat-all-orders" class="text-sm font-bold font-gaming text-white">0</h3>
-      </div>
+    <button type="button" data-order-filter="All" class="bg-[#151922] border border-[#262f40] hover:border-cyan-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition">
+      <i class="fa-solid fa-list text-cyan-400 text-sm"></i><div class="text-left"><span class="text-[10px] uppercase font-bold text-gray-400 block">All Orders</span><h3 id="stat-all-orders" class="text-sm font-bold font-gaming text-white">0</h3></div>
     </button>
-    <button type="button" onclick="openOrdersModal('Pending')" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
-      <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
-      <div class="text-left">
-        <span class="text-[10px] uppercase font-bold text-gray-400 block">Pending</span>
-        <h3 id="stat-pending-orders" class="text-sm font-bold font-gaming text-amber-400">0</h3>
-      </div>
+    <button type="button" data-order-filter="Pending" class="bg-[#151922] border border-[#262f40] hover:border-amber-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition">
+      <i class="fa-solid fa-clock text-amber-400 text-sm"></i><div class="text-left"><span class="text-[10px] uppercase font-bold text-gray-400 block">Pending</span><h3 id="stat-pending-orders" class="text-sm font-bold font-gaming text-amber-400">0</h3></div>
     </button>
-    <button type="button" onclick="openOrdersModal('Processing')" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
-      <i class="fa-solid fa-spinner text-blue-400 text-sm"></i>
-      <div class="text-left">
-        <span class="text-[10px] uppercase font-bold text-gray-400 block">Processing</span>
-        <h3 id="stat-processing-orders" class="text-sm font-bold font-gaming text-blue-400">0</h3>
-      </div>
+    <button type="button" data-order-filter="Processing" class="bg-[#151922] border border-[#262f40] hover:border-blue-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition">
+      <i class="fa-solid fa-spinner text-blue-400 text-sm"></i><div class="text-left"><span class="text-[10px] uppercase font-bold text-gray-400 block">Processing</span><h3 id="stat-processing-orders" class="text-sm font-bold font-gaming text-blue-400">0</h3></div>
     </button>
-    <button type="button" onclick="openOrdersModal('Completed')" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
-      <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
-      <div class="text-left">
-        <span class="text-[10px] uppercase font-bold text-gray-400 block">Completed</span>
-        <h3 id="stat-completed-orders" class="text-sm font-bold font-gaming text-emerald-400">0</h3>
-      </div>
+    <button type="button" data-order-filter="Completed" class="bg-[#151922] border border-[#262f40] hover:border-emerald-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition">
+      <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i><div class="text-left"><span class="text-[10px] uppercase font-bold text-gray-400 block">Completed</span><h3 id="stat-completed-orders" class="text-sm font-bold font-gaming text-emerald-400">0</h3></div>
     </button>
-    <button type="button" onclick="openAllServicesModal()" class="bg-[#151922] border border-[#262f40] hover:border-purple-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition cursor-pointer">
-      <i class="fa-solid fa-layer-group text-purple-400 text-sm"></i>
-      <div class="text-left">
-        <span class="text-[10px] uppercase font-bold text-gray-400 block">Manage</span>
-        <h3 class="text-sm font-bold font-gaming text-purple-400">All Services</h3>
-      </div>
+    <button type="button" id="open-services-btn" class="bg-[#151922] border border-[#262f40] hover:border-purple-400 px-3.5 py-2 rounded-xl flex items-center gap-2.5 shrink-0 shadow-md transition">
+      <i class="fa-solid fa-layer-group text-purple-400 text-sm"></i><div class="text-left"><span class="text-[10px] uppercase font-bold text-gray-400 block">Manage</span><h3 class="text-sm font-bold font-gaming text-purple-400">All Services</h3></div>
     </button>
   </div>
 
-  <!-- ADD MANUAL SMM SERVICE FORM -->
   <div class="bg-[#0e1118] border border-[#262f40] p-4 md:p-5 rounded-2xl space-y-4 shadow-xl">
-    <h2 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2">
-      <i class="fa-solid fa-circle-plus text-cyan-400"></i> Add Manual SMM Service
-    </h2>
+    <h2 class="font-gaming text-base font-bold text-white uppercase flex items-center gap-2"><i class="fa-solid fa-circle-plus text-cyan-400"></i> Add Manual SMM Service</h2>
     <div class="space-y-3 text-xs">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <!-- CUSTOM ICON DROPDOWN BUTTON -->
+      <div>
+        <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
         <div class="relative">
-          <label class="block font-bold text-gray-400 uppercase mb-1">Select Service Template</label>
-          <button type="button" onclick="toggleServiceDropdown(event)" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624] cursor-pointer">
-            <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300">
-              <i class="fa-solid fa-list-ul"></i> Choose Service with Icon...
-            </span>
+          <button type="button" id="dropdown-toggle-btn" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white flex items-center justify-between outline-none hover:border-[#ff4624]">
+            <span id="selected-service-label" class="flex items-center gap-2 truncate text-gray-300"><i class="fa-solid fa-list-ul"></i> Choose Service with Icon...</span>
             <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
           </button>
-
-          <!-- DROPDOWN POPUP LIST WITH ICONS -->
-          <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto sidebar-scroll p-1.5 space-y-1">
-            
-            <div class="text-[10px] font-bold text-red-500 uppercase px-2 py-1"><i class="fa-brands fa-youtube"></i> YouTube Services</div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Shorts Views', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Shorts Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Shorts Views
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Subscribers', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Subscribers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Subscribers
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Likes', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Likes
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Comments', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Comments
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Watch Time', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Watch Time')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Watch Time
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Live Stream', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Live Stream')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Live Stream
-            </div>
-            <div onclick="selectServiceItem('YouTube', 'YouTube Views + Likes Combo', '<i class=\'fa-brands fa-youtube text-red-500\'></i> YouTube Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Views + Likes (Combo)
-            </div>
-
-            <div class="text-[10px] font-bold text-cyan-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-tiktok"></i> TikTok Services</div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Views', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Followers', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Followers
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Likes', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Likes
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Shares', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Shares
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Comments', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Comments
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Live', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Live')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Live
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Saves', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Saves')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Saves
-            </div>
-            <div onclick="selectServiceItem('TikTok', 'TikTok Views + Likes Combo', '<i class=\'fa-brands fa-tiktok text-cyan-400\'></i> TikTok Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-tiktok text-cyan-400"></i> TikTok Views + Likes (Combo)
-            </div>
-
-            <div class="text-[10px] font-bold text-blue-500 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-facebook"></i> Facebook Services</div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Page Followers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Followers
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Page Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Page Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Page Likes
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Post Likes', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Post Likes')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Post Likes
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Reactions', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reactions')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reactions
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Video Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Video Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Video Views
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Reels Views', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Reels Views')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Reels Views
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Comments', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Comments')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Comments
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Shares', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Shares')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Shares
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Group Members', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Group Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Group Members
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Live Viewers', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Live Viewers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Live Viewers
-            </div>
-            <div onclick="selectServiceItem('Facebook', 'Facebook Views + Likes Combo', '<i class=\'fa-brands fa-facebook text-blue-500\'></i> Facebook Views + Likes (Combo)')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-facebook text-blue-500"></i> Facebook Views + Likes (Combo)
-            </div>
-
-            <div class="text-[10px] font-bold text-emerald-400 uppercase px-2 py-1 mt-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp & Others</div>
-            <div onclick="selectServiceItem('WhatsApp', 'WhatsApp Channel Followers', '<i class=\'fa-brands fa-whatsapp text-emerald-400\'></i> WhatsApp Channel Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp Channel Followers
-            </div>
-            <div onclick="selectServiceItem('Instagram', 'Instagram Followers', '<i class=\'fa-brands fa-instagram text-pink-500\'></i> Instagram Followers')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-instagram text-pink-500"></i> Instagram Followers
-            </div>
-            <div onclick="selectServiceItem('Telegram', 'Telegram Members', '<i class=\'fa-brands fa-telegram text-cyan-500\'></i> Telegram Members')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] cursor-pointer text-gray-200">
-              <i class="fa-brands fa-telegram text-cyan-500"></i> Telegram Members
-            </div>
-
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Category Name</label>
-          <input type="text" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / TikTok" required />
+          <div id="custom-service-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0e1118] border border-[#262f40] rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto sidebar-scroll p-1.5 space-y-1"></div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label>
-          <input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube Views [HQ]" required />
-        </div>
-        <div>
-          <label class="block font-bold text-gray-400 uppercase mb-1">Service ID (Manual)</label>
-          <input type="text" id="srv-custom-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. 101" />
-        </div>
+        <div><label class="block font-bold text-gray-400 uppercase mb-1">Category Name</label><input type="text" id="srv-category" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube / TikTok" required></div>
+        <div><label class="block font-bold text-gray-400 uppercase mb-1">Service Name</label><input type="text" id="srv-name" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none focus:border-[#ff4624]" placeholder="e.g. YouTube Views [HQ]" required></div>
       </div>
+
+      <div><label class="block font-bold text-gray-400 uppercase mb-1">Service ID (Manual)</label><input type="text" id="srv-custom-id" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="e.g. 101"></div>
 
       <div class="grid grid-cols-3 gap-2">
-        <div>
-          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Rate per 1000</label>
-          <input type="number" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100" />
-        </div>
-        <div>
-          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Min Qty</label>
-          <input type="number" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="50" />
-        </div>
-        <div>
-          <label class="block font-[10px] font-bold text-gray-400 uppercase mb-1">Max Qty</label>
-          <input type="number" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000" />
-        </div>
+        <div><label class="block font-bold text-gray-400 uppercase mb-1">Rate per 1000</label><input type="number" min="0" step="any" id="srv-rate" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100"></div>
+        <div><label class="block font-bold text-gray-400 uppercase mb-1">Min Qty</label><input type="number" min="1" step="1" id="srv-min" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="50"></div>
+        <div><label class="block font-bold text-gray-400 uppercase mb-1">Max Qty</label><input type="number" min="1" step="1" id="srv-max" class="w-full bg-[#06070a] border border-[#262f40] rounded-lg p-2.5 text-white outline-none" placeholder="100000"></div>
       </div>
-      <button type="button" onclick="saveManualService()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition cursor-pointer">
-        SAVE MANUAL SERVICE
-      </button>
+      <button type="button" id="save-service-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-lg font-gaming font-bold uppercase tracking-wider transition">SAVE MANUAL SERVICE</button>
+      <p id="page-message" class="text-center text-xs text-gray-400" role="status"></p>
     </div>
   </div>
 
-  <!-- ORDERS DETAILS MODAL -->
-  <div id="orders-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="orders-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
-        <h3 id="modal-orders-title" class="font-gaming text-base md:text-lg font-bold text-white uppercase">Orders List</h3>
-        <button type="button" onclick="closeOrdersModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
-        <p class="text-gray-500 text-xs text-center py-6">Loading orders...</p>
-      </div>
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]"><h3 id="modal-orders-title" class="font-gaming text-base md:text-lg font-bold text-white uppercase">Orders List</h3><button type="button" id="close-orders-btn" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button></div>
+      <div id="modal-orders-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll"><p class="text-gray-500 text-xs text-center py-6">Loading orders...</p></div>
     </div>
   </div>
 
-  <!-- ALL SERVICES LIST MODAL -->
-  <div id="services-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="services-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 md:p-5 w-full max-w-xl space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]">
-        <h3 class="font-gaming text-base md:text-lg font-bold text-white uppercase">All Configured Services</h3>
-        <button type="button" onclick="closeAllServicesModal()" class="text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <div id="modal-services-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll">
-        <p class="text-gray-500 text-xs text-center py-6">Loading services...</p>
-      </div>
+      <div class="flex items-center justify-between pb-3 border-b border-[#262f40]"><h3 class="font-gaming text-base md:text-lg font-bold text-white uppercase">All Configured Services</h3><button type="button" id="close-services-btn" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button></div>
+      <div id="modal-services-body" class="flex-1 overflow-y-auto space-y-2 sidebar-scroll"><p class="text-gray-500 text-xs text-center py-6">Loading services...</p></div>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
-  <script>
-    const SUPABASE_URL = "https://yzirjidgdxhljbhhjfqp.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+(() => {
+  'use strict';
 
-    window.allSmmOrdersData = [];
-    window.allSmmServicesData = [];
+  const SUPABASE_URL = 'https://yzirjidgdxhljbhhjfqp.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
 
-    // Run immediately when script loads
-    loadSmmAdminStats();
-    loadAllServices();
+  const $ = (id) => document.getElementById(id);
+  const state = { orders: [], services: [], currentFilter: 'All' };
 
-    function toggleServiceDropdown(e) {
-      if(e) e.stopPropagation();
-      const dropdown = document.getElementById('custom-service-dropdown');
-      if (dropdown) {
-        dropdown.classList.toggle('hidden');
+  function showMessage(message, isError = false) {
+    const el = $('page-message');
+    el.textContent = message;
+    el.className = 'text-center text-xs ' + (isError ? 'text-red-400' : 'text-emerald-400');
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[ch]));
+  }
+
+  function openModal(id) {
+    const el = $(id);
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+  }
+  function closeModal(id) {
+    const el = $(id);
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  }
+
+  const templates = [
+    ['YouTube','YouTube Views','youtube'],['YouTube','YouTube Shorts Views','youtube'],
+    ['YouTube','YouTube Subscribers','youtube'],['YouTube','YouTube Likes','youtube'],
+    ['YouTube','YouTube Comments','youtube'],['YouTube','YouTube Watch Time','youtube'],
+    ['YouTube','YouTube Live Stream','youtube'],['YouTube','YouTube Views + Likes Combo','youtube'],
+    ['TikTok','TikTok Views','tiktok'],['TikTok','TikTok Followers','tiktok'],
+    ['TikTok','TikTok Likes','tiktok'],['TikTok','TikTok Shares','tiktok'],
+    ['TikTok','TikTok Comments','tiktok'],['TikTok','TikTok Live','tiktok'],
+    ['TikTok','TikTok Saves','tiktok'],['TikTok','TikTok Views + Likes Combo','tiktok'],
+    ['Facebook','Facebook Page Followers','facebook'],['Facebook','Facebook Page Likes','facebook'],
+    ['Facebook','Facebook Post Likes','facebook'],['Facebook','Facebook Reactions','facebook'],
+    ['Facebook','Facebook Video Views','facebook'],['Facebook','Facebook Reels Views','facebook'],
+    ['Facebook','Facebook Comments','facebook'],['Facebook','Facebook Shares','facebook'],
+    ['Facebook','Facebook Group Members','facebook'],['Facebook','Facebook Live Viewers','facebook'],
+    ['Facebook','Facebook Views + Likes Combo','facebook'],
+    ['WhatsApp','WhatsApp Channel Followers','whatsapp'],
+    ['Instagram','Instagram Followers','instagram'],['Telegram','Telegram Members','telegram']
+  ];
+  const iconMap = {
+    youtube: ['fa-brands fa-youtube','text-red-500'],
+    tiktok: ['fa-brands fa-tiktok','text-cyan-400'],
+    facebook: ['fa-brands fa-facebook','text-blue-500'],
+    whatsapp: ['fa-brands fa-whatsapp','text-emerald-400'],
+    instagram: ['fa-brands fa-instagram','text-pink-500'],
+    telegram: ['fa-brands fa-telegram','text-cyan-500']
+  };
+
+  function renderTemplateDropdown() {
+    const box = $('custom-service-dropdown');
+    let lastCategory = '';
+    box.innerHTML = '';
+    templates.forEach(([category, name, iconKey]) => {
+      if (category !== lastCategory) {
+        const heading = document.createElement('div');
+        heading.className = 'text-[10px] font-bold text-gray-400 uppercase px-2 py-1 mt-2';
+        heading.textContent = category + ' Services';
+        box.appendChild(heading);
+        lastCategory = category;
       }
-    }
-
-    function selectServiceItem(category, serviceName, htmlLabel) {
-      document.getElementById('srv-category').value = category;
-      document.getElementById('srv-name').value = serviceName;
-      document.getElementById('selected-service-label').innerHTML = htmlLabel;
-      document.getElementById('custom-service-dropdown').classList.add('hidden');
-    }
-
-    window.addEventListener('click', function(e) {
-      const btn = document.getElementById('dropdown-toggle-btn');
-      const dropdown = document.getElementById('custom-service-dropdown');
-      if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
+      const [iconClass, iconColor] = iconMap[iconKey];
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#151922] text-gray-200';
+      item.innerHTML = `<i class="${iconClass} ${iconColor}"></i><span>${escapeHtml(name)}</span>`;
+      item.addEventListener('click', () => {
+        $('srv-category').value = category;
+        $('srv-name').value = name;
+        $('selected-service-label').innerHTML = `<i class="${iconClass} ${iconColor}"></i><span>${escapeHtml(name)}</span>`;
+        $('custom-service-dropdown').classList.add('hidden');
+      });
+      box.appendChild(item);
     });
+  }
 
-    async function loadSmmAdminStats() {
-      try {
-        const { data, error } = await supabase.from('smm_orders').select('*');
-        if (!error && data) {
-          window.allSmmOrdersData = data;
-          document.getElementById('stat-all-orders').innerText = data.length;
-          document.getElementById('stat-pending-orders').innerText = data.filter(o => o.status === 'Pending').length;
-          document.getElementById('stat-processing-orders').innerText = data.filter(o => o.status === 'Processing').length;
-          document.getElementById('stat-completed-orders').innerText = data.filter(o => o.status === 'Completed').length;
-        }
-      } catch (err) {
-        console.warn("Orders error:", err);
-      }
+  function setStats() {
+    $('stat-all-orders').textContent = state.orders.length;
+    $('stat-pending-orders').textContent = state.orders.filter(o => String(o.status || 'Pending').toLowerCase() === 'pending').length;
+    $('stat-processing-orders').textContent = state.orders.filter(o => String(o.status || '').toLowerCase() === 'processing').length;
+    $('stat-completed-orders').textContent = state.orders.filter(o => String(o.status || '').toLowerCase() === 'completed').length;
+  }
+
+  async function loadOrders() {
+    const { data, error } = await window.smmClient.from('smm_orders').select('*');
+    if (error) throw error;
+    state.orders = data || [];
+    setStats();
+  }
+
+  async function loadServices() {
+    const { data, error } = await window.smmClient.from('smm_services').select('*');
+    if (error) throw error;
+    state.services = data || [];
+  }
+
+  async function saveManualService() {
+    const category = $('srv-category').value.trim();
+    const name = $('srv-name').value.trim();
+    const provider_service_id = $('srv-custom-id').value.trim() || null;
+    const rate = Number($('srv-rate').value);
+    const min = Number($('srv-min').value);
+    const max = Number($('srv-max').value);
+    if (!category || !name || $('srv-rate').value === '' || $('srv-min').value === '' || $('srv-max').value === '') {
+      showMessage('Category, service name, rate, min and max are required.', true);
+      alert('Please fill Category, Service Name, Rate, Min Qty and Max Qty.');
+      return;
+    }
+    if (!Number.isFinite(rate) || rate < 0 || !Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max < min) {
+      showMessage('Rate or quantity values are invalid.', true);
+      alert('Rate sahi likhein. Min kam az kam 1 ho aur Max, Min se bara ya barabar ho.');
+      return;
     }
 
-    async function loadAllServices() {
-      try {
-        const { data, error } = await supabase.from('smm_services').select('*');
-        if (!error && data) {
-          window.allSmmServicesData = data;
-        }
-      } catch (err) {
-        console.warn("Services error:", err);
-      }
+    const button = $('save-service-btn');
+    button.disabled = true;
+    button.textContent = 'SAVING...';
+    showMessage('Saving service...');
+    try {
+      const row = { category, name, rate, min, max };
+      if (provider_service_id) row.provider_service_id = provider_service_id;
+      const { error } = await window.smmClient.from('smm_services').insert(row);
+      if (error) throw error;
+
+      alert('Manual Service added successfully!');
+      ['srv-category','srv-name','srv-custom-id','srv-rate','srv-min','srv-max'].forEach(id => $(id).value = '');
+      $('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
+      await loadServices();
+      showMessage('Service successfully saved.');
+    } catch (error) {
+      console.error('Save service error:', error);
+      showMessage(error.message || 'Could not save service.', true);
+      alert('Service save nahi hui: ' + (error.message || 'Unknown database error') + '\n\nAgar RLS/permission error hai to Supabase table policies check karni hongi.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'SAVE MANUAL SERVICE';
     }
+  }
 
-    async function saveManualService() {
-      const category = document.getElementById('srv-category').value.trim();
-      const provider_service_id = document.getElementById('srv-custom-id').value.trim() || '1';
-      const name = document.getElementById('srv-name').value.trim();
-      const rate = document.getElementById('srv-rate').value.trim();
-      const min = document.getElementById('srv-min').value.trim();
-      const max = document.getElementById('srv-max').value.trim();
-
-      if (!category || !name || !rate || !min || !max) { 
-        alert('Please fill all service fields including category and name.'); 
-        return; 
-      }
-
-      try {
-        const { error } = await supabase.from('smm_services').insert([{ 
-          category, provider_service_id, name, rate, min, max 
-        }]);
-
-        if (error) {
-          alert('Database Error: ' + error.message);
-        } else { 
-          alert('Manual Service added successfully!'); 
-          document.getElementById('srv-category').value = '';
-          document.getElementById('srv-name').value = ''; 
-          document.getElementById('srv-custom-id').value = '';
-          document.getElementById('srv-rate').value = ''; 
-          document.getElementById('srv-min').value = ''; 
-          document.getElementById('srv-max').value = ''; 
-          document.getElementById('selected-service-label').innerHTML = '<i class="fa-solid fa-list-ul"></i> Choose Service with Icon...';
-          await loadAllServices();
-        }
-      } catch (err) {
-        alert('Error saving service: ' + err.message);
-      }
-    }
-
-    async function openOrdersModal(filterType) {
-      document.getElementById('orders-modal').classList.remove('hidden');
-      document.getElementById('modal-orders-title').innerText = `${filterType} Orders Details`;
-      const container = document.getElementById('modal-orders-body');
-      container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
-
-      await loadSmmAdminStats();
-      let orders = window.allSmmOrdersData || [];
-      if (filterType !== 'All') {
-        orders = orders.filter(o => o.status && o.status.toLowerCase() === filterType.toLowerCase());
-      }
-
-      if (orders.length === 0) {
+  async function openOrdersModal(filterType) {
+    state.currentFilter = filterType;
+    openModal('orders-modal');
+    $('modal-orders-title').textContent = filterType + ' Orders Details';
+    const container = $('modal-orders-body');
+    container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
+    try {
+      await loadOrders();
+      const orders = filterType === 'All' ? state.orders : state.orders.filter(o => String(o.status || 'Pending').toLowerCase() === filterType.toLowerCase());
+      if (!orders.length) {
         container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">No orders found in this category.</p>';
         return;
       }
-
       container.innerHTML = '';
       orders.forEach(order => {
-        const orderIdShort = order.id ? order.id.slice(0,8) : '---';
-        const isCompleted = order.status === 'Completed';
-        const isPending = !order.status || order.status === 'Pending';
-        
-        container.innerHTML += `
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
-            <div class="space-y-1 truncate flex-1">
-              <p class="text-white font-bold">ID: <span class="text-cyan-400">${orderIdShort}</span></p>
-              <p class="text-gray-400 truncate">Link: <a href="${order.link || '#'}" target="_blank" class="text-amber-400 underline">${order.link || 'N/A'}</a></p>
-              <p class="text-gray-400">Qty: <strong class="text-white">${order.quantity || 0}</strong> | Charge: <strong class="text-emerald-400">$${order.charge || 0}</strong></p>
-            </div>
-            <div class="text-right space-y-2 shrink-0">
-              <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isCompleted ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : order.status === 'Processing' ? 'bg-blue-950 text-blue-400 border border-blue-500/40' : 'bg-amber-950 text-amber-400 border border-amber-500/40'}">${order.status || 'Pending'}</span>
-              <div class="flex gap-1 justify-end pt-1">
-                ${isPending ? `<button onclick="updateOrderStatus('${order.id}', 'Processing')" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Approve</button>` : ''}
-                ${!isCompleted ? `<button onclick="updateOrderStatus('${order.id}', 'Completed')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Complete</button>` : '<span class="text-emerald-400 text-[10px] font-bold block">Done</span>'}
-              </div>
-            </div>
+        const status = String(order.status || 'Pending');
+        const isCompleted = status.toLowerCase() === 'completed';
+        const isPending = status.toLowerCase() === 'pending';
+        const id = String(order.id ?? '');
+        const card = document.createElement('div');
+        card.className = 'bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2';
+        card.innerHTML = `
+          <div class="space-y-1 truncate flex-1 min-w-0">
+            <p class="text-white font-bold">ID: <span class="text-cyan-400">${escapeHtml(id.slice(0,8) || '---')}</span></p>
+            <p class="text-gray-400 truncate">Link: ${order.link ? `<a href="${escapeHtml(order.link)}" target="_blank" rel="noopener noreferrer" class="text-amber-400 underline">Open link</a>` : 'N/A'}</p>
+            <p class="text-gray-400">Qty: <strong class="text-white">${escapeHtml(order.quantity ?? 0)}</strong> | Charge: <strong class="text-emerald-400">${escapeHtml(order.charge ?? 0)}</strong></p>
           </div>
-        `;
+          <div class="text-right space-y-2 shrink-0">
+            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isCompleted ? 'bg-emerald-950 text-emerald-400' : status.toLowerCase()==='processing' ? 'bg-blue-950 text-blue-400' : 'bg-amber-950 text-amber-400'}">${escapeHtml(status)}</span>
+            <div class="flex gap-1 justify-end pt-1">
+              ${isPending ? `<button type="button" data-action="Processing" class="bg-blue-600 text-white px-2.5 py-1 rounded text-[10px] font-bold">Approve</button>` : ''}
+              ${!isCompleted ? `<button type="button" data-action="Completed" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-[10px] font-bold">Complete</button>` : '<span class="text-emerald-400 text-[10px] font-bold">Done</span>'}
+            </div>
+          </div>`;
+        card.querySelectorAll('[data-action]').forEach(btn => {
+          btn.addEventListener('click', () => updateOrderStatus(id, btn.dataset.action));
+        });
+        container.appendChild(card);
       });
+    } catch (error) {
+      console.error('Orders load error:', error);
+      container.innerHTML = `<p class="text-red-400 text-xs text-center py-6">Orders load nahi huay: ${escapeHtml(error.message)}</p>`;
     }
+  }
 
-    function closeOrdersModal() {
-      document.getElementById('orders-modal').classList.add('hidden');
+  async function updateOrderStatus(orderId, newStatus) {
+    if (!orderId) return alert('Order ID missing.');
+    try {
+      const { error } = await window.smmClient.from('smm_orders').update({ status: newStatus }).eq('id', orderId);
+      if (error) throw error;
+      await openOrdersModal(state.currentFilter);
+      alert('Order status updated to ' + newStatus + '.');
+    } catch (error) {
+      console.error('Update status error:', error);
+      alert('Status update nahi hua: ' + error.message);
     }
+  }
 
-    async function openAllServicesModal() {
-      document.getElementById('services-modal').classList.remove('hidden');
-      const container = document.getElementById('modal-services-body');
-      container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
-
-      await loadAllServices();
-      let services = window.allSmmServicesData || [];
-
-      if (services.length === 0) {
+  async function openAllServicesModal() {
+    openModal('services-modal');
+    const container = $('modal-services-body');
+    container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">Loading...</p>';
+    try {
+      await loadServices();
+      if (!state.services.length) {
         container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">No services added yet.</p>';
         return;
       }
-
       container.innerHTML = '';
-      services.forEach(srv => {
-        container.innerHTML += `
-          <div class="bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex items-center justify-between text-xs gap-2">
-            <div class="space-y-1 truncate flex-1">
-              <p class="text-white font-bold"><span class="text-cyan-400">[${srv.category || 'General'}]</span> ${srv.name || 'Service'}</p>
-              <p class="text-gray-400">Rate/1k: <strong class="text-emerald-400">$${srv.rate || 0}</strong> | Min: ${srv.min || 0} - Max: ${srv.max || 0}</p>
-            </div>
-            <div class="text-right shrink-0">
-              <button onclick="deleteService('${srv.id}')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer">Delete</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function closeAllServicesModal() {
-      document.getElementById('services-modal').classList.add('hidden');
-    }
-
-    async function deleteService(serviceId) {
-      if (!confirm('Are you sure you want to delete this service?')) return;
-      try {
-        const { error } = await supabase.from('smm_services').delete().eq('id', serviceId);
-        if (error) {
-          alert('Error deleting service: ' + error.message);
-        } else {
-          alert('Service deleted successfully!');
-          await openAllServicesModal();
-        }
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      try {
-        const { error } = await supabase.from('smm_orders').update({ status: newStatus }).eq('id', orderId);
-        if (error) {
-          alert('Error updating status: ' + error.message);
-        } else {
-          alert(`Order status updated to ${newStatus}!`);
-          await loadSmmAdminStats();
-          openOrdersModal('All');
-        }
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    }
-  </script>
-</body>
-</html>
+      state.services.forEach(service => {
+        const card = document.create
