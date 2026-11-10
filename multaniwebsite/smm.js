@@ -1,7 +1,13 @@
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
-  // Direct app state ya window se balance uthana taake zero na aaye
-  const directBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? JSON.parse(localStorage.getItem('mff_user_profile') || '{}').balance ?? walletBalance ?? 208;
+  // App ki memory ya localStorage se direct real balance uthana
+  let directBalance = 0;
+  try {
+    const storedUser = JSON.parse(localStorage.getItem('mff_user_profile') || localStorage.getItem('supabase.auth.token') || '{}');
+    directBalance = window.state?.currentUser?.balance ?? window.state?.walletBalance ?? storedUser?.balance ?? walletBalance ?? 208;
+  } catch(e) {
+    directBalance = 208;
+  }
 
   container.innerHTML = `
     <div style="padding: 16px; max-width: 430px; margin: 0 auto; font-family: 'Inter', sans-serif;">
@@ -75,42 +81,12 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
     </div>
   `;
 
-  loadServicesAndWallet(user, directBalance, refreshCallback);
+  loadServicesAndOrders(user, directBalance, refreshCallback);
 }
 
-async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
+async function loadServicesAndOrders(user, currentWallet, refreshCallback) {
   const supabase = window.supabase?.createClient('https://yzirjidgdxhljbhhjfqp.supabase.co', 'sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5');
   if (!supabase) return;
-
-  let activeWallet = currentWallet;
-  let currentUserObj = user;
-
-  try {
-    if (!currentUserObj) {
-      let { data: sessionData } = await supabase.auth.getSession();
-      currentUserObj = sessionData?.session?.user || null;
-    }
-
-    if (currentUserObj) {
-      let { data: wData } = await supabase.from('wallets').select('balance').eq('user_id', currentUserObj.id).single();
-      if (wData && wData.balance !== undefined) {
-        activeWallet = Number(wData.balance) || 0;
-      } else {
-        let { data: pData } = await supabase.from('profiles').select('balance').eq('id', currentUserObj.id).single();
-        if (pData && pData.balance !== undefined) {
-          activeWallet = Number(pData.balance) || 0;
-        }
-      }
-    }
-  } catch (e) {
-    console.error("Wallet fetch error:", e);
-  }
-
-  // Update display with fetched balance
-  const walletDisplay = document.getElementById('smm-wallet-display');
-  if (walletDisplay) {
-    walletDisplay.textContent = `PKR ${activeWallet}`;
-  }
 
   let allServices = [];
   let selectedSrv = null;
@@ -190,9 +166,10 @@ async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
     if (totalChargeElem) totalChargeElem.textContent = `PKR ${tot.toFixed(2)}`;
   }
 
-  if (currentUserObj) {
+  // Load History
+  if (user) {
     try {
-      let { data: ords } = await supabase.from('smm_orders').select('*').eq('user_id', currentUserObj.id).order('created_at', { ascending: false }).limit(10);
+      let { data: ords } = await supabase.from('smm_orders').select('*').order('created_at', { ascending: false }).limit(10);
       const histBox = document.getElementById('smm-orders-history');
       if (histBox) {
         if (!ords || ords.length === 0) {
@@ -214,12 +191,13 @@ async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
     }
   }
 
+  // Form Submit
   const smmFormElem = document.getElementById('app-smm-form');
   if (smmFormElem) {
     smmFormElem.addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!selectedSrv) return alert('Please select a service.');
-      if (!currentUserObj) return alert('Please login first.');
+      if (!user) return alert('Please login first.');
 
       const link = document.getElementById('smm-link-input')?.value.trim();
       const qty = Number(document.getElementById('smm-qty-input')?.value) || 0;
@@ -228,7 +206,7 @@ async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
       const charge = (qty / 1000) * rate;
 
       if (qty < min) return alert(`Minimum quantity is ${min}`);
-      if (activeWallet < charge) return alert('Insufficient tournament wallet balance!');
+      if (currentWallet < charge) return alert('Insufficient tournament wallet balance!');
 
       const btn = document.getElementById('smm-submit-btn');
       if (btn) {
@@ -237,14 +215,13 @@ async function loadServicesAndWallet(user, currentWallet, refreshCallback) {
       }
 
       try {
-        const newBal = activeWallet - charge;
-        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', currentUserObj.id);
+        const newBal = currentWallet - charge;
+        let wUp = await supabase.from('wallets').update({ balance: newBal }).eq('user_id', user.id);
         if (wUp.error) {
-          await supabase.from('profiles').update({ balance: newBal }).eq('id', currentUserObj.id);
+          await supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
         }
 
         await supabase.from('smm_orders').insert([{
-          user_id: currentUserObj.id,
           order_id: Math.floor(100000 + Math.random() * 900000),
           service_name: selectedSrv.name,
           link: link,
