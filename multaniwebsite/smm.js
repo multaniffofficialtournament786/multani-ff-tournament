@@ -19,21 +19,23 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
 
         <form id="app-smm-form" style="display:flex;flex-direction:column;gap:14px;">
 
-          <!-- VIP CATEGORY SELECTOR -->
+          <!-- CATEGORY DROPDOWN BUTTON -->
           <div>
             <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT CATEGORY</label>
             <input type="hidden" id="smm-cat-input" required>
-            <div id="smm-cat-cards-container" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px;">
-              <div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Loading categories...</div>
+            <div id="smm-cat-dropdown-btn" style="${fieldStyle}cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+              <span id="smm-cat-selected-text" style="color:#8e9bb0;display:flex;align-items:center;gap:8px;">-- Choose Category --</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:11px;color:#8e9bb0;"></i>
             </div>
           </div>
 
-          <!-- VIP SERVICE SELECTOR -->
+          <!-- SERVICE DROPDOWN BUTTON -->
           <div>
             <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT SERVICE</label>
             <input type="hidden" id="smm-srv-input" required>
-            <div id="smm-srv-cards-container" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;padding-right:2px;">
-              <div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Choose category first</div>
+            <div id="smm-srv-dropdown-btn" style="${fieldStyle}cursor:pointer;display:flex;align-items:center;justify-content:space-between;opacity:0.6;pointer-events:none;">
+              <span id="smm-srv-selected-text" style="color:#8e9bb0;display:flex;align-items:center;gap:8px;">Choose category first</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:11px;color:#8e9bb0;"></i>
             </div>
           </div>
 
@@ -76,6 +78,19 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
         </div>
       </div>
     </div>
+
+    <!-- VIP MODAL POPUP CONTAINER -->
+    <div id="smm-custom-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+      <div style="background:#0e1118;border:1px solid #262f40;border-radius:16px;width:100%;max-width:380px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+        <div style="padding:14px 16px;border-bottom:1px solid #262f40;display:flex;align-items:center;justify-content:space-between;background:#151922;">
+          <h3 id="smm-modal-title" style="font-family:Rajdhani,sans-serif;font-size:16px;color:#00f0ff;margin:0;">SELECT</h3>
+          <button id="smm-modal-close" style="background:transparent;border:0;color:#8e9bb0;font-size:16px;cursor:pointer;padding:4px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="smm-modal-body" style="padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+          <!-- Items will be injected here -->
+        </div>
+      </div>
+    </div>
   `;
 
   loadSMMData(user, refreshCallback);
@@ -101,7 +116,7 @@ function money(value) {
   return Number(value || 0).toFixed(2);
 }
 
-// Helper to assign proper icons based on category/service text
+// Auto-detect and assign proper icons based on category/service text
 function getServiceIcon(text) {
   const t = String(text || '').toLowerCase();
   if (t.includes('youtube') || t.includes('yt')) return '<i class="fa-brands fa-youtube" style="color:#ff0000;font-size:16px;"></i>';
@@ -109,7 +124,7 @@ function getServiceIcon(text) {
   if (t.includes('whatsapp') || t.includes('wa')) return '<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:16px;"></i>';
   if (t.includes('instagram') || t.includes('insta')) return '<i class="fa-brands fa-instagram" style="color:#e1306c;font-size:16px;"></i>';
   if (t.includes('facebook') || t.includes('fb')) return '<i class="fa-brands fa-facebook" style="color:#1877f2;font-size:16px;"></i>';
-  if (t.includes('telegram')) return '<i class="fa-brands fa-telegram" style="color:#229ed9;font-size:16px;"></i>';
+  if (t.includes('telegram') || t.includes('tg')) return '<i class="fa-brands fa-telegram" style="color:#229ed9;font-size:16px;"></i>';
   return '<i class="fa-solid fa-fire" style="color:#ffbe00;font-size:16px;"></i>';
 }
 
@@ -117,11 +132,17 @@ async function loadSMMData(user, refreshCallback) {
   const walletDisplay = document.getElementById('smm-wallet-display');
   const catInput = document.getElementById('smm-cat-input');
   const srvInput = document.getElementById('smm-srv-input');
-  const catContainer = document.getElementById('smm-cat-cards-container');
-  const srvContainer = document.getElementById('smm-srv-cards-container');
+  const catBtn = document.getElementById('smm-cat-dropdown-btn');
+  const srvBtn = document.getElementById('smm-srv-dropdown-btn');
+  const catText = document.getElementById('smm-cat-selected-text');
+  const srvText = document.getElementById('smm-srv-selected-text');
   const historyBox = document.getElementById('smm-orders-history');
+  const modal = document.getElementById('smm-custom-modal');
+  const modalTitle = document.getElementById('smm-modal-title');
+  const modalBody = document.getElementById('smm-modal-body');
+  const modalClose = document.getElementById('smm-modal-close');
 
-  if (!walletDisplay || !catContainer || !srvContainer) return;
+  if (!walletDisplay || !catBtn || !srvBtn) return;
 
   let currentUser = state.currentUser || user || null;
   let profile = null;
@@ -130,6 +151,14 @@ async function loadSMMData(user, refreshCallback) {
   let selectedCategory = '';
 
   const showError = message => alert(message);
+
+  modalClose.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
 
   try {
     const { data: authData, error: authError } =
@@ -142,7 +171,7 @@ async function loadSMMData(user, refreshCallback) {
     if (!currentUser) {
       walletDisplay.textContent = 'Login Required';
       historyBox.textContent = 'Please login to view your orders.';
-      catContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#ff4444;text-align:center;font-size:12px;">Login required</div>';
+      catText.textContent = 'Login required';
       return;
     }
 
@@ -182,26 +211,24 @@ async function loadSMMData(user, refreshCallback) {
     ];
 
     if (!allServices.length) {
-      catContainer.innerHTML =
-        '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">No services available</div>';
+      catText.textContent = 'No services available';
       return;
     }
 
-    // Render Category VIP Cards
-    renderCategoryCards();
-
-    function renderCategoryCards() {
-      catContainer.innerHTML = categories.map(cat => {
+    // Category Dropdown Click
+    catBtn.addEventListener('click', () => {
+      modalTitle.textContent = 'SELECT CATEGORY';
+      modalBody.innerHTML = categories.map(cat => {
         const isSelected = selectedCategory === cat;
         const iconHtml = getServiceIcon(cat);
         return `
-          <div class="smm-cat-card" data-category="${safeText(cat)}" style="
+          <div class="modal-cat-item" data-category="${safeText(cat)}" style="
             background:${isSelected ? 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,114,255,0.15))' : '#06070a'};
             border:1px solid ${isSelected ? '#00f0ff' : '#262f40'};
-            padding:12px 14px;border-radius:10px;cursor:pointer;
+            padding:12px;border-radius:10px;cursor:pointer;
             display:flex;align-items:center;gap:12px;transition:all 0.2s ease;
           ">
-            <div style="background:#151922;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;">
+            <div style="background:#151922;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;">
               ${iconHtml}
             </div>
             <div style="flex-grow:1;font-size:13px;font-weight:600;color:${isSelected ? '#00f0ff' : '#fff'};">
@@ -214,41 +241,44 @@ async function loadSMMData(user, refreshCallback) {
         `;
       }).join('');
 
-      // Add click events to category cards
-      catContainer.querySelectorAll('.smm-cat-card').forEach(card => {
-        card.addEventListener('click', () => {
-          selectedCategory = card.getAttribute('data-category');
+      modal.style.display = 'flex';
+
+      modalBody.querySelectorAll('.modal-cat-item').forEach(item => {
+        item.addEventListener('click', () => {
+          selectedCategory = item.getAttribute('data-category');
           catInput.value = selectedCategory;
+          catText.innerHTML = `${getServiceIcon(selectedCategory)} <span style="color:#fff;">${safeText(selectedCategory)}</span>`;
+          
           selectedService = null;
           srvInput.value = '';
+          srvText.innerHTML = '-- Choose Service --';
+          srvBtn.style.opacity = '1';
+          srvBtn.style.pointerEvents = 'auto';
 
           document.getElementById('smm-info-box').style.display = 'none';
           calculateTotal();
-          renderCategoryCards();
-          renderServiceCards();
+          modal.style.display = 'none';
         });
       });
-    }
+    });
 
-    function renderServiceCards() {
+    // Service Dropdown Click
+    srvBtn.addEventListener('click', () => {
       const filtered = allServices.filter(s => s.category === selectedCategory);
+      if (!filtered.length) return;
 
-      if (!filtered.length) {
-        srvContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Choose category first</div>';
-        return;
-      }
-
-      srvContainer.innerHTML = filtered.map(service => {
+      modalTitle.textContent = 'SELECT SERVICE';
+      modalBody.innerHTML = filtered.map(service => {
         const isSelected = selectedService && String(selectedService.id) === String(service.id);
         const iconHtml = getServiceIcon(service.name);
         return `
-          <div class="smm-srv-card" data-id="${service.id}" style="
+          <div class="modal-srv-item" data-id="${service.id}" style="
             background:${isSelected ? 'linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,100,0,0.15))' : '#06070a'};
             border:1px solid ${isSelected ? '#ffbe00' : '#262f40'};
-            padding:12px 14px;border-radius:10px;cursor:pointer;
+            padding:12px;border-radius:10px;cursor:pointer;
             display:flex;align-items:flex-start;gap:12px;transition:all 0.2s ease;
           ">
-            <div style="background:#151922;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;margin-top:2px;">
+            <div style="background:#151922;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;margin-top:2px;">
               ${iconHtml}
             </div>
             <div style="flex-grow:1;display:flex;flex-direction:column;gap:4px;">
@@ -266,43 +296,39 @@ async function loadSMMData(user, refreshCallback) {
         `;
       }).join('');
 
-      // Add click events to service cards
-      srvContainer.querySelectorAll('.smm-srv-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const srvId = card.getAttribute('data-id');
+      modal.style.display = 'flex';
+
+      modalBody.querySelectorAll('.modal-srv-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const srvId = item.getAttribute('data-id');
           selectedService = allServices.find(s => String(s.id) === String(srvId)) || null;
           srvInput.value = selectedService ? selectedService.id : '';
 
-          const infoBox = document.getElementById('smm-info-box');
+          if (selectedService) {
+            srvText.innerHTML = `${getServiceIcon(selectedService.name)} <span style="color:#fff;">${safeText(selectedService.name)}</span>`;
+            
+            document.getElementById('smm-info-rate').textContent =
+              money(selectedService.rate) + ' PKR';
 
-          if (!selectedService) {
-            infoBox.style.display = 'none';
-            calculateTotal();
-            renderServiceCards();
-            return;
+            document.getElementById('smm-info-min').textContent =
+              selectedService.min;
+
+            document.getElementById('smm-info-max').textContent =
+              selectedService.max;
+
+            document.getElementById('smm-info-box').style.display = 'block';
+
+            const qtyInput = document.getElementById('smm-qty-input');
+            qtyInput.min = selectedService.min;
+            qtyInput.max = selectedService.max;
+            qtyInput.value = selectedService.min;
           }
 
-          document.getElementById('smm-info-rate').textContent =
-            money(selectedService.rate) + ' PKR';
-
-          document.getElementById('smm-info-min').textContent =
-            selectedService.min;
-
-          document.getElementById('smm-info-max').textContent =
-            selectedService.max;
-
-          infoBox.style.display = 'block';
-
-          const qtyInput = document.getElementById('smm-qty-input');
-          qtyInput.min = selectedService.min;
-          qtyInput.max = selectedService.max;
-          qtyInput.value = selectedService.min;
-
           calculateTotal();
-          renderServiceCards();
+          modal.style.display = 'none';
         });
       });
-    }
+    });
 
     document.getElementById('smm-qty-input')
       .addEventListener('input', calculateTotal);
@@ -418,7 +444,7 @@ async function loadSMMData(user, refreshCallback) {
   } catch (error) {
     console.error('SMM loading error:', error);
     walletDisplay.textContent = 'Unable to load';
-    catContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#ff4444;text-align:center;font-size:12px;">Load error</div>';
+    catText.textContent = 'Load error';
     historyBox.textContent = error.message || 'Unable to load SMM data.';
   }
 
