@@ -1,4 +1,3 @@
-
 import { sbClient, state } from './config.js';
 
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
@@ -18,49 +17,53 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
       <div style="background:#0e1118;border:1px solid #262f40;border-radius:16px;padding:18px;margin-bottom:16px;">
         <h3 style="font-family:Rajdhani;color:#fff;margin:0 0 14px;">BUY SMM SERVICE</h3>
 
-        <form id="app-smm-form" style="display:flex;flex-direction:column;gap:12px;">
+        <form id="app-smm-form" style="display:flex;flex-direction:column;gap:14px;">
 
+          <!-- VIP CATEGORY SELECTOR -->
           <div>
-            <label>SELECT CATEGORY</label>
-            <select id="smm-cat-select" required style="${fieldStyle}">
-              <option value="">Loading categories...</option>
-            </select>
+            <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT CATEGORY</label>
+            <input type="hidden" id="smm-cat-input" required>
+            <div id="smm-cat-cards-container" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px;">
+              <div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Loading categories...</div>
+            </div>
+          </div>
+
+          <!-- VIP SERVICE SELECTOR -->
+          <div>
+            <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT SERVICE</label>
+            <input type="hidden" id="smm-srv-input" required>
+            <div id="smm-srv-cards-container" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;padding-right:2px;">
+              <div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Choose category first</div>
+            </div>
+          </div>
+
+          <div id="smm-info-box" style="display:none;background:#151922;border:1px solid #00f0ff44;padding:12px;border-radius:10px;font-size:12px;color:#8e9bb0;">
+            <p style="margin:0 0 4px;">Rate per 1000: <strong id="smm-info-rate" style="color:#00f0ff;"></strong></p>
+            <p style="margin:0 0 4px;">Minimum: <strong id="smm-info-min" style="color:#fff;"></strong></p>
+            <p style="margin:0;">Maximum: <strong id="smm-info-max" style="color:#fff;"></strong></p>
           </div>
 
           <div>
-            <label>SELECT SERVICE</label>
-            <select id="smm-srv-select" required disabled style="${fieldStyle}">
-              <option value="">Choose category first</option>
-            </select>
-          </div>
-
-          <div id="smm-info-box" style="display:none;background:#151922;padding:12px;border-radius:10px;font-size:12px;color:#8e9bb0;">
-            <p>Rate per 1000: <strong id="smm-info-rate"></strong></p>
-            <p>Minimum: <strong id="smm-info-min"></strong></p>
-            <p>Maximum: <strong id="smm-info-max"></strong></p>
-          </div>
-
-          <div>
-            <label>TARGET LINK / PROFILE URL</label>
+            <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">TARGET LINK / PROFILE URL</label>
             <input id="smm-link-input" type="url" required maxlength="2000"
               placeholder="https://..."
               style="${fieldStyle}">
           </div>
 
           <div>
-            <label>QUANTITY</label>
+            <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">QUANTITY</label>
             <input id="smm-qty-input" type="number" min="1" required
               placeholder="100"
               style="${fieldStyle}">
           </div>
 
-          <div style="background:#151922;padding:14px;border-radius:10px;display:flex;justify-content:space-between;">
+          <div style="background:#151922;padding:14px;border-radius:10px;display:flex;justify-content:space-between;border:1px solid #262f40;">
             <span style="color:#8e9bb0;">TOTAL CHARGE</span>
             <strong id="smm-total-charge" style="color:#ffbe00;">PKR 0.00</strong>
           </div>
 
           <button id="smm-submit-btn" type="submit"
-            style="background:linear-gradient(135deg,#00f0ff,#0072ff);color:#000;border:0;padding:14px;border-radius:10px;font-weight:800;">
+            style="background:linear-gradient(135deg,#00f0ff,#0072ff);color:#000;border:0;padding:14px;border-radius:10px;font-weight:800;cursor:pointer;">
             PLACE SMM ORDER
           </button>
         </form>
@@ -98,18 +101,33 @@ function money(value) {
   return Number(value || 0).toFixed(2);
 }
 
+// Helper to assign proper icons based on category/service text
+function getServiceIcon(text) {
+  const t = String(text || '').toLowerCase();
+  if (t.includes('youtube') || t.includes('yt')) return '<i class="fa-brands fa-youtube" style="color:#ff0000;font-size:16px;"></i>';
+  if (t.includes('tiktok') || t.includes('tik tok')) return '<i class="fa-brands fa-tiktok" style="color:#00f0ff;font-size:16px;"></i>';
+  if (t.includes('whatsapp') || t.includes('wa')) return '<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:16px;"></i>';
+  if (t.includes('instagram') || t.includes('insta')) return '<i class="fa-brands fa-instagram" style="color:#e1306c;font-size:16px;"></i>';
+  if (t.includes('facebook') || t.includes('fb')) return '<i class="fa-brands fa-facebook" style="color:#1877f2;font-size:16px;"></i>';
+  if (t.includes('telegram')) return '<i class="fa-brands fa-telegram" style="color:#229ed9;font-size:16px;"></i>';
+  return '<i class="fa-solid fa-fire" style="color:#ffbe00;font-size:16px;"></i>';
+}
+
 async function loadSMMData(user, refreshCallback) {
   const walletDisplay = document.getElementById('smm-wallet-display');
-  const catSelect = document.getElementById('smm-cat-select');
-  const srvSelect = document.getElementById('smm-srv-select');
+  const catInput = document.getElementById('smm-cat-input');
+  const srvInput = document.getElementById('smm-srv-input');
+  const catContainer = document.getElementById('smm-cat-cards-container');
+  const srvContainer = document.getElementById('smm-srv-cards-container');
   const historyBox = document.getElementById('smm-orders-history');
 
-  if (!walletDisplay || !catSelect || !srvSelect) return;
+  if (!walletDisplay || !catContainer || !srvContainer) return;
 
   let currentUser = state.currentUser || user || null;
   let profile = null;
   let allServices = [];
   let selectedService = null;
+  let selectedCategory = '';
 
   const showError = message => alert(message);
 
@@ -124,7 +142,7 @@ async function loadSMMData(user, refreshCallback) {
     if (!currentUser) {
       walletDisplay.textContent = 'Login Required';
       historyBox.textContent = 'Please login to view your orders.';
-      catSelect.innerHTML = '<option value="">Login required</option>';
+      catContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#ff4444;text-align:center;font-size:12px;">Login required</div>';
       return;
     }
 
@@ -163,68 +181,128 @@ async function loadSMMData(user, refreshCallback) {
       ...new Set(allServices.map(s => s.category).filter(Boolean))
     ];
 
-    catSelect.innerHTML =
-      '<option value="">-- Choose Category --</option>' +
-      categories.map(category =>
-        `<option value="${safeText(category)}">${safeText(category)}</option>`
-      ).join('');
-
     if (!allServices.length) {
-      catSelect.innerHTML =
-        '<option value="">No services available</option>';
+      catContainer.innerHTML =
+        '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">No services available</div>';
+      return;
     }
 
-    catSelect.addEventListener('change', () => {
-      selectedService = null;
-      srvSelect.disabled = true;
-      srvSelect.innerHTML =
-        '<option value="">-- Choose Service --</option>';
+    // Render Category VIP Cards
+    renderCategoryCards();
 
-      document.getElementById('smm-info-box').style.display = 'none';
-      calculateTotal();
+    function renderCategoryCards() {
+      catContainer.innerHTML = categories.map(cat => {
+        const isSelected = selectedCategory === cat;
+        const iconHtml = getServiceIcon(cat);
+        return `
+          <div class="smm-cat-card" data-category="${safeText(cat)}" style="
+            background:${isSelected ? 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,114,255,0.15))' : '#06070a'};
+            border:1px solid ${isSelected ? '#00f0ff' : '#262f40'};
+            padding:12px 14px;border-radius:10px;cursor:pointer;
+            display:flex;align-items:center;gap:12px;transition:all 0.2s ease;
+          ">
+            <div style="background:#151922;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;">
+              ${iconHtml}
+            </div>
+            <div style="flex-grow:1;font-size:13px;font-weight:600;color:${isSelected ? '#00f0ff' : '#fff'};">
+              ${safeText(cat)}
+            </div>
+            <div style="width:16px;height:16px;border-radius:50%;border:1px solid ${isSelected ? '#00f0ff' : '#262f40'};display:flex;align-items:center;justify-content:center;">
+              ${isSelected ? '<div style="width:8px;height:8px;border-radius:50%;background:#00f0ff;"></div>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
 
-      const filtered = allServices.filter(
-        s => s.category === catSelect.value
-      );
+      // Add click events to category cards
+      catContainer.querySelectorAll('.smm-cat-card').forEach(card => {
+        card.addEventListener('click', () => {
+          selectedCategory = card.getAttribute('data-category');
+          catInput.value = selectedCategory;
+          selectedService = null;
+          srvInput.value = '';
 
-      srvSelect.innerHTML += filtered.map(service =>
-        `<option value="${service.id}">${safeText(service.name)} (PKR ${money(service.rate)}/1000)</option>`
-      ).join('');
+          document.getElementById('smm-info-box').style.display = 'none';
+          calculateTotal();
+          renderCategoryCards();
+          renderServiceCards();
+        });
+      });
+    }
 
-      srvSelect.disabled = filtered.length === 0;
-    });
+    function renderServiceCards() {
+      const filtered = allServices.filter(s => s.category === selectedCategory);
 
-    srvSelect.addEventListener('change', () => {
-      selectedService = allServices.find(
-        s => String(s.id) === srvSelect.value
-      ) || null;
-
-      const infoBox = document.getElementById('smm-info-box');
-
-      if (!selectedService) {
-        infoBox.style.display = 'none';
-        calculateTotal();
+      if (!filtered.length) {
+        srvContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#8e9bb0;text-align:center;font-size:12px;">Choose category first</div>';
         return;
       }
 
-      document.getElementById('smm-info-rate').textContent =
-        money(selectedService.rate) + ' PKR';
+      srvContainer.innerHTML = filtered.map(service => {
+        const isSelected = selectedService && String(selectedService.id) === String(service.id);
+        const iconHtml = getServiceIcon(service.name);
+        return `
+          <div class="smm-srv-card" data-id="${service.id}" style="
+            background:${isSelected ? 'linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,100,0,0.15))' : '#06070a'};
+            border:1px solid ${isSelected ? '#ffbe00' : '#262f40'};
+            padding:12px 14px;border-radius:10px;cursor:pointer;
+            display:flex;align-items:flex-start;gap:12px;transition:all 0.2s ease;
+          ">
+            <div style="background:#151922;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;margin-top:2px;">
+              ${iconHtml}
+            </div>
+            <div style="flex-grow:1;display:flex;flex-direction:column;gap:4px;">
+              <div style="font-size:13px;font-weight:600;color:${isSelected ? '#ffbe00' : '#fff'};">
+                ${safeText(service.name)}
+              </div>
+              <div style="font-size:11px;color:#8e9bb0;">
+                Rate: <strong style="color:#ffbe00;">PKR ${money(service.rate)}</strong> / 1000 | Min: ${service.min} - Max: ${service.max}
+              </div>
+            </div>
+            <div style="width:16px;height:16px;border-radius:50%;border:1px solid ${isSelected ? '#ffbe00' : '#262f40'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:4px;">
+              ${isSelected ? '<div style="width:8px;height:8px;border-radius:50%;background:#ffbe00;"></div>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
 
-      document.getElementById('smm-info-min').textContent =
-        selectedService.min;
+      // Add click events to service cards
+      srvContainer.querySelectorAll('.smm-srv-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const srvId = card.getAttribute('data-id');
+          selectedService = allServices.find(s => String(s.id) === String(srvId)) || null;
+          srvInput.value = selectedService ? selectedService.id : '';
 
-      document.getElementById('smm-info-max').textContent =
-        selectedService.max;
+          const infoBox = document.getElementById('smm-info-box');
 
-      infoBox.style.display = 'block';
+          if (!selectedService) {
+            infoBox.style.display = 'none';
+            calculateTotal();
+            renderServiceCards();
+            return;
+          }
 
-      const qtyInput = document.getElementById('smm-qty-input');
-      qtyInput.min = selectedService.min;
-      qtyInput.max = selectedService.max;
-      qtyInput.value = selectedService.min;
+          document.getElementById('smm-info-rate').textContent =
+            money(selectedService.rate) + ' PKR';
 
-      calculateTotal();
-    });
+          document.getElementById('smm-info-min').textContent =
+            selectedService.min;
+
+          document.getElementById('smm-info-max').textContent =
+            selectedService.max;
+
+          infoBox.style.display = 'block';
+
+          const qtyInput = document.getElementById('smm-qty-input');
+          qtyInput.min = selectedService.min;
+          qtyInput.max = selectedService.max;
+          qtyInput.value = selectedService.min;
+
+          calculateTotal();
+          renderServiceCards();
+        });
+      });
+    }
 
     document.getElementById('smm-qty-input')
       .addEventListener('input', calculateTotal);
@@ -284,7 +362,6 @@ async function loadSMMData(user, refreshCallback) {
         btn.textContent = 'PLACING ORDER...';
 
         try {
-          // Secure server-side payment, order and transaction
           const { data, error } = await sbClient.rpc(
             'place_smm_order',
             {
@@ -341,7 +418,7 @@ async function loadSMMData(user, refreshCallback) {
   } catch (error) {
     console.error('SMM loading error:', error);
     walletDisplay.textContent = 'Unable to load';
-    catSelect.innerHTML = '<option value="">Load error</option>';
+    catContainer.innerHTML = '<div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;color:#ff4444;text-align:center;font-size:12px;">Load error</div>';
     historyBox.textContent = error.message || 'Unable to load SMM data.';
   }
 
@@ -370,31 +447,46 @@ async function loadSMMData(user, refreshCallback) {
     box.innerHTML = orders.map(order => {
       const status = String(order.status || 'Pending');
       let statusColor = '#ffbe00';
+      let statusBg = 'rgba(255,190,0,0.1)';
 
       if (status.toLowerCase() === 'completed') {
         statusColor = '#00e676';
+        statusBg = 'rgba(0,230,118,0.1)';
       } else if (status.toLowerCase() === 'processing') {
         statusColor = '#00d5ff';
+        statusBg = 'rgba(0,213,255,0.1)';
       }
 
+      const iconHtml = getServiceIcon(order.service_name);
+
       return `
-        <div style="background:#06070a;border:1px solid #262f40;padding:12px;border-radius:10px;">
-          <div style="display:flex;justify-content:space-between;gap:8px;">
-            <strong style="color:#fff;">${safeText(order.service_name)}</strong>
-            <strong style="color:${statusColor};font-size:11px;">
+        <div style="background:#06070a;border:1px solid #262f40;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="background:#151922;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;">
+                ${iconHtml}
+              </div>
+              <strong style="color:#fff;font-size:13px;">${safeText(order.service_name)}</strong>
+            </div>
+            <span style="color:${statusColor};background:${statusBg};border:1px solid ${statusColor}44;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;">
               ${safeText(status)}
-            </strong>
+            </span>
           </div>
-          <p style="color:#8e9bb0;font-size:11px;margin:7px 0;">
-            Order: #${safeText(order.order_id ?? order.id)}
-          </p>
-          <p style="color:#8e9bb0;font-size:11px;margin:5px 0;word-break:break-all;">
-            ${safeText(order.link)}
-          </p>
-          <p style="color:#8e9bb0;font-size:11px;margin:5px 0;">
-            Quantity: ${safeText(order.quantity)}
-            | Charge: <strong style="color:#ffbe00;">PKR ${money(order.charge)}</strong>
-          </p>
+
+          <div style="background:#151922;padding:8px 10px;border-radius:8px;border:1px solid #262f40;display:flex;flex-direction:column;gap:4px;">
+            <div style="color:#8e9bb0;font-size:11px;display:flex;justify-content:space-between;">
+              <span>Order ID: <strong style="color:#fff;">#${safeText(order.order_id ?? order.id)}</strong></span>
+              <span>Qty: <strong style="color:#00f0ff;">${safeText(order.quantity)}</strong></span>
+            </div>
+            <div style="color:#8e9bb0;font-size:11px;word-break:break-all;">
+              Link: <span style="color:#fff;">${safeText(order.link)}</span>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#8e9bb0;padding-top:2px;">
+            <span>${new Date(order.created_at || Date.now()).toLocaleDateString()}</span>
+            <span>Charge: <strong style="color:#ffbe00;">PKR ${money(order.charge)}</strong></span>
+          </div>
         </div>
       `;
     }).join('');
