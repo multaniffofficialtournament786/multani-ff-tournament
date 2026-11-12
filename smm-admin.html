@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,44 +36,43 @@ input,select{outline:none}
  <i class="fa-solid fa-spinner fa-spin"></i> Checking admin access...
 </div>
 
+<!-- Main Dashboard Container -->
 <main id="admin-content" class="hidden space-y-5">
 
- <div class="flex items-center justify-between gap-2">
-  <h2 class="font-gaming text-lg font-bold text-white">SMM ORDERS MANAGEMENT</h2>
-  <button id="refresh-orders" class="bg-cyan-700 px-3 py-2 rounded-lg text-xs font-bold">
+ <!-- Top Control Bar with Search & Refresh -->
+ <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+  <div class="relative flex-1">
+   <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+    <i class="fa-solid fa-search text-xs"></i>
+   </span>
+   <input id="service-search-input" type="text" placeholder="Search service by name or ID..." class="w-full bg-[#0e1118] border border-[#262f40] rounded-xl pl-9 pr-4 py-2.5 text-xs text-white">
+  </div>
+  <button id="refresh-orders" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2.5 rounded-xl text-xs font-bold shrink-0">
    <i class="fa-solid fa-rotate"></i> Refresh
   </button>
  </div>
 
+ <!-- Filter Cards (Click opens Full Screen View) -->
  <div class="horizontal-scroll">
-  <button data-filter="All" class="bg-[#151922] border border-[#262f40] p-3 rounded-xl shrink-0 min-w-24 text-left">
+  <button data-filter="All" class="bg-[#151922] border border-[#262f40] p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-cyan-500 transition-colors">
    <span class="text-[10px] text-gray-400">All Orders</span>
    <strong id="stat-all-orders" class="block text-lg">0</strong>
   </button>
-  <button data-filter="Pending" class="bg-[#151922] border border-amber-900 p-3 rounded-xl shrink-0 min-w-24 text-left">
+  <button data-filter="Pending" class="bg-[#151922] border border-amber-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-amber-500 transition-colors">
    <span class="text-[10px] text-amber-400">Pending</span>
    <strong id="stat-pending-orders" class="block text-lg text-amber-400">0</strong>
   </button>
-  <button data-filter="Processing" class="bg-[#151922] border border-blue-900 p-3 rounded-xl shrink-0 min-w-24 text-left">
+  <button data-filter="Processing" class="bg-[#151922] border border-blue-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-blue-500 transition-colors">
    <span class="text-[10px] text-blue-400">Processing</span>
    <strong id="stat-processing-orders" class="block text-lg text-blue-400">0</strong>
   </button>
-  <button data-filter="Completed" class="bg-[#151922] border border-emerald-900 p-3 rounded-xl shrink-0 min-w-24 text-left">
+  <button data-filter="Completed" class="bg-[#151922] border border-emerald-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-emerald-500 transition-colors">
    <span class="text-[10px] text-emerald-400">Completed</span>
    <strong id="stat-completed-orders" class="block text-lg text-emerald-400">0</strong>
   </button>
  </div>
 
- <section class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 space-y-3">
-  <div class="flex justify-between items-center">
-   <h3 id="orders-heading" class="font-gaming text-lg font-bold text-cyan-400">ALL ORDERS</h3>
-   <span id="orders-count" class="text-xs text-gray-400">0 orders</span>
-  </div>
-  <div id="orders-list" class="space-y-3">
-   <p class="text-center text-gray-400 text-sm py-6">Loading orders...</p>
-  </div>
- </section>
-
+ <!-- Add Manual SMM Service Section -->
  <section class="bg-[#0e1118] border border-[#262f40] p-4 md:p-6 rounded-2xl space-y-4">
   <h2 class="font-gaming text-lg font-bold text-white">
    <i class="fa-solid fa-circle-plus text-cyan-400"></i> ADD MANUAL SMM SERVICE
@@ -82,47 +80,71 @@ input,select{outline:none}
 
   <div>
    <label class="text-xs text-gray-300 font-bold">Category / App Name</label>
-   <input id="srv-category" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="Instagram / TikTok / YouTube">
+   <input id="srv-category" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="Instagram / TikTok / YouTube / Facebook">
   </div>
   <div>
    <label class="text-xs text-gray-300 font-bold">Service Name</label>
-   <input id="srv-name" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="Followers / Likes / Views">
+   <input id="srv-name" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="Followers / Likes / Views">
   </div>
   <div>
    <label class="text-xs text-gray-300 font-bold">Manual Service ID (Optional)</label>
-   <input id="srv-custom-id" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="101">
+   <input id="srv-custom-id" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="101">
   </div>
   <div class="grid grid-cols-3 gap-2">
    <div>
     <label class="text-xs text-gray-300">Rate / 1000</label>
-    <input id="srv-rate" type="number" min="0.01" step="any" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="100">
+    <input id="srv-rate" type="number" min="0.01" step="any" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="100">
    </div>
    <div>
     <label class="text-xs text-gray-300">Min Qty</label>
-    <input id="srv-min" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="50">
+    <input id="srv-min" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="50">
    </div>
    <div>
     <label class="text-xs text-gray-300">Max Qty</label>
-    <input id="srv-max" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm" placeholder="100000">
+    <input id="srv-max" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="100000">
    </div>
   </div>
-  <button id="save-service-btn" class="w-full bg-cyan-700 hover:bg-cyan-600 py-3 rounded-xl font-bold text-sm">
+  <button id="save-service-btn" class="w-full bg-cyan-700 hover:bg-cyan-600 py-3 rounded-xl font-bold text-sm cursor-pointer">
    SAVE MANUAL SERVICE
   </button>
   <p id="page-message" class="text-center text-xs text-gray-400"></p>
  </section>
 
+ <!-- All Configured Services Toggle / Dropdown Section -->
  <section class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 space-y-3">
-  <div class="flex justify-between items-center">
-   <h3 class="font-gaming text-lg font-bold text-purple-400">ALL CONFIGURED SERVICES</h3>
-   <button id="refresh-services" class="text-xs bg-[#202635] px-3 py-2 rounded-lg">Refresh</button>
+  <div class="flex justify-between items-center cursor-pointer select-none" id="toggle-services-section">
+   <h3 class="font-gaming text-lg font-bold text-purple-400 flex items-center gap-2">
+    <i class="fa-solid fa-list-check"></i> ALL CONFIGURED SERVICES <span id="services-badge" class="text-xs bg-[#202635] px-2 py-0.5 rounded-full text-gray-300">0</span>
+   </h3>
+   <div class="flex items-center gap-2">
+    <button id="refresh-services" class="text-xs bg-[#202635] hover:bg-[#2b3345] px-3 py-1.5 rounded-lg text-white" onclick="event.stopPropagation()">Refresh</button>
+    <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300" id="services-chevron"></i>
+   </div>
   </div>
-  <div id="services-list" class="space-y-2">
-   <p class="text-gray-400 text-sm text-center py-4">Loading services...</p>
+  <div id="services-container" class="hidden space-y-3 pt-2 border-t border-[#262f40]">
+   <div id="services-list" class="space-y-3">
+    <p class="text-gray-400 text-sm text-center py-4">Loading services...</p>
+   </div>
   </div>
  </section>
 
 </main>
+
+<!-- Full Screen Modal for Order Categories -->
+<div id="fullscreen-modal" class="fixed inset-0 bg-[#06070a] z-50 hidden flex flex-col p-4 md:p-6 overflow-y-auto">
+ <div class="flex items-center justify-between border-b border-[#262f40] pb-3 mb-4">
+  <div>
+   <h2 id="modal-heading" class="font-gaming text-xl font-bold text-cyan-400 uppercase">ORDERS</h2>
+   <p id="modal-subcount" class="text-xs text-gray-400">0 orders found</p>
+  </div>
+  <button id="close-modal-btn" class="bg-[#151922] border border-[#262f40] px-4 py-2 rounded-lg text-xs font-bold text-white hover:bg-[#202635] cursor-pointer">
+   <i class="fa-solid fa-xmark text-red-500"></i> Close
+  </button>
+ </div>
+ <div id="modal-orders-list" class="space-y-3 flex-1 pb-10">
+  <!-- Dynamic Orders Will Load Here -->
+ </div>
+</div>
 
 <script>
 (() => {
@@ -153,6 +175,19 @@ function message(text, error=false) {
 function showAccessError(text) {
  $('access-message').textContent = text;
  $('access-message').className = 'bg-[#0e1118] border border-red-900 p-4 rounded-xl text-sm text-center text-red-400';
+}
+
+// Auto Icon Selector based on category name
+function getCategoryIcon(categoryName) {
+ const name = (categoryName || '').toLowerCase();
+ if (name.includes('facebook') || name.includes('fb')) return 'fa-brands fa-facebook text-blue-500';
+ if (name.includes('instagram') || name.includes('insta')) return 'fa-brands fa-instagram text-pink-500';
+ if (name.includes('youtube') || name.includes('yt')) return 'fa-brands fa-youtube text-red-500';
+ if (name.includes('tiktok')) return 'fa-brands fa-tiktok text-cyan-400';
+ if (name.includes('whatsapp')) return 'fa-brands fa-whatsapp text-emerald-500';
+ if (name.includes('telegram')) return 'fa-brands fa-telegram text-sky-400';
+ if (name.includes('twitter') || name.includes('x')) return 'fa-brands fa-twitter text-blue-400';
+ return 'fa-solid fa-bolt text-amber-400';
 }
 
 async function checkAdmin() {
@@ -202,9 +237,6 @@ function updateStats() {
 }
 
 async function loadOrders() {
- const box = $('orders-list');
- box.innerHTML = '<p class="text-center text-gray-400 py-6">Loading orders...</p>';
-
  const {data, error} = await client
   .from('smm_orders')
   .select('id,order_id,user_id,service_name,link,quantity,charge,status,created_at,updated_at')
@@ -214,11 +246,13 @@ async function loadOrders() {
 
  orders = data || [];
  updateStats();
- renderOrders();
+ if(!$('fullscreen-modal').classList.contains('hidden')) {
+  renderModalOrders();
+ }
 }
 
-async function renderOrders() {
- const box = $('orders-list');
+async function renderModalOrders() {
+ const box = $('modal-orders-list');
  let list = orders;
 
  if (currentFilter !== 'All') {
@@ -230,15 +264,14 @@ async function renderOrders() {
   });
  }
 
- $('orders-heading').textContent = currentFilter.toUpperCase() + ' ORDERS';
- $('orders-count').textContent = list.length + ' orders';
+ $('modal-heading').textContent = currentFilter.toUpperCase() + ' ORDERS';
+ $('modal-subcount').textContent = list.length + ' orders found';
 
  if (!list.length) {
-  box.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Is category mein abhi koi order nahi hai.</p>';
+  box.innerHTML = '<p class="text-center text-gray-400 py-12 text-sm">Is category mein abhi koi order nahi hai.</p>';
   return;
  }
 
- // Player profile details are optional; order access does not depend on this lookup.
  const ids = [...new Set(list.map(o => o.user_id).filter(Boolean))];
  let profiles = {};
 
@@ -257,16 +290,17 @@ async function renderOrders() {
 
  list.forEach(order => {
   const profile = profiles[order.user_id] || {};
-  const status = String(order.status || 'Pending');
-  const statusColor =
-   status.toLowerCase() === 'completed' || status.toLowerCase() === 'success'
+  const status = String(order.status || 'Pending').toLowerCase();
+  const isCompleted = status === 'completed' || status === 'success';
+
+  const statusColor = isCompleted
     ? 'text-emerald-400 border-emerald-900'
-    : status.toLowerCase() === 'processing' || status.toLowerCase() === 'in progress'
+    : status === 'processing' || status === 'in progress'
      ? 'text-blue-400 border-blue-900'
      : 'text-amber-400 border-amber-900';
 
   const card = document.createElement('article');
-  card.className = 'bg-[#06070a] border border-[#262f40] rounded-xl p-4 space-y-3';
+  card.className = 'bg-[#0e1118] border border-[#262f40] rounded-xl p-4 space-y-3 shadow-lg';
 
   card.innerHTML = `
    <div class="flex justify-between gap-2 items-start">
@@ -274,7 +308,7 @@ async function renderOrders() {
      <p class="text-xs text-gray-400">ORDER ID</p>
      <p class="font-bold text-cyan-400">#${safe(order.order_id || order.id)}</p>
     </div>
-    <span class="text-[10px] uppercase border rounded-lg px-2 py-1 ${statusColor}">${safe(status)}</span>
+    <span class="text-[10px] uppercase border rounded-lg px-2 py-1 ${statusColor}">${safe(order.status || 'Pending')}</span>
    </div>
 
    <div class="border-t border-[#202635] pt-3 space-y-1.5 text-xs">
@@ -290,15 +324,20 @@ async function renderOrders() {
    <div class="bg-[#111722] rounded-lg p-3 space-y-2">
     <p class="text-[10px] text-gray-400 font-bold">PLAYER TARGET LINK</p>
     <p class="text-xs text-amber-300 break-all">${safe(order.link || 'No link')}</p>
-    <button type="button" data-copy-link class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg text-xs font-bold">
+    <button type="button" data-copy-link class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg text-xs font-bold cursor-pointer">
      <i class="fa-solid fa-copy"></i> COPY LINK
     </button>
    </div>
 
-   <div class="grid grid-cols-3 gap-2">
-    <button type="button" data-status="Pending" class="bg-amber-700 hover:bg-amber-600 py-2 rounded-lg text-[11px] font-bold">PENDING</button>
-    <button type="button" data-status="Processing" class="bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-[11px] font-bold">PROCESSING</button>
-    <button type="button" data-status="Completed" class="bg-emerald-700 hover:bg-emerald-600 py-2 rounded-lg text-[11px] font-bold">COMPLETED</button>
+   <div class="action-buttons-wrap grid ${isCompleted ? 'grid-cols-2' : 'grid-cols-3'} gap-2 pt-1">
+    ${!isCompleted ? `
+     <button type="button" data-status="Pending" class="bg-amber-700 hover:bg-amber-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">PENDING</button>
+     <button type="button" data-status="Processing" class="bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">PROCESSING</button>
+     <button type="button" data-status="Completed" class="bg-emerald-700 hover:bg-emerald-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">COMPLETED</button>
+    ` : `
+     <button type="button" data-status="Completed" class="bg-emerald-800 py-2 rounded-lg text-[11px] font-bold text-emerald-200" disabled>COMPLETED</button>
+     <button type="button" data-delete-order class="bg-red-700 hover:bg-red-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer"><i class="fa-solid fa-trash"></i> DELETE</button>
+    `}
    </div>
   `;
 
@@ -318,9 +357,16 @@ async function renderOrders() {
    }
   });
 
-  card.querySelectorAll('[data-status]').forEach(button => {
-   button.addEventListener('click', () => updateOrderStatus(order.id, button.dataset.status, button));
-  });
+  if(!isCompleted) {
+   card.querySelectorAll('[data-status]').forEach(button => {
+    button.addEventListener('click', () => updateOrderStatus(order.id, button.dataset.status, button));
+   });
+  } else {
+   const delBtn = card.querySelector('[data-delete-order]');
+   if(delBtn) {
+    delBtn.addEventListener('click', () => deleteOrder(order.id));
+   }
+  }
 
   box.appendChild(card);
  });
@@ -355,6 +401,18 @@ async function updateOrderStatus(id, newStatus, button) {
  }
 }
 
+async function deleteOrder(id) {
+ if (!confirm('Kya aap is completed order ko delete karna chahte hain?')) return;
+ try {
+  const {error} = await client.from('smm_orders').delete().eq('id', id);
+  if (error) throw error;
+  alert('Order successfully delete ho gaya.');
+  await loadOrders();
+ } catch (e) {
+  alert('Delete error: ' + e.message);
+ }
+}
+
 async function loadServices() {
  const box = $('services-list');
  box.innerHTML = '<p class="text-center text-gray-400 py-4">Loading...</p>';
@@ -366,23 +424,44 @@ async function loadServices() {
 
  if (error) throw error;
  services = data || [];
+ $('services-badge').textContent = services.length;
 
- if (!services.length) {
-  box.innerHTML = '<p class="text-gray-400 text-center text-sm py-5">No services added yet.</p>';
+ renderFilteredServices(services);
+}
+
+function renderFilteredServices(list) {
+ const box = $('services-list');
+ if (!list.length) {
+  box.innerHTML = '<p class="text-gray-400 text-center text-sm py-5">No matching services found.</p>';
   return;
  }
 
  box.innerHTML = '';
- services.forEach(service => {
+ list.forEach(service => {
+  const iconClass = getCategoryIcon(service.category);
   const card = document.createElement('div');
-  card.className = 'bg-[#06070a] border border-[#262f40] p-3 rounded-xl flex justify-between items-center gap-3';
+  card.className = 'bg-[#06070a] border border-[#262f40] p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-md hover:border-cyan-500/50 transition-all';
   card.innerHTML = `
-   <div class="min-w-0">
-    <p class="text-xs text-cyan-400 font-bold">${safe(service.category)}</p>
-    <p class="text-sm text-white font-bold">${safe(service.name)}</p>
-    <p class="text-[10px] text-gray-400">Rate/1k: ${safe(service.rate)} | Min: ${safe(service.min)} | Max: ${safe(service.max)}</p>
+   <div class="flex items-start gap-3 min-w-0">
+    <div class="w-10 h-10 rounded-xl bg-[#151922] border border-[#262f40] flex items-center justify-center shrink-0 text-lg">
+     <i class="${iconClass}"></i>
+    </div>
+    <div class="min-w-0 space-y-1">
+     <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-xs text-cyan-400 font-bold uppercase">${safe(service.category)}</span>
+      ${service.provider_service_id ? `<span class="bg-purple-950/80 text-purple-300 border border-purple-900 text-[10px] px-2 py-0.5 rounded-md font-mono">ID: ${safe(service.provider_service_id)}</span>` : ''}
+     </div>
+     <p class="text-sm text-white font-bold leading-snug">${safe(service.name)}</p>
+     <div class="text-[11px] text-gray-400 flex flex-wrap gap-x-3 gap-y-0.5">
+      <span>Rate/1k: <strong class="text-emerald-400">${safe(service.rate)}</strong></span>
+      <span>Min: <strong class="text-gray-300">${safe(service.min)}</strong></span>
+      <span>Max: <strong class="text-gray-300">${safe(service.max)}</strong></span>
+     </div>
+    </div>
    </div>
-   <button type="button" data-delete-service class="bg-red-700 px-3 py-2 rounded-lg text-xs font-bold shrink-0">Delete</button>
+   <button type="button" data-delete-service class="bg-red-700 hover:bg-red-600 px-3 py-2 rounded-xl text-xs font-bold shrink-0 text-white cursor-pointer w-full md:w-auto">
+    <i class="fa-solid fa-trash"></i> Delete
+   </button>
   `;
   card.querySelector('[data-delete-service]').addEventListener('click', () => deleteService(service.id));
   box.appendChild(card);
@@ -449,23 +528,51 @@ async function init() {
   await Promise.all([loadOrders(),loadServices()]);
  } catch (e) {
   console.error(e);
-  $('orders-list').innerHTML = '<p class="text-red-400 text-sm text-center">Orders load error: ' + safe(e.message) + '</p>';
  }
 
+ // Filter buttons to open Full Screen Modal
  document.querySelectorAll('[data-filter]').forEach(btn => {
   btn.addEventListener('click', async () => {
    currentFilter = btn.dataset.filter;
-   await renderOrders();
+   await renderModalOrders();
+   $('fullscreen-modal').classList.remove('hidden');
   });
  });
 
+ $('close-modal-btn').addEventListener('click', () => {
+  $('fullscreen-modal').classList.add('hidden');
+ });
+
+ // Toggle Services Dropdown
+ $('toggle-services-section').addEventListener('click', () => {
+  const container = $('services-container');
+  const chevron = $('services-chevron');
+  container.classList.toggle('hidden');
+  chevron.classList.toggle('rotate-180');
+ });
+
+ // Real-time Service Search Bar
+ $('service-search-input').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  if(!query) {
+   renderFilteredServices(services);
+   return;
+  }
+  const filtered = services.filter(s => 
+   String(s.name || '').toLowerCase().includes(query) ||
+   String(s.category || '').toLowerCase().includes(query) ||
+   String(s.provider_service_id || '').toLowerCase().includes(query)
+  );
+  renderFilteredServices(filtered);
+ });
+
  $('refresh-orders').addEventListener('click', async () => {
-  try { await loadOrders(); }
+  try { await loadOrders(); alert('Orders refreshed!'); }
   catch(e) { alert('Orders refresh error: ' + e.message); }
  });
 
  $('refresh-services').addEventListener('click', async () => {
-  try { await loadServices(); }
+  try { await loadServices(); alert('Services refreshed!'); }
   catch(e) { alert('Services refresh error: ' + e.message); }
  });
 
