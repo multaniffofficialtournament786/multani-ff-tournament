@@ -1,473 +1,972 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>MULTANI SMM VIP ADMIN</title>  
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>  
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  
-<style>  
-*{box-sizing:border-box}  
-body{margin:0;background:#06070a;color:#f3f4f6;font-family:Inter,sans-serif}  
-.font-gaming{font-family:Rajdhani,sans-serif}  
-input,select{outline:none;color-scheme:dark}  
-button:disabled{opacity:.45;cursor:not-allowed}  
-.page{max-width:850px;margin:auto;padding:14px 14px 50px}  
-.field{width:100%;background:#06070a;border:1px solid #293346;border-radius:11px;padding:12px;color:white;font-size:13px}  
-.field:focus{border-color:#00d5ff}  
-.lbl{display:block;font-size:11px;font-weight:700;color:#aab4c5;margin-bottom:6px}  
-.panel,.card{background:#0e1118;border:1px solid #263247;border-radius:15px;padding:15px}  
-.topbtn{background:#151b26;border:1px solid #293346;border-radius:11px;padding:10px 12px;font-size:11px;font-weight:800;white-space:nowrap}  
-.primary{background:#087b9a;color:white;border-radius:11px;padding:13px;font-size:12px;font-weight:800;width:100%}  
-.muted{color:#8c98aa}  
-.fullscreen{position:fixed;inset:0;z-index:50;background:#06070a;overflow-y:auto;padding:16px}  
-.hidden{display:none!important}  
-.pill{font-size:10px;padding:4px 8px;border-radius:20px;background:#172333;color:#8ceaff}  
-</style>  
-</head>  
-<body>  
-<div class="page space-y-4">  
-<header class="flex items-center justify-between border-b border-[#263247] pb-3">  
- <div>  
-  <h1 class="font-gaming text-2xl font-extrabold tracking-wider text-cyan-400">MULTANI SMM</h1>  
-  <p class="text-[9px] tracking-[2px] text-gray-500">VIP ADMIN CONTROL CENTER</p>  
- </div>  
- <a href="admin.html" class="topbtn"><i class="fa-solid fa-arrow-left text-orange-400"></i> BACK</a>  
-</header>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MULTANI SMM VIP ADMIN</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#06070a;color:#f3f4f6;font-family:Inter,sans-serif}
+.font-gaming{font-family:Rajdhani,sans-serif}
+input,select{outline:none;color-scheme:dark}
+button:disabled{opacity:.45;cursor:not-allowed}
+.page{max-width:850px;margin:auto;padding:14px 14px 50px}
+.field{width:100%;background:#06070a;border:1px solid #293346;border-radius:11px;padding:13px;color:white;font-size:13px;min-height:46px}
+.field:focus{border-color:#00d5ff}
+.lbl{display:block;font-size:11px;font-weight:700;color:#aab4c5;margin-bottom:6px}
+.panel,.card{background:#0e1118;border:1px solid #263247;border-radius:15px;padding:15px}
+.topbtn{background:#151b26;border:1px solid #293346;border-radius:11px;padding:12px 8px;font-size:11px;font-weight:800;min-height:58px;display:flex;align-items:center;justify-content:center;gap:7px;white-space:normal;text-align:center;line-height:1.25}
+.topbtn:active{border-color:#00d5ff}
+.primary{background:#087b9a;color:white;border-radius:11px;padding:14px;font-size:12px;font-weight:800;width:100%;min-height:47px}
+.muted{color:#8c98aa}
+.fullscreen{position:fixed;inset:0;z-index:50;background:#06070a;overflow-y:auto;padding:16px}
+.hidden{display:none!important}
+.pill{font-size:10px;padding:4px 8px;border-radius:20px;background:#172333;color:#8ceaff;display:inline-block}
+.nav-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.navbtn{min-width:0;min-height:68px;flex-direction:column;gap:5px;font-size:11px}
+.navbtn i{font-size:19px}
+.provider-card{background:#101722;border:1px solid #293346;border-radius:13px;padding:13px}
+.order-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.order-tab{border:1px solid #293346;background:#151b26;border-radius:9px;padding:12px 3px;font-size:10px;font-weight:800;text-align:center;min-width:0}
+.order-tab.active{background:#07516b;border-color:#00d5ff;color:#fff}
+.small-action{border:1px solid #293346;background:#151b26;border-radius:9px;padding:10px;font-size:10px;font-weight:800}
+@media(max-width:380px){
+ .page{padding-left:10px;padding-right:10px}
+ .nav-grid{gap:6px}
+ .navbtn{font-size:10px}
+ .order-tab{font-size:9px}
+}
+</style>
+</head>
+<body>
 
-<div id="access" class="panel text-center text-amber-400 text-sm">  
- <i class="fa-solid fa-spinner fa-spin"></i> Checking admin access...  
-</div>  
+<div class="page space-y-4">
+<header class="flex items-center justify-between border-b border-[#263247] pb-4">
+ <div>
+  <h1 class="font-gaming text-3xl font-extrabold tracking-wider text-cyan-400">MULTANI SMM</h1>
+  <p class="text-[9px] tracking-[2px] text-gray-500">VIP ADMIN CONTROL CENTER</p>
+ </div>
+ <a href="admin.html" class="topbtn">
+  <i class="fa-solid fa-arrow-left text-orange-400"></i> BACK
+ </a>
+</header>
 
-<main id="app" class="hidden space-y-4">  
- <nav class="grid grid-cols-5 gap-2">  
-  <button class="topbtn" id="open-provider"><i class="fa-solid fa-server text-cyan-400 block text-lg mb-1"></i>PROVIDER</button>  
-  <button class="topbtn" id="open-orders"><i class="fa-solid fa-cart-shopping text-amber-400 block text-lg mb-1"></i>ORDERS</button>  
-  <button class="topbtn" id="open-published"><i class="fa-solid fa-layer-group text-emerald-400 block text-lg mb-1"></i>PUBLISHED</button>  
-  <button class="topbtn" id="open-manual-service"><i class="fa-solid fa-pen-to-square text-purple-400 block text-lg mb-1"></i>MANUAL SVC</button>  
-  <button class="topbtn" id="open-add-provider"><i class="fa-solid fa-plus-circle text-blue-400 block text-lg mb-1"></i>ADD PROV</button>  
- </nav>   
+<div id="access" class="panel text-center text-amber-400 text-sm">
+ <i class="fa-solid fa-spinner fa-spin"></i> Checking admin access...
+</div>
 
- <section class="panel space-y-4">  
-  <div class="flex justify-between items-center">  
-   <div><h2 class="font-gaming text-xl font-bold">ADD NEW SERVICE</h2><p class="text-[10px] text-gray-500">SMM Decent provider services</p></div>  
-   <span class="pill">SMM DECENT</span>  
-  </div>  
-  <div><label class="lbl">1. SELECT PROVIDER</label><select id="provider-select" class="field"></select></div>  
-  <div><label class="lbl">2. SELECT CATEGORY</label><select id="category-select" class="field" disabled><option value="">Load services first</option></select></div>  
-  <div><label class="lbl">3. SELECT PROVIDER SERVICE</label><select id="service-select" class="field" disabled><option value="">Select category first</option></select></div>  
-  <button id="load-services" class="primary"><i class="fa-solid fa-cloud-arrow-down"></i> LOAD / REFRESH DECENT SERVICES</button>  
-  <p id="api-message" class="text-center text-xs muted"></p>    
-  
-  <div class="border-t border-[#263247] pt-4 space-y-3">  
-   <h3 class="font-gaming text-lg font-bold text-cyan-300">SELECTED SERVICE DETAILS</h3>  
-   <div><label class="lbl">Service Name</label><input id="service-name" class="field" readonly></div>  
-   <div class="grid grid-cols-2 gap-3">  
-    <div><label class="lbl">Provider Service ID</label><input id="provider-service-id" class="field" readonly></div>  
-    <div><label class="lbl">Provider Type</label><input id="provider-type" class="field" readonly></div>  
-    <div><label class="lbl">Minimum Quantity</label><input id="min-qty" class="field" readonly></div>  
-    <div><label class="lbl">Maximum Quantity</label><input id="max-qty" class="field" readonly></div>  
-   </div>  
-   <div class="grid grid-cols-2 gap-3">  
-    <div><label class="lbl">Provider Cost USD / 1000</label><input id="provider-cost" class="field" readonly></div>  
-    <div><label class="lbl">USD to PKR Rate</label><input id="usd-rate" class="field" type="number" min="1" step=".01" value="280"></div>  
-   </div>  
-   <div><label class="lbl">Your Selling Price PKR / 1000</label><input id="selling-price" class="field" type="number" min=".01" step=".01"></div>  
-   <div class="rounded-xl border border-emerald-900 bg-[#071711] p-4 space-y-2">  
-    <div class="flex justify-between text-xs"><span class="text-gray-400">Provider Cost PKR</span><strong id="cost-pkr">PKR 0.00</strong></div>  
-    <div class="flex justify-between text-xs"><span class="text-gray-400">Selling Price</span><strong id="sell-pkr">PKR 0.00</strong></div>  
-    <div class="border-t border-emerald-900 pt-2 flex justify-between"><span class="text-emerald-300 text-sm font-bold">PROFIT / 1000</span><strong id="profit-pkr" class="text-emerald-400 text-lg">PKR 0.00</strong></div>  
-    <p id="profit-note" class="text-[10px] text-gray-500">Estimated profit per 1000 quantity.</p>  
-   </div>  
-   <button id="publish-btn" class="primary" disabled><i class="fa-solid fa-cloud-arrow-up"></i> PUBLISH SERVICE</button>  
-   <p id="form-message" class="text-center text-xs muted"></p>  
-  </div>  
- </section>  
-</main>  
-</div>  
+<main id="app" class="hidden space-y-4">
 
-<section id="provider-page" class="fullscreen hidden">  
- <div class="max-w-3xl mx-auto space-y-4">  
-  <div class="flex justify-between items-center border-b border-[#263247] pb-4">  
-   <div><h2 class="font-gaming text-2xl font-bold text-cyan-400">PROVIDER CONTROL</h2><p class="text-xs text-gray-500">SMM Decent API connection</p></div>  
-   <button class="topbtn close-page">CLOSE ✕</button>  
-  </div>  
-  <div class="card space-y-3">  
-   <div class="flex justify-between"><div><p class="text-[10px] text-gray-500">CONNECTED PROVIDER</p><h3 class="font-gaming text-2xl font-bold">SMM DECENT</h3><p class="text-[10px] text-gray-500">https://smmdecent.co/api/v2</p></div><span class="pill">PROVIDER 01</span></div>  
-   <div class="border-t border-[#263247] pt-3"><p class="text-xs text-gray-500">PROVIDER BALANCE</p><h2 id="provider-balance" class="font-gaming text-3xl font-bold text-emerald-400">$ --</h2><p id="balance-message" class="text-xs muted mt-1"></p></div>  
-   <button id="check-balance" class="primary">CHECK BALANCE</button>  
-   <button id="provider-refresh-services" class="topbtn w-full">FETCH ALL PROVIDER SERVICES</button>  
-   <div class="grid grid-cols-2 gap-2">  
-    <div class="card"><p class="text-[10px] text-gray-500">TOTAL API SERVICES</p><strong id="provider-total" class="text-2xl text-cyan-300">--</strong></div>  
-    <div class="card"><p class="text-[10px] text-gray-500">CATEGORIES</p><strong id="provider-categories" class="text-2xl text-cyan-300">--</strong></div>  
-   </div>  
-   <p id="provider-message" class="text-center text-xs muted"></p>  
-   <p class="text-[10px] text-amber-300">API key Supabase Secrets mein secure hai.</p>  
-  </div>  
- </div>  
-</section>  
+ <nav class="nav-grid">
+  <button class="topbtn navbtn" id="open-provider">
+   <i class="fa-solid fa-server text-cyan-400"></i>PROVIDERS
+  </button>
+  <button class="topbtn navbtn" id="open-orders">
+   <i class="fa-solid fa-cart-shopping text-amber-400"></i>ORDERS
+  </button>
+  <button class="topbtn navbtn" id="open-published">
+   <i class="fa-solid fa-layer-group text-emerald-400"></i>PUBLISHED
+  </button>
+  <button class="topbtn navbtn" id="open-manual-service">
+   <i class="fa-solid fa-pen-to-square text-purple-400"></i>MANUAL SVC
+  </button>
+  <button class="topbtn navbtn" id="open-add-provider">
+   <i class="fa-solid fa-plus-circle text-blue-400"></i>ADD PROVIDER
+  </button>
+  <button class="topbtn navbtn" id="open-search">
+   <i class="fa-solid fa-magnifying-glass text-yellow-400"></i>SEARCH
+  </button>
+ </nav>
 
-<section id="orders-page" class="fullscreen hidden">  
- <div class="max-w-3xl mx-auto space-y-4">  
-  <div class="flex justify-between items-center border-b border-[#263247] pb-4"><div><h2 class="font-gaming text-2xl font-bold text-amber-400">SMM ORDERS</h2><p id="orders-count" class="text-xs text-gray-500">Orders</p></div><button class="topbtn close-page">CLOSE ✕</button></div>  
-  <div class="flex gap-2"><select id="order-filter" class="field"><option>All</option><option>Pending</option><option>Processing</option><option>Completed</option><option>Cancelled</option></select><button id="refresh-orders" class="topbtn">↻</button></div>  
-  <div id="orders-list" class="space-y-3"></div>  
- </div>  
-</section>  
+ <!-- ADD SERVICE -->
+ <section class="panel space-y-4">
+  <div class="flex justify-between items-center gap-2">
+   <div>
+    <h2 class="font-gaming text-xl font-bold">ADD NEW SERVICE</h2>
+    <p class="text-[10px] text-gray-500">Select provider to load its own services</p>
+   </div>
+   <span class="pill" id="selected-provider-badge">SELECT PROVIDER</span>
+  </div>
 
-<section id="published-page" class="fullscreen hidden">  
- <div class="max-w-3xl mx-auto space-y-4">  
-  <div class="flex justify-between items-center border-b border-[#263247] pb-4"><div><h2 class="font-gaming text-2xl font-bold text-emerald-400">PUBLISHED SERVICES</h2><p id="published-count" class="text-xs text-gray-500"></p></div><button class="topbtn close-page">CLOSE ✕</button></div>  
-  <input id="published-search" class="field" placeholder="Search published service...">  
-  <button id="refresh-published" class="topbtn w-full">↻ REFRESH SERVICES</button>  
-  <div id="published-list" class="space-y-3"></div>  
- </div>  
-</section>  
+  <div>
+   <label class="lbl">1. SELECT PROVIDER</label>
+   <select id="provider-select" class="field"></select>
+  </div>
 
-<section id="manual-service-page" class="fullscreen hidden">  
- <div class="max-w-3xl mx-auto space-y-4">  
-  <div class="flex justify-between items-center border-b border-[#263247] pb-4"><div><h2 class="font-gaming text-2xl font-bold text-purple-400">ADD MANUAL SERVICE</h2><p class="text-xs text-gray-500">Without external provider</p></div><button class="topbtn close-page">CLOSE ✕</button></div>  
-  <div class="card space-y-4">  
-   <div><label class="lbl">Category</label><input id="manual-category" class="field" placeholder="Instagram Followers"></div>  
-   <div><label class="lbl">Service Name</label><input id="manual-name" class="field" placeholder="Instagram Followers Non-Drop"></div>  
-   <div class="grid grid-cols-2 gap-3"><div><label class="lbl">Minimum Quantity</label><input id="manual-min" class="field" type="number" value="10"></div><div><label class="lbl">Maximum Quantity</label><input id="manual-max" class="field" type="number" value="10000"></div></div>  
-   <div><label class="lbl">Selling Price PKR / 1000</label><input id="manual-rate" class="field" type="number" min=".01" step=".01"></div>  
-   <button id="publish-manual-btn" class="primary" style="background:#6b21a8">PUBLISH MANUAL SERVICE</button>  
-   <p id="manual-form-message" class="text-center text-xs muted"></p>  
-  </div>  
- </div>  
-</section>  
+  <div>
+   <label class="lbl">2. SELECT CATEGORY</label>
+   <select id="category-select" class="field" disabled>
+    <option value="">Fetch selected provider services first</option>
+   </select>
+  </div>
 
-<section id="add-provider-page" class="fullscreen hidden">  
- <div class="max-w-3xl mx-auto space-y-4">  
-  <div class="flex justify-between items-center border-b border-[#263247] pb-4"><div><h2 class="font-gaming text-2xl font-bold text-blue-400">MANAGE PROVIDERS</h2><p class="text-xs text-gray-500">Maximum 3 providers</p></div><button class="topbtn close-page">CLOSE ✕</button></div>  
-  <div class="card space-y-4">  
-   <h3 class="font-gaming text-lg font-bold text-cyan-300">ADD NEW PROVIDER</h3>  
-   <div><label class="lbl">Provider Name</label><input id="new-prov-name" class="field" placeholder="Provider name"></div>  
-   <div><label class="lbl">API URL</label><input id="new-prov-url" class="field" placeholder="https://provider.com/api/v2"></div>  
-   <div><label class="lbl">Secret Name</label><input id="new-prov-secret" class="field" placeholder="PROVIDER_API_KEY_2"></div>  
-   <div class="grid grid-cols-2 gap-3"><div><label class="lbl">Currency</label><input id="new-prov-currency" class="field" value="USD"></div><div><label class="lbl">Slot (auto)</label><input id="new-prov-slot" class="field" readonly></div></div>  
-   <button id="save-new-provider-btn" class="primary" style="background:#1d4ed8">SAVE PROVIDER</button>  
-   <p id="prov-form-message" class="text-center text-xs muted"></p>  
-  </div>  
-  <div class="card space-y-3"><h3 class="font-gaming text-lg font-bold text-cyan-300">CONFIGURED PROVIDERS</h3><div id="providers-list" class="space-y-2"></div></div>  
- </div>  
-</section>  
+  <div>
+   <label class="lbl">3. SELECT PROVIDER SERVICE</label>
+   <select id="service-select" class="field" disabled>
+    <option value="">Select category first</option>
+   </select>
+  </div>
 
-<script>  
-(() => {  
-'use strict';  
-  
-const URL='https://yzirjidgdxhljbhhjfqp.supabase.co';  
-const KEY='sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';  
-const db=window.supabase.createClient(URL,KEY);  
-const $=id=>document.getElementById(id);  
-  
-let adminUser=null,provider=null,apiServices=[],selectedApiService=null;  
-let publishedServices=[],allOrders=[],allProviders=[];  
-  
-function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}  
-function say(id,msg,error=false){$(id).textContent=msg;$(id).className='text-center text-xs '+(error?'text-red-400':'text-emerald-400');}  
-function openPage(id){closePages();$(id).classList.remove('hidden');}  
-function closePages(){['provider-page','orders-page','published-page','manual-service-page','add-provider-page'].forEach(id=>$(id).classList.add('hidden'));}  
-  
-async function checkAdmin(){  
- const {data,error}=await db.auth.getUser();  
- if(error)throw error;  
- adminUser=data.user;  
- if(!adminUser)throw new Error('Pehle Tournament Admin Panel mein login karein.');  
- const {data:p,error:pe}=await db.from('profiles').select('is_admin').eq('id',adminUser.id).maybeSingle();  
- if(pe)throw pe;  
- if(!p||p.is_admin!==true)throw new Error('Sirf admin is panel ko use kar sakta hai.');  
- $('access').classList.add('hidden');$('app').classList.remove('hidden');  
-}  
-  
-async function loadProvider(){  
- const {data,error}=await db.from('smm_providers').select('id,name,api_url,secret_name,currency,is_active,orders_enabled,slot').order('slot');  
- if(error)throw error;  
- allProviders=data||[];  
- provider=allProviders.find(p=>Number(p.slot)===1)||allProviders[0]||null;  
- if(!provider)throw new Error('SMM provider database mein nahi mila.');  
- $('provider-select').innerHTML=allProviders.map(p=>`<option value="${safe(p.id)}">${safe(p.name)} (Slot ${safe(p.slot)})</option>`).join('');  
- $('provider-select').value=provider.id;  
- renderProvidersList();  
- updateProviderLimit();  
-}  
-  
-function updateProviderLimit(){  
- const slots=[1,2,3].filter(n=>!allProviders.some(p=>Number(p.slot)===n));  
- $('new-prov-slot').value=slots[0]||'';  
- const full=allProviders.length>=3||slots.length===0;  
- $('open-add-provider').disabled=full;  
- $('save-new-provider-btn').disabled=full;  
- if(full){$('open-add-provider').title='Maximum 3 providers reached';$('save-new-provider-btn').textContent='MAX 3 PROVIDERS REACHED';}  
- else{$('save-new-provider-btn').textContent='SAVE PROVIDER';}  
-}  
-  
-async function fetchProviderServices(){  
- if(!provider)await loadProvider();  
- if(Number(provider.slot)!==1){say('api-message','Is provider ka API integration abhi configure nahi hua.',true);return;}  
- $('load-services').disabled=true;$('load-services').textContent='LOADING...';  
- say('api-message','SMM Decent se services load ho rahi hain...');  
- try{  
-  const {data,error}=await db.functions.invoke('smmd-services-check');  
-  if(error)throw error;  
-  if(!data||data.success!==true||!Array.isArray(data.services))throw new Error(data?.error||'Provider response invalid.');  
-  apiServices=data.services;  
-  const cats=[...new Set(apiServices.map(s=>String(s.category||'Other').trim()).filter(Boolean))].sort();  
-  $('category-select').innerHTML='<option value="">Select Category</option>'+cats.map(c=>`<option value="${safe(c)}">${safe(c)}</option>`).join('');  
-  $('category-select').disabled=false;  
-  $('service-select').innerHTML='<option value="">Select Service</option>';$('service-select').disabled=true;  
-  $('provider-total').textContent=apiServices.length;$('provider-categories').textContent=cats.length;  
-  $('provider-message').textContent='Services successfully loaded.';  
-  say('api-message',apiServices.length+' services aur '+cats.length+' categories load ho gayi hain.');  
- }catch(e){console.error(e);say('api-message','API error: '+e.message,true);say('provider-message','API error: '+e.message,true);}  
- finally{$('load-services').disabled=false;$('load-services').innerHTML='<i class="fa-solid fa-cloud-arrow-down"></i> LOAD / REFRESH DECENT SERVICES';}  
-}  
-  
-function fillServiceDropdown(){  
- const cat=$('category-select').value;  
- const list=apiServices.filter(s=>String(s.category||'Other').trim()===cat);  
- $('service-select').innerHTML='<option value="">Select Service</option>'+list.map(s=>`<option value="${safe(s.service)}">${safe(s.name)} (ID: ${safe(s.service)})</option>`).join('');  
- $('service-select').disabled=!list.length;clearSelectedService();  
-}  
-function clearSelectedService(){  
- selectedApiService=null;  
- ['service-name','provider-service-id','provider-type','min-qty','max-qty','provider-cost'].forEach(id=>$(id).value='');  
- $('publish-btn').disabled=true;calculateProfit();  
-}  
-function selectApiService(){  
- selectedApiService=apiServices.find(s=>String(s.service)===String($('service-select').value))||null;  
- if(!selectedApiService){clearSelectedService();return;}  
- const s=selectedApiService;  
- $('service-name').value=s.name||'';$('provider-service-id').value=String(s.service);  
- $('provider-type').value=s.type||'Default';$('min-qty').value=Number(s.min)||1;  
- $('max-qty').value=Number(s.max)||1;$('provider-cost').value=Number(s.rate)||0;  
- $('selling-price').value='';$('publish-btn').disabled=false;calculateProfit();  
-}  
-function calculateProfit(){  
- const cost=Number($('provider-cost').value||0),fx=Number($('usd-rate').value||0),sell=Number($('selling-price').value||0);  
- const pkr=cost*fx,profit=sell-pkr;  
- $('cost-pkr').textContent='PKR '+pkr.toFixed(2);$('sell-pkr').textContent='PKR '+sell.toFixed(2);  
- $('profit-pkr').textContent='PKR '+profit.toFixed(2);  
- $('profit-pkr').className=(profit>=0?'text-emerald-400':'text-red-400')+' text-lg';  
-}  
-async function publishService(){  
- if(!provider||!selectedApiService)return say('form-message','Pehle provider service select karein.',true);  
- const s=selectedApiService,rate=Number($('selling-price').value),fx=Number($('usd-rate').value),cost=Number(s.rate),min=Number(s.min),max=Number(s.max);  
- if(!Number.isFinite(rate)||rate<=0)return say('form-message','Valid PKR selling price enter karein.',true);  
- if(!Number.isFinite(fx)||fx<=0)return say('form-message','USD rate sahi enter karein.',true);  
- if(!Number.isFinite(cost)||cost<0)return say('form-message','Provider cost valid nahi.',true);  
- if(!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min)return say('form-message','Minimum aur maximum quantity check karein.',true);  
- const btn=$('publish-btn');btn.disabled=true;btn.textContent='PUBLISHING...';  
- try{  
-  const {error}=await db.from('smm_services').insert([{  
-   provider_id:provider.id,provider_service_id:String(s.service),  
-   category:String(s.category||'Other'),name:String(s.name||'').trim(),  
-   rate,min,max,provider_cost:cost,provider_currency:provider.currency||'USD',is_active:true  
-  }]);  
-  if(error)throw error;  
-  say('form-message','Service publish ho gayi.');  
-  $('service-select').value='';$('selling-price').value='';clearSelectedService();  
-  await loadPublishedServices();  
- }catch(e){console.error(e);say('form-message','Publish error: '+e.message,true);}  
- finally{btn.disabled=!selectedApiService;btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> PUBLISH SERVICE';}  
-}  
-async function publishManualService(){  
- const category=$('manual-category').value.trim(),name=$('manual-name').value.trim();  
- const min=Number($('manual-min').value),max=Number($('manual-max').value),rate=Number($('manual-rate').value);  
- if(!category||!name)return say('manual-form-message','Category aur name lazmi hain.',true);  
- if(!Number.isInteger(min)||min<1||!Number.isInteger(max)||max<min)return say('manual-form-message','Quantity check karein.',true);  
- if(!Number.isFinite(rate)||rate<=0)return say('manual-form-message','Selling price valid enter karein.',true);  
- const btn=$('publish-manual-btn');btn.disabled=true;btn.textContent='PUBLISHING...';  
- try{  
-  const {error}=await db.from('smm_services').insert([{  
-   provider_id:null,provider_service_id:null,category,name,rate,min,max,  
-   provider_cost:0,provider_currency:'PKR',is_active:true  
-  }]);  
-  if(error)throw error;  
-  say('manual-form-message','Manual service publish ho gayi.');  
-  $('manual-category').value='';$('manual-name').value='';$('manual-rate').value='';  
-  await loadPublishedServices();  
- }catch(e){say('manual-form-message','Error: '+e.message,true);}  
- finally{btn.disabled=false;btn.textContent='PUBLISH MANUAL SERVICE';}  
-}  
-async function checkBalance(){  
- const btn=$('check-balance');btn.disabled=true;btn.textContent='CHECKING...';  
- say('balance-message','Balance check ho raha hai...');  
- try{  
-  const {data,error}=await db.functions.invoke('smmd-balance-check');  
-  if(error)throw error;if(!data||data.success!==true)throw new Error(data?.error||'Balance check failed.');  
-  $('provider-balance').textContent='$ '+Number(data.balance||0).toFixed(4);  
-  $('balance-message').textContent='Currency: '+(data.currency||'USD');  
- }catch(e){say('balance-message','Balance error: '+e.message,true);}  
- finally{btn.disabled=false;btn.textContent='CHECK BALANCE';}  
-}  
-  
-async function loadPublishedServices(){  
- $('published-list').innerHTML='<p class="muted text-center py-6">Loading...</p>';  
- const {data,error}=await db.from('smm_services').select('id,category,name,rate,min,max,provider_service_id,provider_cost,provider_currency,is_active,provider_id').order('id',{ascending:false});  
- if(error)throw error;publishedServices=data||[];  
- $('published-count').textContent=publishedServices.length+' saved services';renderPublished();  
-}  
-function renderPublished(){  
- const q=$('published-search').value.toLowerCase().trim();  
- const list=publishedServices.filter(s=>[s.name,s.category,s.provider_service_id].some(v=>String(v||'').toLowerCase().includes(q)));  
- if(!list.length){$('published-list').innerHTML='<p class="muted text-center py-8">No services found.</p>';return;}  
- $('published-list').innerHTML='';  
- list.forEach(s=>{  
-  const manual=!s.provider_id,card=document.createElement('article');card.className='card space-y-3';  
-  card.innerHTML=`  
-   <div class="flex justify-between gap-2"><div class="min-w-0">  
-   <span class="pill">${safe(s.category)}</span> ${manual?'<span class="pill" style="background:#3b0764;color:#d8b4fe">MANUAL</span>':'<span class="pill">API</span>'}  
-   <h3 class="font-bold text-sm mt-2 break-words">${safe(s.name)}</h3>  
-   <p class="text-[10px] text-gray-500">Service ID: ${safe(s.provider_service_id||'Manual')}</p></div>  
-   <span class="${s.is_active?'text-emerald-400':'text-red-400'} text-[10px]">${s.is_active?'PUBLISHED':'HIDDEN'}</span></div>  
-   <div class="grid grid-cols-2 gap-2 text-xs">  
-   <p class="text-gray-400">Selling: <b class="text-emerald-400">PKR ${safe(s.rate)}</b></p>  
-   <p class="text-gray-400">Cost: <b>${safe(s.provider_cost??'--')} ${safe(s.provider_currency||'USD')}</b></p>  
-   <p class="text-gray-400">Min: <b>${safe(s.min)}</b></p><p class="text-gray-400">Max: <b>${safe(s.max)}</b></p></div>  
-   <div class="grid grid-cols-2 gap-2">  
-   <button class="topbtn" data-toggle>${s.is_active?'UNPUBLISH / HIDE':'PUBLISH / SHOW'}</button>  
-   <button class="topbtn text-red-400 border-red-900" data-delete>DELETE SERVICE</button></div>`;  
-  card.querySelector('[data-toggle]').onclick=()=>toggleService(s);  
-  card.querySelector('[data-delete]').onclick=()=>deletePublishedService(s.id);  
-  $('published-list').appendChild(card);  
- });  
-}  
-async function toggleService(s){  
- if(!confirm(s.is_active?'Service players se hide karni hai?':'Service players ke liye publish karni hai?'))return;  
- const {error}=await db.from('smm_services').update({is_active:!s.is_active}).eq('id',s.id);  
- if(error){alert('Update error: '+error.message);return;}await loadPublishedServices();  
-}  
-async function deletePublishedService(id){  
- const s=publishedServices.find(x=>Number(x.id)===Number(id));if(!s)return;  
- if(!confirm('Service permanently delete karni hai?'))return;  
- const {count,error:checkError}=await db.from('smm_orders').select('*',{count:'exact',head:true}).eq('service_name',s.name);  
- if(checkError){alert('Orders check nahi ho saka. Safety ke liye delete rok di gayi: '+checkError.message);return;}  
- if(count>0){alert('Is service ke '+count+' orders maujood hain. Orders history ki wajah se service delete nahi ki ja sakti. Pehle un orders ka record resolve karein.');return;}  
- const {error}=await db.from('smm_services').delete().eq('id',id);  
- if(error){alert('Delete error: '+error.message);return;}await loadPublishedServices();  
-}  
-  
-async function loadOrders(){  
- $('orders-list').innerHTML='<p class="muted text-center py-6">Loading orders...</p>';  
- const {data,error}=await db.from('smm_orders').select('id,order_id,user_id,service_name,link,quantity,charge,status,created_at,provider_order_id,provider_status,provider_error,provider_id').order('created_at',{ascending:false}).limit(200);  
- if(error)throw error;allOrders=data||[];renderOrders();  
-}  
-function renderOrders(){  
- const filter=$('order-filter').value;  
- const list=filter==='All'?allOrders:allOrders.filter(o=>String(o.status||'Pending').toLowerCase()===filter.toLowerCase());  
- $('orders-count').textContent=list.length+' orders shown';  
- if(!list.length){$('orders-list').innerHTML='<p class="muted text-center py-8">No orders found.</p>';return;}  
- $('orders-list').innerHTML='';  
- list.forEach(o=>{  
-  const manual=!o.provider_id,completed=String(o.status||'').toLowerCase()==='completed';  
-  const card=document.createElement('article');card.className='card space-y-2';  
-  let actions='';  
-  if(manual){  
-   actions=completed  
-    ?`<button class="topbtn text-red-400 border-red-900 w-full" data-delete>DELETE ORDER</button>`  
-    :`<div class="grid grid-cols-4 gap-2"><button class="topbtn" data-status="Pending">PENDING</button><button class="topbtn" data-status="Processing">PROCESSING</button><button class="topbtn" data-status="Completed">COMPLETED</button><button class="topbtn text-red-400 border-red-900" data-delete>DELETE</button></div>`;  
-  }else{  
-   actions=completed  
-    ?`<button class="topbtn text-red-400 border-red-900 w-full" data-delete>DELETE ORDER</button>`  
-    :`<p class="text-[10px] text-cyan-300">API MANAGED — STATUS PROVIDER SE UPDATE HOGA</p>`;  
-  }  
-  card.innerHTML=`  
-   <div class="flex justify-between"><div class="flex gap-2"><b class="text-cyan-300">#${safe(o.order_id||o.id)}</b><span class="pill">${manual?'MANUAL':'API'}</span></div><span class="pill">${safe(o.status||'Pending')}</span></div>  
-   <p class="text-sm font-bold">${safe(o.service_name)}</p>  
-   <p class="text-xs text-gray-400">Quantity: ${safe(o.quantity)} | Charge: PKR ${safe(o.charge)}</p>  
-   <p class="text-[10px] text-gray-500 break-all">Provider Order ID: ${safe(o.provider_order_id||'Not submitted')}</p>  
-   <p class="text-[10px] text-gray-500 break-all">Provider Status: ${safe(o.provider_status||'Not available')}</p>  
-   ${o.provider_error?`<p class="text-[10px] text-red-400">${safe(o.provider_error)}</p>`:''}  
-   <p class="text-[10px] text-gray-500 break-all">Target: ${safe(o.link)}</p>${actions}`;  
-  if(manual&&!completed)card.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>manualOrderStatus(o.id,b.dataset.status));  
-  const del=card.querySelector('[data-delete]');if(del)del.onclick=()=>deleteOrder(o.id);  
-  $('orders-list').appendChild(card);  
- });  
-}  
-async function manualOrderStatus(id,status){  
- if(!confirm('Order status '+status+' karna hai?'))return;  
- const {error}=await db.from('smm_orders').update({status,updated_at:new Date().toISOString()}).eq('id',id).is('provider_id',null);  
- if(error){alert('Status update error: '+error.message);return;}await loadOrders();  
-}  
-async function deleteOrder(id){  
- if(!confirm('Order delete karna hai?'))return;  
- const {error}=await db.from('smm_orders').delete().eq('id',id);  
- if(error){alert('Delete error: '+error.message);return;}await loadOrders();  
-}  
-  
-async function renderProvidersList(){  
- const el=$('providers-list');  
- if(!allProviders.length){el.innerHTML='<p class="muted">No providers found.</p>';return;}  
- el.innerHTML='';  
- for(const p of allProviders){  
-  const item=document.createElement('div');item.className='card flex justify-between items-center gap-2';  
-  item.innerHTML=`<div><h4 class="font-bold text-sm">${safe(p.name)} (Slot ${safe(p.slot)})</h4><p class="text-[10px] text-gray-400 break-all">${safe(p.api_url)}</p></div><button class="topbtn text-red-400 border-red-900">DELETE</button>`;  
-  item.querySelector('button').onclick=()=>deleteProvider(p.id,p.name);  
-  el.appendChild(item);  
- }  
- updateProviderLimit();  
-}  
-async function saveNewProvider(){  
- if(allProviders.length>=3)return say('prov-form-message','Maximum 3 providers allowed hain.',true);  
- const name=$('new-prov-name').value.trim(),api_url=$('new-prov-url').value.trim(),secret_name=$('new-prov-secret').value.trim(),currency=$('new-prov-currency').value.trim()||'USD';  
- const slot=Number($('new-prov-slot').value);  
- if(!name||!api_url||!secret_name)return say('prov-form-message','Name, API URL aur Secret Name lazmi hain.',true);  
- if(!/^https:\/\/.+/i.test(api_url))return say('prov-form-message','HTTPS API URL enter karein.',true);  
- if(![1,2,3].includes(slot)||allProviders.some(p=>Number(p.slot)===slot))return say('prov-form-message','Provider slot available nahi. Refresh karke dobara try karein.',true);  
- const btn=$('save-new-provider-btn');btn.disabled=true;btn.textContent='SAVING...';  
- try{  
-  const {error}=await db.from('smm_providers').insert([{name,api_url,secret_name,currency,slot,is_active:true,orders_enabled:false}]);  
-  if(error)throw error;  
-  say('prov-form-message','Provider record save ho gaya. API integration abhi alag configure karni hogi.');  
-  $('new-prov-name').value='';$('new-prov-url').value='';$('new-prov-secret').value='';  
-  await loadProvider();  
- }catch(e){say('prov-form-message','Save error: '+e.message,true);}  
- finally{updateProviderLimit();}  
-}  
-async function deleteProvider(id,name){  
- const {count:sCount,error:sErr}=await db.from('smm_services').select('*',{count:'exact',head:true}).eq('provider_id',id);  
- if(sErr){alert('Services check nahi ho saka. Delete rok di gayi: '+sErr.message);return;}  
- if(sCount>0){alert(name+' ke '+sCount+' services linked hain. Pehle services ka record resolve karein.');return;}  
- const {count:oCount,error:oErr}=await db.from('smm_orders').select('*',{count:'exact',head:true}).eq('provider_id',id);  
- if(oErr){alert('Orders check nahi ho sake. Delete rok di gayi: '+oErr.message);return;}  
- if(oCount>0){alert(name+' ke '+oCount+' orders linked hain. Provider delete nahi ho sakta.');return;}  
- if(!confirm('Provider '+name+' delete karna hai?'))return;  
- const {error}=await db.from('smm_providers').delete().eq('id',id);  
- if(error){alert('Delete error: '+error.message);return;}await loadProvider();  
-}  
-  
-async function init(){  
- try{await checkAdmin();await loadProvider();}  
- catch(e){console.error(e);$('access').textContent='Access error: '+e.message;$('access').className='panel text-center text-red-400 text-sm';}  
-}  
-  
-$('load-services').onclick=fetchProviderServices;  
-$('provider-refresh-services').onclick=fetchProviderServices;  
-$('category-select').onchange=fillServiceDropdown;  
-$('service-select').onchange=selectApiService;  
-$('usd-rate').oninput=calculateProfit;  
-$('selling-price').oninput=calculateProfit;  
-$('publish-btn').onclick=publishService;  
-$('check-balance').onclick=checkBalance;  
-$('open-provider').onclick=()=>openPage('provider-page');  
-$('open-orders').onclick=async()=>{openPage('orders-page');try{await loadOrders();}catch(e){$('orders-list').textContent=e.message;}};  
-$('open-published').onclick=async()=>{openPage('published-page');try{await loadPublishedServices();}catch(e){$('published-list').textContent=e.message;}};  
-$('open-manual-service').onclick=()=>openPage('manual-service-page');  
-$('open-add-provider').onclick=()=>{updateProviderLimit();if(allProviders.length<3)openPage('add-provider-page');};  
-document.querySelectorAll('.close-page').forEach(b=>b.onclick=closePages);  
-$('refresh-orders').onclick=async()=>{try{await loadOrders();}catch(e){alert(e.message);}};  
-$('order-filter').onchange=renderOrders;  
-$('refresh-published').onclick=async()=>{try{await loadPublishedServices();}catch(e){alert(e.message);}};  
-$('published-search').oninput=renderPublished;  
-$('publish-manual-btn').onclick=publishManualService;  
-$('save-new-provider-btn').onclick=saveNewProvider;  
-window.addEventListener('DOMContentLoaded',init);  
-})();  
-</script>  
-</body>  
+  <button id="load-services" class="primary">
+   <i class="fa-solid fa-cloud-arrow-down"></i> FETCH SELECTED PROVIDER SERVICES
+  </button>
+  <p id="api-message" class="text-center text-xs muted"></p>
+
+  <div class="border-t border-[#263247] pt-4 space-y-3">
+   <h3 class="font-gaming text-lg font-bold text-cyan-300">SELECTED SERVICE DETAILS</h3>
+   <div>
+    <label class="lbl">Service Name</label>
+    <input id="service-name" class="field" readonly>
+   </div>
+   <div class="grid grid-cols-2 gap-3">
+    <div><label class="lbl">Provider Service ID</label><input id="provider-service-id" class="field" readonly></div>
+    <div><label class="lbl">Provider Type</label><input id="provider-type" class="field" readonly></div>
+    <div><label class="lbl">Minimum Quantity</label><input id="min-qty" class="field" readonly></div>
+    <div><label class="lbl">Maximum Quantity</label><input id="max-qty" class="field" readonly></div>
+   </div>
+   <div class="grid grid-cols-2 gap-3">
+    <div><label class="lbl">Provider Cost / 1000</label><input id="provider-cost" class="field" readonly></div>
+    <div><label class="lbl">USD to PKR Rate</label><input id="usd-rate" class="field" type="number" min="1" step=".01" value="280"></div>
+   </div>
+   <div>
+    <label class="lbl">Your Selling Price PKR / 1000</label>
+    <input id="selling-price" class="field" type="number" min=".01" step=".01">
+   </div>
+   <div class="rounded-xl border border-emerald-900 bg-[#071711] p-4 space-y-2">
+    <div class="flex justify-between text-xs"><span class="text-gray-400">Provider Cost PKR</span><strong id="cost-pkr">PKR 0.00</strong></div>
+    <div class="flex justify-between text-xs"><span class="text-gray-400">Selling Price</span><strong id="sell-pkr">PKR 0.00</strong></div>
+    <div class="border-t border-emerald-900 pt-2 flex justify-between">
+     <span class="text-emerald-300 text-sm font-bold">PROFIT / 1000</span>
+     <strong id="profit-pkr" class="text-emerald-400 text-lg">PKR 0.00</strong>
+    </div>
+    <p class="text-[10px] text-gray-500">USD conversion is applied to USD provider rates. Non-USD provider rates require their own currency conversion before publishing.</p>
+   </div>
+   <button id="publish-btn" class="primary" disabled>
+    <i class="fa-solid fa-cloud-arrow-up"></i> PUBLISH SERVICE
+   </button>
+   <p id="form-message" class="text-center text-xs muted"></p>
+  </div>
+ </section>
+</main>
+</div>
+
+<!-- PROVIDER CONTROL -->
+<section id="provider-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-cyan-400">PROVIDER CONTROL</h2>
+    <p class="text-xs text-gray-500">All configured providers</p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+
+  <div class="card space-y-3">
+   <h3 class="font-gaming text-lg text-cyan-300 font-bold">PROVIDER OVERVIEW</h3>
+   <p class="text-xs muted">Har provider ka balance aur services alag test karein.</p>
+   <div id="providers-control-list" class="space-y-3"></div>
+   <button id="refresh-provider-list" class="topbtn w-full">
+    <i class="fa-solid fa-rotate"></i> REFRESH PROVIDER LIST
+   </button>
+  </div>
+ </div>
+</section>
+
+<!-- ORDERS -->
+<section id="orders-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-amber-400">SMM ORDERS</h2>
+    <p id="orders-count" class="text-xs text-gray-500">Orders</p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+
+  <div class="order-tabs">
+   <button class="order-tab active" data-order-filter="All">ALL ORDERS</button>
+   <button class="order-tab" data-order-filter="Pending">PENDING</button>
+   <button class="order-tab" data-order-filter="Processing">PROCESSING</button>
+   <button class="order-tab" data-order-filter="Completed">COMPLETED</button>
+  </div>
+  <div class="flex gap-2">
+   <input id="order-search" class="field" placeholder="Search order ID / service / link...">
+   <button id="refresh-orders" class="topbtn">↻</button>
+  </div>
+  <div id="orders-list" class="space-y-3"></div>
+ </div>
+</section>
+
+<!-- PUBLISHED -->
+<section id="published-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-emerald-400">PUBLISHED SERVICES</h2>
+    <p id="published-count" class="text-xs text-gray-500"></p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+  <input id="published-search" class="field" placeholder="Search published service...">
+  <button id="refresh-published" class="topbtn w-full">↻ REFRESH SERVICES</button>
+  <div id="published-list" class="space-y-3"></div>
+ </div>
+</section>
+
+<!-- MANUAL SERVICE -->
+<section id="manual-service-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-purple-400">ADD MANUAL SERVICE</h2>
+    <p class="text-xs text-gray-500">Without external provider</p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+  <div class="card space-y-4">
+   <div><label class="lbl">Category</label><input id="manual-category" class="field" placeholder="Instagram Followers"></div>
+   <div><label class="lbl">Service Name</label><input id="manual-name" class="field" placeholder="Instagram Followers Non-Drop"></div>
+   <div class="grid grid-cols-2 gap-3">
+    <div><label class="lbl">Minimum Quantity</label><input id="manual-min" class="field" type="number" value="10"></div>
+    <div><label class="lbl">Maximum Quantity</label><input id="manual-max" class="field" type="number" value="10000"></div>
+   </div>
+   <div><label class="lbl">Selling Price PKR / 1000</label><input id="manual-rate" class="field" type="number" min=".01" step=".01"></div>
+   <button id="publish-manual-btn" class="primary" style="background:#6b21a8">PUBLISH MANUAL SERVICE</button>
+   <p id="manual-form-message" class="text-center text-xs muted"></p>
+  </div>
+ </div>
+</section>
+
+<!-- ADD PROVIDER -->
+<section id="add-provider-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-blue-400">MANAGE PROVIDERS</h2>
+    <p class="text-xs text-gray-500">Maximum 3 provider slots</p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+  <div class="card space-y-4">
+   <h3 class="font-gaming text-lg font-bold text-cyan-300">ADD NEW PROVIDER</h3>
+   <div><label class="lbl">Provider Name</label><input id="new-prov-name" class="field" placeholder="Hafiz Panel"></div>
+   <div><label class="lbl">API URL</label><input id="new-prov-url" class="field" placeholder="https://provider.com/api/v2"></div>
+   <div><label class="lbl">Secret Name</label><input id="new-prov-secret" class="field" placeholder="HAFIZ_API_KEY"></div>
+   <div class="grid grid-cols-2 gap-3">
+    <div><label class="lbl">Currency</label><input id="new-prov-currency" class="field" value="USD"></div>
+    <div><label class="lbl">Slot (auto)</label><input id="new-prov-slot" class="field" readonly></div>
+   </div>
+   <p class="text-[10px] text-amber-300">Note: Slot 1 = Decent, Slot 2 = Hafiz. Slot 3 requires its own tested Edge Functions before API testing can work.</p>
+   <button id="save-new-provider-btn" class="primary" style="background:#1d4ed8">SAVE PROVIDER</button>
+   <p id="prov-form-message" class="text-center text-xs muted"></p>
+  </div>
+  <div class="card space-y-3">
+   <h3 class="font-gaming text-lg font-bold text-cyan-300">CONFIGURED PROVIDERS</h3>
+   <div id="providers-list" class="space-y-2"></div>
+  </div>
+ </div>
+</section>
+
+<!-- GLOBAL SEARCH -->
+<section id="search-page" class="fullscreen hidden">
+ <div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex justify-between items-center border-b border-[#263247] pb-4">
+   <div>
+    <h2 class="font-gaming text-2xl font-bold text-yellow-400">GLOBAL SEARCH</h2>
+    <p class="text-xs text-gray-500">Search services and orders</p>
+   </div>
+   <button class="topbtn close-page">CLOSE ✕</button>
+  </div>
+  <input id="global-search-input" class="field" placeholder="Search service name, category, order ID...">
+  <div id="global-search-results" class="space-y-3">
+   <p class="muted text-center">Type to search.</p>
+  </div>
+ </div>
+</section>
+
+<script>
+(() => {
+'use strict';
+
+const URL='https://yzirjidgdxhljbhhjfqp.supabase.co';
+const KEY='sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
+const db=window.supabase.createClient(URL,KEY);
+const $=id=>document.getElementById(id);
+
+let adminUser=null,provider=null,apiServices=[],selectedApiService=null;
+let publishedServices=[],allOrders=[],allProviders=[];
+let currentOrderFilter='All';
+let serviceCacheProviderId=null;
+
+function safe(v){
+ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function say(id,msg,error=false){
+ $(id).textContent=msg;
+ $(id).className='text-center text-xs '+(error?'text-red-400':'text-emerald-400');
+}
+function openPage(id){
+ closePages();
+ $(id).classList.remove('hidden');
+}
+function closePages(){
+ ['provider-page','orders-page','published-page','manual-service-page','add-provider-page','search-page']
+ .forEach(id=>$(id).classList.add('hidden'));
+}
+function providerFunction(p,kind){
+ const slot=Number(p.slot);
+ if(slot===1){
+  return kind==='balance'?'smmd-balance-check':'smmd-services-check';
+ }
+ if(slot===2){
+  return kind==='balance'?'hafiz-balance-check':'hafiz-services-check';
+ }
+ return null;
+}
+function providerReady(p){
+ return !!providerFunction(p,'balance');
+}
+
+async function checkAdmin(){
+ const {data,error}=await db.auth.getUser();
+ if(error)throw error;
+ adminUser=data.user;
+ if(!adminUser)throw new Error('Pehle Tournament Admin Panel mein login karein.');
+ const {data:p,error:pe}=await db.from('profiles').select('is_admin').eq('id',adminUser.id).maybeSingle();
+ if(pe)throw pe;
+ if(!p||p.is_admin!==true)throw new Error('Sirf admin is panel ko use kar sakta hai.');
+ $('access').classList.add('hidden');
+ $('app').classList.remove('hidden');
+}
+
+async function loadProvider(){
+ const {data,error}=await db.from('smm_providers')
+ .select('id,name,api_url,secret_name,currency,is_active,orders_enabled,slot')
+ .order('slot');
+ if(error)throw error;
+ allProviders=data||[];
+ provider=allProviders.find(p=>Number(p.slot)===1)||allProviders[0]||null;
+
+ $('provider-select').innerHTML=allProviders.map(p=>
+  `<option value="${safe(p.id)}">${safe(p.name)} (Slot ${safe(p.slot)})</option>`
+ ).join('');
+
+ if(provider)$('provider-select').value=provider.id;
+ updateSelectedProvider();
+ renderProvidersList();
+ renderProviderControl();
+ updateProviderLimit();
+}
+
+function updateSelectedProvider(){
+ provider=allProviders.find(p=>String(p.id)===String($('provider-select').value))||null;
+ apiServices=[];
+ serviceCacheProviderId=null;
+ selectedApiService=null;
+ $('selected-provider-badge').textContent=provider?provider.name.toUpperCase():'NO PROVIDER';
+ $('category-select').innerHTML='<option value="">Fetch selected provider services first</option>';
+ $('category-select').disabled=true;
+ $('service-select').innerHTML='<option value="">Select category first</option>';
+ $('service-select').disabled=true;
+ clearSelectedService();
+ if(provider){
+  const ready=providerReady(provider);
+  $('load-services').disabled=!ready;
+  $('load-services').textContent=ready?'FETCH '+provider.name.toUpperCase()+' SERVICES':'API NOT CONFIGURED FOR THIS SLOT';
+ }else{
+  $('load-services').disabled=true;
+ }
+}
+
+function updateProviderLimit(){
+ const slots=[1,2,3].filter(n=>!allProviders.some(p=>Number(p.slot)===n));
+ $('new-prov-slot').value=slots[0]||'';
+ const full=allProviders.length>=3||slots.length===0;
+ $('open-add-provider').disabled=full;
+ $('save-new-provider-btn').disabled=full;
+ $('save-new-provider-btn').textContent=full?'MAX 3 PROVIDERS REACHED':'SAVE PROVIDER';
+}
+
+async function invokeProvider(p,kind){
+ const fn=providerFunction(p,kind);
+ if(!fn)throw new Error('Slot '+p.slot+' ka API integration abhi configure nahi hai.');
+ const {data,error}=await db.functions.invoke(fn);
+ if(error)throw error;
+ if(!data||data.success!==true)throw new Error(data?.error||'Provider request failed.');
+ return data;
+}
+
+async function fetchProviderServices(forProvider=null){
+ const target=forProvider||provider;
+ if(!target)return say('api-message','Provider select karein.',true);
+ if(!providerReady(target))return say('api-message','Is provider ka API function configure nahi hai.',true);
+
+ const isMain=String(target.id)===String(provider?.id);
+ if(isMain){
+  $('load-services').disabled=true;
+  $('load-services').textContent='FETCHING SERVICES...';
+  say('api-message',target.name+' se services load ho rahi hain...');
+ }
+ try{
+  const data=await invokeProvider(target,'services');
+  if(!Array.isArray(data.services))throw new Error('Services response array nahi hai.');
+  if(isMain){
+   apiServices=data.services;
+   serviceCacheProviderId=String(target.id);
+   fillCategories();
+   say('api-message',target.name+': '+apiServices.length+' services load ho gayi hain.');
+  }
+  return data.services;
+ }catch(e){
+  console.error(e);
+  if(isMain)say('api-message',target.name+' API error: '+e.message,true);
+  throw e;
+ }finally{
+  if(isMain){
+   $('load-services').disabled=false;
+   $('load-services').innerHTML='<i class="fa-solid fa-cloud-arrow-down"></i> FETCH '+safe(target.name.toUpperCase())+' SERVICES';
+  }
+ }
+}
+
+function fillCategories(){
+ const cats=[...new Set(apiServices.map(s=>String(s.category||'Other').trim()).filter(Boolean))].sort();
+ $('category-select').innerHTML='<option value="">Select Category</option>'+
+ cats.map(c=>`<option value="${safe(c)}">${safe(c)}</option>`).join('');
+ $('category-select').disabled=false;
+ $('service-select').innerHTML='<option value="">Select category first</option>';
+ $('service-select').disabled=true;
+}
+
+function fillServiceDropdown(){
+ const cat=$('category-select').value;
+ const list=apiServices.filter(s=>String(s.category||'Other').trim()===cat);
+ $('service-select').innerHTML='<option value="">Select Service</option>'+
+ list.map(s=>`<option value="${safe(s.service)}">${safe(s.name)} (ID: ${safe(s.service)})</option>`).join('');
+ $('service-select').disabled=!list.length;
+ clearSelectedService();
+}
+
+function clearSelectedService(){
+ selectedApiService=null;
+ ['service-name','provider-service-id','provider-type','min-qty','max-qty','provider-cost']
+ .forEach(id=>$(id).value='');
+ $('publish-btn').disabled=true;
+ calculateProfit();
+}
+
+function selectApiService(){
+ if(serviceCacheProviderId!==String(provider?.id)){
+  clearSelectedService();
+  return say('form-message','Selected provider services dobara fetch karein.',true);
+ }
+ selectedApiService=apiServices.find(s=>String(s.service)===String($('service-select').value))||null;
+ if(!selectedApiService){clearSelectedService();return;}
+ const s=selectedApiService;
+ $('service-name').value=s.name||'';
+ $('provider-service-id').value=String(s.service);
+ $('provider-type').value=s.type||'Default';
+ $('min-qty').value=Number(s.min)||1;
+ $('max-qty').value=Number(s.max)||1;
+ $('provider-cost').value=Number(s.rate)||0;
+ $('selling-price').value='';
+ $('publish-btn').disabled=false;
+ calculateProfit();
+}
+
+function calculateProfit(){
+ const cost=Number($('provider-cost').value||0);
+ const fx=Number($('usd-rate').value||0);
+ const sell=Number($('selling-price').value||0);
+ const currency=String(provider?.currency||'USD').toUpperCase();
+ const pkr=currency==='PKR'?cost:cost*fx;
+ const profit=sell-pkr;
+ $('cost-pkr').textContent='PKR '+pkr.toFixed(2);
+ $('sell-pkr').textContent='PKR '+sell.toFixed(2);
+ $('profit-pkr').textContent='PKR '+profit.toFixed(2);
+ $('profit-pkr').className=(profit>=0?'text-emerald-400':'text-red-400')+' text-lg';
+}
+
+async function publishService(){
+ if(!provider||!selectedApiService)return say('form-message','Pehle provider service select karein.',true);
+ if(serviceCacheProviderId!==String(provider.id))return say('form-message','Service list selected provider ki nahi. Dobara fetch karein.',true);
+ const s=selectedApiService;
+ const rate=Number($('selling-price').value);
+ const fx=Number($('usd-rate').value);
+ const cost=Number(s.rate);
+ const min=Number(s.min),max=Number(s.max);
+ if(!Number.isFinite(rate)||rate<=0)return say('form-message','Valid PKR selling price enter karein.',true);
+ if(String(provider.currency||'USD').toUpperCase()==='USD'&&(!Number.isFinite(fx)||fx<=0))return say('form-message','USD rate sahi enter karein.',true);
+ if(!Number.isFinite(cost)||cost<0)return say('form-message','Provider cost valid nahi.',true);
+ if(!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min)return say('form-message','Minimum aur maximum quantity check karein.',true);
+
+ const btn=$('publish-btn');
+ btn.disabled=true;btn.textContent='PUBLISHING...';
+ try{
+  const {error}=await db.from('smm_services').insert([{
+   provider_id:provider.id,
+   provider_service_id:String(s.service),
+   category:String(s.category||'Other'),
+   name:String(s.name||'').trim(),
+   rate,
+   min,max,
+   provider_cost:cost,
+   provider_currency:provider.currency||'USD',
+   is_active:true
+  }]);
+  if(error)throw error;
+  say('form-message',provider.name+' service successfully publish ho gayi.');
+  $('service-select').value='';
+  $('selling-price').value='';
+  clearSelectedService();
+  await loadPublishedServices();
+ }catch(e){
+  console.error(e);
+  say('form-message','Publish error: '+e.message,true);
+ }finally{
+  btn.disabled=!selectedApiService;
+  btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> PUBLISH SERVICE';
+ }
+}
+
+async function publishManualService(){
+ const category=$('manual-category').value.trim();
+ const name=$('manual-name').value.trim();
+ const min=Number($('manual-min').value);
+ const max=Number($('manual-max').value);
+ const rate=Number($('manual-rate').value);
+ if(!category||!name)return say('manual-form-message','Category aur name lazmi hain.',true);
+ if(!Number.isInteger(min)||min<1||!Number.isInteger(max)||max<min)return say('manual-form-message','Quantity check karein.',true);
+ if(!Number.isFinite(rate)||rate<=0)return say('manual-form-message','Selling price valid enter karein.',true);
+ const btn=$('publish-manual-btn');
+ btn.disabled=true;btn.textContent='PUBLISHING...';
+ try{
+  const {error}=await db.from('smm_services').insert([{
+   provider_id:null,provider_service_id:null,category,name,rate,min,max,
+   provider_cost:0,provider_currency:'PKR',is_active:true
+  }]);
+  if(error)throw error;
+  say('manual-form-message','Manual service publish ho gayi.');
+  $('manual-category').value='';$('manual-name').value='';$('manual-rate').value='';
+  await loadPublishedServices();
+ }catch(e){say('manual-form-message','Error: '+e.message,true);}
+ finally{btn.disabled=false;btn.textContent='PUBLISH MANUAL SERVICE';}
+}
+
+async function loadPublishedServices(){
+ $('published-list').innerHTML='<p class="muted text-center py-6">Loading...</p>';
+ const {data,error}=await db.from('smm_services')
+ .select('id,category,name,rate,min,max,provider_service_id,provider_cost,provider_currency,is_active,provider_id')
+ .order('id',{ascending:false});
+ if(error)throw error;
+ publishedServices=data||[];
+ $('published-count').textContent=publishedServices.length+' saved services';
+ renderPublished();
+}
+
+function getProviderName(id){
+ const p=allProviders.find(x=>String(x.id)===String(id));
+ return p?.name||(id?'Provider':'Manual');
+}
+
+function renderPublished(){
+ const q=$('published-search').value.toLowerCase().trim();
+ const list=publishedServices.filter(s=>
+  [s.name,s.category,s.provider_service_id,getProviderName(s.provider_id)]
+  .some(v=>String(v||'').toLowerCase().includes(q))
+ );
+ if(!list.length){
+  $('published-list').innerHTML='<p class="muted text-center py-8">No services found.</p>';
+  return;
+ }
+ $('published-list').innerHTML='';
+ list.forEach(s=>{
+  const manual=!s.provider_id;
+  const card=document.createElement('article');
+  card.className='card space-y-3';
+  card.innerHTML=`
+   <div class="flex justify-between gap-2">
+    <div class="min-w-0">
+     <span class="pill">${safe(s.category)}</span>
+     <span class="pill">${safe(manual?'MANUAL':getProviderName(s.provider_id))}</span>
+     <h3 class="font-bold text-sm mt-2 break-words">${safe(s.name)}</h3>
+     <p class="text-[10px] text-gray-500">Service ID: ${safe(s.provider_service_id||'Manual')}</p>
+    </div>
+    <span class="${s.is_active?'text-emerald-400':'text-red-400'} text-[10px]">${s.is_active?'PUBLISHED':'HIDDEN'}</span>
+   </div>
+   <div class="grid grid-cols-2 gap-2 text-xs">
+    <p class="text-gray-400">Selling: <b class="text-emerald-400">PKR ${safe(s.rate)}</b></p>
+    <p class="text-gray-400">Cost: <b>${safe(s.provider_cost??'--')} ${safe(s.provider_currency||'USD')}</b></p>
+    <p class="text-gray-400">Min: <b>${safe(s.min)}</b></p>
+    <p class="text-gray-400">Max: <b>${safe(s.max)}</b></p>
+   </div>
+   <div class="grid grid-cols-2 gap-2">
+    <button class="topbtn" data-toggle>${s.is_active?'UNPUBLISH / HIDE':'PUBLISH / SHOW'}</button>
+    <button class="topbtn text-red-400 border-red-900" data-delete>DELETE SERVICE</button>
+   </div>`;
+  card.querySelector('[data-toggle]').onclick=()=>toggleService(s);
+  card.querySelector('[data-delete]').onclick=()=>deletePublishedService(s.id);
+  $('published-list').appendChild(card);
+ });
+}
+
+async function toggleService(s){
+ if(!confirm(s.is_active?'Service players se hide karni hai?':'Service players ke liye publish karni hai?'))return;
+ const {error}=await db.from('smm_services').update({is_active:!s.is_active}).eq('id',s.id);
+ if(error){alert('Update error: '+error.message);return;}
+ await loadPublishedServices();
+}
+
+async function deletePublishedService(id){
+ const s=publishedServices.find(x=>Number(x.id)===Number(id));
+ if(!s)return;
+ if(!confirm('Service permanently delete karni hai?'))return;
+ const {count,error:checkError}=await db.from('smm_orders')
+ .select('*',{count:'exact',head:true}).eq('service_name',s.name);
+ if(checkError){alert('Orders check nahi ho saka. Safety ke liye delete rok di gayi: '+checkError.message);return;}
+ if(count>0){alert('Is service ke '+count+' orders maujood hain. Delete nahi ki ja sakti.');return;}
+ const {error}=await db.from('smm_services').delete().eq('id',id);
+ if(error){alert('Delete error: '+error.message);return;}
+ await loadPublishedServices();
+}
+
+async function loadOrders(){
+ $('orders-list').innerHTML='<p class="muted text-center py-6">Loading orders...</p>';
+ const {data,error}=await db.from('smm_orders')
+ .select('id,order_id,user_id,service_name,link,quantity,charge,status,created_at,provider_order_id,provider_status,provider_error,provider_id')
+ .order('created_at',{ascending:false}).limit(200);
+ if(error)throw error;
+ allOrders=data||[];
+ renderOrders();
+}
+
+function renderOrders(){
+ const filter=currentOrderFilter;
+ const q=$('order-search').value.toLowerCase().trim();
+ const list=allOrders.filter(o=>{
+  const status=String(o.status||'Pending').toLowerCase();
+  const matchesFilter=filter==='All'||status===filter.toLowerCase();
+  const matchesSearch=[o.order_id,o.id,o.service_name,o.link,o.provider_order_id]
+   .some(v=>String(v||'').toLowerCase().includes(q));
+  return matchesFilter&&matchesSearch;
+ });
+ $('orders-count').textContent=list.length+' orders shown';
+ document.querySelectorAll('[data-order-filter]').forEach(b=>{
+  b.classList.toggle('active',b.dataset.orderFilter===filter);
+ });
+ if(!list.length){
+  $('orders-list').innerHTML='<p class="muted text-center py-8">No orders found.</p>';
+  return;
+ }
+ $('orders-list').innerHTML='';
+ list.forEach(o=>{
+  const manual=!o.provider_id;
+  const completed=String(o.status||'').toLowerCase()==='completed';
+  const card=document.createElement('article');
+  card.className='card space-y-2';
+  let actions='';
+  if(manual){
+   actions=completed
+    ?`<button class="topbtn text-red-400 border-red-900 w-full" data-delete>DELETE ORDER</button>`
+    :`<div class="grid grid-cols-4 gap-2">
+      <button class="small-action" data-status="Pending">PENDING</button>
+      <button class="small-action" data-status="Processing">PROCESSING</button>
+      <button class="small-action" data-status="Completed">COMPLETED</button>
+      <button class="small-action text-red-400" data-delete>DELETE</button>
+     </div>`;
+  }else{
+   actions=completed
+    ?`<button class="topbtn text-red-400 border-red-900 w-full" data-delete>DELETE ORDER</button>`
+    :`<p class="text-[10px] text-cyan-300">API MANAGED — PROVIDER STATUS SYNC SYSTEM REQUIRED</p>`;
+  }
+  card.innerHTML=`
+   <div class="flex justify-between gap-2">
+    <div class="flex gap-2"><b class="text-cyan-300">#${safe(o.order_id||o.id)}</b><span class="pill">${manual?'MANUAL':safe(getProviderName(o.provider_id))}</span></div>
+    <span class="pill">${safe(o.status||'Pending')}</span>
+   </div>
+   <p class="text-sm font-bold">${safe(o.service_name)}</p>
+   <p class="text-xs text-gray-400">Quantity: ${safe(o.quantity)} | Charge: PKR ${safe(o.charge)}</p>
+   <p class="text-[10px] text-gray-500 break-all">Provider Order ID: ${safe(o.provider_order_id||'Not submitted')}</p>
+   <p class="text-[10px] text-gray-500 break-all">Provider Status: ${safe(o.provider_status||'Not available')}</p>
+   ${o.provider_error?`<p class="text-[10px] text-red-400">${safe(o.provider_error)}</p>`:''}
+   <p class="text-[10px] text-gray-500 break-all">Target: ${safe(o.link)}</p>
+   ${actions}`;
+  if(manual&&!completed){
+   card.querySelectorAll('[data-status]').forEach(b=>
+    b.onclick=()=>manualOrderStatus(o.id,b.dataset.status)
+   );
+  }
+  const del=card.querySelector('[data-delete]');
+  if(del)del.onclick=()=>deleteOrder(o.id);
+  $('orders-list').appendChild(card);
+ });
+}
+
+async function manualOrderStatus(id,status){
+ if(!confirm('Order status '+status+' karna hai?'))return;
+ const {error}=await db.from('smm_orders').update({
+  status,updated_at:new Date().toISOString()
+ }).eq('id',id).is('provider_id',null);
+ if(error){alert('Status update error: '+error.message);return;}
+ await loadOrders();
+}
+
+async function deleteOrder(id){
+ if(!confirm('Order delete karna hai?'))return;
+ const {error}=await db.from('smm_orders').delete().eq('id',id);
+ if(error){alert('Delete error: '+error.message);return;}
+ await loadOrders();
+}
+
+function renderProvidersList(){
+ const el=$('providers-list');
+ if(!allProviders.length){el.innerHTML='<p class="muted">No providers found.</p>';return;}
+ el.innerHTML='';
+ allProviders.forEach(p=>{
+  const item=document.createElement('div');
+  item.className='card flex justify-between items-center gap-2';
+  item.innerHTML=`
+   <div class="min-w-0">
+    <h4 class="font-bold text-sm">${safe(p.name)} (Slot ${safe(p.slot)})</h4>
+    <p class="text-[10px] text-gray-400 break-all">${safe(p.api_url)}</p>
+    <p class="text-[10px] ${providerReady(p)?'text-emerald-400':'text-amber-400'}">${providerReady(p)?'API FUNCTIONS CONFIGURED':'API FUNCTION NOT CONFIGURED'}</p>
+   </div>
+   <button class="topbtn text-red-400 border-red-900">DELETE</button>`;
+  item.querySelector('button').onclick=()=>deleteProvider(p.id,p.name);
+  el.appendChild(item);
+ });
+ updateProviderLimit();
+}
+
+function renderProviderControl(){
+ const el=$('providers-control-list');
+ if(!allProviders.length){
+  el.innerHTML='<p class="muted text-center">No providers configured.</p>';
+  return;
+ }
+ el.innerHTML='';
+ allProviders.forEach(p=>{
+  const ready=providerReady(p);
+  const card=document.createElement('div');
+  card.className='provider-card space-y-3';
+  const status=ready?'API READY':'NOT CONFIGURED';
+  card.innerHTML=`
+   <div class="flex justify-between gap-2">
+    <div class="min-w-0">
+     <h3 class="font-gaming text-xl font-bold text-white">${safe(p.name)}</h3>
+     <p class="text-[10px] text-gray-500 break-all">${safe(p.api_url)}</p>
+     <p class="text-[10px] ${ready?'text-emerald-400':'text-amber-400'}">${status} • SLOT ${safe(p.slot)}</p>
+    </div>
+    <span class="pill">${safe(p.currency||'USD')}</span>
+   </div>
+   <div class="rounded-lg bg-[#080d13] border border-[#293346] p-3">
+    <p class="text-[10px] text-gray-500">PROVIDER BALANCE</p>
+    <strong class="text-xl text-emerald-400" data-balance>--</strong>
+    <p class="text-[10px] muted" data-balance-msg>Not checked yet</p>
+   </div>
+   <div class="grid grid-cols-2 gap-2">
+    <button class="small-action" data-balance-btn ${ready?'':'disabled'}>
+     <i class="fa-solid fa-wallet"></i> CHECK BALANCE
+    </button>
+    <button class="small-action" data-services-btn ${ready?'':'disabled'}>
+     <i class="fa-solid fa-cloud-arrow-down"></i> FETCH SERVICES
+    </button>
+   </div>
+   <p class="text-[10px] muted" data-service-msg></p>`;
+  const balanceBtn=card.querySelector('[data-balance-btn]');
+  const servicesBtn=card.querySelector('[data-services-btn]');
+  balanceBtn.onclick=async()=>{
+   balanceBtn.disabled=true;balanceBtn.textContent='CHECKING...';
+   try{
+    const data=await invokeProvider(p,'balance');
+    const currency=data.currency||p.currency||'USD';
+    card.querySelector('[data-balance]').textContent=
+     currency+' '+Number(data.balance||0).toFixed(4);
+    card.querySelector('[data-balance-msg]').textContent='Balance check successful';
+   }catch(e){
+    card.querySelector('[data-balance-msg]').textContent='Error: '+e.message;
+   }finally{
+    balanceBtn.disabled=false;
+    balanceBtn.innerHTML='<i class="fa-solid fa-wallet"></i> CHECK BALANCE';
+   }
+  };
+  servicesBtn.onclick=async()=>{
+   servicesBtn.disabled=true;servicesBtn.textContent='FETCHING...';
+   try{
+    const data=await invokeProvider(p,'services');
+    if(!Array.isArray(data.services))throw new Error('Invalid services response');
+    card.querySelector('[data-service-msg]').textContent=
+     data.services.length+' services fetched successfully. Main Add Service dropdown mein isi provider ko select karke load karein.';
+   }catch(e){
+    card.querySelector('[data-service-msg]').textContent='Error: '+e.message;
+   }finally{
+    servicesBtn.disabled=false;
+    servicesBtn.innerHTML='<i class="fa-solid fa-cloud-arrow-down"></i> FETCH SERVICES';
+   }
+  };
+  el.appendChild(card);
+ });
+}
+
+async function saveNewProvider(){
+ if(allProviders.length>=3)return say('prov-form-message','Maximum 3 providers allowed hain.',true);
+ const name=$('new-prov-name').value.trim();
+ const api_url=$('new-prov-url').value.trim();
+ const secret_name=$('new-prov-secret').value.trim();
+ const currency=$('new-prov-currency').value.trim()||'USD';
+ const slot=Number($('new-prov-slot').value);
+ if(!name||!api_url||!secret_name)return say('prov-form-message','Name, API URL aur Secret Name lazmi hain.',true);
+ if(!/^https:\/\/.+/i.test(api_url))return say('prov-form-message','HTTPS API URL enter karein.',true);
+ if(![1,2,3].includes(slot)||allProviders.some(p=>Number(p.slot)===slot))
+  return say('prov-form-message','Provider slot available nahi.',true);
+
+ if(slot===1&&name.toLowerCase().includes('hafiz'))
+  return say('prov-form-message','Hafiz Panel ko Slot 2 mein add karein.',true);
+ if(slot===2&&!name.toLowerCase().includes('hafiz'))
+  return say('prov-form-message','Slot 2 Hafiz Panel ke liye reserved hai.',true);
+
+ const btn=$('save-new-provider-btn');
+ btn.disabled=true;btn.textContent='SAVING...';
+ try{
+  const {error}=await db.from('smm_providers').insert([{
+   name,api_url,secret_name,currency,slot,is_active:true,orders_enabled:false
+  }]);
+  if(error)throw error;
+  say('prov-form-message','Provider database mein save ho gaya. Secret Supabase mein pehle se hona chahiye.');
+  $('new-prov-name').value='';
+  $('new-prov-url').value='';
+  $('new-prov-secret').value='';
+  await loadProvider();
+  await loadPublishedServices().catch(()=>{});
+ }catch(e){
+  say('prov-form-message','Save error: '+e.message,true);
+ }finally{
+  updateProviderLimit();
+ }
+}
+
+async function deleteProvider(id,name){
+ const {count:sCount,error:sErr}=await db.from('smm_services')
+ .select('*',{count:'exact',head:true}).eq('provider_id',id);
+ if(sErr){alert('Services check nahi ho saka. Delete rok di gayi: '+sErr.message);return;}
+ if(sCount>0){alert(name+' ke '+sCount+' services linked hain. Pehle unka record resolve karein.');return;}
+ const {count:oCount,error:oErr}=await db.from('smm_orders')
+ .select('*',{count:'exact',head:true}).eq('provider_id',id);
+ if(oErr){alert('Orders check nahi ho sake. Delete rok di gayi: '+oErr.message);return;}
+ if(oCount>0){alert(name+' ke '+oCount+' orders linked hain. Provider delete nahi ho sakta.');return;}
+ if(!confirm('Provider '+name+' delete karna hai?'))return;
+ const {error}=await db.from('smm_providers').delete().eq('id',id);
+ if(error){alert('Delete error: '+error.message);return;}
+ await loadProvider();
+}
+
+function globalSearch(){
+ const q=$('global-search-input').value.toLowerCase().trim();
+ const el=$('global-search-results');
+ if(!q){el.innerHTML='<p class="muted text-center">Type to search.</p>';return;}
+ const services=publishedServices.filter(s=>
+  [s.name,s.category,s.provider_service_id,getProviderName(s.provider_id)]
+  .some(v=>String(v||'').toLowerCase().includes(q))
+ ).slice(0,30);
+ const orders=allOrders.filter(o=>
+  [o.order_id,o.id,o.service_name,o.link,o.provider_order_id]
+  .some(v=>String(v||'').toLowerCase().includes(q))
+ ).slice(0,30);
+ let html='<h3 class="font-gaming text-lg text-cyan-300">SERVICES ('+services.length+')</h3>';
+ if(!services.length)html+='<p class="muted text-xs">No matching services.</p>';
+ services.forEach(s=>{
+  html+=`<div class="card mb-2">
+   <b class="text-sm">${safe(s.name)}</b>
+   <p class="text-xs text-gray-400">${safe(s.category)} • ${safe(getProviderName(s.provider_id))}</p>
+   <p class="text-xs text-emerald-400">PKR ${safe(s.rate)} / 1000</p>
+  </div>`;
+ });
+ html+='<h3 class="font-gaming text-lg text-amber-300 mt-4">ORDERS ('+orders.length+')</h3>';
+ if(!orders.length)html+='<p class="muted text-xs">No matching orders.</p>';
+ orders.forEach(o=>{
+  html+=`<div class="card mb-2">
+   <b class="text-sm">#${safe(o.order_id||o.id)} — ${safe(o.service_name)}</b>
+   <p class="text-xs text-gray-400">${safe(o.status||'Pending')} • ${safe(o.quantity)} quantity</p>
+  </div>`;
+ });
+ el.innerHTML=html;
+}
+
+async function init(){
+ try{
+  await checkAdmin();
+  await loadProvider();
+ }catch(e){
+  console.error(e);
+  $('access').textContent='Access error: '+e.message;
+  $('access').className='panel text-center text-red-400 text-sm';
+ }
+}
+
+$('load-services').onclick=()=>fetchProviderServices();
+$('provider-refresh-services').onclick=()=>fetchProviderServices();
+$('category-select').onchange=fillServiceDropdown;
+$('service-select').onchange=selectApiService;
+$('provider-select').onchange=updateSelectedProvider;
+$('usd-rate').oninput=calculateProfit;
+$('selling-price').oninput=calculateProfit;
+$('publish-btn').onclick=publishService;
+
+$('open-provider').onclick=()=>{
+ openPage('provider-page');
+ renderProviderControl();
+};
+$('open-orders').onclick=async()=>{
+ openPage('orders-page');
+ try{await loadOrders();}catch(e){$('orders-list').textContent=e.message;}
+};
+$('open-published').onclick=async()=>{
+ openPage('published-page');
+ try{await loadPublishedServices();}catch(e){$('published-list').textContent=e.message;}
+};
+$('open-manual-service').onclick=()=>openPage('manual-service-page');
+$('open-add-provider').onclick=()=>{
+ updateProviderLimit();
+ if(allProviders.length<3)openPage('add-provider-page');
+};
+$('open-search').onclick=async()=>{
+ openPage('search-page');
+ try{
+  await Promise.all([loadOrders(),loadPublishedServices()]);
+ }catch(e){console.error(e);}
+ $('global-search-input').focus();
+};
+document.querySelectorAll('.close-page').forEach(b=>b.onclick=closePages);
+
+$('refresh-orders').onclick=async()=>{
+ try{await loadOrders();}catch(e){alert(e.message);}
+};
+$('order-search').oninput=renderOrders;
+document.querySelectorAll('[data-order-filter]').forEach(b=>{
+ b.onclick=()=>{
+  currentOrderFilter=b.dataset.orderFilter;
+  renderOrders();
+ };
+});
+$('refresh-published').onclick=async()=>{
+ try{await loadPublishedServices();}catch(e){alert(e.message);}
+};
+$('published-search').oninput=renderPublished;
+$('publish-manual-btn').onclick=publishManualService;
+$('save-new-provider-btn').onclick=saveNewProvider;
+$('refresh-provider-list').onclick=async()=>{
+ try{await loadProvider();}catch(e){alert(e.message);}
+};
+$('global-search-input').oninput=globalSearch;
+
+window.addEventListener('DOMContentLoaded',init);
+if(document.readyState!=='loading')init();
+
+})();
+</script>
+</body>
 </html>
