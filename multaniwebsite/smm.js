@@ -19,7 +19,6 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
 
         <form id="app-smm-form" style="display:flex;flex-direction:column;gap:14px;">
 
-          <!-- CATEGORY DROPDOWN BUTTON -->
           <div>
             <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT CATEGORY</label>
             <input type="hidden" id="smm-cat-input" required>
@@ -29,7 +28,6 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
             </div>
           </div>
 
-          <!-- SERVICE DROPDOWN BUTTON -->
           <div>
             <label style="display:block;font-size:11px;color:#8e9bb0;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">SELECT SERVICE</label>
             <input type="hidden" id="smm-srv-input" required>
@@ -79,7 +77,6 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
       </div>
     </div>
 
-    <!-- VIP MODAL POPUP CONTAINER -->
     <div id="smm-custom-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
       <div style="background:#0e1118;border:1px solid #262f40;border-radius:16px;width:100%;max-width:380px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
         <div style="padding:14px 16px;border-bottom:1px solid #262f40;display:flex;align-items:center;justify-content:space-between;background:#151922;">
@@ -87,7 +84,6 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
           <button id="smm-modal-close" style="background:transparent;border:0;color:#8e9bb0;font-size:16px;cursor:pointer;padding:4px;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="smm-modal-body" style="padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
-          <!-- Items will be injected here -->
         </div>
       </div>
     </div>
@@ -116,15 +112,27 @@ function money(value) {
   return Number(value || 0).toFixed(2);
 }
 
-// Auto-detect and assign proper icons based on category/service text
 function getServiceIcon(text) {
   const t = String(text || '').toLowerCase();
-  if (t.includes('youtube') || t.includes('yt')) return '<i class="fa-brands fa-youtube" style="color:#ff0000;font-size:16px;"></i>';
-  if (t.includes('tiktok') || t.includes('tik tok')) return '<i class="fa-brands fa-tiktok" style="color:#00f0ff;font-size:16px;"></i>';
-  if (t.includes('whatsapp') || t.includes('wa')) return '<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:16px;"></i>';
-  if (t.includes('instagram') || t.includes('insta')) return '<i class="fa-brands fa-instagram" style="color:#e1306c;font-size:16px;"></i>';
-  if (t.includes('facebook') || t.includes('fb')) return '<i class="fa-brands fa-facebook" style="color:#1877f2;font-size:16px;"></i>';
-  if (t.includes('telegram') || t.includes('tg')) return '<i class="fa-brands fa-telegram" style="color:#229ed9;font-size:16px;"></i>';
+
+  if (t.includes('youtube') || t.includes('yt'))
+    return '<i class="fa-brands fa-youtube" style="color:#ff0000;font-size:16px;"></i>';
+
+  if (t.includes('tiktok') || t.includes('tik tok'))
+    return '<i class="fa-brands fa-tiktok" style="color:#00f0ff;font-size:16px;"></i>';
+
+  if (t.includes('whatsapp') || t.includes('wa'))
+    return '<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:16px;"></i>';
+
+  if (t.includes('instagram') || t.includes('insta'))
+    return '<i class="fa-brands fa-instagram" style="color:#e1306c;font-size:16px;"></i>';
+
+  if (t.includes('facebook') || t.includes('fb'))
+    return '<i class="fa-brands fa-facebook" style="color:#1877f2;font-size:16px;"></i>';
+
+  if (t.includes('telegram') || t.includes('tg'))
+    return '<i class="fa-brands fa-telegram" style="color:#229ed9;font-size:16px;"></i>';
+
   return '<i class="fa-solid fa-fire" style="color:#ffbe00;font-size:16px;"></i>';
 }
 
@@ -187,6 +195,7 @@ async function loadSMMData(user, refreshCallback) {
     if (profileError) throw profileError;
 
     profile = profileData;
+
     state.currentProfile = {
       ...state.currentProfile,
       ...profileData
@@ -195,10 +204,12 @@ async function loadSMMData(user, refreshCallback) {
     walletDisplay.textContent =
       'PKR ' + money(profile.wallet_balance);
 
+    // Load only published services, including provider information
     const { data: services, error: servicesError } =
       await sbClient
         .from('smm_services')
-        .select('id,category,name,rate,min,max')
+        .select('id,category,name,rate,min,max,provider_id,provider_service_id,is_active')
+        .eq('is_active', true)
         .order('category')
         .order('name');
 
@@ -215,12 +226,14 @@ async function loadSMMData(user, refreshCallback) {
       return;
     }
 
-    // Category Dropdown Click
+    // Category Dropdown
     catBtn.addEventListener('click', () => {
       modalTitle.textContent = 'SELECT CATEGORY';
+
       modalBody.innerHTML = categories.map(cat => {
         const isSelected = selectedCategory === cat;
         const iconHtml = getServiceIcon(cat);
+
         return `
           <div class="modal-cat-item" data-category="${safeText(cat)}" style="
             background:${isSelected ? 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,114,255,0.15))' : '#06070a'};
@@ -247,30 +260,42 @@ async function loadSMMData(user, refreshCallback) {
         item.addEventListener('click', () => {
           selectedCategory = item.getAttribute('data-category');
           catInput.value = selectedCategory;
-          catText.innerHTML = `${getServiceIcon(selectedCategory)} <span style="color:#fff;">${safeText(selectedCategory)}</span>`;
-          
+
+          catText.innerHTML =
+            `${getServiceIcon(selectedCategory)} <span style="color:#fff;">${safeText(selectedCategory)}</span>`;
+
           selectedService = null;
           srvInput.value = '';
           srvText.innerHTML = '-- Choose Service --';
+
           srvBtn.style.opacity = '1';
           srvBtn.style.pointerEvents = 'auto';
 
           document.getElementById('smm-info-box').style.display = 'none';
+
           calculateTotal();
           modal.style.display = 'none';
         });
       });
     });
 
-    // Service Dropdown Click
+    // Service Dropdown
     srvBtn.addEventListener('click', () => {
-      const filtered = allServices.filter(s => s.category === selectedCategory);
+      const filtered = allServices.filter(
+        s => s.category === selectedCategory
+      );
+
       if (!filtered.length) return;
 
       modalTitle.textContent = 'SELECT SERVICE';
+
       modalBody.innerHTML = filtered.map(service => {
-        const isSelected = selectedService && String(selectedService.id) === String(service.id);
+        const isSelected =
+          selectedService &&
+          String(selectedService.id) === String(service.id);
+
         const iconHtml = getServiceIcon(service.name);
+
         return `
           <div class="modal-srv-item" data-id="${service.id}" style="
             background:${isSelected ? 'linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,100,0,0.15))' : '#06070a'};
@@ -301,12 +326,18 @@ async function loadSMMData(user, refreshCallback) {
       modalBody.querySelectorAll('.modal-srv-item').forEach(item => {
         item.addEventListener('click', () => {
           const srvId = item.getAttribute('data-id');
-          selectedService = allServices.find(s => String(s.id) === String(srvId)) || null;
-          srvInput.value = selectedService ? selectedService.id : '';
+
+          selectedService =
+            allServices.find(s => String(s.id) === String(srvId)) || null;
+
+          srvInput.value = selectedService
+            ? selectedService.id
+            : '';
 
           if (selectedService) {
-            srvText.innerHTML = `${getServiceIcon(selectedService.name)} <span style="color:#fff;">${safeText(selectedService.name)}</span>`;
-            
+            srvText.innerHTML =
+              `${getServiceIcon(selectedService.name)} <span style="color:#fff;">${safeText(selectedService.name)}</span>`;
+
             document.getElementById('smm-info-rate').textContent =
               money(selectedService.rate) + ' PKR';
 
@@ -318,7 +349,9 @@ async function loadSMMData(user, refreshCallback) {
 
             document.getElementById('smm-info-box').style.display = 'block';
 
-            const qtyInput = document.getElementById('smm-qty-input');
+            const qtyInput =
+              document.getElementById('smm-qty-input');
+
             qtyInput.min = selectedService.min;
             qtyInput.max = selectedService.max;
             qtyInput.value = selectedService.min;
@@ -339,6 +372,7 @@ async function loadSMMData(user, refreshCallback) {
       ) || 0;
 
       const rate = Number(selectedService?.rate) || 0;
+
       const charge = selectedService
         ? Math.round((qty / 1000 * rate + Number.EPSILON) * 100) / 100
         : 0;
@@ -347,14 +381,19 @@ async function loadSMMData(user, refreshCallback) {
         'PKR ' + money(charge);
     }
 
+    // Load order history and refresh provider statuses
     await loadOrderHistory(currentUser.id);
 
+    // Place Order
     document.getElementById('app-smm-form')
       .addEventListener('submit', async event => {
         event.preventDefault();
 
         const btn = document.getElementById('smm-submit-btn');
-        const link = document.getElementById('smm-link-input').value.trim();
+
+        const link =
+          document.getElementById('smm-link-input').value.trim();
+
         const qty = Number(
           document.getElementById('smm-qty-input').value
         );
@@ -398,14 +437,59 @@ async function loadSMMData(user, refreshCallback) {
           );
 
           if (error) throw error;
-          if (!data?.success) {
+
+          if (!data?.success || !data.order_id) {
             throw new Error('Order could not be placed.');
           }
 
+          let providerMessage = '';
+
+          const isApiService =
+            selectedService.provider_id &&
+            selectedService.provider_service_id;
+
+          if (isApiService) {
+            btn.textContent = 'SENDING TO PROVIDER...';
+
+            try {
+              const { data: submitResult, error: submitError } =
+                await sbClient.functions.invoke('smmd-submit-order', {
+                  body: {
+                    order_id: data.order_id,
+                    service_id: selectedService.id
+                  }
+                });
+
+              if (submitError || !submitResult?.success) {
+                console.error(
+                  'Provider submission issue:',
+                  submitError || submitResult
+                );
+
+                providerMessage =
+                  '\nProvider submission confirm nahi hui. Dobara order place na karein; admin se contact karein.';
+              } else {
+                providerMessage =
+                  '\nProvider Order ID: ' +
+                  (submitResult.provider_order_id || 'Submitted');
+              }
+
+            } catch (providerError) {
+              console.error('Provider connection error:', providerError);
+
+              providerMessage =
+                '\nProvider submission confirm nahi hui. Dobara order place na karein; admin se contact karein.';
+            }
+
+          } else {
+            providerMessage = '\nOrder Type: Manual Service';
+          }
+
           alert(
-            `Order placed successfully!\nOrder ID: ${data.order_id}\nCharge: PKR ${money(data.charge)}`
+            `Order created successfully!\nOrder ID: ${data.order_id}\nCharge: PKR ${money(data.charge)}${providerMessage}`
           );
 
+          // Refresh wallet balance
           const { data: updatedProfile, error: updateError } =
             await sbClient
               .from('profiles')
@@ -416,6 +500,7 @@ async function loadSMMData(user, refreshCallback) {
           if (updateError) throw updateError;
 
           profile = updatedProfile;
+
           state.currentProfile = {
             ...state.currentProfile,
             ...updatedProfile
@@ -434,7 +519,11 @@ async function loadSMMData(user, refreshCallback) {
 
         } catch (error) {
           console.error('SMM order error:', error);
-          showError(error.message || 'Order failed. Please try again.');
+
+          showError(
+            error.message || 'Order failed. Please try again.'
+          );
+
         } finally {
           btn.disabled = false;
           btn.textContent = 'PLACE SMM ORDER';
@@ -443,18 +532,23 @@ async function loadSMMData(user, refreshCallback) {
 
   } catch (error) {
     console.error('SMM loading error:', error);
+
     walletDisplay.textContent = 'Unable to load';
     catText.textContent = 'Load error';
-    historyBox.textContent = error.message || 'Unable to load SMM data.';
+
+    historyBox.textContent =
+      error.message || 'Unable to load SMM data.';
   }
 
+  // Load orders and refresh active API order statuses
   async function loadOrderHistory(userId) {
     const box = document.getElementById('smm-orders-history');
+
     if (!box) return;
 
-    const { data: orders, error } = await sbClient
+    let { data: orders, error } = await sbClient
       .from('smm_orders')
-      .select('id,order_id,service_name,link,quantity,charge,status,created_at')
+      .select('id,order_id,service_name,link,quantity,charge,status,created_at,provider_order_id,provider_id')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(20);
@@ -470,8 +564,40 @@ async function loadSMMData(user, refreshCallback) {
       return;
     }
 
+    const activeApiOrders = orders.filter(order => {
+      const status = String(order.status || '').toLowerCase();
+
+      return order.provider_order_id &&
+        !['completed', 'cancelled', 'partial', 'failed'].includes(status);
+    });
+
+    if (activeApiOrders.length) {
+      await Promise.allSettled(
+        activeApiOrders.map(order =>
+          sbClient.functions.invoke('smmd-order-status', {
+            body: {
+              order_id: order.id
+            }
+          })
+        )
+      );
+
+      const { data: refreshedOrders, error: refreshError } =
+        await sbClient
+          .from('smm_orders')
+          .select('id,order_id,service_name,link,quantity,charge,status,created_at,provider_order_id,provider_id')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+      if (!refreshError && refreshedOrders) {
+        orders = refreshedOrders;
+      }
+    }
+
     box.innerHTML = orders.map(order => {
       const status = String(order.status || 'Pending');
+
       let statusColor = '#ffbe00';
       let statusBg = 'rgba(255,190,0,0.1)';
 
@@ -481,12 +607,19 @@ async function loadSMMData(user, refreshCallback) {
       } else if (status.toLowerCase() === 'processing') {
         statusColor = '#00d5ff';
         statusBg = 'rgba(0,213,255,0.1)';
+      } else if (
+        status.toLowerCase() === 'failed' ||
+        status.toLowerCase() === 'cancelled'
+      ) {
+        statusColor = '#ff5252';
+        statusBg = 'rgba(255,82,82,0.1)';
       }
 
       const iconHtml = getServiceIcon(order.service_name);
 
       return `
         <div style="background:#06070a;border:1px solid #262f40;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="background:#151922;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #262f40;flex-shrink:0;">
@@ -494,6 +627,7 @@ async function loadSMMData(user, refreshCallback) {
               </div>
               <strong style="color:#fff;font-size:13px;">${safeText(order.service_name)}</strong>
             </div>
+
             <span style="color:${statusColor};background:${statusBg};border:1px solid ${statusColor}44;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;">
               ${safeText(status)}
             </span>
@@ -504,6 +638,7 @@ async function loadSMMData(user, refreshCallback) {
               <span>Order ID: <strong style="color:#fff;">#${safeText(order.order_id ?? order.id)}</strong></span>
               <span>Qty: <strong style="color:#00f0ff;">${safeText(order.quantity)}</strong></span>
             </div>
+
             <div style="color:#8e9bb0;font-size:11px;word-break:break-all;">
               Link: <span style="color:#fff;">${safeText(order.link)}</span>
             </div>
