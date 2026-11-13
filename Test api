@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Test</title>
+</head>
+<body>
+    <h2>SastaSMM API Test</h2>
+    <button onclick="checkBalance()">Balance Check Karein</button>
+    <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
+
+    <script>
+        function checkBalance() {
+            const url = 'https://sastasmmpak.com/api/v2';
+            
+            const formData = new URLSearchParams();
+            formData.append('key', 'YAHAN_APNI_API_KEY_RHEKHEIN'); // Yahan apni API key likhein
+            formData.append('action', 'balance');
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = "Result: " + JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('result').innerText = "Error aa gaya: " + error;
+            });
+        }
+    </script>
+</body>
+</html>
