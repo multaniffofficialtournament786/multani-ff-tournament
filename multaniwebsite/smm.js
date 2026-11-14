@@ -1,6 +1,7 @@
 import { sbClient, state } from './config.js';
 
 // MULTANI FF OFFICIAL - SMM SERVICES MODULE
+// Provider submission uses smmd-submit-order-v2
 
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
   container.innerHTML = `
@@ -83,8 +84,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
           <h3 id="smm-modal-title" style="font-family:Rajdhani,sans-serif;font-size:16px;color:#00f0ff;margin:0;">SELECT</h3>
           <button id="smm-modal-close" style="background:transparent;border:0;color:#8e9bb0;font-size:16px;cursor:pointer;padding:4px;"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="smm-modal-body" style="padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
-        </div>
+        <div id="smm-modal-body" style="padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
     </div>
   `;
@@ -204,7 +204,6 @@ async function loadSMMData(user, refreshCallback) {
     walletDisplay.textContent =
       'PKR ' + money(profile.wallet_balance);
 
-    // Load only published services, including provider information
     const { data: services, error: servicesError } =
       await sbClient
         .from('smm_services')
@@ -226,7 +225,6 @@ async function loadSMMData(user, refreshCallback) {
       return;
     }
 
-    // Category Dropdown
     catBtn.addEventListener('click', () => {
       modalTitle.textContent = 'SELECT CATEGORY';
 
@@ -279,7 +277,6 @@ async function loadSMMData(user, refreshCallback) {
       });
     });
 
-    // Service Dropdown
     srvBtn.addEventListener('click', () => {
       const filtered = allServices.filter(
         s => s.category === selectedCategory
@@ -381,10 +378,8 @@ async function loadSMMData(user, refreshCallback) {
         'PKR ' + money(charge);
     }
 
-    // Load order history and refresh provider statuses
     await loadOrderHistory(currentUser.id);
 
-    // Place Order
     document.getElementById('app-smm-form')
       .addEventListener('submit', async event => {
         event.preventDefault();
@@ -453,7 +448,7 @@ async function loadSMMData(user, refreshCallback) {
 
             try {
               const { data: submitResult, error: submitError } =
-                await sbClient.functions.invoke('smmd-submit-order', {
+                await sbClient.functions.invoke('smmd-submit-order-v2', {
                   body: {
                     order_id: data.order_id,
                     service_id: selectedService.id
@@ -467,7 +462,7 @@ async function loadSMMData(user, refreshCallback) {
                 );
 
                 providerMessage =
-                  '\nProvider submission confirm nahi hui. Dobara order place na karein; admin se contact karein.';
+                  '\nProvider submission confirm nahi hui. Order dobara place na karein; admin se contact karein.';
               } else {
                 providerMessage =
                   '\nProvider Order ID: ' +
@@ -478,7 +473,7 @@ async function loadSMMData(user, refreshCallback) {
               console.error('Provider connection error:', providerError);
 
               providerMessage =
-                '\nProvider submission confirm nahi hui. Dobara order place na karein; admin se contact karein.';
+                '\nProvider submission confirm nahi hui. Order dobara place na karein; admin se contact karein.';
             }
 
           } else {
@@ -489,7 +484,6 @@ async function loadSMMData(user, refreshCallback) {
             `Order created successfully!\nOrder ID: ${data.order_id}\nCharge: PKR ${money(data.charge)}${providerMessage}`
           );
 
-          // Refresh wallet balance
           const { data: updatedProfile, error: updateError } =
             await sbClient
               .from('profiles')
@@ -540,7 +534,6 @@ async function loadSMMData(user, refreshCallback) {
       error.message || 'Unable to load SMM data.';
   }
 
-  // Load orders and refresh active API order statuses
   async function loadOrderHistory(userId) {
     const box = document.getElementById('smm-orders-history');
 
