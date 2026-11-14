@@ -759,15 +759,9 @@ function renderOrders(){
     </div>
     <div class="data-line">Date: ${esc(x.created_at?new Date(x.created_at).toLocaleString():'—')}</div>
     <hr>
-    <div class="row">
-     <div class="field" style="margin:0;flex:1 1 130px">
-      <label>Order Status</label>
-      <select class="full-input" id="status-${x.id}">
-       ${['Pending','Processing','Completed','Partial','Canceled'].map(s=>`<option value="${s}" ${status.toLowerCase()===s.toLowerCase()?'selected':''}>${s}</option>`).join('')}
-      </select>
-     </div>
+    <div class="vip-card-row data-line">
+     <span>Order Status: <b>${esc(status)}</b></span>
      <div class="actions">
-      <button class="cyan" onclick="updateOrder(${Number(x.id)})">Save Status</button>
       <button class="secondary" onclick="copyOrderLink(${Number(x.id)})">Copy Link</button>
       ${isCompleted ? `<button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>` : ''}
      </div>
@@ -776,17 +770,7 @@ function renderOrders(){
   `;
  }).join('')||'<div class="msg">No matching orders found.</div>';
 }
-async function updateOrder(id){
- const select=$('status-'+id);
- if(!select)return;
- const status=select.value;
- const {error}=await sb.from('smm_orders')
-  .update({status,updated_at:new Date().toISOString()})
-  .eq('id',id);
- if(error){alert('Status update error: '+error.message);return}
- alert('Order status update ho gaya.');
- loadOrders();
-}
+
 function copyOrderLink(id){
  const order=orders.find(x=>Number(x.id)===Number(id));
  if(order)copyText(order.link||'');
