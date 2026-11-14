@@ -735,6 +735,8 @@ function renderOrders(){
   const u=getUserDetails(x.user_id);
   const avatar=u.avatar?escAttr(u.avatar):'https://www.gravatar.com/avatar/?d=mp';
   const status=String(x.status||'Pending');
+  const isCompleted = status.toLowerCase() === 'completed';
+
   return `
    <div class="vip-card">
     <div class="vip-card-row">
@@ -767,7 +769,7 @@ function renderOrders(){
      <div class="actions">
       <button class="cyan" onclick="updateOrder(${Number(x.id)})">Save Status</button>
       <button class="secondary" onclick="copyOrderLink(${Number(x.id)})">Copy Link</button>
-      <button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>
+      ${isCompleted ? `<button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>` : ''}
      </div>
     </div>
    </div>
