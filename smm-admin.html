@@ -1,204 +1,826 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>MULTANI SMM VIP ADMIN</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
 <style>
-:root{--bg:#07090e;--panel:#10151f;--panel2:#151d29;--line:#263244;--txt:#f4f7fb;--muted:#8d9bad;--orange:#ff542e;--cyan:#00d5ff;--green:#24d18b;--red:#ff5364}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700;background:var(--orange);color:white}button.secondary{background:#202b3a;border:1px solid var(--line);color:white}button.cyan{background:#073746;color:var(--cyan);border:1px solid #07546a}button.danger{background:#4a1d28;color:#ff8a98}button:disabled{opacity:.45;cursor:not-allowed}
-header{height:46px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#090d14;position:sticky;top:0;z-index:5}.brand{font:700 15px Rajdhani;color:var(--orange);letter-spacing:0.5px;white-space:nowrap}.brand span{color:var(--cyan)}.wrap{max-width:1200px;margin:auto;padding:12px}.layout{display:grid;grid-template-columns:225px 1fr;gap:12px}.side,.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px}.side{padding:10px;height:max-content;position:sticky;top:56px}.nav{width:100%;text-align:left;background:transparent;color:#bdc8d7;margin:3px 0;border:1px solid transparent;padding:10px;border-radius:8px}.nav.active,.nav:hover{background:#1b2533;border-color:#354459;color:white}.nav small{display:block;color:var(--muted);font-weight:400;margin-top:2px}.content{min-width:0}.page{display:none}.page.active{display:block}.pagehead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:2px 0 12px}.pagehead h1{font:700 24px Rajdhani;margin:0}.muted{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{padding:14px}.stat b{font:700 22px Rajdhani;display:block;margin-top:6px}.panel{padding:14px;margin-bottom:12px}.panel h3{margin:0 0 12px;font:700 18px Rajdhani}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.field{flex:1;min-width:150px;margin:0 0 10px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.field input,.field select{width:100%;background:#080d14;color:white;border:1px solid #334155;border-radius:8px;padding:10px;outline:none}.field input:focus,.field select:focus{border-color:var(--cyan)}.vip-card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}.vip-card-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.vip-card h4{margin:0;font-size:14px;color:var(--txt);word-break:break-word}.pill{padding:4px 8px;border-radius:20px;background:#172b35;color:var(--cyan);font-size:11px}.profit{color:var(--green);font-weight:800}.warn{color:#ffbd65}.hidden{display:none!important}.msg{padding:10px;border-radius:8px;margin:8px 0;background:#172433;color:#b9d9e5;font-size:12px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.provider{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0c121b}.provider h4{margin:0 0 6px}.actions{display:flex;gap:6px;flex-wrap:wrap}.login{max-width:380px;margin:8vh auto;padding:20px}.login h1{font:700 26px Rajdhani}
-@media(max-width:760px){.layout{grid-template-columns:1fr}.side{position:static;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.nav{font-size:11px;padding:8px}.nav small{display:none}.grid{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.wrap{padding:8px}.pagehead h1{font-size:20px}.pagehead{align-items:flex-start;flex-direction:column}}
-</style></head>
+:root{
+ --bg:#07090e;--panel:#10151f;--panel2:#151d29;--line:#263244;
+ --txt:#f4f7fb;--muted:#8d9bad;--orange:#ff542e;
+ --cyan:#00d5ff;--green:#24d18b;--red:#ff5364;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit;max-width:100%}
+button{cursor:pointer;border:0;border-radius:9px;padding:10px 13px;font-weight:700;background:var(--orange);color:white}
+button.secondary{background:#202b3a;border:1px solid var(--line);color:white}
+button.cyan{background:#073746;color:var(--cyan);border:1px solid #07546a}
+button.danger{background:#4a1d28;color:#ff8a98}
+button:disabled{opacity:.45;cursor:not-allowed}
+header{
+ min-height:42px;height:42px;border-bottom:1px solid var(--line);
+ display:flex;align-items:center;justify-content:space-between;
+ gap:8px;padding:0 9px;background:#090d14;
+ position:sticky;top:0;z-index:20;width:100%;
+}
+.header-left{display:flex;align-items:center;gap:8px;min-width:0}
+.brand{font:700 14px Rajdhani;color:var(--orange);letter-spacing:.35px;white-space:nowrap}
+.brand span{color:var(--cyan)}
+.back-btn{padding:5px 9px;font-size:11px;white-space:nowrap}
+.header-tag{font-size:10px;color:var(--muted);white-space:nowrap}
+.wrap{width:100%;max-width:1450px;margin:auto;padding:10px}
+.layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:10px}
+.side,.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:11px}
+.side{padding:8px;height:max-content;position:sticky;top:51px}
+.nav{
+ width:100%;text-align:left;background:transparent;color:#bdc8d7;
+ margin:2px 0;border:1px solid transparent;padding:9px;
+ border-radius:8px;font-size:12px;
+}
+.nav.active,.nav:hover{background:#1b2533;border-color:#354459;color:white}
+.nav small{display:block;color:var(--muted);font-weight:400;margin-top:2px;font-size:10px}
+.content{min-width:0;width:100%}
+.page{display:none;width:100%;min-width:0}
+.page.active{display:block}
+.pagehead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:2px 0 12px}
+.pagehead h1{font:700 22px Rajdhani;margin:0;overflow-wrap:anywhere}
+.muted{color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stat{padding:13px;min-width:0}
+.stat b{font:700 22px Rajdhani;display:block;margin-top:6px;overflow-wrap:anywhere}
+.panel{padding:12px;margin-bottom:10px;min-width:0}
+.panel h3{margin:0 0 11px;font:700 17px Rajdhani}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.field{flex:1;min-width:0;margin:0 0 9px}
+.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.field input,.field select{
+ width:100%;min-width:0;background:#080d14;color:white;
+ border:1px solid #334155;border-radius:8px;padding:10px;outline:none;
+}
+.field input:focus,.field select:focus{border-color:var(--cyan)}
+.vip-card{
+ width:100%;min-width:0;background:var(--panel2);
+ border:1px solid var(--line);border-radius:10px;
+ padding:11px;margin-bottom:8px;display:flex;flex-direction:column;gap:8px;
+ overflow:hidden;
+}
+.vip-card-row{
+ display:flex;justify-content:space-between;align-items:center;
+ flex-wrap:wrap;gap:7px;min-width:0;
+}
+.vip-card h4{margin:0;font-size:13px;color:var(--txt);overflow-wrap:anywhere;word-break:break-word}
+.vip-card strong,.vip-card span,.vip-card small{overflow-wrap:anywhere}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#172b35;color:var(--cyan);font-size:10px}
+.profit{color:var(--green);font-weight:800}
+.warn{color:#ffbd65}
+.hidden{display:none!important}
+.msg{padding:10px;border-radius:8px;margin:8px 0;background:#172433;color:#b9d9e5;font-size:12px;overflow-wrap:anywhere}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.provider{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0c121b;min-width:0}
+.provider h4{margin:0 0 6px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.actions button{font-size:11px;padding:7px 10px}
+.login{max-width:380px;margin:8vh auto;padding:20px}
+.login h1{font:700 26px Rajdhani}
+.user-info{display:flex;align-items:center;gap:8px;min-width:0}
+.user-avatar{width:34px;height:34px;flex:0 0 34px;border-radius:50%;object-fit:cover;background:#202b3a;border:1px solid var(--line)}
+.user-text{min-width:0;overflow-wrap:anywhere}
+.user-text strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.user-text small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.data-line{font-size:11px;color:var(--muted);overflow-wrap:anywhere;word-break:break-word}
+.card-title{font-weight:700;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
+.full-input{width:100%;min-width:0;background:#080d14;color:white;border:1px solid #334155;padding:8px;border-radius:7px}
+hr{border:0;border-top:1px solid var(--line);width:100%}
+@media(max-width:760px){
+ .wrap{padding:7px}
+ .layout{grid-template-columns:minmax(0,1fr);gap:8px}
+ .side{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:5px}
+ .nav{font-size:10px;padding:8px 5px;text-align:center;margin:0}
+ .nav small{display:none}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cards{grid-template-columns:minmax(0,1fr)}
+ .pagehead h1{font-size:19px}
+ .panel{padding:10px}
+}
+@media(max-width:360px){
+ .brand{font-size:12px}
+ .header-tag{display:none}
+ .side{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .vip-card{padding:9px}
+}
+</style>
+</head>
+
 <body>
+
 <header>
-  <div style="display:flex;align-items:center;gap:8px">
-    <button class="secondary" style="padding:5px 10px;font-size:11px" onclick="go('dashboard')">← Back</button>
-    <div class="brand">MULTANI <span>SMM</span> VIP</div>
-  </div>
-  <div class="actions">
-    <span id="adminLabel" class="muted" style="font-size:11px">Admin</span>
-    <button class="secondary" style="padding:5px 10px;font-size:11px" onclick="logout()">Logout</button>
-  </div>
+ <div class="header-left">
+  <button class="secondary back-btn" onclick="goBack()">← Back</button>
+  <div class="brand">MULTANI <span>SMM VIP</span></div>
+ </div>
+ <div class="header-tag" id="adminLabel">ADMIN PANEL</div>
 </header>
-<div id="loginView" class="panel login"><h1>ADMIN LOGIN</h1><p class="muted">Supabase admin account se login karein</p><div class="field"><label>Email</label><input id="email" type="email" placeholder="Admin email"></div><div class="field"><label>Password</label><input id="password" type="password" placeholder="Password"></div><button style="width:100%" onclick="login()">Login to Admin</button><div id="loginMsg" class="msg hidden"></div></div>
-<div id="app" class="wrap hidden"><div class="layout">
-<aside class="side">
-<button class="nav active" data-page="servicesHome" onclick="go('servicesHome')">＋ Add Service<small>Front page / setup</small></button>
-<button class="nav" data-page="providers" onclick="go('providers')">◈ Providers<small>Balance & connection</small></button>
-<button class="nav" data-page="orders" onclick="go('orders')">▤ Orders<small>Manage customer orders</small></button>
-<button class="nav" data-page="serviceList" onclick="go('serviceList')">▦ Saved Services<small>Edit / activate / delete</small></button>
-<button class="nav" data-page="dashboard" onclick="go('dashboard')">▣ Dashboard<small>Overview & stats</small></button>
-<button class="nav" data-page="settings" onclick="go('settings')">⚙ Settings<small>Currency conversion</small></button>
-</aside>
-<main class="content">
-<section class="page active" id="servicesHome">
-<div class="pagehead"><div><h1>ADD PROVIDER SERVICE</h1><div class="muted">Provider choose karein, services fetch karein, apna rate set karein</div></div></div>
-<div class="panel"><h3>1. Provider Select Karein</h3><div class="row"><div class="field"><label>Provider</label><select id="providerSelect"><option value="073f1243-cffc-48ea-ba2b-e005a04b6467">SMM Decent</option><option value="fece7369-2e70-4c58-9c66-45068952a61a">Hafiz Panel</option><option value="612e9ebb-3a40-4059-b39d-9bf9af691c78" disabled>Sasta SMM — Pending</option></select></div><div class="field"><label>Search provider service</label><input id="providerSearch" placeholder="Service name ya ID"></div><button onclick="fetchProviderServices()">Fetch Services</button></div><div id="fetchMsg" class="msg hidden"></div></div>
-<div class="panel"><h3>2. Provider Service Select Karein</h3><div class="muted" style="margin-bottom:10px">Fetch hone ke baad services yahan VIP cards mein nazar ayengi.</div><div id="providerRows"><div class="msg">Abhi services fetch nahi ki gayin.</div></div></div>
-<div class="panel" id="pricingPanel"><h3>3. Selling Rate & Profit Setup</h3><div id="selectedInfo" class="msg">Pehle provider list se koi service select karein.</div><div class="row"><div class="field"><label>Category</label><input id="newCategory" placeholder="Instagram / TikTok / YouTube"></div><div class="field"><label>Service Name</label><input id="newName" placeholder="Selected service name"></div></div><div class="row"><div class="field"><label>Provider Cost Rate</label><input id="providerRate" readonly></div><div class="field"><label>Provider Currency</label><input id="providerCurrency" readonly></div><div class="field"><label>Minimum</label><input id="newMin" type="number" readonly></div><div class="field"><label>Maximum</label><input id="newMax" type="number" readonly></div></div><div class="row"><div class="field"><label>Aapka Selling Rate (PKR / 1000)</label><input id="sellingRate" type="number" min="0" step="0.0001" placeholder="Apni rate likhein" oninput="calcProfit()"></div><div class="field"><label>USD to PKR Rate</label><input id="fxRateDisplay" readonly></div><div class="field"><label>Estimated Provider Cost (PKR)</label><input id="costPKR" readonly></div><div class="field"><label>Estimated Profit (PKR)</label><input id="profitPKR" readonly></div></div><div class="actions"><button onclick="saveSelectedService()">＋ Add This Service</button><button class="secondary" onclick="clearSelected()">Clear Selection</button></div><div id="saveMsg" class="msg hidden"></div></div>
-</section>
-<section class="page" id="providers"><div class="pagehead"><div><h1>PROVIDER CONTROL CENTER</h1><div class="muted">Har provider ka balance check karein</div></div></div><div class="cards">
-<div class="provider"><h4>SMM Decent</h4><div class="muted">Active · Slot 1</div><p id="decentBalance">Balance: Not checked</p><button onclick="checkBalance('decent')">Check Balance</button><button class="cyan" onclick="selectProviderAndFetch('073f1243-cffc-48ea-ba2b-e005a04b6467')">Fetch Services</button></div>
-<div class="provider"><h4>Hafiz Panel</h4><div class="muted">Active · Slot 2</div><p id="hafizBalance">Balance: Not checked</p><button onclick="checkBalance('hafiz')">Check Balance</button><button class="cyan" onclick="selectProviderAndFetch('fece7369-2e70-4c58-9c66-45068952a61a')">Fetch Services</button></div>
-<div class="provider"><h4>Sasta SMM</h4><div class="muted warn">Integration Pending</div><p id="sastaBalance">Balance: Disabled</p><button disabled>Check Balance</button><button disabled>Fetch Services</button></div></div><div class="panel" style="margin-top:12px"><h3>Connection Notes</h3><p class="muted">Provider API keys Supabase Edge Function secrets mein honi chahiye.</p></div></section>
-<section class="page" id="orders"><div class="pagehead"><div><h1>ORDER MANAGEMENT</h1><div class="muted">Customer orders, user info & status update</div></div><button onclick="loadOrders()">Refresh Orders</button></div><div class="row"><div class="field"><label>Search</label><input id="orderSearch" placeholder="Order ID / service / user" oninput="renderOrders()"></div><div class="field"><label>Status</label><select id="orderStatusFilter" onchange="renderOrders()"><option value="">All Orders</option><option>Pending</option><option>Processing</option><option>Completed</option><option>Partial</option><option>Canceled</option></select></div></div><div class="panel" id="orderRows"><div class="msg">Refresh orders to load.</div></div></section>
-<section class="page" id="serviceList"><div class="pagehead"><div><h1>SAVED SERVICES</h1><div class="muted">Your panel services — edit selling rate and availability</div></div><button onclick="loadServices()">Refresh Services</button></div><div class="field"><label>Search service</label><input id="savedSearch" placeholder="Search..." oninput="renderSavedServices()"></div><div class="panel" id="savedRows"><div class="msg">Refresh services to load.</div></div></section>
-<section class="page" id="dashboard"><div class="pagehead"><div><h1>ADMIN DASHBOARD</h1><div class="muted">Live data from Supabase</div></div><button onclick="refreshAll()">Refresh All</button></div><div class="grid"><div class="stat">Total Orders<b id="statAll">—</b></div><div class="stat">Pending<b id="statPending">—</b></div><div class="stat">Processing<b id="statProcessing">—</b></div><div class="stat">Completed<b id="statCompleted">—</b></div></div><div class="panel" style="margin-top:12px"><h3>Quick Actions</h3><div class="actions"><button onclick="go('servicesHome')">Add Service</button><button class="secondary" onclick="go('providers')">Providers</button><button class="secondary" onclick="go('orders')">Orders</button><button class="secondary" onclick="go('serviceList')">Saved Services</button></div></div></section>
-<section class="page" id="settings"><div class="pagehead"><div><h1>PANEL SETTINGS</h1><div class="muted">Profit calculator currency setup</div></div></div><div class="panel"><h3>Currency Conversion</h3><div class="field"><label>1 USD = PKR</label><input id="fxRate" type="number" min="0" step="0.01" placeholder="Example: 280"></div><button onclick="saveFx()">Save Conversion Rate</button><div id="fxMsg" class="msg hidden"></div><p class="muted">Yeh conversion estimated profit aur PKR cost calculation ke liye hai.</p></div></section>
-</main></div></div>
+
+<div id="loginView" class="panel login">
+ <h1>ADMIN LOGIN</h1>
+ <p class="muted">Supabase admin account se login karein</p>
+ <div class="field"><label>Email</label><input id="email" type="email" placeholder="Admin email"></div>
+ <div class="field"><label>Password</label><input id="password" type="password" placeholder="Password"></div>
+ <button style="width:100%" onclick="login()">Login to Admin</button>
+ <div id="loginMsg" class="msg hidden"></div>
+</div>
+
+<div id="app" class="wrap hidden">
+ <div class="layout">
+
+  <aside class="side">
+   <button class="nav active" data-page="servicesHome" onclick="go('servicesHome')">＋ Add Service<small>Provider service setup</small></button>
+   <button class="nav" data-page="providers" onclick="go('providers')">◈ Providers<small>Balance & connection</small></button>
+   <button class="nav" data-page="orders" onclick="go('orders')">▤ Orders<small>Customer orders</small></button>
+   <button class="nav" data-page="serviceList" onclick="go('serviceList')">▦ Saved Services<small>Manage services</small></button>
+   <button class="nav" data-page="dashboard" onclick="go('dashboard')">▣ Dashboard<small>Overview & stats</small></button>
+   <button class="nav" data-page="settings" onclick="go('settings')">⚙ Settings<small>Currency & logout</small></button>
+  </aside>
+
+  <main class="content">
+
+   <!-- ADD SERVICE -->
+   <section class="page active" id="servicesHome">
+    <div class="pagehead">
+     <div>
+      <h1>ADD PROVIDER SERVICE</h1>
+      <div class="muted">Provider select karein aur service apne panel mein add karein</div>
+     </div>
+    </div>
+
+    <div class="panel">
+     <h3>1. Provider Select Karein</h3>
+     <div class="row">
+      <div class="field">
+       <label>Provider</label>
+       <select id="providerSelect">
+        <option value="073f1243-cffc-48ea-ba2b-e005a04b6467">SMM Decent</option>
+        <option value="fece7369-2e70-4c58-9c66-45068952a61a">Hafiz Panel</option>
+        <option value="612e9ebb-3a40-4059-b39d-9bf9af691c78" disabled>Sasta SMM — Pending</option>
+       </select>
+      </div>
+      <div class="field">
+       <label>Search Provider Service</label>
+       <input id="providerSearch" placeholder="Service name ya ID">
+      </div>
+      <button onclick="fetchProviderServices()">Fetch Services</button>
+     </div>
+     <div id="fetchMsg" class="msg hidden"></div>
+    </div>
+
+    <div class="panel">
+     <h3>2. Provider Services</h3>
+     <div class="muted" style="margin-bottom:9px">Har service alag card mein nazar ayegi.</div>
+     <div id="providerRows"><div class="msg">Abhi services fetch nahi ki gayin.</div></div>
+    </div>
+
+    <div class="panel" id="pricingPanel">
+     <h3>3. Selling Rate & Profit Setup</h3>
+     <div id="selectedInfo" class="msg">Pehle provider list se service select karein.</div>
+
+     <div class="row">
+      <div class="field"><label>Category</label><input id="newCategory" placeholder="Instagram / TikTok / YouTube"></div>
+      <div class="field"><label>Service Name</label><input id="newName" placeholder="Selected service name"></div>
+     </div>
+
+     <div class="row">
+      <div class="field"><label>Provider Service ID</label><input id="providerServiceId" readonly></div>
+      <div class="field"><label>Provider Status</label><input id="providerStatus" readonly></div>
+     </div>
+
+     <div class="row">
+      <div class="field"><label>Provider Rate (per 1000)</label><input id="providerRate" readonly></div>
+      <div class="field"><label>Provider Currency</label><input id="providerCurrency" readonly></div>
+      <div class="field"><label>Minimum</label><input id="newMin" type="number" readonly></div>
+      <div class="field"><label>Maximum</label><input id="newMax" type="number" readonly></div>
+     </div>
+
+     <div class="row">
+      <div class="field">
+       <label>Your Selling Rate (PKR / 1000)</label>
+       <input id="sellingRate" type="number" min="0" step="0.0001" placeholder="Apni selling rate" oninput="calcProfit()">
+      </div>
+      <div class="field"><label>USD to PKR Rate</label><input id="fxRateDisplay" readonly></div>
+      <div class="field"><label>Provider Cost (PKR / 1000)</label><input id="costPKR" readonly></div>
+      <div class="field"><label>Estimated Profit (PKR / 1000)</label><input id="profitPKR" readonly></div>
+     </div>
+
+     <div class="msg">Profit calculation per 1000 quantity par hai. Provider cost aur selling rate dono PKR mein compare honge.</div>
+     <div class="actions">
+      <button onclick="saveSelectedService()">＋ Add This Service</button>
+      <button class="secondary" onclick="clearSelected()">Clear Selection</button>
+     </div>
+     <div id="saveMsg" class="msg hidden"></div>
+    </div>
+   </section>
+
+   <!-- PROVIDERS -->
+   <section class="page" id="providers">
+    <div class="pagehead">
+     <div><h1>PROVIDER CONTROL CENTER</h1><div class="muted">Provider balance aur service connection</div></div>
+    </div>
+
+    <div class="cards">
+     <div class="provider">
+      <h4>SMM Decent</h4><div class="muted">Active · Slot 1</div>
+      <p id="decentBalance" class="data-line">Balance: Not checked</p>
+      <div class="actions">
+       <button onclick="checkBalance('decent')">Check Balance</button>
+       <button class="cyan" onclick="selectProviderAndFetch('073f1243-cffc-48ea-ba2b-e005a04b6467')">Fetch Services</button>
+      </div>
+     </div>
+
+     <div class="provider">
+      <h4>Hafiz Panel</h4><div class="muted">Active · Slot 2</div>
+      <p id="hafizBalance" class="data-line">Balance: Not checked</p>
+      <div class="actions">
+       <button onclick="checkBalance('hafiz')">Check Balance</button>
+       <button class="cyan" onclick="selectProviderAndFetch('fece7369-2e70-4c58-9c66-45068952a61a')">Fetch Services</button>
+      </div>
+     </div>
+
+     <div class="provider">
+      <h4>Sasta SMM</h4><div class="warn">Integration Pending</div>
+      <p id="sastaBalance" class="data-line">Balance: Disabled</p>
+      <button disabled>Integration Pending</button>
+     </div>
+    </div>
+
+    <div class="panel" style="margin-top:10px">
+     <h3>Connection Notes</h3>
+     <p class="muted">Provider API keys Supabase Edge Function secrets mein honi chahiye. Frontend mein API secret key save na karein.</p>
+    </div>
+   </section>
+
+   <!-- ORDERS -->
+   <section class="page" id="orders">
+    <div class="pagehead">
+     <div><h1>ORDER MANAGEMENT</h1><div class="muted">Customer orders aur user profile details</div></div>
+     <button onclick="loadOrders()">Refresh</button>
+    </div>
+
+    <div class="panel">
+     <div class="row">
+      <div class="field"><label>Search Orders</label><input id="orderSearch" placeholder="Order ID / service / email / UID" oninput="renderOrders()"></div>
+      <div class="field">
+       <label>Status Filter</label>
+       <select id="orderStatusFilter" onchange="renderOrders()">
+        <option value="">All Orders</option>
+        <option>Pending</option><option>Processing</option><option>Completed</option><option>Partial</option><option>Canceled</option>
+       </select>
+      </div>
+     </div>
+    </div>
+    <div id="orderRows"><div class="msg">Refresh orders to load.</div></div>
+   </section>
+
+   <!-- SAVED SERVICES -->
+   <section class="page" id="serviceList">
+    <div class="pagehead">
+     <div><h1>SAVED SERVICES</h1><div class="muted">Manage your panel services</div></div>
+     <button onclick="loadServices()">Refresh</button>
+    </div>
+    <div class="panel">
+     <div class="field"><label>Search Saved Service</label><input id="savedSearch" placeholder="Service name / category / provider ID" oninput="renderSavedServices()"></div>
+    </div>
+    <div id="savedRows"><div class="msg">Refresh services to load.</div></div>
+   </section>
+
+   <!-- DASHBOARD -->
+   <section class="page" id="dashboard">
+    <div class="pagehead">
+     <div><h1>ADMIN DASHBOARD</h1><div class="muted">Live data from Supabase</div></div>
+     <button onclick="refreshAll()">Refresh All</button>
+    </div>
+    <div class="grid">
+     <div class="stat">Total Orders<b id="statAll">—</b></div>
+     <div class="stat">Pending<b id="statPending">—</b></div>
+     <div class="stat">Processing<b id="statProcessing">—</b></div>
+     <div class="stat">Completed<b id="statCompleted">—</b></div>
+    </div>
+    <div class="panel" style="margin-top:10px">
+     <h3>Quick Actions</h3>
+     <div class="actions">
+      <button onclick="go('servicesHome')">Add Service</button>
+      <button class="secondary" onclick="go('providers')">Providers</button>
+      <button class="secondary" onclick="go('orders')">Orders</button>
+      <button class="secondary" onclick="go('serviceList')">Saved Services</button>
+     </div>
+    </div>
+   </section>
+
+   <!-- SETTINGS -->
+   <section class="page" id="settings">
+    <div class="pagehead"><div><h1>PANEL SETTINGS</h1><div class="muted">Currency conversion and account</div></div></div>
+    <div class="panel">
+     <h3>Currency Conversion</h3>
+     <div class="field"><label>1 USD = PKR</label><input id="fxRate" type="number" min="0" step="0.01" placeholder="Example: 280"></div>
+     <button onclick="saveFx()">Save Conversion Rate</button>
+     <div id="fxMsg" class="msg hidden"></div>
+     <p class="muted">Yeh rate USD provider cost ko PKR mein convert karne ke liye use hota hai. Sahi current rate enter karein.</p>
+    </div>
+    <div class="panel">
+     <h3>Admin Account</h3>
+     <div class="muted" id="settingsEmail">Admin account</div>
+     <button class="danger" style="margin-top:10px" onclick="logout()">Logout</button>
+    </div>
+   </section>
+
+  </main>
+ </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://yzirjidgdxhljbhhjfqp.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
 const PROVIDERS={
- '073f1243-cffc-48ea-ba2b-e005a04b6467':{name:'SMM Decent',services:'smmd-services-check',balance:'smmd-balance-check'},
- 'fece7369-2e70-4c58-9c66-45068952a61a':{name:'Hafiz Panel',services:'hafiz-services-check',balance:'hafiz-balance-check'}
+ '073f1243-cffc-48ea-ba2b-e005a04b6467':{
+  name:'SMM Decent',services:'smmd-services-check',balance:'smmd-balance-check'
+ },
+ 'fece7369-2e70-4c58-9c66-45068952a61a':{
+  name:'Hafiz Panel',services:'hafiz-services-check',balance:'hafiz-balance-check'
+ }
 };
-let currentUser=null,providerServices=[],selectedProviderService=null,savedServices=[],orders=[];
+
+let currentUser=null;
+let providerServices=[];
+let selectedProviderService=null;
+let savedServices=[];
+let orders=[];
+let userMap={};
+let currentPage='servicesHome';
+let pageHistory=[];
+
 const $=id=>document.getElementById(id);
-function msg(id,t){$(id).textContent=t;$(id).classList.remove('hidden')}
-function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===id));if(id==='orders')loadOrders();if(id==='serviceList')loadServices()}
-async function login(){msg('loginMsg','Signing in...');const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){msg('loginMsg',error.message);return}await verifyAdmin(data.user)}
-async function verifyAdmin(user){const {data,error}=await sb.from('profiles').select('is_admin').eq('id',user.id).maybeSingle();if(error||!data?.is_admin){await sb.auth.signOut();msg('loginMsg','Admin permission nahi mili. profiles.is_admin check karein.');return}currentUser=user;$('loginView').classList.add('hidden');$('app').classList.remove('hidden');$('adminLabel').textContent=user.email;loadFx();refreshAll()}
-async function logout(){await sb.auth.signOut();location.reload()}
-sb.auth.getSession().then(async({data})=>{if(data.session)await verifyAdmin(data.session.user)});
+
+function msg(id,text){
+ const el=$(id);
+ if(!el)return;
+ el.textContent=text;
+ el.classList.remove('hidden');
+}
+function hideMsg(id){$(id)?.classList.add('hidden')}
+
+function go(id){
+ if(!$(id))return;
+ if(currentPage!==id)pageHistory.push(currentPage);
+ showPage(id);
+}
+function showPage(id){
+ currentPage=id;
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ $(id)?.classList.add('active');
+ document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+ if(id==='orders')loadOrders();
+ if(id==='serviceList')loadServices();
+}
+function goBack(){
+ const previous=pageHistory.pop();
+ if(previous&&$(previous)){showPage(previous);return}
+ if(currentPage!=='servicesHome'){showPage('servicesHome');return}
+ showPage('dashboard');
+}
+async function login(){
+ hideMsg('loginMsg');
+ msg('loginMsg','Signing in...');
+ const email=$('email').value.trim();
+ const password=$('password').value;
+ if(!email||!password){msg('loginMsg','Email aur password enter karein.');return}
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){msg('loginMsg',error.message);return}
+ await verifyAdmin(data.user);
+}
+async function verifyAdmin(user){
+ const {data,error}=await sb.from('profiles').select('is_admin').eq('id',user.id).maybeSingle();
+ if(error||!data?.is_admin){
+  await sb.auth.signOut();
+  msg('loginMsg','Admin permission nahi mili. profiles.is_admin check karein.');
+  return;
+ }
+ currentUser=user;
+ $('loginView').classList.add('hidden');
+ $('app').classList.remove('hidden');
+ $('adminLabel').textContent='ADMIN';
+ $('settingsEmail').textContent=user.email||user.id;
+ loadFx();
+ refreshAll();
+}
+async function logout(){
+ await sb.auth.signOut();
+ location.reload();
+}
+sb.auth.getSession().then(async({data})=>{
+ if(data.session)await verifyAdmin(data.session.user);
+});
+
 function providerId(){return $('providerSelect').value}
-async function selectProviderAndFetch(id){$('providerSelect').value=id;go('servicesHome');await fetchProviderServices()}
-async function fetchProviderServices(){const id=providerId(),p=PROVIDERS[id];if(!p){msg('fetchMsg','Yeh provider active nahi hai.');return}msg('fetchMsg',p.name+' se services fetch ho rahi hain...');$('providerRows').innerHTML='<div class="msg">Loading...</div>';const {data,error}=await sb.functions.invoke(p.services,{body:{}});if(error){msg('fetchMsg','Function error: '+error.message);$('providerRows').innerHTML='<div class="msg">Fetch failed.</div>';return}let list=Array.isArray(data)?data:(data?.services||data?.data||data?.result||data?.items||[]);if(!Array.isArray(list)){msg('fetchMsg','Response mein services list nahi mili');return}providerServices=list.map(x=>({raw:x,id:String(x.service??x.service_id??x.id??x.id_service??''),name:String(x.name??x.title??x.service_name??''),rate:Number(x.rate??x.price??x.cost??0),currency:String(x.currency??data?.currency??'USD'),min:Number(x.min??x.minimum??0),max:Number(x.max??x.maximum??0),category:String(x.category??x.category_name??'General')})).filter(x=>x.id&&x.name);renderProviderServices();msg('fetchMsg',p.name+': '+providerServices.length+' services fetched.')}
+async function selectProviderAndFetch(id){
+ $('providerSelect').value=id;
+ go('servicesHome');
+ await fetchProviderServices();
+}
+function extractServiceArray(data){
+ if(Array.isArray(data))return data;
+ const candidates=[
+  data?.services,data?.data,data?.result,data?.items,
+  data?.response?.services,data?.response?.data,
+  data?.data?.services,data?.result?.services
+ ];
+ for(const item of candidates)if(Array.isArray(item))return item;
+ return [];
+}
+async function fetchProviderServices(){
+ const id=providerId();
+ const p=PROVIDERS[id];
+ if(!p){msg('fetchMsg','Yeh provider abhi available nahi hai.');return}
+ msg('fetchMsg',p.name+' se services fetch ho rahi hain...');
+ $('providerRows').innerHTML='<div class="msg">Loading services...</div>';
+
+ const {data,error}=await sb.functions.invoke(p.services,{body:{}});
+ if(error){
+  msg('fetchMsg','Function error: '+error.message);
+  $('providerRows').innerHTML='<div class="msg">Services fetch nahi ho sakin. Backend function check karna hoga.</div>';
+  return;
+ }
+ if(data?.success===false){
+  msg('fetchMsg',data.message||data.error||'Provider ne request reject kar di.');
+  $('providerRows').innerHTML='<div class="msg">Provider response failed.</div>';
+  return;
+ }
+
+ const list=extractServiceArray(data);
+ if(!list.length){
+  msg('fetchMsg','Response mein services list nahi mili. Function response format check karna hoga.');
+  $('providerRows').innerHTML='<div class="msg">No services returned.</div>';
+  return;
+ }
+
+ providerServices=list.map(x=>{
+  const rawId=x.service??x.service_id??x.id??x.id_service??x.serviceId??'';
+  const rawRate=x.rate??x.price??x.cost??x.amount??0;
+  return {
+   raw:x,
+   id:String(rawId),
+   name:String(x.name??x.title??x.service_name??x.serviceName??''),
+   rate:Number(rawRate),
+   currency:String(x.currency??data?.currency??'USD').toUpperCase(),
+   min:Number(x.min??x.minimum??x.min_quantity??0),
+   max:Number(x.max??x.maximum??x.max_quantity??0),
+   category:String(x.category??x.category_name??'General'),
+   status:String(x.status??x.service_status??'Not provided')
+  };
+ }).filter(x=>x.id&&x.name);
+
+ renderProviderServices();
+ msg('fetchMsg',p.name+': '+providerServices.length+' services fetched.');
+}
 function renderProviderServices(){
-  const q=$('providerSearch').value.toLowerCase();
-  const rows=providerServices.filter(x=>(x.name+' '+x.id).toLowerCase().includes(q));
-  $('providerRows').innerHTML=rows.map(x=>`
-    <div class="vip-card">
-      <div class="vip-card-row">
-        <div><strong>Provider ID:</strong> ${esc(x.id)}</div>
-        <div class="pill">${x.rate} ${esc(x.currency)}</div>
-      </div>
-      <div><h4>${esc(x.name)}</h4></div>
-      <div class="vip-card-row muted" style="font-size:11px">
-        <span>Min: ${x.min} / Max: ${x.max}</span>
-        <button class="cyan" style="padding:6px 12px;font-size:11px" onclick="chooseService('${escAttr(x.id)}')">Select</button>
-      </div>
-    </div>
-  `).join('')||'<div class="msg">No matching services.</div>';
+ const q=$('providerSearch').value.toLowerCase().trim();
+ const rows=providerServices.filter(x=>(x.name+' '+x.id+' '+x.category).toLowerCase().includes(q));
+ $('providerRows').innerHTML=rows.map((x,i)=>`
+  <div class="vip-card">
+   <div class="vip-card-row">
+    <span class="pill">Provider ID: ${esc(x.id)}</span>
+    <span class="pill">${formatNumber(x.rate)} ${esc(x.currency)} / 1000</span>
+   </div>
+   <h4>${esc(x.name)}</h4>
+   <div class="vip-card-row data-line">
+    <span>Category: ${esc(x.category)}</span>
+    <span>Status: ${esc(x.status)}</span>
+   </div>
+   <div class="vip-card-row data-line">
+    <span>Minimum: ${formatNumber(x.min)}</span>
+    <span>Maximum: ${formatNumber(x.max)}</span>
+    <button class="cyan" onclick="chooseService(${i})">Select Service</button>
+   </div>
+  </div>
+ `).join('')||'<div class="msg">No matching services.</div>';
 }
 $('providerSearch').addEventListener('input',renderProviderServices);
-function chooseService(id){selectedProviderService=providerServices.find(x=>x.id===id);if(!selectedProviderService)return;const x=selectedProviderService;$('selectedInfo').textContent='Selected: '+x.name+' | Provider ID: '+x.id;$('newName').value=x.name;$('newCategory').value=x.category;$('providerRate').value=x.rate;$('providerCurrency').value=x.currency;$('newMin').value=x.min;$('newMax').value=x.max;calcProfit();$('pricingPanel').scrollIntoView({behavior:'smooth',block:'start'})}
-function clearSelected(){selectedProviderService=null;$('selectedInfo').textContent='Pehle provider list se koi service select karein.';['newName','newCategory','providerRate','providerCurrency','newMin','newMax','sellingRate','costPKR','profitPKR'].forEach(x=>$(x).value='')}
-function fx(){return Number(localStorage.getItem('multani_smm_fx')||0)}
-function loadFx(){const v=fx();$('fxRate').value=v||'';$('fxRateDisplay').value=v||'Set in Settings';calcProfit()}
-function saveFx(){const v=Number($('fxRate').value);if(!(v>0)){msg('fxMsg','Valid conversion rate enter karein.');return}localStorage.setItem('multani_smm_fx',String(v));loadFx();msg('fxMsg','Conversion rate saved.')}
-function calcProfit(){if(!selectedProviderService)return;const x=selectedProviderService,sell=Number($('sellingRate').value),rate=fx(),cost=(x.currency.toUpperCase()==='PKR'?x.rate:x.rate*rate);$('costPKR').value=Number.isFinite(cost)?cost.toFixed(2)+' PKR':'Set FX rate';$('profitPKR').value=(sell>0&&rate>0?(sell-cost).toFixed(2)+' PKR':'Enter selling rate & FX');$('profitPKR').className=(sell>cost?'profit':'warn')}
-async function saveSelectedService(){const x=selectedProviderService;if(!x){alert('Pehle provider service select karein.');return}const sell=Number($('sellingRate').value);if(!(sell>0)){alert('Apna selling rate enter karein.');return}const costPKR=x.currency.toUpperCase()==='PKR'?x.rate:x.rate*fx();if(x.currency.toUpperCase()!=='PKR'&&!(fx()>0)){alert('Settings mein USD to PKR rate set karein.');return}const payload={category:$('newCategory').value.trim()||x.category,name:$('newName').value.trim()||x.name,rate:sell,min:x.min,max:x.max,provider_service_id:x.id,provider_id:providerId(),provider_cost:x.rate,provider_currency:x.currency,is_active:true};msg('saveMsg','Saving service...');const {data:dupe,error:de}=await sb.from('smm_services').select('id').eq('provider_id',providerId()).eq('provider_service_id',x.id).maybeSingle();if(de){msg('saveMsg','Duplicate check failed: '+de.message);return}if(dupe){msg('saveMsg','Yeh provider service pehle se add hai.');return}const {error}=await sb.from('smm_services').insert(payload);if(error){msg('saveMsg','Save error: '+error.message);return}msg('saveMsg','Service successfully add ho gayi. Cost: '+costPKR.toFixed(2)+' PKR | Selling: '+sell+' PKR');loadServices()}
-async function checkBalance(key){const p=key==='decent'?PROVIDERS['073f1243-cffc-48ea-ba2b-e005a04b6467']:PROVIDERS['fece7369-2e70-4c58-9c66-45068952a61a'];const target=key+'Balance';$(target).textContent='Checking...';const {data,error}=await sb.functions.invoke(p.balance,{body:{}});if(error){$(target).textContent='Error: '+error.message;return}const balance=data?.balance??data?.funds??data?.amount??'Unknown';const currency=data?.currency??'';$(target).textContent=(data?.success===false?'Failed: ':'Balance: ')+balance+' '+currency}
-async function loadServices(){const {data,error}=await sb.from('smm_services').select('id,category,name,rate,min,max,provider_service_id,provider_id,provider_cost,provider_currency,is_active').order('id',{ascending:false}).limit(1000);if(error){$('savedRows').innerHTML='<div class="msg">Error: '+esc(error.message)+'</div>';return}savedServices=data||[];renderSavedServices()}
-function renderSavedServices(){
-  const q=($('savedSearch')?.value||'').toLowerCase();
-  const a=savedServices.filter(x=>(x.name+' '+x.category+' '+x.provider_service_id).toLowerCase().includes(q));
-  const rateConverter=fx();
-  $('savedRows').innerHTML=a.map(x=>{
-    const costInPKR=x.provider_currency&&x.provider_currency.toUpperCase()==='PKR'?x.provider_cost:(x.provider_cost*(rateConverter>0?rateConverter:0));
-    return `
-      <div class="vip-card">
-        <div class="vip-card-row">
-          <div><strong>${esc(x.name)}</strong><br><small class="muted">${esc(x.category||'')}</small></div>
-          <div>${x.is_active?'<span class="pill">Active</span>':'<span class="pill">Off</span>'}</div>
-        </div>
-        <div class="vip-card-row muted" style="font-size:11px">
-          <span>Provider ID: ${esc(x.provider_service_id||'Manual')}</span>
-          <span>Cost: ${Number.isFinite(costInPKR)?costInPKR.toFixed(2):'—'} PKR</span>
-        </div>
-        <div class="vip-card-row" style="align-items:center">
-          <div style="flex:1;min-width:120px">
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Selling Rate (PKR)</label>
-            <input style="width:100%;background:#080d14;color:white;border:1px solid #334155;padding:8px;border-radius:7px" type="number" id="rate-${x.id}" value="${x.rate}">
-          </div>
-          <div class="actions" style="margin-top:14px">
-            <button class="cyan" style="padding:7px 10px;font-size:11px" onclick="updateService(${x.id})">Save</button>
-            <button class="secondary" style="padding:7px 10px;font-size:11px" onclick="toggleService(${x.id},${!x.is_active})">${x.is_active?'Disable':'Enable'}</button>
-            <button class="danger" style="padding:7px 10px;font-size:11px" onclick="deleteService(${x.id})">Delete</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('')||'<div class="msg">No services found.</div>';
+
+function chooseService(index){
+ const x=providerServices[index];
+ if(!x)return;
+ selectedProviderService=x;
+ $('selectedInfo').textContent='Selected: '+x.name+' | Provider Service ID: '+x.id;
+ $('newName').value=x.name;
+ $('newCategory').value=x.category;
+ $('providerServiceId').value=x.id;
+ $('providerStatus').value=x.status;
+ $('providerRate').value=formatNumber(x.rate);
+ $('providerCurrency').value=x.currency;
+ $('newMin').value=x.min;
+ $('newMax').value=x.max;
+ calcProfit();
+ $('pricingPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
-async function updateService(id){const rate=Number($('rate-'+id).value);if(!(rate>0)){alert('Valid rate enter karein');return}const {error}=await sb.from('smm_services').update({rate}).eq('id',id);if(error)alert(error.message);else loadServices()}
-async function toggleService(id,v){const {error}=await sb.from('smm_services').update({is_active:v}).eq('id',id);if(error)alert(error.message);else loadServices()}
-async function deleteService(id){if(!confirm('Service delete karni hai?'))return;const {error}=await sb.from('smm_services').delete().eq('id',id);if(error)alert(error.message);else loadServices()}
+function clearSelected(){
+ selectedProviderService=null;
+ $('selectedInfo').textContent='Pehle provider list se service select karein.';
+ ['newName','newCategory','providerServiceId','providerStatus','providerRate','providerCurrency','newMin','newMax','sellingRate','costPKR','profitPKR'].forEach(id=>$(id).value='');
+}
+function fx(){return Number(localStorage.getItem('multani_smm_fx')||0)}
+function loadFx(){
+ const v=fx();
+ $('fxRate').value=v||'';
+ $('fxRateDisplay').value=v?v+' PKR':'Not set';
+ calcProfit();
+}
+function saveFx(){
+ const v=Number($('fxRate').value);
+ if(!(v>0)){msg('fxMsg','Valid USD to PKR rate enter karein.');return}
+ localStorage.setItem('multani_smm_fx',String(v));
+ loadFx();
+ msg('fxMsg','Conversion rate save ho gaya.');
+}
+function convertToPKR(rate,currency){
+ const c=String(currency||'USD').toUpperCase();
+ if(c==='PKR')return Number(rate);
+ if(c==='USD'&&fx()>0)return Number(rate)*fx();
+ return null;
+}
+function calcProfit(){
+ if(!selectedProviderService)return;
+ const x=selectedProviderService;
+ const sell=Number($('sellingRate').value);
+ const cost=convertToPKR(x.rate,x.currency);
+ $('costPKR').value=cost===null?'FX rate / currency check karein':cost.toFixed(4)+' PKR';
+ if(cost===null||!(sell>0)){
+  $('profitPKR').value='—';
+  $('profitPKR').className='warn';
+  return;
+ }
+ const profit=sell-cost;
+ $('profitPKR').value=profit.toFixed(4)+' PKR';
+ $('profitPKR').className=profit>=0?'profit':'warn';
+}
+$('sellingRate').addEventListener('input',calcProfit);
+
+async function saveSelectedService(){
+ const x=selectedProviderService;
+ if(!x){alert('Pehle provider service select karein.');return}
+ const selling=Number($('sellingRate').value);
+ if(!(selling>0)){alert('Apna selling rate enter karein.');return}
+ const costPKR=convertToPKR(x.rate,x.currency);
+ if(costPKR===null){alert('USD to PKR conversion rate Settings mein set karein.');return}
+ if(selling<costPKR&&!confirm('Aapka selling rate provider cost se kam hai. Kya phir bhi add karna hai?'))return;
+
+ const activeProvider=providerId();
+ const payload={
+  category:$('newCategory').value.trim()||x.category,
+  name:$('newName').value.trim()||x.name,
+  rate:selling,
+  min:x.min,
+  max:x.max,
+  provider_service_id:x.id,
+  provider_id:activeProvider,
+  provider_cost:x.rate,
+  provider_currency:x.currency,
+  is_active:true
+ };
+
+ msg('saveMsg','Service save ho rahi hai...');
+ const {data:duplicate,error:duplicateError}=await sb
+  .from('smm_services')
+  .select('id')
+  .eq('provider_id',activeProvider)
+  .eq('provider_service_id',x.id)
+  .maybeSingle();
+
+ if(duplicateError){msg('saveMsg','Duplicate check error: '+duplicateError.message);return}
+ if(duplicate){msg('saveMsg','Yeh provider service pehle se saved hai.');return}
+
+ const {error}=await sb.from('smm_services').insert(payload);
+ if(error){msg('saveMsg','Save error: '+error.message);return}
+
+ msg('saveMsg','Service add ho gayi. Provider cost: '+costPKR.toFixed(2)+' PKR | Selling: '+selling.toFixed(2)+' PKR');
+ loadServices();
+}
+
+async function checkBalance(key){
+ const p=key==='decent'
+  ?PROVIDERS['073f1243-cffc-48ea-ba2b-e005a04b6467']
+  :PROVIDERS['fece7369-2e70-4c58-9c66-45068952a61a'];
+ const target=key+'Balance';
+ $(target).textContent='Checking provider balance...';
+ const {data,error}=await sb.functions.invoke(p.balance,{body:{}});
+ if(error){$(target).textContent='Error: '+error.message;return}
+ if(data?.success===false){$(target).textContent='Failed: '+(data.message||data.error||'Provider error');return}
+ const balance=data?.balance??data?.funds??data?.amount??'Unknown';
+ const currency=data?.currency??'';
+ $(target).textContent='Balance: '+balance+' '+currency;
+}
+
+async function loadServices(){
+ $('savedRows').innerHTML='<div class="msg">Loading saved services...</div>';
+ const {data,error}=await sb.from('smm_services')
+  .select('id,category,name,rate,min,max,provider_service_id,provider_id,provider_cost,provider_currency,is_active')
+  .order('id',{ascending:false}).limit(1000);
+ if(error){$('savedRows').innerHTML='<div class="msg">Error: '+esc(error.message)+'</div>';return}
+ savedServices=data||[];
+ renderSavedServices();
+}
+function providerName(id){
+ return PROVIDERS[id]?.name||'Provider';
+}
+function renderSavedServices(){
+ const q=($('savedSearch')?.value||'').toLowerCase().trim();
+ const filtered=savedServices.filter(x=>
+  (String(x.name||'')+' '+String(x.category||'')+' '+String(x.provider_service_id||'')).toLowerCase().includes(q)
+ );
+ $('savedRows').innerHTML=filtered.map(x=>{
+  const cost=convertToPKR(Number(x.provider_cost||0),x.provider_currency||'USD');
+  const costText=cost===null?'FX rate required':cost.toFixed(4)+' PKR';
+  return `
+   <div class="vip-card">
+    <div class="vip-card-row">
+     <span class="pill">${x.is_active?'ACTIVE':'DISABLED'}</span>
+     <span class="pill">${esc(providerName(x.provider_id))}</span>
+    </div>
+    <div class="card-title">${esc(x.name)}</div>
+    <div class="data-line">Category: ${esc(x.category||'—')}</div>
+    <div class="vip-card-row data-line">
+     <span>Provider ID: ${esc(x.provider_service_id||'Manual')}</span>
+     <span>Provider Cost: <b>${esc(costText)}</b></span>
+    </div>
+    <div class="vip-card-row data-line">
+     <span>Min: ${formatNumber(x.min)} · Max: ${formatNumber(x.max)}</span>
+     <span>Your Rate: <b>${formatNumber(x.rate)} PKR / 1000</b></span>
+    </div>
+    <hr>
+    <div class="row">
+     <div class="field" style="margin:0;flex:1 1 130px">
+      <label>Selling Rate (PKR / 1000)</label>
+      <input class="full-input" type="number" min="0" step="0.0001" id="rate-${x.id}" value="${Number(x.rate)||0}">
+     </div>
+     <div class="actions">
+      <button class="cyan" onclick="updateService(${Number(x.id)})">Save Rate</button>
+      <button class="secondary" onclick="toggleService(${Number(x.id)},${!x.is_active})">${x.is_active?'Disable':'Enable'}</button>
+      <button class="danger" onclick="deleteService(${Number(x.id)})">Delete</button>
+     </div>
+    </div>
+   </div>
+  `;
+ }).join('')||'<div class="msg">No saved services found.</div>';
+}
+async function updateService(id){
+ const rate=Number($('rate-'+id)?.value);
+ if(!(rate>0)){alert('Valid selling rate enter karein.');return}
+ const {error}=await sb.from('smm_services').update({rate}).eq('id',id);
+ if(error){alert('Update error: '+error.message);return}
+ alert('Selling rate update ho gaya.');
+ loadServices();
+}
+async function toggleService(id,value){
+ const {error}=await sb.from('smm_services').update({is_active:value}).eq('id',id);
+ if(error){alert(error.message);return}
+ loadServices();
+}
+async function deleteService(id){
+ if(!confirm('Kya aap service delete karna chahte hain?'))return;
+ const {error}=await sb.from('smm_services').delete().eq('id',id);
+ if(error){alert(error.message);return}
+ loadServices();
+}
+
 async function loadOrders(){
-  const {data,error}=await sb.from('smm_orders').select('id,order_id,user_id,service_name,link,quantity,charge,status,created_at,updated_at').order('created_at',{ascending:false}).limit(500);
-  if(error){$('orderRows').innerHTML='<div class="msg">Error: '+esc(error.message)+'</div>';return}
-  orders=data||[];
-  const userIds=[...new Set(orders.map(o=>o.user_id).filter(Boolean))];
-  let userMap={};
-  if(userIds.length>0){
-    const {data:profilesData}=await sb.from('profiles').select('id,email,raw_user_meta_data').in('id',userIds);
-    if(profilesData){profilesData.forEach(p=>{userMap[p.id]=p;})}
+ $('orderRows').innerHTML='<div class="msg">Loading orders...</div>';
+ const {data,error}=await sb.from('smm_orders')
+  .select('id,order_id,user_id,service_name,link,quantity,charge,status,created_at,updated_at')
+  .order('created_at',{ascending:false}).limit(500);
+
+ if(error){$('orderRows').innerHTML='<div class="msg">Orders error: '+esc(error.message)+'</div>';return}
+ orders=data||[];
+ userMap={};
+
+ const userIds=[...new Set(orders.map(o=>o.user_id).filter(Boolean))];
+ if(userIds.length){
+  const {data:profilesData,error:profileError}=await sb.from('profiles').select('*').in('id',userIds);
+  if(!profileError&&profilesData){
+   profilesData.forEach(p=>{userMap[p.id]=p});
   }
-  window._userMap=userMap;
-  renderOrders();
-  stats();
+ }
+ renderOrders();
+ stats();
+}
+function getUserDetails(userId){
+ const p=userMap[userId]||{};
+ const email=p.email||p.user_email||p.email_address||'Email profile mein available nahi';
+ const name=p.full_name||p.name||p.username||p.display_name||p.first_name||'Customer';
+ const avatar=p.avatar_url||p.photo_url||p.profile_image||p.image_url||p.picture||'';
+ return {email,name,avatar};
 }
 function renderOrders(){
-  const q=($('orderSearch')?.value||'').toLowerCase(),s=$('orderStatusFilter')?.value||'';
-  const a=orders.filter(x=>(!s||x.status===s)&&JSON.stringify(x).toLowerCase().includes(q));
-  const userMap=window._userMap||{};
-  $('orderRows').innerHTML=a.map(x=>{
-    const usr=userMap[x.user_id]||{};
-    const userEmail=usr.email||x.user_id||'Guest User';
-    const userUid=x.user_id||'—';
-    const userAvatar=usr.raw_user_meta_data?.avatar_url||usr.raw_user_meta_data?.picture||'https://www.gravatar.com/avatar/?d=mp';
-    return `
-      <div class="vip-card">
-        <div class="vip-card-row" style="border-bottom:1px solid var(--line);padding-bottom:6px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <img src="${escAttr(userAvatar)}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;background:#202b3a" onerror="this.src='https://www.gravatar.com/avatar/?d=mp'">
-            <div>
-              <div style="font-weight:600;font-size:12px">${esc(userEmail)}</div>
-              <small class="muted" style="font-size:10px">UID: ${esc(userUid.slice(0,12))}...</small>
-            </div>
-          </div>
-          <div><span class="pill">#${esc(x.order_id||x.id)}</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;font-size:13px;margin-bottom:3px">${esc(x.service_name||'')}</div>
-          <div class="muted" style="font-size:11px;word-break:break-all">Link: ${esc(x.link||'')}</div>
-        </div>
-        <div class="vip-card-row muted" style="font-size:11px">
-          <span>Qty: <b>${x.quantity??''}</b></span>
-          <span>Charge: <b>${x.charge??''}</b></span>
-          <span>Date: ${esc(x.created_at?new Date(x.created_at).toLocaleString():'')}</span>
-        </div>
-        <div class="vip-card-row" style="align-items:center;margin-top:4px">
-          <div style="flex:1;min-width:130px">
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Status</label>
-            <select id="status-${x.id}" style="width:100%;background:#080d14;color:white;border:1px solid #334155;padding:8px;border-radius:7px">
-              <option ${x.status==='Pending'?'selected':''}>Pending</option>
-              <option ${x.status==='Processing'?'selected':''}>Processing</option>
-              <option ${x.status==='Completed'?'selected':''}>Completed</option>
-              <option ${x.status==='Partial'?'selected':''}>Partial</option>
-              <option ${x.status==='Canceled'?'selected':''}>Canceled</option>
-            </select>
-          </div>
-          <div class="actions" style="margin-top:14px">
-            <button class="cyan" style="padding:7px 10px;font-size:11px" onclick="updateOrder(${x.id})">Save</button>
-            <button class="secondary" style="padding:7px 10px;font-size:11px" onclick="copyText('${escAttr(x.link||'')}')">Copy Link</button>
-            <button class="danger" style="padding:7px 10px;font-size:11px" onclick="deleteOrder(${x.id})">Delete</button>
-          </div>
-        </div>
+ const q=($('orderSearch')?.value||'').toLowerCase().trim();
+ const statusFilter=$('orderStatusFilter')?.value||'';
+ const filtered=orders.filter(x=>{
+  const details=getUserDetails(x.user_id);
+  const haystack=[x.order_id,x.id,x.user_id,x.service_name,x.link,details.email,details.name].join(' ').toLowerCase();
+  return (!statusFilter||String(x.status||'')===statusFilter)&&haystack.includes(q);
+ });
+
+ $('orderRows').innerHTML=filtered.map(x=>{
+  const u=getUserDetails(x.user_id);
+  const avatar=u.avatar?escAttr(u.avatar):'https://www.gravatar.com/avatar/?d=mp';
+  const status=String(x.status||'Pending');
+  return `
+   <div class="vip-card">
+    <div class="vip-card-row">
+     <div class="user-info">
+      <img class="user-avatar" src="${avatar}" onerror="this.onerror=null;this.src='https://www.gravatar.com/avatar/?d=mp'">
+      <div class="user-text">
+       <strong>${esc(u.name)}</strong>
+       <small>${esc(u.email)}</small>
       </div>
-    `;
-  }).join('')||'<div class="msg">No orders found.</div>';
-  stats();
+     </div>
+     <span class="pill">ORDER #${esc(x.order_id||x.id)}</span>
+    </div>
+    <div class="data-line">User UID: <b>${esc(x.user_id||'—')}</b></div>
+    <hr>
+    <div class="card-title">${esc(x.service_name||'Service name unavailable')}</div>
+    <div class="data-line">Order Link: ${esc(x.link||'—')}</div>
+    <div class="vip-card-row data-line">
+     <span>Quantity: <b>${formatNumber(x.quantity)}</b></span>
+     <span>Charge: <b>${formatNumber(x.charge)} PKR</b></span>
+    </div>
+    <div class="data-line">Date: ${esc(x.created_at?new Date(x.created_at).toLocaleString():'—')}</div>
+    <hr>
+    <div class="row">
+     <div class="field" style="margin:0;flex:1 1 130px">
+      <label>Order Status</label>
+      <select class="full-input" id="status-${x.id}">
+       ${['Pending','Processing','Completed','Partial','Canceled'].map(s=>`<option value="${s}" ${status.toLowerCase()===s.toLowerCase()?'selected':''}>${s}</option>`).join('')}
+      </select>
+     </div>
+     <div class="actions">
+      <button class="cyan" onclick="updateOrder(${Number(x.id)})">Save Status</button>
+      <button class="secondary" onclick="copyOrderLink(${Number(x.id)})">Copy Link</button>
+      <button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>
+     </div>
+    </div>
+   </div>
+  `;
+ }).join('')||'<div class="msg">No matching orders found.</div>';
 }
-async function updateOrder(id){const status=$('status-'+id).value;const {error}=await sb.from('smm_orders').update({status,updated_at:new Date().toISOString()}).eq('id',id);if(error)alert(error.message);else loadOrders()}
-async function deleteOrder(id){if(!confirm('Order delete karna hai?'))return;const {error}=await sb.from('smm_orders').delete().eq('id',id);if(error)alert(error.message);else loadOrders()}
-function stats(){$('statAll').textContent=orders.length;$('statPending').textContent=orders.filter(x=>x.status==='Pending').length;$('statProcessing').textContent=orders.filter(x=>x.status==='Processing').length;$('statCompleted').textContent=orders.filter(x=>x.status==='Completed').length}
-async function refreshAll(){await Promise.all([loadOrders(),loadServices()])}
-function copyText(t){navigator.clipboard?.writeText(t).then(()=>alert('Copied')).catch(()=>alert(t))}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function escAttr(s){return String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;')}
-</script></body></html>
+async function updateOrder(id){
+ const select=$('status-'+id);
+ if(!select)return;
+ const status=select.value;
+ const {error}=await sb.from('smm_orders')
+  .update({status,updated_at:new Date().toISOString()})
+  .eq('id',id);
+ if(error){alert('Status update error: '+error.message);return}
+ alert('Order status update ho gaya.');
+ loadOrders();
+}
+function copyOrderLink(id){
+ const order=orders.find(x=>Number(x.id)===Number(id));
+ if(order)copyText(order.link||'');
+}
+async function deleteOrder(id){
+ if(!confirm('Kya aap yeh order delete karna chahte hain?'))return;
+ const {error}=await sb.from('smm_orders').delete().eq('id',id);
+ if(error){alert(error.message);return}
+ loadOrders();
+}
+function stats(){
+ $('statAll').textContent=orders.length;
+ $('statPending').textContent=orders.filter(x=>String(x.status).toLowerCase()==='pending').length;
+ $('statProcessing').textContent=orders.filter(x=>String(x.status).toLowerCase()==='processing').length;
+ $('statCompleted').textContent=orders.filter(x=>String(x.status).toLowerCase()==='completed').length;
+}
+async function refreshAll(){
+ await Promise.all([loadOrders(),loadServices()]);
+}
+function copyText(value){
+ const text=String(value||'');
+ if(!text){alert('Copy karne ke liye link nahi hai.');return}
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(text).then(()=>alert('Copied')).catch(()=>prompt('Copy this:',text));
+ }else prompt('Copy this:',text);
+}
+function formatNumber(value){
+ const n=Number(value);
+ return Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:4}):'—';
+}
+function esc(value){
+ return String(value??'').replace(/[&<>"']/g,c=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[c]));
+}
+function escAttr(value){return esc(value)}
+</script>
+</body>
+</html>
