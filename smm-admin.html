@@ -9,10 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Inter,sans-serif;background:#05070a;color:#f3f4f6}
+body{font-family:Inter,sans-serif;background:#06070a;color:#f3f4f6}
 .font-gaming{font-family:Rajdhani,sans-serif}
 .sidebar-scroll::-webkit-scrollbar{width:4px}
-.sidebar-scroll::-webkit-scrollbar-thumb{background:#1e293b}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:#262f40}
 .horizontal-scroll{display:flex;overflow-x:auto;gap:10px;scrollbar-width:none;padding-bottom:4px}
 .horizontal-scroll::-webkit-scrollbar{display:none}
 button:disabled{opacity:.5;cursor:not-allowed}
@@ -20,259 +20,131 @@ input,select{outline:none}
 </style>
 </head>
 
-<body class="p-3 md:p-6 max-w-6xl mx-auto space-y-6 pb-24">
+<body class="p-3 md:p-6 max-w-5xl mx-auto space-y-5 pb-20">
 
-<!-- Header -->
-<header class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-800 pb-4 gap-3 bg-[#0b0f19] p-4 rounded-2xl shadow-xl">
- <div class="flex items-center gap-3">
-  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-gaming text-xl shadow-lg shadow-cyan-500/20">
-   <i class="fa-solid fa-shield-halved"></i>
-  </div>
-  <div>
-   <h1 class="font-gaming text-xl sm:text-2xl font-bold tracking-wider text-cyan-400">MULTANI FF</h1>
-   <p class="text-[11px] text-gray-400 tracking-wide font-medium">VIP SMM ADMIN CONTROL CENTER</p>
-  </div>
+<header class="flex items-center justify-between border-b border-[#262f40] pb-3">
+ <div>
+  <h1 class="font-gaming text-xl font-bold tracking-wider text-cyan-400">MULTANI FF</h1>
+  <p class="text-[10px] text-gray-400">SMM ADMIN CONTROL CENTER</p>
  </div>
- <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-  <a href="admin.html" class="bg-[#151b2b] hover:bg-[#1e273d] border border-gray-800 px-4 py-2 rounded-xl text-xs font-bold text-gray-200 transition-all flex items-center gap-2">
-   <i class="fa-solid fa-arrow-left text-orange-400"><span>Back</span></i>
-  </a>
- </div>
+ <a href="admin.html" class="bg-[#151922] border border-[#262f40] px-4 py-2 rounded-lg text-xs font-bold">
+  <i class="fa-solid fa-arrow-left text-orange-500"></i> Back
+ </a>
 </header>
 
-<!-- Access Message -->
-<div id="access-message" class="bg-[#0b0f19] border border-gray-800 p-6 rounded-2xl text-sm text-center text-amber-400 shadow-xl flex items-center justify-center gap-3">
- <i class="fa-solid fa-spinner fa-spin text-lg"></i> Checking admin access and verifying credentials...
+<div id="access-message" class="bg-[#0e1118] border border-[#262f40] p-4 rounded-xl text-sm text-center text-amber-400">
+ <i class="fa-solid fa-spinner fa-spin"></i> Checking admin access...
 </div>
 
 <!-- Main Dashboard Container -->
-<main id="admin-content" class="hidden space-y-6">
+<main id="admin-content" class="hidden space-y-5">
 
- <!-- Search & Global Actions Bar -->
- <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-[#0b0f19] p-4 rounded-2xl border border-gray-800 shadow-xl">
-  <div class="relative md:col-span-2">
-   <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+ <!-- Top Control Bar with Search & Refresh -->
+ <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+  <div class="relative flex-1">
+   <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
     <i class="fa-solid fa-search text-xs"></i>
    </span>
-   <input id="global-search-input" type="text" placeholder="Search orders (ID, Player, UID) or services..." class="w-full bg-[#05070a] border border-gray-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white placeholder-gray-500 focus:border-cyan-500 transition-colors">
+   <input id="service-search-input" type="text" placeholder="Search service by name or ID..." class="w-full bg-[#0e1118] border border-[#262f40] rounded-xl pl-9 pr-4 py-2.5 text-xs text-white">
   </div>
-  <div class="flex items-center gap-2">
-   <button id="refresh-all-btn" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-3 rounded-xl text-xs font-bold transition-all shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2 cursor-pointer">
-    <i class="fa-solid fa-rotate"></i> Refresh All Data
-   </button>
-  </div>
+  <button id="refresh-orders" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2.5 rounded-xl text-xs font-bold shrink-0">
+   <i class="fa-solid fa-rotate"></i> Refresh
+  </button>
  </div>
 
- <!-- SECTION 1: Provider Control Center (SMM Decent, Hafiz Panel, Sasta SMM) -->
- <section class="bg-[#0b0f19] border border-gray-800 p-4 md:p-6 rounded-2xl space-y-4 shadow-xl">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-   <h2 class="font-gaming text-lg font-bold text-white flex items-center gap-2">
-    <i class="fa-solid fa-server text-cyan-400"></i> API PROVIDER CONTROL CENTER
-   </h2>
-   <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-2.5 py-1 rounded-lg font-mono">Live Sync Active</span>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="providers-container">
-   <!-- SMM Decent -->
-   <div class="bg-[#05070a] border border-gray-800 rounded-xl p-4 space-y-3 flex flex-col justify-between hover:border-cyan-500/50 transition-all">
-    <div>
-     <div class="flex items-center justify-between mb-2">
-      <span class="text-xs font-bold text-cyan-300 font-gaming uppercase tracking-wider">SMM Decent</span>
-      <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900 px-2 py-0.5 rounded-md font-bold">Active</span>
-     </div>
-     <p id="balance-smm-decent" class="text-xs text-gray-400">Balance: <strong class="text-white">Click Check</strong></p>
-    </div>
-    <div class="grid grid-cols-2 gap-2 pt-2">
-     <button type="button" data-provider-balance="smm_decent" class="bg-[#151b2b] hover:bg-[#1e273d] text-cyan-300 border border-cyan-900/50 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer">
-      <i class="fa-solid fa-wallet"></i> Balance
-     </button>
-     <button type="button" data-provider-fetch="smm_decent" class="bg-cyan-700 hover:bg-cyan-600 text-white py-2 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-md">
-      <i class="fa-solid fa-cloud-arrow-down"></i> Fetch Srv
-     </button>
-    </div>
-   </div>
-
-   <!-- Hafiz Panel -->
-   <div class="bg-[#05070a] border border-gray-800 rounded-xl p-4 space-y-3 flex flex-col justify-between hover:border-cyan-500/50 transition-all">
-    <div>
-     <div class="flex items-center justify-between mb-2">
-      <span class="text-xs font-bold text-purple-300 font-gaming uppercase tracking-wider">Hafiz Panel</span>
-      <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900 px-2 py-0.5 rounded-md font-bold">Active</span>
-     </div>
-     <p id="balance-hafiz_panel" class="text-xs text-gray-400">Balance: <strong class="text-white">Click Check</strong></p>
-    </div>
-    <div class="grid grid-cols-2 gap-2 pt-2">
-     <button type="button" data-provider-balance="hafiz_panel" class="bg-[#151b2b] hover:bg-[#1e273d] text-purple-300 border border-purple-900/50 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer">
-      <i class="fa-solid fa-wallet"></i> Balance
-     </button>
-     <button type="button" data-provider-fetch="hafiz_panel" class="bg-purple-700 hover:bg-purple-600 text-white py-2 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-md">
-      <i class="fa-solid fa-cloud-arrow-down"></i> Fetch Srv
-     </button>
-    </div>
-   </div>
-
-   <!-- Sasta SMM (Pending / Disabled) -->
-   <div class="bg-[#05070a] border border-amber-950/40 rounded-xl p-4 space-y-3 flex flex-col justify-between opacity-80">
-    <div>
-     <div class="flex items-center justify-between mb-2">
-      <span class="text-xs font-bold text-amber-400 font-gaming uppercase tracking-wider">Sasta SMM</span>
-      <span class="text-[10px] bg-amber-950/80 text-amber-400 border border-amber-900 px-2 py-0.5 rounded-md font-bold">Pending</span>
-     </div>
-     <p class="text-xs text-gray-500">API Integration: <strong class="text-amber-400/80">Incomplete / Locked</strong></p>
-    </div>
-    <div class="grid grid-cols-2 gap-2 pt-2">
-     <button type="button" disabled class="bg-[#151b2b]/50 text-gray-600 border border-gray-800 py-2 rounded-lg text-xs font-bold cursor-not-allowed">
-      <i class="fa-solid fa-wallet"></i> Balance
-     </button>
-     <button type="button" disabled class="bg-amber-900/20 text-amber-600/80 py-2 rounded-lg text-xs font-bold cursor-not-allowed">
-      <i class="fa-solid fa-lock"></i> Locked
-     </button>
-    </div>
-   </div>
-  </div>
- </section>
-
- <!-- SECTION 2: Add Manual Service OR Import Provider Services -->
- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <!-- Add Manual SMM Service -->
-  <section class="bg-[#0b0f19] border border-gray-800 p-4 md:p-6 rounded-2xl space-y-4 shadow-xl">
-   <h2 class="font-gaming text-lg font-bold text-white flex items-center gap-2">
-    <i class="fa-solid fa-circle-plus text-cyan-400"></i> ADD MANUAL SMM SERVICE
-   </h2>
-   <div>
-    <label class="text-xs text-gray-300 font-bold">Category / App Name</label>
-    <input id="srv-category" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-cyan-500" placeholder="Instagram / TikTok / YouTube / Facebook">
-   </div>
-   <div>
-    <label class="text-xs text-gray-300 font-bold">Service Name</label>
-    <input id="srv-name" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-cyan-500" placeholder="Followers / Likes / Views">
-   </div>
-   <div>
-    <label class="text-xs text-gray-300 font-bold">Manual Service ID (Optional)</label>
-    <input id="srv-custom-id" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-cyan-500" placeholder="101">
-   </div>
-   <div class="grid grid-cols-3 gap-2">
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Rate / 1000</label>
-     <input id="srv-rate" type="number" min="0.01" step="any" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white" placeholder="100">
-    </div>
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Min Qty</label>
-     <input id="srv-min" type="number" min="1" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white" placeholder="50">
-    </div>
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Max Qty</label>
-     <input id="srv-max" type="number" min="1" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white" placeholder="100000">
-    </div>
-   </div>
-   <button id="save-service-btn" class="w-full bg-cyan-700 hover:bg-cyan-600 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg shadow-cyan-700/20 cursor-pointer">
-    SAVE MANUAL SERVICE
-   </button>
-   <p id="page-message" class="text-center text-xs text-gray-400"></p>
-  </section>
-
-  <!-- Import Provider Services Section -->
-  <section class="bg-[#0b0f19] border border-gray-800 p-4 md:p-6 rounded-2xl space-y-4 shadow-xl">
-   <h2 class="font-gaming text-lg font-bold text-white flex items-center gap-2">
-    <i class="fa-solid fa-cloud-arrow-down text-purple-400"></i> IMPORT PROVIDER SERVICES
-   </h2>
-   <div>
-    <label class="text-xs text-gray-300 font-bold">Select Active Provider</label>
-    <select id="import-provider-select" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-purple-500">
-     <option value="">-- Choose Provider --</option>
-     <option value="smm_decent">SMM Decent</option>
-     <option value="hafiz_panel">Hafiz Panel</option>
-    </select>
-   </div>
-   <div>
-    <label class="text-xs text-gray-300 font-bold">Select Fetched Service</label>
-    <select id="import-service-select" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-purple-500" disabled>
-     <option value="">First click 'Fetch Srv' above or select provider</option>
-    </select>
-   </div>
-   <div class="grid grid-cols-2 gap-3">
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Provider Cost (Original)</label>
-     <input id="import-cost" type="number" step="any" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-gray-400" placeholder="0.00" readonly>
-    </div>
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Currency</label>
-     <input id="import-currency" type="text" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-gray-400" placeholder="PKR / USD" readonly>
-    </div>
-   </div>
-   <div class="grid grid-cols-2 gap-3">
-    <div>
-     <label class="text-[11px] text-gray-300 font-bold">Provider Service ID</label>
-     <input id="import-provider-service-id" type="text" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-gray-400" placeholder="ID" readonly>
-    </div>
-    <div>
-     <label class="text-[11px] text-cyan-300 font-bold">My Selling Price / Rate</label>
-     <input id="import-selling-rate" type="number" step="any" class="w-full mt-1 bg-[#05070a] border border-gray-800 rounded-xl p-3 text-xs text-white border-cyan-800" placeholder="Enter Rate per 1k">
-    </div>
-   </div>
-   <button id="import-save-btn" class="w-full bg-purple-700 hover:bg-purple-600 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg shadow-purple-700/20 cursor-pointer">
-    IMPORT & SAVE SERVICE TO DB
-   </button>
-   <p id="import-message" class="text-center text-xs text-gray-400"></p>
-  </section>
+ <!-- Filter Cards (Click opens Full Screen View) -->
+ <div class="horizontal-scroll">
+  <button data-filter="All" class="bg-[#151922] border border-[#262f40] p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-cyan-500 transition-colors">
+   <span class="text-[10px] text-gray-400">All Orders</span>
+   <strong id="stat-all-orders" class="block text-lg">0</strong>
+  </button>
+  <button data-filter="Pending" class="bg-[#151922] border border-amber-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-amber-500 transition-colors">
+   <span class="text-[10px] text-amber-400">Pending</span>
+   <strong id="stat-pending-orders" class="block text-lg text-amber-400">0</strong>
+  </button>
+  <button data-filter="Processing" class="bg-[#151922] border border-blue-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-blue-500 transition-colors">
+   <span class="text-[10px] text-blue-400">Processing</span>
+   <strong id="stat-processing-orders" class="block text-lg text-blue-400">0</strong>
+  </button>
+  <button data-filter="Completed" class="bg-[#151922] border border-emerald-900 p-3 rounded-xl shrink-0 min-w-24 text-left cursor-pointer hover:border-emerald-500 transition-colors">
+   <span class="text-[10px] text-emerald-400">Completed</span>
+   <strong id="stat-completed-orders" class="block text-lg text-emerald-400">0</strong>
+  </button>
  </div>
 
- <!-- SECTION 3: Orders Management (Separate Tabs & Filter Cards) -->
- <section class="bg-[#0b0f19] border border-gray-800 p-4 md:p-6 rounded-2xl space-y-4 shadow-xl">
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-gray-800 pb-3">
-   <h2 class="font-gaming text-lg font-bold text-white flex items-center gap-2">
-    <i class="fa-solid fa-list-check text-cyan-400"></i> SMM ORDERS MANAGEMENT
-   </h2>
-   <button id="refresh-orders" class="bg-[#151b2b] hover:bg-[#1e273d] text-cyan-300 border border-cyan-900 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all">
-    <i class="fa-solid fa-rotate"></i> Refresh Orders
-   </button>
-  </div>
+ <!-- Add Manual SMM Service Section -->
+ <section class="bg-[#0e1118] border border-[#262f40] p-4 md:p-6 rounded-2xl space-y-4">
+  <h2 class="font-gaming text-lg font-bold text-white">
+   <i class="fa-solid fa-circle-plus text-cyan-400"></i> ADD MANUAL SMM SERVICE
+  </h2>
 
-  <!-- Order Status Tabs / Filter Cards -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-   <button data-filter="All" class="order-tab bg-[#151b2b] border border-cyan-500 p-3 rounded-xl text-left cursor-pointer hover:border-cyan-400 transition-all shadow-md">
-    <span class="text-[10px] text-gray-400 font-bold uppercase">All Orders</span>
-    <strong id="stat-all-orders" class="block text-lg text-cyan-400 font-gaming">0</strong>
-   </button>
-   <button data-filter="Pending" class="order-tab bg-[#05070a] border border-gray-800 p-3 rounded-xl text-left cursor-pointer hover:border-amber-500 transition-all shadow-md">
-    <span class="text-[10px] text-amber-400 font-bold uppercase">Pending</span>
-    <strong id="stat-pending-orders" class="block text-lg text-amber-400 font-gaming">0</strong>
-   </button>
-   <button data-filter="Processing" class="order-tab bg-[#05070a] border border-gray-800 p-3 rounded-xl text-left cursor-pointer hover:border-blue-500 transition-all shadow-md">
-    <span class="text-[10px] text-blue-400 font-bold uppercase">Processing</span>
-    <strong id="stat-processing-orders" class="block text-lg text-blue-400 font-gaming">0</strong>
-   </button>
-   <button data-filter="Completed" class="order-tab bg-[#05070a] border border-gray-800 p-3 rounded-xl text-left cursor-pointer hover:border-emerald-500 transition-all shadow-md">
-    <span class="text-[10px] text-emerald-400 font-bold uppercase">Completed</span>
-    <strong id="stat-completed-orders" class="block text-lg text-emerald-400 font-gaming">0</strong>
-   </button>
+  <div>
+   <label class="text-xs text-gray-300 font-bold">Category / App Name</label>
+   <input id="srv-category" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="Instagram / TikTok / YouTube / Facebook">
   </div>
-
-  <!-- Orders List Container -->
-  <div id="orders-container" class="space-y-3 pt-2">
-   <p class="text-center text-gray-400 py-8 text-xs">Loading orders...</p>
+  <div>
+   <label class="text-xs text-gray-300 font-bold">Service Name</label>
+   <input id="srv-name" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="Followers / Likes / Views">
   </div>
+  <div>
+   <label class="text-xs text-gray-300 font-bold">Manual Service ID (Optional)</label>
+   <input id="srv-custom-id" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="101">
+  </div>
+  <div class="grid grid-cols-3 gap-2">
+   <div>
+    <label class="text-xs text-gray-300">Rate / 1000</label>
+    <input id="srv-rate" type="number" min="0.01" step="any" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="100">
+   </div>
+   <div>
+    <label class="text-xs text-gray-300">Min Qty</label>
+    <input id="srv-min" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="50">
+   </div>
+   <div>
+    <label class="text-xs text-gray-300">Max Qty</label>
+    <input id="srv-max" type="number" min="1" class="w-full mt-1 bg-[#06070a] border border-[#262f40] rounded-xl p-3 text-sm text-white" placeholder="100000">
+   </div>
+  </div>
+  <button id="save-service-btn" class="w-full bg-cyan-700 hover:bg-cyan-600 py-3 rounded-xl font-bold text-sm cursor-pointer">
+   SAVE MANUAL SERVICE
+  </button>
+  <p id="page-message" class="text-center text-xs text-gray-400"></p>
  </section>
 
- <!-- SECTION 4: All Configured Services Toggle Section -->
- <section class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 md:p-6 space-y-3 shadow-xl">
+ <!-- All Configured Services Toggle / Dropdown Section -->
+ <section class="bg-[#0e1118] border border-[#262f40] rounded-2xl p-4 space-y-3">
   <div class="flex justify-between items-center cursor-pointer select-none" id="toggle-services-section">
    <h3 class="font-gaming text-lg font-bold text-purple-400 flex items-center gap-2">
-    <i class="fa-solid fa-database"></i> ALL CONFIGURED SERVICES <span id="services-badge" class="text-xs bg-[#151b2b] border border-purple-900 px-2.5 py-0.5 rounded-full text-purple-300 font-mono">0</span>
+    <i class="fa-solid fa-list-check"></i> ALL CONFIGURED SERVICES <span id="services-badge" class="text-xs bg-[#202635] px-2 py-0.5 rounded-full text-gray-300">0</span>
    </h3>
    <div class="flex items-center gap-2">
-    <button id="refresh-services" class="text-xs bg-[#151b2b] hover:bg-[#1e273d] border border-gray-800 px-3 py-1.5 rounded-lg text-white" onclick="event.stopPropagation()">Refresh</button>
+    <button id="refresh-services" class="text-xs bg-[#202635] hover:bg-[#2b3345] px-3 py-1.5 rounded-lg text-white" onclick="event.stopPropagation()">Refresh</button>
     <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300" id="services-chevron"></i>
    </div>
   </div>
-  <div id="services-container" class="hidden space-y-3 pt-3 border-t border-gray-800">
+  <div id="services-container" class="hidden space-y-3 pt-2 border-t border-[#262f40]">
    <div id="services-list" class="space-y-3">
-    <p class="text-gray-400 text-xs text-center py-4">Loading configured services...</p>
+    <p class="text-gray-400 text-sm text-center py-4">Loading services...</p>
    </div>
   </div>
  </section>
 
 </main>
+
+<!-- Full Screen Modal for Order Categories -->
+<div id="fullscreen-modal" class="fixed inset-0 bg-[#06070a] z-50 hidden flex flex-col p-4 md:p-6 overflow-y-auto">
+ <div class="flex items-center justify-between border-b border-[#262f40] pb-3 mb-4">
+  <div>
+   <h2 id="modal-heading" class="font-gaming text-xl font-bold text-cyan-400 uppercase">ORDERS</h2>
+   <p id="modal-subcount" class="text-xs text-gray-400">0 orders found</p>
+  </div>
+  <button id="close-modal-btn" class="bg-[#151922] border border-[#262f40] px-4 py-2 rounded-lg text-xs font-bold text-white hover:bg-[#202635] cursor-pointer">
+   <i class="fa-solid fa-xmark text-red-500"></i> Close
+  </button>
+ </div>
+ <div id="modal-orders-list" class="space-y-3 flex-1 pb-10">
+  <!-- Dynamic Orders Will Load Here -->
+ </div>
+</div>
 
 <script>
 (() => {
@@ -288,10 +160,6 @@ let currentUser = null;
 let orders = [];
 let services = [];
 let currentFilter = 'All';
-let fetchedProviderServices = {
- smm_decent: [],
- hafiz_panel: []
-};
 
 function safe(value) {
  return String(value ?? '').replace(/[&<>"']/g, c => ({
@@ -304,16 +172,12 @@ function message(text, error=false) {
  $('page-message').className = 'text-center text-xs ' + (error ? 'text-red-400' : 'text-emerald-400');
 }
 
-function importMessage(text, error=false) {
- $('import-message').textContent = text;
- $('import-message').className = 'text-center text-xs ' + (error ? 'text-red-400' : 'text-emerald-400');
-}
-
 function showAccessError(text) {
  $('access-message').textContent = text;
- $('access-message').className = 'bg-[#0b0f19] border border-red-900 p-6 rounded-2xl text-sm text-center text-red-400 shadow-xl';
+ $('access-message').className = 'bg-[#0e1118] border border-red-900 p-4 rounded-xl text-sm text-center text-red-400';
 }
 
+// Auto Icon Selector based on category name
 function getCategoryIcon(categoryName) {
  const name = (categoryName || '').toLowerCase();
  if (name.includes('facebook') || name.includes('fb')) return 'fa-brands fa-facebook text-blue-500';
@@ -360,17 +224,16 @@ async function checkAdmin() {
 }
 
 function updateStats() {
- const count = status => orders.filter(o => {
-  const s = String(o.status || 'Pending').toLowerCase();
-  if (status === 'Processing') return s === 'processing' || s === 'in progress';
-  if (status === 'Completed') return s === 'completed' || s === 'success';
-  return s === status.toLowerCase();
- }).length;
+ const count = status => orders.filter(o =>
+  String(o.status || 'Pending').toLowerCase() === status.toLowerCase()
+ ).length;
 
  $('stat-all-orders').textContent = orders.length;
  $('stat-pending-orders').textContent = count('Pending');
- $('stat-processing-orders').textContent = count('Processing');
- $('stat-completed-orders').textContent = count('Completed');
+ $('stat-processing-orders').textContent = count('Processing') +
+  orders.filter(o => String(o.status || '').toLowerCase() === 'in progress').length;
+ $('stat-completed-orders').textContent = count('Completed') +
+  orders.filter(o => String(o.status || '').toLowerCase() === 'success').length;
 }
 
 async function loadOrders() {
@@ -380,13 +243,16 @@ async function loadOrders() {
   .order('created_at', {ascending:false});
 
  if (error) throw error;
+
  orders = data || [];
  updateStats();
- renderOrders();
+ if(!$('fullscreen-modal').classList.contains('hidden')) {
+  renderModalOrders();
+ }
 }
 
-async function renderOrders() {
- const box = $('orders-container');
+async function renderModalOrders() {
+ const box = $('modal-orders-list');
  let list = orders;
 
  if (currentFilter !== 'All') {
@@ -398,23 +264,17 @@ async function renderOrders() {
   });
  }
 
- const globalQuery = $('global-search-input').value.toLowerCase().trim();
- if (globalQuery) {
-  list = list.filter(o => 
-   String(o.order_id || '').toLowerCase().includes(globalQuery) ||
-   String(o.service_name || '').toLowerCase().includes(globalQuery) ||
-   String(o.link || '').toLowerCase().includes(globalQuery) ||
-   String(o.user_id || '').toLowerCase().includes(globalQuery)
-  );
- }
+ $('modal-heading').textContent = currentFilter.toUpperCase() + ' ORDERS';
+ $('modal-subcount').textContent = list.length + ' orders found';
 
  if (!list.length) {
-  box.innerHTML = '<p class="text-center text-gray-400 py-10 text-xs">Koi order nahi mila is category ya search mein.</p>';
+  box.innerHTML = '<p class="text-center text-gray-400 py-12 text-sm">Is category mein abhi koi order nahi hai.</p>';
   return;
  }
 
  const ids = [...new Set(list.map(o => o.user_id).filter(Boolean))];
  let profiles = {};
+
  if (ids.length) {
   const {data: playerRows, error: playerError} = await client
    .from('profiles')
@@ -427,59 +287,56 @@ async function renderOrders() {
  }
 
  box.innerHTML = '';
+
  list.forEach(order => {
   const profile = profiles[order.user_id] || {};
   const status = String(order.status || 'Pending').toLowerCase();
   const isCompleted = status === 'completed' || status === 'success';
 
   const statusColor = isCompleted
-    ? 'text-emerald-400 border-emerald-900 bg-emerald-950/30'
+    ? 'text-emerald-400 border-emerald-900'
     : status === 'processing' || status === 'in progress'
-     ? 'text-blue-400 border-blue-900 bg-blue-950/30'
-     : 'text-amber-400 border-amber-900 bg-amber-950/30';
+     ? 'text-blue-400 border-blue-900'
+     : 'text-amber-400 border-amber-900';
 
   const card = document.createElement('article');
-  card.className = 'bg-[#05070a] border border-gray-800 rounded-xl p-4 space-y-3 shadow-md hover:border-gray-700 transition-all';
+  card.className = 'bg-[#0e1118] border border-[#262f40] rounded-xl p-4 space-y-3 shadow-lg';
 
   card.innerHTML = `
-   <div class="flex flex-col sm:flex-row justify-between gap-2 items-start sm:items-center">
+   <div class="flex justify-between gap-2 items-start">
     <div>
-     <span class="text-[10px] text-gray-400 uppercase font-bold">Order ID</span>
-     <p class="font-bold text-cyan-400 font-gaming text-sm sm:text-base">#${safe(order.order_id || order.id)}</p>
+     <p class="text-xs text-gray-400">ORDER ID</p>
+     <p class="font-bold text-cyan-400">#${safe(order.order_id || order.id)}</p>
     </div>
-    <span class="text-[10px] uppercase border rounded-lg px-2.5 py-1 font-bold ${statusColor}">${safe(order.status || 'Pending')}</span>
+    <span class="text-[10px] uppercase border rounded-lg px-2 py-1 ${statusColor}">${safe(order.status || 'Pending')}</span>
    </div>
 
-   <div class="border-t border-gray-800/80 pt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-    <div>
-     <p class="text-gray-400">Player Name: <strong class="text-white">${safe(profile.free_fire_name || 'Player')}</strong></p>
-     <p class="text-gray-400">Free Fire UID: <strong class="text-white">${safe(profile.free_fire_uid || 'Not available')}</strong></p>
-     <p class="text-gray-400">User ID: <span class="text-gray-300 font-mono text-[11px]">${safe(order.user_id || 'N/A')}</span></p>
-    </div>
-    <div>
-     <p class="text-gray-400">Service: <strong class="text-white">${safe(order.service_name || 'N/A')}</strong></p>
-     <p class="text-gray-400">Quantity: <strong class="text-white">${safe(order.quantity)}</strong></p>
-     <p class="text-gray-400">Charge: <strong class="text-emerald-400 font-bold">PKR ${safe(order.charge ?? 0)}</strong></p>
-     <p class="text-gray-500 text-[11px]">Date: ${safe(order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A')}</p>
-    </div>
+   <div class="border-t border-[#202635] pt-3 space-y-1.5 text-xs">
+    <p class="text-gray-300">Player: <strong class="text-white">${safe(profile.free_fire_name || 'Player')}</strong></p>
+    <p class="text-gray-400 break-all">Free Fire UID: <strong class="text-white">${safe(profile.free_fire_uid || 'Not available')}</strong></p>
+    <p class="text-gray-400 break-all">User ID: <span class="text-gray-300">${safe(order.user_id || 'N/A')}</span></p>
+    <p class="text-gray-300">Service: <strong class="text-white">${safe(order.service_name || 'N/A')}</strong></p>
+    <p class="text-gray-300">Quantity: <strong class="text-white">${safe(order.quantity)}</strong></p>
+    <p class="text-gray-300">Charge: <strong class="text-emerald-400">PKR ${safe(order.charge ?? 0)}</strong></p>
+    <p class="text-gray-500">Date: ${safe(order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A')}</p>
    </div>
 
-   <div class="bg-[#0b0f19] rounded-xl p-3 space-y-2 border border-gray-800">
-    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Player Target Link</p>
-    <p class="text-xs text-amber-300 break-all font-mono">${safe(order.link || 'No link provided')}</p>
-    <button type="button" data-copy-link class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-2 shadow-sm">
-     <i class="fa-solid fa-copy"></i> Copy Target Link
+   <div class="bg-[#111722] rounded-lg p-3 space-y-2">
+    <p class="text-[10px] text-gray-400 font-bold">PLAYER TARGET LINK</p>
+    <p class="text-xs text-amber-300 break-all">${safe(order.link || 'No link')}</p>
+    <button type="button" data-copy-link class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg text-xs font-bold cursor-pointer">
+     <i class="fa-solid fa-copy"></i> COPY LINK
     </button>
    </div>
 
-   <div class="grid ${isCompleted ? 'grid-cols-2' : 'grid-cols-3'} gap-2 pt-1">
+   <div class="action-buttons-wrap grid ${isCompleted ? 'grid-cols-2' : 'grid-cols-3'} gap-2 pt-1">
     ${!isCompleted ? `
-     <button type="button" data-status="Pending" class="bg-amber-700/80 hover:bg-amber-600 text-white py-2 rounded-lg text-xs font-bold cursor-pointer transition-all">PENDING</button>
-     <button type="button" data-status="Processing" class="bg-blue-700/80 hover:bg-blue-600 text-white py-2 rounded-lg text-xs font-bold cursor-pointer transition-all">PROCESSING</button>
-     <button type="button" data-status="Completed" class="bg-emerald-700/80 hover:bg-emerald-600 text-white py-2 rounded-lg text-xs font-bold cursor-pointer transition-all">COMPLETED</button>
+     <button type="button" data-status="Pending" class="bg-amber-700 hover:bg-amber-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">PENDING</button>
+     <button type="button" data-status="Processing" class="bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">PROCESSING</button>
+     <button type="button" data-status="Completed" class="bg-emerald-700 hover:bg-emerald-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer">COMPLETED</button>
     ` : `
-     <button type="button" class="bg-emerald-900/50 border border-emerald-800 text-emerald-300 py-2 rounded-lg text-xs font-bold" disabled>COMPLETED</button>
-     <button type="button" data-delete-order class="bg-red-700 hover:bg-red-600 text-white py-2 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-trash"></i> DELETE</button>
+     <button type="button" data-status="Completed" class="bg-emerald-800 py-2 rounded-lg text-[11px] font-bold text-emerald-200" disabled>COMPLETED</button>
+     <button type="button" data-delete-order class="bg-red-700 hover:bg-red-600 py-2 rounded-lg text-[11px] font-bold cursor-pointer"><i class="fa-solid fa-trash"></i> DELETE</button>
     `}
    </div>
   `;
@@ -488,7 +345,7 @@ async function renderOrders() {
    if (!order.link) return alert('Is order ka link available nahi hai.');
    try {
     await navigator.clipboard.writeText(order.link);
-    alert('Player link successfully copy ho gaya!');
+    alert('Player link copy ho gaya!');
    } catch {
     const input = document.createElement('textarea');
     input.value = order.link;
@@ -496,17 +353,19 @@ async function renderOrders() {
     input.select();
     document.execCommand('copy');
     input.remove();
-    alert('Player link copy ho gaya!');
+    alert('Link copy ho gaya!');
    }
   });
 
-  if (!isCompleted) {
-   card.querySelectorAll('[data-status]').forEach(btn => {
-    btn.addEventListener('click', () => updateOrderStatus(order.id, btn.dataset.status, btn));
+  if(!isCompleted) {
+   card.querySelectorAll('[data-status]').forEach(button => {
+    button.addEventListener('click', () => updateOrderStatus(order.id, button.dataset.status, button));
    });
   } else {
    const delBtn = card.querySelector('[data-delete-order]');
-   if (delBtn) delBtn.addEventListener('click', () => deleteOrder(order.id));
+   if(delBtn) {
+    delBtn.addEventListener('click', () => deleteOrder(order.id));
+   }
   }
 
   box.appendChild(card);
@@ -515,6 +374,7 @@ async function renderOrders() {
 
 async function updateOrderStatus(id, newStatus, button) {
  if (!confirm('Order status ' + newStatus + ' karna hai?')) return;
+
  button.disabled = true;
  const oldText = button.textContent;
  button.textContent = 'UPDATING...';
@@ -522,17 +382,20 @@ async function updateOrderStatus(id, newStatus, button) {
  try {
   const {data, error} = await client
    .from('smm_orders')
-   .update({status: newStatus, updated_at: new Date().toISOString()})
+   .update({status:newStatus, updated_at:new Date().toISOString()})
    .eq('id', id)
    .select('id,status')
    .single();
 
   if (error) throw error;
+  if (!data) throw new Error('Status update confirm nahi hua.');
+
   alert('Order status successfully ' + newStatus + ' ho gaya.');
   await loadOrders();
  } catch (e) {
   console.error(e);
-  alert('Status update error: ' + e.message);
+  alert('Status update nahi hua: ' + e.message);
+ } finally {
   button.disabled = false;
   button.textContent = oldText;
  }
@@ -550,126 +413,54 @@ async function deleteOrder(id) {
  }
 }
 
-async function checkProviderBalance(providerKey) {
- const balanceEl = $(`balance-${providerKey}`);
- balanceEl.innerHTML = 'Balance: <strong class="text-amber-400">Checking...</strong>';
- try {
-  const { data, error } = await client.functions.invoke('smm-proxy', {
-   body: { action: 'balance', provider: providerKey }
-  });
-  if (error) throw error;
-  if (data && data.balance !== undefined) {
-   balanceEl.innerHTML = `Balance: <strong class="text-emerald-400">${data.balance} ${data.currency || 'PKR'}</strong>`;
-   alert(`${providerKey.replace('_', ' ').toUpperCase()} Balance: ${data.balance} ${data.currency || 'PKR'}`);
-  } else {
-   throw new Error('Invalid balance response from server.');
-  }
- } catch (e) {
-  console.error(e);
-  balanceEl.innerHTML = 'Balance: <strong class="text-red-400">Failed</strong>';
-  alert('Balance check error: ' + e.message + '. (Make sure smm-proxy Edge function is configured with provider API keys).');
- }
-}
-
-async function fetchProviderServices(providerKey) {
- alert(`${providerKey.replace('_', ' ').toUpperCase()} services fetching initiated via secure server...`);
- try {
-  const { data, error } = await client.functions.invoke('smm-proxy', {
-   body: { action: 'services', provider: providerKey }
-  });
-  if (error) throw error;
-  if (data && Array.isArray(data.services)) {
-   fetchedProviderServices[providerKey] = data.services;
-   alert(`Successfully fetched ${data.services.length} services from ${providerKey.replace('_', ' ').toUpperCase()}! Now select them in Import section.`);
-   if ($('import-provider-select').value === providerKey) {
-    populateImportDropdown(providerKey);
-   }
-  } else {
-   throw new Error('Services array not returned from provider API.');
-  }
- } catch (e) {
-  console.error(e);
-  alert('Fetch services error: ' + e.message + '. (Ensure Edge function and provider credentials are valid).');
- }
-}
-
-function populateImportDropdown(providerKey) {
- const selectBox = $('import-service-select');
- selectBox.innerHTML = '<option value="">-- Select Service --</option>';
- const list = fetchedProviderServices[providerKey] || [];
- if (!list.length) {
-  selectBox.innerHTML = '<option value="">No services fetched yet. Click Fetch Srv first.</option>';
-  selectBox.disabled = true;
-  return;
- }
- selectBox.disabled = false;
- list.forEach((srv, idx) => {
-  const opt = document.createElement('option');
-  opt.value = idx;
-  opt.textContent = `[ID: ${srv.service || srv.id}] ${srv.name} (${srv.rate} ${srv.currency || 'PKR'})`;
-  selectBox.appendChild(opt);
- });
-}
-
 async function loadServices() {
  const box = $('services-list');
- box.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Loading configured services...</p>';
+ box.innerHTML = '<p class="text-center text-gray-400 py-4">Loading...</p>';
 
- const {data, error} = await client
+ const {data,error} = await client
   .from('smm_services')
   .select('*')
-  .order('id', {ascending: false});
+  .order('id',{ascending:false});
 
  if (error) throw error;
  services = data || [];
  $('services-badge').textContent = services.length;
+
  renderFilteredServices(services);
 }
 
 function renderFilteredServices(list) {
  const box = $('services-list');
- const query = $('global-search-input').value.toLowerCase().trim();
- let filtered = list;
-
- if (query) {
-  filtered = list.filter(s =>
-   String(s.name || '').toLowerCase().includes(query) ||
-   String(s.category || '').toLowerCase().includes(query) ||
-   String(s.provider_service_id || '').toLowerCase().includes(query)
-  );
- }
-
- if (!filtered.length) {
-  box.innerHTML = '<p class="text-gray-400 text-center text-xs py-5">No matching services found.</p>';
+ if (!list.length) {
+  box.innerHTML = '<p class="text-gray-400 text-center text-sm py-5">No matching services found.</p>';
   return;
  }
 
  box.innerHTML = '';
- filtered.forEach(service => {
+ list.forEach(service => {
   const iconClass = getCategoryIcon(service.category);
   const card = document.createElement('div');
-  card.className = 'bg-[#05070a] border border-gray-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-sm hover:border-cyan-500/50 transition-all';
+  card.className = 'bg-[#06070a] border border-[#262f40] p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-md hover:border-cyan-500/50 transition-all';
   card.innerHTML = `
    <div class="flex items-start gap-3 min-w-0">
-    <div class="w-10 h-10 rounded-xl bg-[#0b0f19] border border-gray-800 flex items-center justify-center shrink-0 text-lg">
+    <div class="w-10 h-10 rounded-xl bg-[#151922] border border-[#262f40] flex items-center justify-center shrink-0 text-lg">
      <i class="${iconClass}"></i>
     </div>
     <div class="min-w-0 space-y-1">
      <div class="flex items-center gap-2 flex-wrap">
       <span class="text-xs text-cyan-400 font-bold uppercase">${safe(service.category)}</span>
-      ${service.provider_service_id ? `<span class="bg-purple-950/80 text-purple-300 border border-purple-900 text-[10px] px-2 py-0.5 rounded-md font-mono">Provider ID: ${safe(service.provider_service_id)}</span>` : ''}
+      ${service.provider_service_id ? `<span class="bg-purple-950/80 text-purple-300 border border-purple-900 text-[10px] px-2 py-0.5 rounded-md font-mono">ID: ${safe(service.provider_service_id)}</span>` : ''}
      </div>
      <p class="text-sm text-white font-bold leading-snug">${safe(service.name)}</p>
      <div class="text-[11px] text-gray-400 flex flex-wrap gap-x-3 gap-y-0.5">
       <span>Rate/1k: <strong class="text-emerald-400">${safe(service.rate)}</strong></span>
       <span>Min: <strong class="text-gray-300">${safe(service.min)}</strong></span>
       <span>Max: <strong class="text-gray-300">${safe(service.max)}</strong></span>
-      ${service.provider_cost ? `<span>Cost: <strong class="text-amber-400">${safe(service.provider_cost)}</strong></span>` : ''}
      </div>
     </div>
    </div>
-   <button type="button" data-delete-service class="bg-red-700 hover:bg-red-600 px-3 py-2 rounded-xl text-xs font-bold shrink-0 text-white cursor-pointer w-full md:w-auto transition-all">
-    <i class="fa-solid fa-trash"></i> Delete Service
+   <button type="button" data-delete-service class="bg-red-700 hover:bg-red-600 px-3 py-2 rounded-xl text-xs font-bold shrink-0 text-white cursor-pointer w-full md:w-auto">
+    <i class="fa-solid fa-trash"></i> Delete
    </button>
   `;
   card.querySelector('[data-delete-service]').addEventListener('click', () => deleteService(service.id));
@@ -686,11 +477,11 @@ async function saveManualService() {
  const providerId = $('srv-custom-id').value.trim() || null;
 
  if (!category || !name || !$('srv-rate').value || !$('srv-min').value || !$('srv-max').value) {
-  message('Tamam fields fill karein.', true);
+  message('Tamam fields fill karein.',true);
   return;
  }
  if (!Number.isFinite(rate) || rate <= 0 || !Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max < min) {
-  message('Rate aur quantity values check karein.', true);
+  message('Rate aur quantity values check karein.',true);
   return;
  }
 
@@ -699,82 +490,28 @@ async function saveManualService() {
  button.textContent = 'SAVING...';
 
  try {
-  const row = {category, name, rate, min, max};
+  const row = {category,name,rate,min,max};
   if (providerId) row.provider_service_id = providerId;
 
   const {error} = await client.from('smm_services').insert([row]);
   if (error) throw error;
 
-  ['srv-category', 'srv-name', 'srv-custom-id', 'srv-rate', 'srv-min', 'srv-max'].forEach(id => $(id).value = '');
-  message('Manual service successfully saved!');
+  ['srv-category','srv-name','srv-custom-id','srv-rate','srv-min','srv-max'].forEach(id => $(id).value = '');
+  message('Service successfully saved.');
   await loadServices();
  } catch (e) {
   console.error(e);
-  message('Service save error: ' + e.message, true);
+  message('Service save nahi hui: ' + e.message,true);
  } finally {
   button.disabled = false;
   button.textContent = 'SAVE MANUAL SERVICE';
  }
 }
 
-async function saveImportedService() {
- const provider = $('import-provider-select').value;
- const srvIdx = $('import-service-select').value;
- const sellingRate = Number($('import-selling-rate').value);
-
- if (!provider || srvIdx === '' || !sellingRate || sellingRate <= 0) {
-  importMessage('Please select provider, service, and enter a valid selling rate.', true);
-  return;
- }
-
- const srvList = fetchedProviderServices[provider] || [];
- const selectedSrv = srvList[Number(srvIdx)];
- if (!selectedSrv) {
-  importMessage('Selected service not found in fetched list.', true);
-  return;
- }
-
- const button = $('import-save-btn');
- button.disabled = true;
- button.textContent = 'IMPORTING...';
-
- try {
-  const row = {
-   category: selectedSrv.category || provider.replace('_', ' ').toUpperCase(),
-   name: selectedSrv.name,
-   rate: sellingRate,
-   min: Number(selectedSrv.min || 10),
-   max: Number(selectedSrv.max || 10000),
-   provider_service_id: String(selectedSrv.service || selectedSrv.id),
-   provider_cost: Number(selectedSrv.rate || 0),
-   currency: selectedSrv.currency || 'PKR',
-   provider_uuid: provider
-  };
-
-  const {error} = await client.from('smm_services').insert([row]);
-  if (error) throw error;
-
-  importMessage('Service successfully imported and saved to database!');
-  $('import-selling-rate').value = '';
-  $('import-cost').value = '';
-  $('import-currency').value = '';
-  $('import-provider-service-id').value = '';
-  $('import-service-select').value = '';
-  $('import-service-select').disabled = true;
-  await loadServices();
- } catch (e) {
-  console.error(e);
-  importMessage('Import error: ' + e.message, true);
- } finally {
-  button.disabled = false;
-  button.textContent = 'IMPORT & SAVE SERVICE TO DB';
- }
-}
-
 async function deleteService(id) {
  if (!confirm('Kya aap ye service delete karna chahte hain?')) return;
  try {
-  const {error} = await client.from('smm_services').delete().eq('id', id);
+  const {error} = await client.from('smm_services').delete().eq('id',id);
   if (error) throw error;
   alert('Service delete ho gayi.');
   await loadServices();
@@ -788,31 +525,25 @@ async function init() {
  if (!allowed) return;
 
  try {
-  await Promise.all([loadOrders(), loadServices()]);
+  await Promise.all([loadOrders(),loadServices()]);
  } catch (e) {
   console.error(e);
  }
 
- // Order tabs filter
- document.querySelectorAll('.order-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-   document.querySelectorAll('.order-tab').forEach(b => {
-    b.classList.remove('border-cyan-500', 'bg-[#151b2b]');
-    b.classList.add('border-gray-800', 'bg-[#05070a]');
-    b.querySelector('strong').classList.remove('text-cyan-400');
-    b.querySelector('strong').classList.add('text-gray-200');
-   });
-   btn.classList.remove('border-gray-800', 'bg-[#05070a]');
-   btn.classList.add('border-cyan-500', 'bg-[#151b2b]');
-   btn.querySelector('strong').classList.remove('text-gray-200');
-   btn.querySelector('strong').classList.add('text-cyan-400');
-
+ // Filter buttons to open Full Screen Modal
+ document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', async () => {
    currentFilter = btn.dataset.filter;
-   renderOrders();
+   await renderModalOrders();
+   $('fullscreen-modal').classList.remove('hidden');
   });
  });
 
- // Toggle Services Accordion
+ $('close-modal-btn').addEventListener('click', () => {
+  $('fullscreen-modal').classList.add('hidden');
+ });
+
+ // Toggle Services Dropdown
  $('toggle-services-section').addEventListener('click', () => {
   const container = $('services-container');
   const chevron = $('services-chevron');
@@ -820,78 +551,35 @@ async function init() {
   chevron.classList.toggle('rotate-180');
  });
 
- // Global Search (Filters both Orders and Services in real-time)
- $('global-search-input').addEventListener('input', () => {
-  renderOrders();
-  renderFilteredServices(services);
- });
-
- // Provider Balance & Fetch Event Listeners
- document.querySelectorAll('[data-provider-balance]').forEach(btn => {
-  btn.addEventListener('click', () => checkProviderBalance(btn.dataset.providerBalance));
- });
-
- document.querySelectorAll('[data-provider-fetch]').forEach(btn => {
-  btn.addEventListener('click', () => fetchProviderServices(btn.dataset.providerFetch));
- });
-
- // Import Provider Select Change
- $('import-provider-select').addEventListener('change', (e) => {
-  const prov = e.target.value;
-  if (!prov) {
-   $('import-service-select').innerHTML = '<option value="">-- Choose Provider First --</option>';
-   $('import-service-select').disabled = true;
-   $('import-cost').value = '';
-   $('import-currency').value = '';
-   $('import-provider-service-id').value = '';
+ // Real-time Service Search Bar
+ $('service-search-input').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  if(!query) {
+   renderFilteredServices(services);
    return;
   }
-  populateImportDropdown(prov);
- });
-
- // Import Service Selection Change
- $('import-service-select').addEventListener('change', (e) => {
-  const idx = e.target.value;
-  const prov = $('import-provider-select').value;
-  if (idx === '' || !prov) {
-   $('import-cost').value = '';
-   $('import-currency').value = '';
-   $('import-provider-service-id').value = '';
-   return;
-  }
-  const srv = (fetchedProviderServices[prov] || [])[Number(idx)];
-  if (srv) {
-   $('import-cost').value = srv.rate || 0;
-   $('import-currency').value = srv.currency || 'PKR';
-   $('import-provider-service-id').value = srv.service || srv.id || '';
-   $('import-selling-rate').value = Math.ceil(Number(srv.rate || 0) * 1.25);
-  }
+  const filtered = services.filter(s => 
+   String(s.name || '').toLowerCase().includes(query) ||
+   String(s.category || '').toLowerCase().includes(query) ||
+   String(s.provider_service_id || '').toLowerCase().includes(query)
+  );
+  renderFilteredServices(filtered);
  });
 
  $('refresh-orders').addEventListener('click', async () => {
-  try { await loadOrders(); alert('Orders refreshed successfully!'); }
-  catch(e) { alert('Refresh error: ' + e.message); }
+  try { await loadOrders(); alert('Orders refreshed!'); }
+  catch(e) { alert('Orders refresh error: ' + e.message); }
  });
 
  $('refresh-services').addEventListener('click', async () => {
-  try { await loadServices(); alert('Services refreshed successfully!'); }
-  catch(e) { alert('Refresh error: ' + e.message); }
+  try { await loadServices(); alert('Services refreshed!'); }
+  catch(e) { alert('Services refresh error: ' + e.message); }
  });
 
- $('refresh-all-btn').addEventListener('click', async () => {
-  try {
-   await Promise.all([loadOrders(), loadServices()]);
-   alert('All data refreshed successfully!');
-  } catch(e) {
-   alert('Refresh error: ' + e.message);
-  }
- });
-
- $('save-service-btn').addEventListener('click', saveManualService);
- $('import-save-btn').addEventListener('click', saveImportedService);
+ $('save-service-btn').addEventListener('click',saveManualService);
 }
 
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded',init);
 })();
 </script>
 </body>
