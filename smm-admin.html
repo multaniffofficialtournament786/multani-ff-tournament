@@ -265,7 +265,7 @@ hr{border:0;border-top:1px solid var(--line);width:100%}
    <!-- ORDERS -->
    <section class="page" id="orders">
     <div class="pagehead">
-     <div><h1>ORDER MANAGEMENT</h1><div class="muted">Customer orders aur user profile details</div></div>
+     <div><h1>ORDER MANAGEMENT</h1><div class="muted">Customer orders aur status update</div></div>
      <button onclick="loadOrders()">Refresh</button>
     </div>
 
@@ -276,7 +276,7 @@ hr{border:0;border-top:1px solid var(--line);width:100%}
        <label>Status Filter</label>
        <select id="orderStatusFilter" onchange="renderOrders()">
         <option value="">All Orders</option>
-        <option>Pending</option><option>Processing</option><option>Completed</option><option>Partial</option><option>Canceled</option>
+        <option>pending</option><option>processing</option><option>completed</option><option>partial</option><option>cancelled</option>
        </select>
       </div>
      </div>
@@ -728,14 +728,14 @@ function renderOrders(){
  const filtered=orders.filter(x=>{
   const details=getUserDetails(x.user_id);
   const haystack=[x.order_id,x.id,x.user_id,x.service_name,x.link,details.email,details.name].join(' ').toLowerCase();
-  return (!statusFilter||String(x.status||'')===statusFilter)&&haystack.includes(q);
+  return (!statusFilter||String(x.status||'').toLowerCase()===statusFilter.toLowerCase())&&haystack.includes(q);
  });
 
  $('orderRows').innerHTML=filtered.map(x=>{
   const u=getUserDetails(x.user_id);
   const avatar=u.avatar?escAttr(u.avatar):'https://www.gravatar.com/avatar/?d=mp';
-  const status=String(x.status||'Pending');
-  const isCompleted = status.toLowerCase() === 'completed';
+  const status=String(x.status||'pending').toLowerCase();
+  const canDelete = status === 'completed' || status === 'cancelled';
 
   return `
    <div class="vip-card">
@@ -760,15 +760,38 @@ function renderOrders(){
     <div class="data-line">Date: ${esc(x.created_at?new Date(x.created_at).toLocaleString():'—')}</div>
     <hr>
     <div class="vip-card-row data-line">
-     <span>Order Status: <b>${esc(status)}</b></span>
-     <div class="actions">
+     <div class="field" style="margin:0;flex:1 1 140px">
+      <label>Status Update</label>
+      <select class="full-input" id="status-${x.id}" onchange="updateOrderStatus(${x.id}, this.value)">
+       <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
+       <option value="processing" ${status==='processing'?'selected':''}>Processing</option>
+       <option value="completed" ${status==='completed'?'selected':''}>Completed</option>
+       <option value="partial" ${status==='partial'?'selected':''}>Partial</option>
+       <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
+      </select>
+     </div>
+     <div class="actions" style="margin-top:16px">
       <button class="secondary" onclick="copyOrderLink(${Number(x.id)})">Copy Link</button>
-      ${isCompleted ? `<button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>` : ''}
+      ${canDelete ? `<button class="danger" onclick="deleteOrder(${Number(x.id)})">Delete</button>` : ''}
      </div>
     </div>
    </div>
   `;
  }).join('')||'<div class="msg">No matching orders found.</div>';
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+ const { error } = await sb.rpc('admin_update_order_status', {
+  p_order_id: orderId,
+  p_new_status: newStatus
+ });
+ if(error) {
+  alert('Status update error: ' + error.message);
+  loadOrders();
+  return;
+ }
+ alert('Order status update ho gaya!');
+ loadOrders();
 }
 
 function copyOrderLink(id){
