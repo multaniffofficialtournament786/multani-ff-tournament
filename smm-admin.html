@@ -785,10 +785,11 @@ async function updateOrderStatus(orderId, newStatus) {
  const errorBox = document.getElementById('error-msg-' + orderId);
  if(errorBox) errorBox.classList.add('hidden');
 
- const { error } = await sb.rpc('admin_update_order_status', {
-  p_order_id: String(orderId),
-  p_new_status: newStatus
- });
+ // Direct database update taake status foran update ho aur player website/app par reflect ho
+ const { error } = await sb
+  .from('smm_orders')
+  .update({ status: newStatus, updated_at: new Date().toISOString() })
+  .eq('id', orderId);
 
  if(error) {
   console.error('Status update error:', error.message);
@@ -799,6 +800,7 @@ async function updateOrderStatus(orderId, newStatus) {
   loadOrders();
   return;
  }
+
  loadOrders();
 }
 
