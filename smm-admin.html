@@ -63,19 +63,35 @@ header{
  border:1px solid #334155;border-radius:8px;padding:10px;outline:none;
 }
 .field input:focus,.field select:focus{border-color:var(--cyan)}
+
+/* VIP COLORFUL CARDS DESIGN */
 .vip-card{
- width:100%;min-width:0;background:var(--panel2);
- border:1px solid var(--line);border-radius:10px;
- padding:11px;margin-bottom:8px;display:flex;flex-direction:column;gap:8px;
- overflow:hidden;
+ width:100%;min-width:0;background:linear-gradient(145deg, #101726, #0d121c);
+ border:1px solid #2a3b55;border-radius:12px;
+ padding:14px;margin-bottom:10px;display:flex;flex-direction:column;gap:9px;
+ box-shadow:0 6px 18px rgba(0,0,0,0.4);
+ position:relative;overflow:hidden;
 }
+/* Completed Card Special Glow & Border */
+.vip-card.completed-card{
+ background:linear-gradient(145deg, #0d231e, #0a1814);
+ border:1px solid #24d18b;
+ box-shadow:0 6px 20px rgba(36,209,139,0.15);
+}
+.vip-card.completed-card::before{
+ content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+ background:var(--green);
+}
+
 .vip-card-row{
  display:flex;justify-content:space-between;align-items:center;
  flex-wrap:wrap;gap:7px;min-width:0;
 }
 .vip-card h4{margin:0;font-size:13px;color:var(--txt);overflow-wrap:anywhere;word-break:break-word}
 .vip-card strong,.vip-card span,.vip-card small{overflow-wrap:anywhere}
-.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#172b35;color:var(--cyan);font-size:10px}
+.pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#1a2536;color:var(--cyan);font-size:10px;font-weight:700;border:1px solid #2d4260}
+.completed-card .pill{background:#113829;color:var(--green);border-color:#1e5e44}
+
 .profit{color:var(--green);font-weight:800}
 .warn{color:#ffbd65}
 .hidden{display:none!important}
@@ -88,14 +104,14 @@ header{
 .login{max-width:380px;margin:8vh auto;padding:20px}
 .login h1{font:700 26px Rajdhani}
 .user-info{display:flex;align-items:center;gap:8px;min-width:0}
-.user-avatar{width:34px;height:34px;flex:0 0 34px;border-radius:50%;object-fit:cover;background:#202b3a;border:1px solid var(--line)}
+.user-avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;object-fit:cover;background:#202b3a;border:1px solid var(--cyan)}
 .user-text{min-width:0;overflow-wrap:anywhere}
-.user-text strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.user-text strong{font-size:12px;display:block;overflow-wrap:anywhere;color:#fff}
 .user-text small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
-.data-line{font-size:11px;color:var(--muted);overflow-wrap:anywhere;word-break:break-word}
-.card-title{font-weight:700;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
+.data-line{font-size:11px;color:#a2b2c8;overflow-wrap:anywhere;word-break:break-word}
+.card-title{font-weight:700;font-size:14px;color:#fff;overflow-wrap:anywhere;word-break:break-word}
 .full-input{width:100%;min-width:0;background:#080d14;color:white;border:1px solid #334155;padding:8px;border-radius:7px}
-hr{border:0;border-top:1px solid var(--line);width:100%}
+hr{border:0;border-top:1px solid #223046;width:100%}
 @media(max-width:760px){
  .wrap{padding:7px}
  .layout{grid-template-columns:minmax(0,1fr);gap:8px}
@@ -735,10 +751,11 @@ function renderOrders(){
   const u=getUserDetails(x.user_id);
   const avatar=u.avatar?escAttr(u.avatar):'https://www.gravatar.com/avatar/?d=mp';
   const status=String(x.status||'pending').toLowerCase();
-  const canDelete = status === 'completed' || status === 'cancelled';
+  const isCompleted = status === 'completed';
+  const canDelete = isCompleted || status === 'cancelled';
 
   return `
-   <div class="vip-card" id="card-${x.id}">
+   <div class="vip-card ${isCompleted ? 'completed-card' : ''}" id="card-${x.id}">
     <div class="vip-card-row">
      <div class="user-info">
       <img class="user-avatar" src="${avatar}" onerror="this.onerror=null;this.src='https://www.gravatar.com/avatar/?d=mp'">
@@ -785,7 +802,6 @@ async function updateOrderStatus(orderId, newStatus) {
  const errorBox = document.getElementById('error-msg-' + orderId);
  if(errorBox) errorBox.classList.add('hidden');
 
- // Direct database update taake status foran update ho aur player website/app par reflect ho
  const { error } = await sb
   .from('smm_orders')
   .update({ status: newStatus, updated_at: new Date().toISOString() })
