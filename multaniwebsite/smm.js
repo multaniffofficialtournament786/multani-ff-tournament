@@ -1,7 +1,6 @@
 import { sbClient, state } from './config.js';
 
-// MULTANI FF OFFICIAL - SMM SERVICES MODULE
-// Provider submission uses smmd-submit-order-v2
+// MULTANI FF OFFICIAL - SMM SERVICES MODULE (MANUAL MODE)
 
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
   container.innerHTML = `
@@ -422,6 +421,7 @@ async function loadSMMData(user, refreshCallback) {
         btn.textContent = 'PLACING ORDER...';
 
         try {
+          // Manual order via Supabase RPC (balances will be deducted and status set to pending)
           const { data, error } = await sbClient.rpc(
             'place_smm_order',
             {
@@ -437,51 +437,8 @@ async function loadSMMData(user, refreshCallback) {
             throw new Error('Order could not be placed.');
           }
 
-          let providerMessage = '';
-
-          const isApiService =
-            selectedService.provider_id &&
-            selectedService.provider_service_id;
-
-          if (isApiService) {
-            btn.textContent = 'SENDING TO PROVIDER...';
-
-            try {
-              const { data: submitResult, error: submitError } =
-                await sbClient.functions.invoke('smmd-submit-order-v2', {
-                  body: {
-                    order_id: data.order_id,
-                    service_id: selectedService.id
-                  }
-                });
-
-              if (submitError || !submitResult?.success) {
-                console.error(
-                  'Provider submission issue:',
-                  submitError || submitResult
-                );
-
-                providerMessage =
-                  '\nProvider submission confirm nahi hui. Order dobara place na karein; admin se contact karein.';
-              } else {
-                providerMessage =
-                  '\nProvider Order ID: ' +
-                  (submitResult.provider_order_id || 'Submitted');
-              }
-
-            } catch (providerError) {
-              console.error('Provider connection error:', providerError);
-
-              providerMessage =
-                '\nProvider submission confirm nahi hui. Order dobara place na karein; admin se contact karein.';
-            }
-
-          } else {
-            providerMessage = '\nOrder Type: Manual Service';
-          }
-
           alert(
-            `Order created successfully!\nOrder ID: ${data.order_id}\nCharge: PKR ${money(data.charge)}${providerMessage}`
+            `Order created successfully!\nOrder ID: ${data.order_id}\nCharge: PKR ${money(data.charge)}\nStatus: Pending (Manual Order)`
           );
 
           const { data: updatedProfile, error: updateError } =
@@ -557,39 +514,8 @@ async function loadSMMData(user, refreshCallback) {
       return;
     }
 
-    const activeApiOrders = orders.filter(order => {
-      const status = String(order.status || '').toLowerCase();
-
-      return order.provider_order_id &&
-        !['completed', 'cancelled', 'partial', 'failed'].includes(status);
-    });
-
-    if (activeApiOrders.length) {
-      await Promise.allSettled(
-        activeApiOrders.map(order =>
-          sbClient.functions.invoke('smmd-order-status', {
-            body: {
-              order_id: order.id
-            }
-          })
-        )
-      );
-
-      const { data: refreshedOrders, error: refreshError } =
-        await sbClient
-          .from('smm_orders')
-          .select('id,order_id,service_name,link,quantity,charge,status,created_at,provider_order_id,provider_id')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-      if (!refreshError && refreshedOrders) {
-        orders = refreshedOrders;
-      }
-    }
-
     box.innerHTML = orders.map(order => {
-      const status = String(order.status || 'Pending');
+      const status = String(order.status || 'pending');
 
       let statusColor = '#ffbe00';
       let statusBg = 'rgba(255,190,0,0.1)';
