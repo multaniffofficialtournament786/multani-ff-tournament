@@ -1,6 +1,6 @@
 import { sbClient, state } from './config.js';
 
-// MULTANI FF OFFICIAL - SMM SERVICES MODULE (VIP MANUAL MODE + 7 RULES + FULL SCREEN FILTER ORDERS)
+// MULTANI FF OFFICIAL - SMM SERVICES MODULE (VIP MANUAL MODE + 7 RULES + FULL SCREEN FILTER + NTFY FRONTEND ALERT)
 
 export function renderSMMView(container, user, walletBalance, refreshCallback) {
   container.innerHTML = `
@@ -373,9 +373,20 @@ async function loadSMMData(user, refreshCallback) {
         if (error) throw error;
         if (!data?.success || !data.order_id) throw new Error('Order could not be placed.');
 
+        // Send Notification to ntfy.sh directly from frontend
+        try {
+          await fetch('https://ntfy.sh/multani_smm_orders_786', {
+            method: 'POST',
+            body: `🚨 New SMM Order Received!\nService: ${selectedService.name}\nQty: ${qty}\nCharge: PKR ${money((qty / 1000) * selectedService.rate)}`
+          });
+        } catch (ntfyErr) {
+          console.error('Ntfy notification failed:', ntfyErr);
+        }
+
         alert(`Order created successfully!\nOrder ID: ${data.order_id}\nStatus: Pending (1-5 Hours)`);
         document.getElementById('smm-link-input').value = '';
         await fetchOrders(currentUser.id);
+        if (typeof refreshCallback === 'function') refreshCallback();
       } catch (error) {
         showError(error.message || 'Order failed.');
       } finally {
