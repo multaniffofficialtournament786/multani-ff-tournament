@@ -738,7 +738,7 @@ function renderOrders(){
   const canDelete = status === 'completed' || status === 'cancelled';
 
   return `
-   <div class="vip-card">
+   <div class="vip-card" id="card-${x.id}">
     <div class="vip-card-row">
      <div class="user-info">
       <img class="user-avatar" src="${avatar}" onerror="this.onerror=null;this.src='https://www.gravatar.com/avatar/?d=mp'">
@@ -758,6 +758,7 @@ function renderOrders(){
      <span>Charge: <b>${formatNumber(x.charge)} PKR</b></span>
     </div>
     <div class="data-line">Date: ${esc(x.created_at?new Date(x.created_at).toLocaleString():'—')}</div>
+    <div id="error-msg-${x.id}" class="msg hidden" style="background:#4a1d28;color:#ff8a98;margin-top:4px;"></div>
     <hr>
     <div class="vip-card-row data-line">
      <div class="field" style="margin:0;flex:1 1 140px">
@@ -781,16 +782,23 @@ function renderOrders(){
 }
 
 async function updateOrderStatus(orderId, newStatus) {
+ const errorBox = document.getElementById('error-msg-' + orderId);
+ if(errorBox) errorBox.classList.add('hidden');
+
  const { error } = await sb.rpc('admin_update_order_status', {
-  p_order_id: orderId,
+  p_order_id: String(orderId),
   p_new_status: newStatus
  });
+
  if(error) {
-  alert('Status update error: ' + error.message);
+  console.error('Status update error:', error.message);
+  if(errorBox) {
+   errorBox.textContent = 'Error: ' + error.message;
+   errorBox.classList.remove('hidden');
+  }
   loadOrders();
   return;
  }
- alert('Order status update ho gaya!');
  loadOrders();
 }
 
