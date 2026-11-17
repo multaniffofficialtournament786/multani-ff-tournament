@@ -27,7 +27,7 @@ export function renderSMMView(container, user, walletBalance, refreshCallback) {
           <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;">
             <li><strong>Order Completion Time:</strong> Aapka order <span style="color:#00f0ff;">1 se 5 ghante</span> mein complete ho jayega.</li>
             <li><strong>Order Pending Status:</strong> Aapka order Pending mein chala gaya hai, admin check kar ke complete kar dega.</li>
-            <li><strong>Fast / Emergency Support:</strong> Jaldi ya emergency mein order complete karwane ke liye <a href="https://wa.me/" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp par admin se rabta karein</a>.</li>
+            <li><strong>Fast / Emergency Support:</strong> Jaldi ya emergency mein order complete karwane ke liye <a href="https://chat.whatsapp.com/JfF5X5kMhsgCLqA8w3vvXF?s=cl&p=a&iam=2" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Group Join Karein</a>.</li>
             <li><strong>Correct Link Policy:</strong> Order lagate waqt link hamesha public aur sahi enter karein. Galat link ki surat mein zim dari user ki hogi.</li>
             <li><strong>Refund & Cancellation:</strong> Refund sirf order cancel hone par milta hai. Completed ya Processing orders par refund nahi hota.</li>
             <li><strong>Wallet & Balance:</strong> Wallet mein balance sirf authorized methods (EasyPaisa / SadaPay / Meezan) se add karein. Fake transaction ID par account block ho jayega.</li>
@@ -219,7 +219,6 @@ async function loadSMMData(user, refreshCallback) {
   modalClose.addEventListener('click', () => { modal.style.display = 'none'; });
   modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
-  // Open & Close Fullscreen Orders History Modal
   openHistoryBtn.addEventListener('click', () => {
     historyModal.style.display = 'flex';
     renderFilteredOrders();
@@ -228,7 +227,6 @@ async function loadSMMData(user, refreshCallback) {
     historyModal.style.display = 'none';
   });
 
-  // Filter Tabs Event
   filterTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       filterTabs.forEach(t => {
