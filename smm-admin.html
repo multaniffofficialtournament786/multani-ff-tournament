@@ -72,7 +72,6 @@ header{
  box-shadow:0 6px 18px rgba(0,0,0,0.4);
  position:relative;overflow:hidden;
 }
-/* Completed Card Special Glow & Border */
 .vip-card.completed-card{
  background:linear-gradient(145deg, #0d231e, #0a1814);
  border:1px solid #24d18b;
@@ -96,7 +95,7 @@ header{
 .warn{color:#ffbd65}
 .hidden{display:none!important}
 .msg{padding:10px;border-radius:8px;margin:8px 0;background:#172433;color:#b9d9e5;font-size:12px;overflow-wrap:anywhere}
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .provider{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0c121b;min-width:0}
 .provider h4{margin:0 0 6px}
 .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -155,7 +154,7 @@ hr{border:0;border-top:1px solid #223046;width:100%}
  <div class="layout">
 
   <aside class="side">
-   <button class="nav active" data-page="servicesHome" onclick="go('servicesHome')">＋ Add Service<small>Provider service setup</small></button>
+   <button class="nav active" data-page="servicesHome" onclick="go('servicesHome')">＋ Add Service<small>Provider & manual setup</small></button>
    <button class="nav" data-page="providers" onclick="go('providers')">◈ Providers<small>Balance & connection</small></button>
    <button class="nav" data-page="orders" onclick="go('orders')">▤ Orders<small>Customer orders</small></button>
    <button class="nav" data-page="serviceList" onclick="go('serviceList')">▦ Saved Services<small>Manage services</small></button>
@@ -169,39 +168,56 @@ hr{border:0;border-top:1px solid #223046;width:100%}
    <section class="page active" id="servicesHome">
     <div class="pagehead">
      <div>
-      <h1>ADD PROVIDER SERVICE</h1>
-      <div class="muted">Provider select karein aur service apne panel mein add karein</div>
+      <h1>ADD SERVICE</h1>
+      <div class="muted">Hafiz Panel se fetch karein ya Sasta SMM se manual service add karein</div>
      </div>
     </div>
 
     <div class="panel">
-     <h3>1. Provider Select Karein</h3>
+     <h3>1. Service Type Select Karein</h3>
      <div class="row">
       <div class="field">
-       <label>Provider</label>
-       <select id="providerSelect">
-        <option value="073f1243-cffc-48ea-ba2b-e005a04b6467">SMM Decent</option>
-        <option value="fece7369-2e70-4c58-9c66-45068952a61a">Hafiz Panel</option>
-        <option value="612e9ebb-3a40-4059-b39d-9bf9af691c78" disabled>Sasta SMM — Pending</option>
+       <label>Service Source</label>
+       <select id="providerSelect" onchange="onSourceChange()">
+        <option value="fece7369-2e70-4c58-9c66-45068952a61a">Hafiz Panel (Auto Fetch)</option>
+        <option value="sasta_manual">Sasta SMM (Manual Add)</option>
        </select>
       </div>
-      <div class="field">
+      <div class="field" id="searchFieldContainer">
        <label>Search Provider Service</label>
        <input id="providerSearch" placeholder="Service name ya ID">
       </div>
-      <button onclick="fetchProviderServices()">Fetch Services</button>
+      <button id="fetchServicesBtn" onclick="fetchProviderServices()">Fetch Services</button>
      </div>
      <div id="fetchMsg" class="msg hidden"></div>
     </div>
 
-    <div class="panel">
-     <h3>2. Provider Services</h3>
-     <div class="muted" style="margin-bottom:9px">Har service alag card mein nazar ayegi.</div>
-     <div id="providerRows"><div class="msg">Abhi services fetch nahi ki gayin.</div></div>
+    <!-- Manual Form for Sasta SMM -->
+    <div class="panel hidden" id="manualServicePanel">
+     <h3>Sasta SMM — Manual Service Add</h3>
+     <div class="row">
+      <div class="field"><label>Category</label><input id="manualCategory" placeholder="TikTok / YouTube / Instagram"></div>
+      <div class="field"><label>Service Name</label><input id="manualName" placeholder="Service ka naam"></div>
+     </div>
+     <div class="row">
+      <div class="field"><label>Selling Rate (PKR / 1000)</label><input id="manualRate" type="number" min="0" step="0.0001" placeholder="Misal: 150"></div>
+      <div class="field"><label>Minimum Quantity</label><input id="manualMin" type="number" value="10"></div>
+      <div class="field"><label>Maximum Quantity</label><input id="manualMax" type="number" value="10000"></div>
+     </div>
+     <div class="actions" style="margin-top:10px;">
+      <button onclick="saveManualService()">＋ Add Manual Service</button>
+     </div>
+     <div id="manualMsg" class="msg hidden"></div>
+    </div>
+
+    <div class="panel" id="providerServicesContainer">
+     <h3>2. Hafiz Panel Services</h3>
+     <div class="muted" style="margin-bottom:9px">Har service alag card mein nazar ayegi. Select kar ke rate set karein.</div>
+     <div id="providerRows"><div class="msg">Hafiz Panel select kar ke Fetch Services par click karein.</div></div>
     </div>
 
     <div class="panel" id="pricingPanel">
-     <h3>3. Selling Rate & Profit Setup</h3>
+     <h3>3. Selling Rate & Profit Setup (Hafiz Panel)</h3>
      <div id="selectedInfo" class="msg">Pehle provider list se service select karein.</div>
 
      <div class="row">
@@ -248,16 +264,7 @@ hr{border:0;border-top:1px solid #223046;width:100%}
 
     <div class="cards">
      <div class="provider">
-      <h4>SMM Decent</h4><div class="muted">Active · Slot 1</div>
-      <p id="decentBalance" class="data-line">Balance: Not checked</p>
-      <div class="actions">
-       <button onclick="checkBalance('decent')">Check Balance</button>
-       <button class="cyan" onclick="selectProviderAndFetch('073f1243-cffc-48ea-ba2b-e005a04b6467')">Fetch Services</button>
-      </div>
-     </div>
-
-     <div class="provider">
-      <h4>Hafiz Panel</h4><div class="muted">Active · Slot 2</div>
+      <h4>Hafiz Panel</h4><div class="muted">Active · Auto Fetch</div>
       <p id="hafizBalance" class="data-line">Balance: Not checked</p>
       <div class="actions">
        <button onclick="checkBalance('hafiz')">Check Balance</button>
@@ -266,15 +273,15 @@ hr{border:0;border-top:1px solid #223046;width:100%}
      </div>
 
      <div class="provider">
-      <h4>Sasta SMM</h4><div class="warn">Integration Pending</div>
-      <p id="sastaBalance" class="data-line">Balance: Disabled</p>
-      <button disabled>Integration Pending</button>
+      <h4>Sasta SMM</h4><div class="warn">Manual Services Mode</div>
+      <p class="data-line">Balance: Manual Management</p>
+      <button class="secondary" onclick="go('servicesHome'); $('providerSelect').value='sasta_manual'; onSourceChange();">Add Manual Service</button>
      </div>
     </div>
 
     <div class="panel" style="margin-top:10px">
      <h3>Connection Notes</h3>
-     <p class="muted">Provider API keys Supabase Edge Function secrets mein honi chahiye. Frontend mein API secret key save na karein.</p>
+     <p class="muted">Hafiz Panel API automatic connected hai. Sasta SMM se aap apni marzi ki manual services baghair API ke add kar sakte hain.</p>
     </div>
    </section>
 
@@ -362,11 +369,11 @@ const SUPABASE_ANON_KEY='sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
 const PROVIDERS={
- '073f1243-cffc-48ea-ba2b-e005a04b6467':{
-  name:'SMM Decent',services:'smmd-services-check',balance:'smmd-balance-check'
- },
  'fece7369-2e70-4c58-9c66-45068952a61a':{
   name:'Hafiz Panel',services:'hafiz-services-check',balance:'hafiz-balance-check'
+ },
+ 'sasta_manual':{
+  name:'Sasta SMM',services:'',balance:''
  }
 };
 
@@ -408,6 +415,24 @@ function goBack(){
  if(currentPage!=='servicesHome'){showPage('servicesHome');return}
  showPage('dashboard');
 }
+
+function onSourceChange(){
+ const val=$('providerSelect').value;
+ if(val==='sasta_manual'){
+  $('manualServicePanel').classList.remove('hidden');
+  $('providerServicesContainer').classList.add('hidden');
+  $('pricingPanel').classList.add('hidden');
+  $('searchFieldContainer').classList.add('hidden');
+  $('fetchServicesBtn').classList.add('hidden');
+ }else{
+  $('manualServicePanel').classList.add('hidden');
+  $('providerServicesContainer').classList.remove('hidden');
+  $('pricingPanel').classList.remove('hidden');
+  $('searchFieldContainer').classList.remove('hidden');
+  $('fetchServicesBtn').classList.remove('hidden');
+ }
+}
+
 async function login(){
  hideMsg('loginMsg');
  msg('loginMsg','Signing in...');
@@ -444,6 +469,7 @@ sb.auth.getSession().then(async({data})=>{
 function providerId(){return $('providerSelect').value}
 async function selectProviderAndFetch(id){
  $('providerSelect').value=id;
+ onSourceChange();
  go('servicesHome');
  await fetchProviderServices();
 }
@@ -459,6 +485,7 @@ function extractServiceArray(data){
 }
 async function fetchProviderServices(){
  const id=providerId();
+ if(id==='sasta_manual')return;
  const p=PROVIDERS[id];
  if(!p){msg('fetchMsg','Yeh provider abhi available nahi hai.');return}
  msg('fetchMsg',p.name+' se services fetch ho rahi hain...');
@@ -478,7 +505,7 @@ async function fetchProviderServices(){
 
  const list=extractServiceArray(data);
  if(!list.length){
-  msg('fetchMsg','Response mein services list nahi mili. Function response format check karna hoga.');
+  msg('fetchMsg','Response mein services list nahi mili.');
   $('providerRows').innerHTML='<div class="msg">No services returned.</div>';
   return;
  }
@@ -524,7 +551,7 @@ function renderProviderServices(){
   </div>
  `).join('')||'<div class="msg">No matching services.</div>';
 }
-$('providerSearch').addEventListener('input',renderProviderServices);
+$('providerSearch')?.addEventListener('input',renderProviderServices);
 
 function chooseService(index){
  const x=providerServices[index];
@@ -582,7 +609,43 @@ function calcProfit(){
  $('profitPKR').value=profit.toFixed(4)+' PKR';
  $('profitPKR').className=profit>=0?'profit':'warn';
 }
-$('sellingRate').addEventListener('input',calcProfit);
+$('sellingRate')?.addEventListener('input',calcProfit);
+
+async function saveManualService(){
+ const cat=$('manualCategory').value.trim();
+ const name=$('manualName').value.trim();
+ const rate=Number($('manualRate').value);
+ const min=Number($('manualMin').value)||10;
+ const max=Number($('manualMax').value)||10000;
+
+ if(!cat||!name||!(rate>0)){
+  msg('manualMsg','Category, Name aur valid Selling Rate enter karein.');
+  return;
+ }
+
+ const payload={
+  category: cat,
+  name: name,
+  rate: rate,
+  min: min,
+  max: max,
+  provider_service_id: 'manual_sasta',
+  provider_id: 'sasta_manual',
+  provider_cost: 0,
+  provider_currency: 'PKR',
+  is_active: true
+ };
+
+ msg('manualMsg','Manual service save ho rahi hai...');
+ const {error}=await sb.from('smm_services').insert(payload);
+ if(error){msg('manualMsg','Error: '+error.message);return}
+
+ msg('manualMsg','Sasta SMM ki manual service kamyabi se add ho gayi!');
+ $('manualCategory').value='';
+ $('manualName').value='';
+ $('manualRate').value='';
+ loadServices();
+}
 
 async function saveSelectedService(){
  const x=selectedProviderService;
@@ -626,17 +689,16 @@ async function saveSelectedService(){
 }
 
 async function checkBalance(key){
- const p=key==='decent'
-  ?PROVIDERS['073f1243-cffc-48ea-ba2b-e005a04b6467']
-  :PROVIDERS['fece7369-2e70-4c58-9c66-45068952a61a'];
- const target=key+'Balance';
- $(target).textContent='Checking provider balance...';
- const {data,error}=await sb.functions.invoke(p.balance,{body:{}});
- if(error){$(target).textContent='Error: '+error.message;return}
- if(data?.success===false){$(target).textContent='Failed: '+(data.message||data.error||'Provider error');return}
- const balance=data?.balance??data?.funds??data?.amount??'Unknown';
- const currency=data?.currency??'';
- $(target).textContent='Balance: '+balance+' '+currency;
+ if(key==='hafiz'){
+  const p=PROVIDERS['fece7369-2e70-4c58-9c66-45068952a61a'];
+  $('hafizBalance').textContent='Checking provider balance...';
+  const {data,error}=await sb.functions.invoke(p.balance,{body:{}});
+  if(error){$('hafizBalance').textContent='Error: '+error.message;return}
+  if(data?.success===false){$('hafizBalance').textContent='Failed: '+(data.message||data.error||'Provider error');return}
+  const balance=data?.balance??data?.funds??data?.amount??'Unknown';
+  const currency=data?.currency??'';
+  $('hafizBalance').textContent='Balance: '+balance+' '+currency;
+ }
 }
 
 async function loadServices(){
@@ -649,7 +711,8 @@ async function loadServices(){
  renderSavedServices();
 }
 function providerName(id){
- return PROVIDERS[id]?.name||'Provider';
+ if(id==='sasta_manual')return 'Sasta SMM (Manual)';
+ return 'Hafiz Panel';
 }
 function renderSavedServices(){
  const q=($('savedSearch')?.value||'').toLowerCase().trim();
@@ -657,8 +720,8 @@ function renderSavedServices(){
   (String(x.name||'')+' '+String(x.category||'')+' '+String(x.provider_service_id||'')).toLowerCase().includes(q)
  );
  $('savedRows').innerHTML=filtered.map(x=>{
-  const cost=convertToPKR(Number(x.provider_cost||0),x.provider_currency||'USD');
-  const costText=cost===null?'FX rate required':cost.toFixed(4)+' PKR';
+  const isManual = x.provider_id === 'sasta_manual';
+  const costText = isManual ? 'Manual (No Cost)' : (convertToPKR(Number(x.provider_cost||0), x.provider_currency||'USD')?.toFixed(4)+' PKR' || 'FX rate required');
   return `
    <div class="vip-card">
     <div class="vip-card-row">
