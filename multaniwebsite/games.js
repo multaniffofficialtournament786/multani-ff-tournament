@@ -1,8 +1,62 @@
 import { sbClient, state, Toast, Sound, escapeHTML } from './config.js';
 import { loadUserMissionState, saveUserMissionState } from './missions.js';
 
+/**
+ * User ki game progress (unlocked levels) Supabase se load karta hai
+ */
+export async function loadUserGameProgress() {
+  try {
+    const { data: { user } } = await sbClient.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await sbClient
+      .from('user_game_progress')
+      .select('unlocked_levels')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data && data.unlocked_levels) {
+      state.unlockedLevels = data.unlocked_levels;
+    } else {
+      // Agar pehla record nahi hai toh default level 1 unlock rakhein
+      state.unlockedLevels = [1];
+    }
+  } catch (err) {
+    console.error("Error loading game progress:", err);
+    if (!state.unlockedLevels) state.unlockedLevels = [1];
+  }
+}
+
+/**
+ * Naya level unlock hone par Supabase aur local state me save karta hai
+ */
+export async function unlockGameLevel(levelNumber) {
+  if (!state.unlockedLevels) state.unlockedLevels = [1];
+  
+  if (!state.unlockedLevels.includes(levelNumber)) {
+    state.unlockedLevels.push(levelNumber);
+  }
+
+  try {
+    const { data: { user } } = await sbClient.auth.getUser();
+    if (user) {
+      await sbClient
+        .from('user_game_progress')
+        .upsert({ 
+          user_id: user.id, 
+          unlocked_levels: state.unlockedLevels,
+          updated_at: new Date()
+        });
+    }
+  } catch (err) {
+    console.error("Error saving game progress:", err);
+  }
+}
+
 export async function renderGamesList() {
   loadUserMissionState(true);
+  await loadUserGameProgress(); // Login ke baad levels progress fetch karein
+  
   const view = document.getElementById('app-view');
 
   view.innerHTML = `
@@ -105,7 +159,7 @@ export function closeGamePlayer() {
   }
 
   if (state.currentGameSessionStart && state.currentGamePlayingUrl) {
-    const sessionDurationSeconds = (Date.now() - state.currentGameSessionStart) / 1000;
+    const sessionDurationSeconds = (Date.0 - state.currentGameSessionStart) / 1000;
     
     if (sessionDurationSeconds >= 30) {
       if (!state.userMissionState.playedGamesList.includes(state.currentGamePlayingUrl)) {
