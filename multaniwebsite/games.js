@@ -15,15 +15,20 @@ export async function loadUserGameProgress() {
       .eq('user_id', user.id)
       .single();
 
-    if (data && data.unlocked_levels) {
+    if (error && error.code !== 'PGRST116') {
+      console.error("Error loading game progress:", error);
+    }
+
+    if (data && Array.isArray(data.unlocked_levels) && data.unlocked_levels.length > 0) {
       state.unlockedLevels = data.unlocked_levels;
-    } else {
-      // Agar pehla record nahi hai toh default level 1 unlock rakhein
+    } else if (!Array.isArray(state.unlockedLevels) || state.unlockedLevels.length === 0) {
       state.unlockedLevels = [1];
     }
   } catch (err) {
     console.error("Error loading game progress:", err);
-    if (!state.unlockedLevels) state.unlockedLevels = [1];
+    if (!Array.isArray(state.unlockedLevels) || state.unlockedLevels.length === 0) {
+      state.unlockedLevels = [1];
+    }
   }
 }
 
@@ -31,8 +36,10 @@ export async function loadUserGameProgress() {
  * Naya level unlock hone par Supabase aur local state me save karta hai
  */
 export async function unlockGameLevel(levelNumber) {
-  if (!state.unlockedLevels) state.unlockedLevels = [1];
-  
+  if (!Array.isArray(state.unlockedLevels) || state.unlockedLevels.length === 0) {
+    state.unlockedLevels = [1];
+  }
+
   if (!state.unlockedLevels.includes(levelNumber)) {
     state.unlockedLevels.push(levelNumber);
   }
@@ -42,10 +49,10 @@ export async function unlockGameLevel(levelNumber) {
     if (user) {
       await sbClient
         .from('user_game_progress')
-        .upsert({ 
-          user_id: user.id, 
+        .upsert({
+          user_id: user.id,
           unlocked_levels: state.unlockedLevels,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         });
     }
   } catch (err) {
@@ -55,8 +62,8 @@ export async function unlockGameLevel(levelNumber) {
 
 export async function renderGamesList() {
   loadUserMissionState(true);
-  await loadUserGameProgress(); // Login ke baad levels progress fetch karein
-  
+  await loadUserGameProgress();
+
   const view = document.getElementById('app-view');
 
   view.innerHTML = `
@@ -85,7 +92,6 @@ export async function renderGamesList() {
   const container = document.getElementById('dynamic-games-container');
 
   try {
-    // Seedha Admin Panel wale database table se games uthayega
     const { data: dbGames, error } = await sbClient
       .from('site_games')
       .select('*')
@@ -123,7 +129,7 @@ export function launchGame(gameUrl, title) {
   const modal = document.getElementById('game-player-modal');
   const iframe = document.getElementById('game-iframe');
   const titleEl = document.getElementById('active-game-title');
-  
+
   if (modal && iframe) {
     iframe.src = gameUrl;
     if (titleEl) titleEl.innerText = title;
@@ -159,8 +165,8 @@ export function closeGamePlayer() {
   }
 
   if (state.currentGameSessionStart && state.currentGamePlayingUrl) {
-    const sessionDurationSeconds = (Date.0 - state.currentGameSessionStart) / 1000;
-    
+    const sessionDurationSeconds = (Date.now() - state.currentGameSessionStart) / 1000;
+
     if (sessionDurationSeconds >= 30) {
       if (!state.userMissionState.playedGamesList.includes(state.currentGamePlayingUrl)) {
         state.userMissionState.playedGamesList.push(state.currentGamePlayingUrl);
