@@ -1,7 +1,7 @@
 import { sbClient, state, Toast, Loader, Sound, escapeHTML } from './config.js';
 import { syncAuthAndProfile } from './auth.js';
 
-const APK_DOWNLOAD_URL = "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
+const APK_DOWNLOAD_URL = "https://www.mediafire.com/file/xp9osrzl7kkce2s/MULTANI_FF_.apk/file";
 
 // ==========================================
 // 1. WINNERS LIST PAGE
