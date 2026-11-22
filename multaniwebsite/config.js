@@ -1,9 +1,10 @@
-// ==========================================
-// MULTANI FF OFFICIAL - CONFIGURATION
-// SAFE UPDATED VERSION WITH VIP SPLASH LOADER
-// ==========================================
 
-// Supabase Configuration
+ // ==========================================
+ // MULTANI FF OFFICIAL - CONFIGURATION
+ // SAFE UPDATED VERSION WITH VIP SPLASH LOADER
+ // ==========================================
+
+ // Supabase Configuration
 export const SUPABASE_URL =
   "https://yzirjidgdxhljbhhjfqp.supabase.co";
 
@@ -11,7 +12,7 @@ export const SUPABASE_ANON_KEY =
   "sb_publishable_-dPl2eQV4afRDarZOR3QGA_RoDvmsX5";
 
 export const APK_DOWNLOAD_LINK =
-  "https://www.mediafire.com/file/9rz2av8v75uoo7q/_MULTANI_FF_OFFICIAL_TOURNAMENT_20171925+%281%29.apk/file?dkey=4ejqto951zi&r=1369";
+  "https://www.mediafire.com/file/xp9osrzl7kkce2s/MULTANI_FF_.apk/file";
 
 // ==========================================
 // SUPABASE CLIENT - SAFE INITIALIZATION
@@ -199,7 +200,6 @@ function injectVipLoaderStyles() {
       user-select: none;
     }
 
-    /* VIP Corner Brackets */
     .mff-corner {
       position: absolute;
       width: 24px;
@@ -214,7 +214,6 @@ function injectVipLoaderStyles() {
     .mff-bottom-left { bottom: 20px; left: 20px; border-width: 0 0 3px 3px; }
     .mff-bottom-right { bottom: 20px; right: 20px; border-width: 0 3px 3px 0; }
 
-    /* Center Section */
     .mff-center-wrap {
       display: flex;
       flex-direction: column;
@@ -224,7 +223,6 @@ function injectVipLoaderStyles() {
       margin-bottom: auto;
     }
 
-    /* 3D Rotating Logo Container */
     .mff-logo-stage {
       position: relative;
       width: 140px;
@@ -268,7 +266,6 @@ function injectVipLoaderStyles() {
       background-color: #030a13;
     }
 
-    /* Typography */
     .mff-brand-title {
       font-size: 26px;
       font-weight: 900;
@@ -298,7 +295,6 @@ function injectVipLoaderStyles() {
       margin-top: 14px;
     }
 
-    /* Bottom Loading Bar */
     .mff-bottom-wrap {
       width: 100%;
       max-width: 280px;
@@ -338,17 +334,10 @@ function injectVipLoaderStyles() {
       animation: mffProgressAnim 1.6s ease-in-out infinite;
     }
 
-    /* Keyframes */
     @keyframes mffCoinTurn {
-      0% {
-        transform: rotateY(0deg);
-      }
-      50% {
-        transform: rotateY(180deg);
-      }
-      100% {
-        transform: rotateY(360deg);
-      }
+      0% { transform: rotateY(0deg); }
+      50% { transform: rotateY(180deg); }
+      100% { transform: rotateY(360deg); }
     }
 
     @keyframes mffRingSpin {
@@ -404,7 +393,6 @@ export const Loader = {
         `;
         document.body.appendChild(splash);
 
-        // Fallback paths agar raw link slow ho
         const imgEl = document.getElementById('mff-logo-img');
         if (imgEl) {
           const sources = [
@@ -487,3 +475,4 @@ window.addEventListener('unhandledrejection', (event) => {
     event.reason
   );
 });
+              
